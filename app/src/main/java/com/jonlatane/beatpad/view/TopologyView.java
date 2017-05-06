@@ -1,6 +1,8 @@
 package com.jonlatane.beatpad.view;
 
 import android.content.Context;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,6 +71,12 @@ public class TopologyView extends RelativeLayout {
 
     public void init() {
         currentChord = getChordView();
+        currentChord.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setChord(chord);
+            }
+        });
         post(new Runnable() {
             @Override
             public void run() {
@@ -78,19 +86,38 @@ public class TopologyView extends RelativeLayout {
     }
 
     private void updateTranslations() {
-        double theta = Math.PI / (sequences.size() + 1);
+        double theta = Math.PI / sequences.size();
         float maxTX = getWidth() * 0.4f;
         float maxTY = getHeight() * 0.4f;
+        currentChord.animate().scaleX(2).scaleY(2).start();
         for(int i = 0; i < sequences.size(); i++) {
             SequenceViews sv = sequences.get(i);
-            double sin = Math.sin(i * theta);
-            float x = (float)(maxTX * (1d - sin));
+            double sin = Math.sin((i * theta) - ((Math.PI - theta) / 2));
+            double cos = Math.cos((i * theta) - ((Math.PI - theta) / 2));
+            float x = (float)(maxTX * cos);
             float y = (float)(maxTY * sin);
             sv.forward.animate()
-                    .translationX(x).translationY(y).start();
+                    .translationX(x).translationY(-y).start();
             sv.back.animate()
-                    .translationX(-x).translationY(-y).start();
+                    .translationX(-x).translationY(y).start();
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    private void resetTranslations() {
+        for(SequenceViews sv : sequences) {
+            sv.forward.animate().translationX(0).translationY(0).setDuration(250).start();
+            sv.back.animate().translationX(0).translationY(0).setDuration(250).withEndAction(new Runnable() {
+                @Override
+                public void run() {
+                    updateTranslations();
+                }
+            }).start();
+        }
+    }
+
+    public Chord getChord() {
+        return chord;
     }
 
     public void setChord(Chord c) {
@@ -100,6 +127,9 @@ public class TopologyView extends RelativeLayout {
         for(SequenceViews sv : sequences) {
             sv.forward.setText(sv.sequence.forward(chord).getName());
             sv.back.setText(sv.sequence.back(chord).getName());
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            resetTranslations();
         }
     }
 

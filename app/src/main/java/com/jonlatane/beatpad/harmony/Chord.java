@@ -1,5 +1,10 @@
 package com.jonlatane.beatpad.harmony;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.google.common.primitives.Ints;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -10,7 +15,7 @@ import java.util.Set;
  * Created by jonlatane on 5/5/17.
  */
 
-public class Chord {
+public class Chord implements Parcelable {
     static final String[] NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
     public static final Integer[] MAJOR = {4, 7};
     public static final Integer[] MAJOR_6 = {4, 7, 9};
@@ -20,6 +25,8 @@ public class Chord {
     public static final Integer[] MINOR_7 = {3, 7, 10};
     public static final Integer[] MINOR__MAJOR_7 = {3, 7, 11};
     public static final Integer[] DOM_7 = {4, 7, 10};
+    public static final Integer[] DIM = {3, 6};
+    public static final Integer[] AUG = {4, 8};
 
     final int octave;
     final int span;
@@ -55,9 +62,10 @@ public class Chord {
 
     public List<Integer> getTones() {
         Integer normalRoot = root + (12 * (octave - 4));
-        List<Integer> tones = new LinkedList<>(Collections.singleton(normalRoot));
+        List<Integer> tones = new LinkedList<>();
         int relativeOctave = 0;
         Outer: while(true) {
+            tones.add(normalRoot + 12 * relativeOctave);
             for(Integer color : extension) {
                 Integer tone = normalRoot + color + 12*relativeOctave;
                 if(tone - normalRoot <= span) {
@@ -73,7 +81,8 @@ public class Chord {
 
     public String getName() {
         return NAMES[root]
-                + (isDominant() ? "7" : isMinor() ? "m" : "");
+                + (isDominant() ? "7" : isMinor() ? "m" : "")
+                + (isDiminished() ? "b5" : isAugmented() ? "#5" : "");
     }
 
     public boolean isMinor() {
@@ -81,15 +90,64 @@ public class Chord {
     }
 
     public boolean isMajor() {
-        return colors.contains(4) || !colors.contains(3);
+        return colors.contains(4) || !isMinor();
     }
 
     public boolean isDominant() {
         return isMajor() && colors.contains(10);
     }
 
+    public boolean isDiminished() {
+        return colors.contains(6) && !hasPerfectFifth();
+    }
+
+    public boolean isAugmented() {
+        return colors.contains(8) && !hasPerfectFifth();
+    }
+
+    private boolean hasPerfectFifth() {
+        return colors.contains(7);
+    }
+
     private void addTone(Integer tone) {
         this.extension.add((1200 + tone) % 12);
         this.colors.add((1200 + tone) % 12);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(octave);
+        dest.writeInt(span);
+        dest.writeInt(root);
+        dest.writeInt(extension.size());
+        dest.writeIntArray(Ints.toArray(extension));
+    }
+
+    public static final Creator<Chord> CREATOR = new Creator<Chord>() {
+        @Override
+        public Chord createFromParcel(Parcel in) {
+            return new Chord(in);
+        }
+
+        @Override
+        public Chord[] newArray(int size) {
+            return new Chord[size];
+        }
+    };
+
+    private Chord(Parcel in) {
+        octave = in.readInt();
+        span = in.readInt();
+        root = in.readInt();
+        int[] extensionTones = new int[in.readInt()];
+        in.readIntArray(extensionTones);
+        for(int i : extensionTones) {
+            addTone(i);
+        }
     }
 }

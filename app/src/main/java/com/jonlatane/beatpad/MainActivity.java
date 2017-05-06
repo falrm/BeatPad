@@ -13,9 +13,7 @@ import com.jonlatane.beatpad.view.TopologyView;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static com.jonlatane.beatpad.harmony.Sequence.CIRCLE_OF_FIFTHS;
-import static com.jonlatane.beatpad.harmony.Sequence.OCTAVES;
-import static com.jonlatane.beatpad.harmony.Sequence.TWO_FIVE_ONE;
+import static com.jonlatane.beatpad.harmony.Sequence.*;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,18 +26,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         topology = (TopologyView) findViewById(R.id.topology);
-        topology.addSequence(CIRCLE_OF_FIFTHS);
-        topology.addSequence(TWO_FIVE_ONE);
         topology.addSequence(OCTAVES);
-        instrumentThread = new InstrumentThread(new HarmonicOvertoneSeriesGenerator(), 480, 0.7f);
+        topology.addSequence(TWO_FIVE_ONE);
+        topology.addSequence(CIRCLE_OF_FIFTHS);
+        topology.addSequence(AUG_DIM);
+        topology.addSequence(CHROMATIC);
         topology.setOnChordChangedListener(new TopologyView.OnChordChangedListener() {
             @Override
             public void onChordChanged(Chord c) {
-                instrumentThread.setTones(c.getTones());
+                if(instrumentThread != null) instrumentThread.setTones(c.getTones());
             }
         });
-        topology.setChord(new Chord(0, Chord.MAJOR_6, 2, 48));
         Orientation.initialize(this);
+    }
+
+    public void onResume() {
+        super.onResume();
+        instrumentThread = new InstrumentThread(new HarmonicOvertoneSeriesGenerator(), 480, 0.9f);
         executorService.execute(instrumentThread);
     }
 
@@ -48,5 +51,20 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         instrumentThread.stopped = true;
         AudioTrackCache.releaseAll();
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        Chord chord = savedInstanceState.getParcelable("currentChord");
+        if(chord == null) {
+            chord = new Chord(0, Chord.MAJOR_6, 2, 48);
+        }
+        topology.setChord(chord);
+    }
+
+    // invoked when the activity may be temporarily destroyed, save the instance state here
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable("currentChord", topology.getChord());
     }
 }

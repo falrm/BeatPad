@@ -16,7 +16,7 @@ public class InstrumentThread implements Runnable {
     private long pauseDuration;
     private long syncDelay = 0;
     private final Instrument instrument;
-    private AudioTrack track = null;
+    private AudioTrack[] tracks = new AudioTrack[3];
     private List<Integer> tones;
     public volatile boolean stopped = false;
 
@@ -46,7 +46,9 @@ public class InstrumentThread implements Runnable {
         while(!stopped) {
             long delay;
             if(playing) {
-                instrument.stop(track);
+                for(AudioTrack track : tracks) {
+                    instrument.stop(track);
+                }
                 playing = false;
                 delay = pauseDuration;
             } else {
@@ -55,8 +57,10 @@ public class InstrumentThread implements Runnable {
                 if(tones != null) {
                     float relativePitch = (-Orientation.pitch + 1.58f) / 3.14f;
                     //Log.i(TAG, String.format("Relative pitch: %.2f", relativePitch));
-                    int toneIndex = Math.round((tones.size() - 1) * relativePitch);
-                    track = instrument.play(tones.get(toneIndex));
+                    int toneIndex = Math.round((tones.size() - tracks.length) * relativePitch);
+                    for(int i = 0; i < tracks.length; i++) {
+                        tracks[i] = instrument.play(tones.get(toneIndex + i));
+                    }
                     playing = true;
                 }
                 delay = playDuration;
