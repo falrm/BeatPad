@@ -3,7 +3,6 @@ package com.jonlatane.beatpad;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Toast;
 
 import com.jonlatane.beatpad.audio.AudioTrackCache;
 import com.jonlatane.beatpad.audio.generator.HarmonicOvertoneSeriesGenerator;
@@ -16,7 +15,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.jonlatane.beatpad.harmony.Sequence.*;
+import static com.jonlatane.beatpad.harmony.Sequence.AUG_DIM;
+import static com.jonlatane.beatpad.harmony.Sequence.CIRCLE_OF_FIFTHS;
+import static com.jonlatane.beatpad.harmony.Sequence.NINES;
+import static com.jonlatane.beatpad.harmony.Sequence.REL_MINOR_MAJOR;
+import static com.jonlatane.beatpad.harmony.Sequence.TWO_FIVE_ONE;
 import static com.jonlatane.beatpad.harmony.chord.Chord.MAJOR_6;
 
 public class MainActivity extends AppCompatActivity {
@@ -39,18 +42,17 @@ public class MainActivity extends AppCompatActivity {
         topology.setOnChordChangedListener(new TopologyView.OnChordChangedListener() {
             @Override
             public void onChordChanged(Chord c) {
-                if(instrumentThread != null) instrumentThread.setTones(c.getTones(-36, 36));
+                instrumentThread.setTones(c.getTones(-36, 36));
             }
         });
+        topology.setChord(new Chord(0, MAJOR_6));
         topology.setCurrentChordClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(!playing.getAndSet(true)) {
-                    Toast.makeText(MainActivity.this, "playing", Toast.LENGTH_SHORT).show();
                     instrumentThread.stopped = false;
                     executorService.execute(instrumentThread);
                 } else {
-                    Toast.makeText(MainActivity.this, "stopping", Toast.LENGTH_SHORT).show();
                     instrumentThread.stopped = true;
                     AudioTrackCache.releaseAll();
                     playing.set(false);
@@ -58,14 +60,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         Orientation.initialize(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if(topology.getChord() == null) {
-            topology.setChord(new Chord(0, MAJOR_6));
-        }
     }
 
     @Override
