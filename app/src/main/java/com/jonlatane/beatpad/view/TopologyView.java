@@ -2,7 +2,6 @@ package com.jonlatane.beatpad.view;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,22 +9,29 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.jonlatane.beatpad.R;
-import com.jonlatane.beatpad.harmony.Chord;
 import com.jonlatane.beatpad.harmony.Sequence;
+import com.jonlatane.beatpad.harmony.chord.Chord;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jonlatane.beatpad.harmony.Chord.MAJOR_7;
+import static com.jonlatane.beatpad.harmony.Sequence.CHROMATIC;
+import static com.jonlatane.beatpad.harmony.chord.Chord.MAJOR_6;
 
 /**
  * Created by jonlatane on 5/5/17.
  */
 public class TopologyView extends RelativeLayout {
-    private Chord chord = new Chord(0, MAJOR_7, 2, 24);
-    private TextView currentChord;
+    private Chord chord;
+    private OnChordChangedListener onChordChangedListener;
+    private View selectedChord;
 
-    private class SequenceViews {
+    TextView currentChord;
+    TextView halfStepUp;
+    TextView halfStepDown;
+    List<SequenceViews> sequences = new ArrayList<>();
+
+    class SequenceViews {
         final Sequence sequence;
         final TextView forward = getChordView();
         final TextView back = getChordView();
@@ -34,6 +40,7 @@ public class TopologyView extends RelativeLayout {
             forward.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    selectedChord = v;
                     setChord(sequence.forward(chord));
                 }
             });
@@ -41,14 +48,13 @@ public class TopologyView extends RelativeLayout {
             back.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    selectedChord = v;
                     setChord(sequence.back(chord));
                 }
             });
             back.setText(sequence.back(chord).getName());
         }
     }
-    private List<SequenceViews> sequences = new ArrayList<>();
-    private OnChordChangedListener onChordChangedListener;
     public interface OnChordChangedListener {
         void onChordChanged(Chord c);
     }
@@ -69,51 +75,60 @@ public class TopologyView extends RelativeLayout {
         init();
     }
 
-    public void init() {
-        currentChord = getChordView();
+    public void setOnChordChangedListener(OnChordChangedListener onChordChangedListener) {
+        this.onChordChangedListener = onChordChangedListener;
+    }
+
+    public void setCurrentChordClickListener(final OnClickListener listener) {
         currentChord.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                setChord(chord);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    currentChord.animate().scaleX(2.5f).scaleY(2.5f).withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            currentChord.animate().scaleX(2f).scaleY(2f).start();
+                        }
+                    }).start();
+                }
+                listener.onClick(v);
+            }
+        });
+    }
+
+    private void init() {
+        chord = new Chord(0, MAJOR_6);
+        currentChord = getChordView();
+        halfStepUp = getChordView();
+        halfStepDown = getChordView();
+        halfStepUp.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedChord = v;
+                setChord(CHROMATIC.forward(chord));
+            }
+        });
+        halfStepDown.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedChord = v;
+                setChord(CHROMATIC.back(chord));
             }
         });
         post(new Runnable() {
             @Override
             public void run() {
-                updateTranslations();
+                TopologyAnimations.skipToInitialState(TopologyView.this);
             }
         });
-    }
-
-    private void updateTranslations() {
-        double theta = Math.PI / sequences.size();
-        float maxTX = getWidth() * 0.4f;
-        float maxTY = getHeight() * 0.4f;
-        currentChord.animate().scaleX(2).scaleY(2).start();
-        for(int i = 0; i < sequences.size(); i++) {
-            SequenceViews sv = sequences.get(i);
-            double sin = Math.sin((i * theta) - ((Math.PI - theta) / 2));
-            double cos = Math.cos((i * theta) - ((Math.PI - theta) / 2));
-            float x = (float)(maxTX * cos);
-            float y = (float)(maxTY * sin);
-            sv.forward.animate()
-                    .translationX(x).translationY(-y).start();
-            sv.back.animate()
-                    .translationX(-x).translationY(y).start();
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    private void resetTranslations() {
-        for(SequenceViews sv : sequences) {
-            sv.forward.animate().translationX(0).translationY(0).setDuration(250).start();
-            sv.back.animate().translationX(0).translationY(0).setDuration(250).withEndAction(new Runnable() {
-                @Override
-                public void run() {
-                    updateTranslations();
-                }
-            }).start();
-        }
+        updateChordText();
+        post(new Runnable() {
+            @Override
+            public void run() {
+                TopologyAnimations.skipToInitialState(TopologyView.this);
+                TopologyAnimations.animateToSelectionPhase(TopologyView.this);
+            }
+        });
     }
 
     public Chord getChord() {
@@ -122,14 +137,21 @@ public class TopologyView extends RelativeLayout {
 
     public void setChord(Chord c) {
         chord = c;
-        onChordChangedListener.onChordChanged(c);
-        currentChord.setText(c.getName());
+        if(selectedChord != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            TopologyAnimations.animateToTargetChord(this, selectedChord);
+        } else {
+            updateChordText();
+        }
+        if(onChordChangedListener != null) onChordChangedListener.onChordChanged(chord);
+    }
+
+    void updateChordText() {
+        currentChord.setText(chord.getName());
+        halfStepUp.setText(CHROMATIC.forward(chord).getName());
+        halfStepDown.setText(CHROMATIC.back(chord).getName());
         for(SequenceViews sv : sequences) {
             sv.forward.setText(sv.sequence.forward(chord).getName());
             sv.back.setText(sv.sequence.back(chord).getName());
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            resetTranslations();
         }
     }
 
@@ -142,9 +164,5 @@ public class TopologyView extends RelativeLayout {
 
     public void addSequence(Sequence sequence) {
         sequences.add(new SequenceViews(sequence));
-    }
-
-    public void setOnChordChangedListener(OnChordChangedListener onChordChangedListener) {
-        this.onChordChangedListener = onChordChangedListener;
     }
 }
