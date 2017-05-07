@@ -1,10 +1,10 @@
 package com.jonlatane.beatpad.view;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -22,6 +22,7 @@ import static com.jonlatane.beatpad.harmony.chord.Chord.MAJOR_6;
  * Created by jonlatane on 5/5/17.
  */
 public class TopologyView extends RelativeLayout {
+    private static final String TAG = TopologyView.class.getSimpleName();
     private Chord chord;
     private OnChordChangedListener onChordChangedListener;
     private View selectedChord;
@@ -32,9 +33,11 @@ public class TopologyView extends RelativeLayout {
     List<SequenceViews> sequences = new ArrayList<>();
 
     class SequenceViews {
+        final ImageView connectForward = inflateConnectorView();
+        final ImageView connectBack = inflateConnectorView();
+        final TextView forward = inflateChordView();
+        final TextView back = inflateChordView();
         final Sequence sequence;
-        final TextView forward = getChordView();
-        final TextView back = getChordView();
         SequenceViews(final Sequence s) {
             this.sequence = s;
             forward.setOnClickListener(new OnClickListener() {
@@ -83,14 +86,12 @@ public class TopologyView extends RelativeLayout {
         currentChord.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    currentChord.animate().scaleX(2.5f).scaleY(2.5f).withEndAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            currentChord.animate().scaleX(2f).scaleY(2f).start();
-                        }
-                    }).start();
-                }
+                currentChord.animate().scaleX(2.5f).scaleY(2.5f).withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        currentChord.animate().scaleX(2f).scaleY(2f).start();
+                    }
+                }).start();
                 listener.onClick(v);
             }
         });
@@ -98,9 +99,10 @@ public class TopologyView extends RelativeLayout {
 
     private void init() {
         chord = new Chord(0, MAJOR_6);
-        currentChord = getChordView();
-        halfStepUp = getChordView();
-        halfStepDown = getChordView();
+        currentChord = inflateChordView();
+        halfStepUp = inflateChordView();
+        halfStepDown = inflateChordView();
+        currentChord.setZ(2);
         halfStepUp.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,7 +139,7 @@ public class TopologyView extends RelativeLayout {
 
     public void setChord(Chord c) {
         chord = c;
-        if(selectedChord != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+        if(selectedChord != null) {
             TopologyAnimations.animateToTargetChord(this, selectedChord);
         } else {
             updateChordText();
@@ -155,9 +157,18 @@ public class TopologyView extends RelativeLayout {
         }
     }
 
-    private TextView getChordView() {
+    private TextView inflateChordView() {
         LayoutInflater.from(getContext()).inflate(R.layout.topology_chord, this, true);
         TextView result = (TextView) findViewWithTag("newChord");
+        result.setTag(null);
+        result.setZ(1);
+        return result;
+    }
+
+    private ImageView inflateConnectorView() {
+        LayoutInflater.from(getContext()).inflate(R.layout.topology_connector, this, true);
+        ImageView result = (ImageView) findViewWithTag("newConnector");
+        result.setZ(0);
         result.setTag(null);
         return result;
     }

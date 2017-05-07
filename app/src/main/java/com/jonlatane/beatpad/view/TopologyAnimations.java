@@ -14,7 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by jonlatane on 5/7/17.
  */
 public class TopologyAnimations {
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     static void animateToTargetChord(final TopologyView v, View target) {
         float tX = target.getTranslationX();
         float tY = target.getTranslationY();
@@ -46,14 +45,21 @@ public class TopologyAnimations {
         v.halfStepDown.animate().translationY(v.getHeight() * 0.15f).alpha(1).start();
         for(int i = 0; i < v.sequences.size(); i++) {
             TopologyView.SequenceViews sv = v.sequences.get(i);
-            double sin = Math.sin((i * theta) - ((Math.PI - theta) / 2));
-            double cos = Math.cos((i * theta) - ((Math.PI - theta) / 2));
+            double forwardAngle = (i * theta) - ((Math.PI - theta) / 2);
+            double sin = Math.sin(forwardAngle);
+            double cos = Math.cos(forwardAngle);
             float x = (float)(maxTX * cos);
             float y = (float)(maxTY * sin);
             sv.forward.animate()
-                    .translationX(x).translationY(y).alpha(1).start();
+                    .translationX(x).translationY(-y).alpha(1).start();
             sv.back.animate()
                     .translationX(-x).translationY(y).alpha(1).start();
+
+            //TODO figure out something better to do with connectors
+            sv.connectForward.animate().scaleY(2).translationX(x/2).translationY(-y/2)
+                    .rotation((float)-Math.toDegrees(forwardAngle)).alpha(0).start();
+            sv.connectBack.animate().scaleY(2).translationX(-x/2).translationY(y/2)
+                    .rotation((float)-Math.toDegrees(forwardAngle)).alpha(0).start();
         }
     }
 
@@ -71,7 +77,7 @@ public class TopologyAnimations {
             chord.setAlpha(0);
         }
         for(TopologyView.SequenceViews sv : v.sequences) {
-            for(View chord : new View[] {sv.forward, sv.back}) {
+            for(View chord : new View[] {sv.forward, sv.back, sv.connectForward, sv.connectBack}) {
                 chord.setScaleX(1);
                 chord.setScaleY(1);
                 chord.setTranslationX(0);
@@ -107,6 +113,8 @@ public class TopologyAnimations {
             TopologyView.SequenceViews sv = v.sequences.get(i);
             result.add(sv.forward);
             result.add(sv.back);
+            result.add(sv.connectForward);
+            result.add(sv.connectBack);
         }
         return result;
     }

@@ -60,6 +60,33 @@ public class Chord implements Parcelable {
     }
 
     /**
+     * Gets a derivative chord created by replacing all of the outTones with inTones.
+     * For instance, replaceOrAdd(2,1) should turn any chord except a #9 chord into that chord with a b9
+     * @param outTone
+     * @param inTone
+     * @return A new chord.  Its extension will have all of this chord's instances of outTone replaced
+     *         with inTone.  If none were found, inTone will be added.
+     */
+    public Chord replaceOrAdd(int outTone, int inTone) {
+        boolean found = false;
+        int[] newExtension = new int[extension.length];
+        for(int i = 0; i < extension.length; i++) {
+            int tone = extension[i];
+            if(tone == outTone) {
+                found = true;
+                newExtension[i] = inTone;
+            } else {
+                newExtension[i] = tone;
+            }
+        }
+        Chord result = new Chord(root, newExtension);
+        if(!found) {
+            result = result.plus(inTone);
+        }
+        return result;
+    }
+
+    /**
      *
      * @param bottom lowest allowed note, inclusive
      * @param top highest allowed note, inclusive

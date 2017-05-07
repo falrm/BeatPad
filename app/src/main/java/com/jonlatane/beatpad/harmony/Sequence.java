@@ -6,26 +6,33 @@ package com.jonlatane.beatpad.harmony;
 import com.jonlatane.beatpad.harmony.chord.Chord;
 import com.jonlatane.beatpad.harmony.chord.Heptatonics;
 
-import static com.jonlatane.beatpad.harmony.chord.Chord.*;
-import static com.jonlatane.beatpad.harmony.chord.Heptatonics.AUGMENTED;
+import static com.jonlatane.beatpad.harmony.chord.Chord.AUG;
+import static com.jonlatane.beatpad.harmony.chord.Chord.DIM;
+import static com.jonlatane.beatpad.harmony.chord.Chord.MAJOR_6;
+import static com.jonlatane.beatpad.harmony.chord.Chord.MINOR_7;
+import static com.jonlatane.beatpad.harmony.chord.Heptatonics.NONEXISTENT;
 
 public abstract class Sequence {
     public static Sequence NINES = new Sequence() {
         @Override
         public Chord forward(Chord c) {
             switch(c.heptatonics.second()) {
-                case Heptatonics.MAJOR: case AUGMENTED:
-                    return c.plus(3);
-                default: return c.plus(2);
+                case NONEXISTENT:
+                    return c.plus(2);
+                case Heptatonics.MAJOR:
+                    return c.replaceOrAdd(2, 3);
+                default: return c.replaceOrAdd(1, 2);
             }
         }
 
         @Override
         public Chord back(Chord c) {
             switch(c.heptatonics.second()) {
-                case Heptatonics.MAJOR: case Heptatonics.MINOR:
-                    return c.plus(1);
-                default: return c.plus(2);
+                case Heptatonics.AUGMENTED:
+                    return c.replaceOrAdd(3, 2);
+                case Heptatonics.MAJOR:
+                    return c.replaceOrAdd(2, 1);
+                default: return c.replaceOrAdd(2, 1);
             }
         }
     };

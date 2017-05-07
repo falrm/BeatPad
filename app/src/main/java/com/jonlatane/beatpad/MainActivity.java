@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        instrumentThread = new InstrumentThread(new HarmonicOvertoneSeriesGenerator(), 480, 0.9f);
+        instrumentThread = new InstrumentThread(new HarmonicOvertoneSeriesGenerator(), 120);
         topology = (TopologyView) findViewById(R.id.topology);
         topology.addSequence(AUG_DIM);
         topology.addSequence(REL_MINOR_MAJOR);

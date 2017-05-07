@@ -12,12 +12,13 @@ import java.util.List;
  */
 public class InstrumentThread implements Runnable {
     private static final String TAG = InstrumentThread.class.getSimpleName();
-    private long playDuration;
-    private long pauseDuration;
-    private long syncDelay = 0;
+
+    private int beatsPerMinute;
+    private boolean[] subDivisions = {true, false, true};
+
     private final Instrument instrument;
-    private AudioTrack[] tracks = new AudioTrack[3];
     private List<Integer> tones;
+    private int harmonicThickness = 4;
     public volatile boolean stopped = false;
 
     /**
@@ -26,14 +27,9 @@ public class InstrumentThread implements Runnable {
      * @param generator
      * @param beatsPerMinute
      */
-    public InstrumentThread(AudioTrackGenerator generator, Integer beatsPerMinute, Float holdAmount) {
-        if(holdAmount <= 0 || holdAmount >= 1) {
-            throw new IllegalArgumentException("nope");
-        }
+    public InstrumentThread(AudioTrackGenerator generator, Integer beatsPerMinute, boolean... subDivisons) {
         this.instrument = new Instrument(generator);
-        Long msBetweenBeats = 60000L / beatsPerMinute.longValue();
-        playDuration = (long) (holdAmount * msBetweenBeats);
-        pauseDuration = msBetweenBeats - playDuration;
+        this.beatsPerMinute = beatsPerMinute;
     }
 
     public void setTones(List<Integer> tones) {
@@ -42,33 +38,50 @@ public class InstrumentThread implements Runnable {
 
     @Override
     public void run() {
-        boolean playing = false;
         while(!stopped) {
-            long delay;
-            if(playing) {
-                for(AudioTrack track : tracks) {
-                    instrument.stop(track);
-                }
-                playing = false;
-                delay = pauseDuration;
-            } else {
-                //Log.i(TAG, String.format("Azimuth: %.2f, Pitch: %.2f, Roll: %.2f, Inclination: %.2f",
-                //        Orientation.azimuth, Orientation.pitch, Orientation.roll, Orientation.inclination));
-                if(tones != null) {
-                    float relativePitch = (-Orientation.pitch + 1.58f) / 3.14f;
-                    //Log.i(TAG, String.format("Relative pitch: %.2f", relativePitch));
-                    int toneIndex = Math.round((tones.size() - tracks.length) * relativePitch);
-                    for(int i = 0; i < tracks.length; i++) {
-                        tracks[i] = instrument.play(tones.get(toneIndex + i));
-                    }
-                    playing = true;
-                }
-                delay = playDuration;
-            }
-            try {
-                Thread.sleep(delay + syncDelay);
-                syncDelay = 0;
-            } catch (InterruptedException ignored) { }
+            playBeat();
         }
+    }
+
+    private void playBeat() {
+        AudioTrack[] tracks = new AudioTrack[harmonicThickness];
+
+        try {
+            long msBetweenSubdivisions = 60000L / (beatsPerMinute * subDivisions.length);
+
+            for (boolean subDivision : subDivisions) {
+                // Roll as a number between 0 and 1
+                float relativeRoll = 1 - (-Orientation.roll + 1.58f) / 3.14f;
+                // Normalize it to the range [0.2, 0.8]
+                relativeRoll = Math.min(Math.max(0.05f, relativeRoll * 2 - 0.4f), 0.95f);
+                long playDuration = (long) (relativeRoll * msBetweenSubdivisions);
+                long pauseDuration = msBetweenSubdivisions - playDuration;
+
+                // Interpret the booleans as "play" or "rest"
+                if(subDivision) {
+                    playSubdivision(tracks, playDuration, pauseDuration);
+                } else {
+                    Thread.sleep(msBetweenSubdivisions);
+                }
+            }
+        } catch (InterruptedException ignored) { }
+    }
+
+    private void playSubdivision(AudioTrack[] tracks, long playDuration, long pauseDuration) throws InterruptedException {
+        // Play the notes
+        if (tones != null) {
+            // Normalize device's physical pitch to a number between 0 and 1
+            float relativePitch = (-Orientation.pitch + 1.58f) / 3.14f;
+            //Log.i(TAG, String.format("Relative pitch: %.2f", relativePitch));
+            int toneIndex = Math.round((tones.size() - tracks.length) * relativePitch);
+            for (int i = 0; i < tracks.length; i++) {
+                tracks[i] = instrument.play(tones.get(toneIndex + i));
+            }
+        }
+        Thread.sleep(playDuration);
+        for(AudioTrack track : tracks) {
+            instrument.stop(track);
+        }
+        Thread.sleep(pauseDuration);
     }
 }
