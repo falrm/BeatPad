@@ -112,14 +112,20 @@ public class TopologyAnimations {
         v.centralChord.setTranslationY(0);
         v.centralChord.setRotation(0);
         v.centralChord.setAlpha(1);
-        for(View chord : new View [] {v.halfStepUp, v.halfStepDown}) {
+        for(TextView chord : new TextView [] {v.halfStepUp, v.halfStepDown}) {
             chord.setScaleX(0.7f);
             chord.setScaleY(0.7f);
             chord.setTranslationX(0);
             chord.setTranslationY(0);
             chord.setTranslationZ(0);
             chord.setRotation(-90);
-            chord.setAlpha(0);
+            if(chord == v.selectedChord && chord == v.halfStepUp) {
+                v.halfStepDown.setAlpha(1);
+                v.halfStepDown.setTranslationY(v.getHeight() * 0.15f);
+            } else if(chord == v.selectedChord && chord == v.halfStepDown) {
+                v.halfStepUp.setAlpha(1);
+                v.halfStepUp.setTranslationY(-v.getHeight() * 0.15f);
+            }
         }
         for(TopologyView.SequenceViews sv : v.sequences) {
             if(sv.forward == v.selectedChord || sv.back == v.selectedChord) {
