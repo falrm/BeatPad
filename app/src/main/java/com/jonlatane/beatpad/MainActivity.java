@@ -3,14 +3,18 @@ package com.jonlatane.beatpad;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
 import com.jonlatane.beatpad.audio.AudioTrackCache;
-import com.jonlatane.beatpad.audio.generator.HarmonicOvertoneSeriesGenerator;
 import com.jonlatane.beatpad.harmony.chord.Chord;
 import com.jonlatane.beatpad.instrument.InstrumentThread;
+import com.jonlatane.beatpad.instrument.MIDIInstrument;
 import com.jonlatane.beatpad.sensors.Orientation;
 import com.jonlatane.beatpad.view.TopologyView;
+
+import org.billthefarmer.mididriver.GeneralMidiConstants;
+import org.billthefarmer.mididriver.MidiDriver;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,13 +30,18 @@ public class MainActivity extends AppCompatActivity {
     private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
     private Snackbar playingAdvice;
     InstrumentThread instrumentThread;
+    MIDIInstrument instrument;
     TopologyView topology;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        instrumentThread = new InstrumentThread(new HarmonicOvertoneSeriesGenerator(), 120);
+
+        instrument = new MIDIInstrument();
+        //instrumentThread = new InstrumentThread(new HarmonicOvertoneSeriesGenerator(), 120);
+        instrumentThread = new InstrumentThread(instrument = new MIDIInstrument(), 120);
+
         topology = (TopologyView) findViewById(R.id.topology);
         playingAdvice = Snackbar.make(topology,
                 "Tap the center chord to stop playback.", Snackbar.LENGTH_LONG);
@@ -44,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         topology.setOnChordChangedListener(new TopologyView.OnChordChangedListener() {
             @Override
             public void onChordChanged(Chord c) {
-                instrumentThread.setTones(c.getTones(-36, 36));
+                instrumentThread.setTones(c.getTones(-60, 60));
             }
         });
         topology.setChord(new Chord(0, MAJ_7));
@@ -67,10 +76,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        MIDIInstrument.DRIVER.setOnMidiStartListener(new MidiDriver.OnMidiStartListener() {
+            @Override
+            public void onMidiStart() {
+                instrument.selectInstrument(GeneralMidiConstants.BRIGHT_ACOUSTIC_PIANO);
+            }
+        });
+        MIDIInstrument.DRIVER.start();
+
+        // Get the configuration.
+        int[] config = MIDIInstrument.DRIVER.config();
+
+        // Print out the details.
+        Log.d(this.getClass().getName(), "maxVoices: " + config[0]);
+        Log.d(this.getClass().getName(), "numChannels: " + config[1]);
+        Log.d(this.getClass().getName(), "sampleRate: " + config[2]);
+        Log.d(this.getClass().getName(), "mixBufferSize: " + config[3]);
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
         instrumentThread.stopped = true;
         AudioTrackCache.releaseAll();
+        MIDIInstrument.DRIVER.stop();
     }
 
     @Override

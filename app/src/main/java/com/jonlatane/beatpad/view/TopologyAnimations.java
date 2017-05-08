@@ -255,7 +255,7 @@ public class TopologyAnimations {
     private static void animateAxisToSelectionPhase(final View axis, float tX, float tY) {
         float density = axis.getContext().getResources().getDisplayMetrics().density;
         int width = (int) (density * (tX + 50));
-        ViewPropertyAnimator propertyAnimator = axis.animate().translationY(tY).alpha(0.2f);
+        ViewPropertyAnimator propertyAnimator = axis.animate().translationY(tY).alpha(0.4f);
         animateWidth(axis, width);
         propertyAnimator.setDuration(DURATION).start();
     }

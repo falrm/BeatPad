@@ -1,9 +1,5 @@
 package com.jonlatane.beatpad.instrument;
 
-import android.media.AudioTrack;
-import android.util.Log;
-
-import com.jonlatane.beatpad.audio.AudioTrackGenerator;
 import com.jonlatane.beatpad.sensors.Orientation;
 
 import java.util.List;
@@ -15,21 +11,23 @@ public class InstrumentThread implements Runnable {
     private static final String TAG = InstrumentThread.class.getSimpleName();
 
     private int beatsPerMinute;
-    private boolean[] subDivisions = {true, true, true};
+    private boolean[] subDivisions = {true, true};
 
     private final Instrument instrument;
     private List<Integer> tones;
-    private int harmonicThickness = 4;
     public volatile boolean stopped = false;
 
+    private int toneSpread = 5;
+    private int numSimultaneousTones = 5;
+
     /**
-     * Two InstrumentThreads should not share the same AudioTrackGenerator.
+     * Creates a playback thread for the given instrument.
      *
-     * @param generator
+     * @param instrument
      * @param beatsPerMinute
      */
-    public InstrumentThread(AudioTrackGenerator generator, Integer beatsPerMinute, boolean... subDivisons) {
-        this.instrument = new Instrument(generator);
+    public InstrumentThread(Instrument instrument, Integer beatsPerMinute, boolean... subDivisons) {
+        this.instrument = instrument;
         this.beatsPerMinute = beatsPerMinute;
     }
 
@@ -45,8 +43,6 @@ public class InstrumentThread implements Runnable {
     }
 
     private void playBeat() {
-        AudioTrack[] tracks = new AudioTrack[harmonicThickness];
-
         try {
             long msBetweenSubdivisions = 60000L / (beatsPerMinute * subDivisions.length);
 
@@ -56,38 +52,37 @@ public class InstrumentThread implements Runnable {
                 if(relativeRoll > 1.62) relativeRoll -= 1.62;
                 if(relativeRoll <-1.62) relativeRoll += 1.62;
                 relativeRoll /= 3.14;
-                Log.i(TAG, "roll " + relativeRoll);
                 // Normalize it to the range [0.3f, 1.0f]
                 relativeRoll = Math.min(Math.max(0.3f, (3f * relativeRoll * 0.7f) + 0.65f), 1.0f);
-                Log.i(TAG, "articulation " + relativeRoll);
                 long playDuration = (long) (relativeRoll * msBetweenSubdivisions);
                 long pauseDuration = msBetweenSubdivisions - playDuration;
 
                 // Interpret the booleans as "play" or "rest"
                 if(subDivision) {
-                    playSubdivision(tracks, playDuration, pauseDuration);
+                    playSubdivision(playDuration, pauseDuration);
                 } else {
                     Thread.sleep(msBetweenSubdivisions);
+                }
+                if(stopped) {
+                    break;
                 }
             }
         } catch (InterruptedException ignored) { }
     }
 
-    private void playSubdivision(AudioTrack[] tracks, long playDuration, long pauseDuration) throws InterruptedException {
+    private void playSubdivision(long playDuration, long pauseDuration) throws InterruptedException {
         // Play the notes
         if (tones != null) {
             // Normalize device's physical pitch to a number between 0 and 1
             float relativePitch = (-Orientation.pitch + 1.58f) / 3.14f;
             //Log.i(TAG, String.format("Relative pitch: %.2f", relativePitch));
-            int toneIndex = Math.round((tones.size() - tracks.length) * relativePitch);
-            for (int i = 0; i < tracks.length; i++) {
-                tracks[i] = instrument.play(tones.get(toneIndex + i));
+            int toneIndex = Math.round((tones.size() - toneSpread) * relativePitch);
+            for (int i = 0; i < numSimultaneousTones; i++) {
+                instrument.play(tones.get(toneIndex + (i * toneSpread/numSimultaneousTones)));
             }
         }
         Thread.sleep(playDuration);
-        for(AudioTrack track : tracks) {
-            instrument.stop(track);
-        }
+        instrument.stop();
         Thread.sleep(pauseDuration);
     }
 }
