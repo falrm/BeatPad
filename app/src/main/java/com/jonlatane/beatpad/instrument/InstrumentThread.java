@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.instrument;
 
 import android.media.AudioTrack;
+import android.util.Log;
 
 import com.jonlatane.beatpad.audio.AudioTrackGenerator;
 import com.jonlatane.beatpad.sensors.Orientation;
@@ -50,10 +51,15 @@ public class InstrumentThread implements Runnable {
             long msBetweenSubdivisions = 60000L / (beatsPerMinute * subDivisions.length);
 
             for (boolean subDivision : subDivisions) {
-                // Roll as a number between 0 and 1
-                float relativeRoll = 1 - (-Orientation.roll + 1.58f) / 3.14f;
-                // Normalize it to the range [0.2, 0.8]
-                relativeRoll = Math.min(Math.max(0.05f, relativeRoll * 2 - 0.4f), 0.95f);
+                // Roll as a number between -0.5 and 0.5
+                float relativeRoll = Orientation.roll;
+                if(relativeRoll > 1.62) relativeRoll -= 1.62;
+                if(relativeRoll <-1.62) relativeRoll += 1.62;
+                relativeRoll /= 3.14;
+                Log.i(TAG, "roll " + relativeRoll);
+                // Normalize it to the range [0.3f, 1.0f]
+                relativeRoll = Math.min(Math.max(0.3f, (3f * relativeRoll * 0.7f) + 0.65f), 1.0f);
+                Log.i(TAG, "articulation " + relativeRoll);
                 long playDuration = (long) (relativeRoll * msBetweenSubdivisions);
                 long pauseDuration = msBetweenSubdivisions - playDuration;
 

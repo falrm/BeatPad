@@ -16,20 +16,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.jonlatane.beatpad.harmony.Sequence.CHROMATIC;
-import static com.jonlatane.beatpad.harmony.chord.Chord.MAJ_6;
+import static com.jonlatane.beatpad.harmony.chord.Chord.MAJ_7;
 
 /**
  * Created by jonlatane on 5/5/17.
  */
 public class TopologyView extends RelativeLayout {
     private static final String TAG = TopologyView.class.getSimpleName();
+    static final float CONNECTOR_Z = 1;
     private Chord chord;
     private OnChordChangedListener onChordChangedListener;
 
     TextView selectedChord;
     TextView centralChord;
+    ImageView centralChordBackground;
     TextView halfStepUp;
     TextView halfStepDown;
+    ImageView halfStepBackground;
     List<SequenceViews> sequences = new ArrayList<>();
 
     class SequenceViews {
@@ -87,26 +90,18 @@ public class TopologyView extends RelativeLayout {
         centralChord.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                centralChord.animate().scaleX(2.5f).scaleY(2.5f).withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        centralChord.animate().scaleX(2f).scaleY(2f).start();
-                    }
-                }).start();
+                TopologyAnimations.animateCentralChordClick(TopologyView.this);
                 listener.onClick(v);
             }
         });
     }
 
     private void init() {
-        chord = new Chord(0, MAJ_6);
-        centralChord = inflateChordView();
-        halfStepUp = inflateChordView();
-        halfStepDown = inflateChordView();
+        chord = new Chord(0, MAJ_7);
         inflateBG();
-        centralChord.setZ(5);
-        halfStepUp.setZ(1);
-        halfStepDown.setZ(1);
+        centralChord = inflateChordView(6);
+        halfStepUp = inflateChordView(4);
+        halfStepDown = inflateChordView(4);
         halfStepUp.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,12 +150,15 @@ public class TopologyView extends RelativeLayout {
         }
     }
 
+    private TextView inflateChordView() {
+        return inflateChordView(2);
+    }
 
-   private TextView inflateChordView() {
+    private TextView inflateChordView(float defaultZ) {
         LayoutInflater.from(getContext()).inflate(R.layout.topology_chord, this, true);
         TextView result = (TextView) findViewWithTag("newChord");
         result.setTag(null);
-        result.setZ(2);
+        result.setZ(defaultZ);
         return result;
     }
 
@@ -175,17 +173,20 @@ public class TopologyView extends RelativeLayout {
     private ImageView inflateConnectorView() {
         LayoutInflater.from(getContext()).inflate(R.layout.topology_connector, this, true);
         ImageView result = (ImageView) findViewWithTag("newConnector");
-        result.setZ(1);
+        result.setZ(CONNECTOR_Z);
         result.setTag(null);
         return result;
     }
 
-    private ImageView inflateBG() {
+    private void inflateBG() {
         LayoutInflater.from(getContext()).inflate(R.layout.topology_bg, this, true);
-        ImageView result = (ImageView) findViewWithTag("newBG");
-        result.setZ(3);
-        result.setTag(null);
-        return result;
+        centralChordBackground = (ImageView) findViewWithTag("newBG");
+        centralChordBackground.setZ(5);
+        centralChordBackground.setTag(null);
+        LayoutInflater.from(getContext()).inflate(R.layout.topology_bg_axis, this, true);
+        halfStepBackground = (ImageView) findViewWithTag("newBG");
+        halfStepBackground.setZ(3);
+        halfStepBackground.setTag(null);
     }
 
     public void addSequence(Sequence sequence) {

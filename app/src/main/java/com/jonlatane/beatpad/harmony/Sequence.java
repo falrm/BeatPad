@@ -91,6 +91,17 @@ public abstract class Sequence {
     public static Sequence CIRCLE_OF_FIFTHS = new Sequence() {
         @Override
         public Chord forward(Chord c) {
+            return new Chord(c.root - 7, c.extension);
+        }
+
+        @Override
+        public Chord back(Chord c) {
+            return new Chord(c.root + 7, c.extension);
+        }
+    };
+    public static Sequence CIRCLE_OF_FOURTHS = new Sequence() {
+        @Override
+        public Chord forward(Chord c) {
             return new Chord(c.root + 7, c.extension);
         }
 

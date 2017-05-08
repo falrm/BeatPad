@@ -11,6 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.jonlatane.beatpad.view.TopologyView.CONNECTOR_Z;
+
 /**
  * TopologyView works with three states for animation consistency.
  *
@@ -25,7 +27,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by jonlatane on 5/7/17.
  */
 public class TopologyAnimations {
-    private static final long DURATION = 500;
+    private static final long DURATION = 250;
+
+    static void animateCentralChordClick(final TopologyView v) {
+        v.centralChord.animate().scaleX(2.5f).scaleY(2.5f).setDuration(DURATION/2).withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                v.centralChord.animate().scaleX(2f).scaleY(2f).setDuration(DURATION/2).start();
+            }
+        }).start();
+    }
 
     static void animateToTargetChord(final TopologyView v) {
         View target = v.selectedChord;
@@ -41,22 +52,24 @@ public class TopologyAnimations {
                 .translationYBy(centralTY)
                 .rotation(target.getRotation())
                 .scaleX(target.getScaleX()).scaleY(target.getScaleY()));
-        for(TextView chromatic : new TextView[] {v.halfStepDown, v.halfStepUp}) {
-            ViewPropertyAnimator a = chromatic.animate();
-            if(chromatic == v.selectedChord) {
+        for(TextView halfStep : new TextView[] {v.halfStepDown, v.halfStepUp}) {
+            if(halfStep == v.selectedChord) {
                 toTargetChord.add(
-                        chromatic.animate()
+                        halfStep.animate()
                                 .scaleX(2).scaleY(2)
                                 .rotation(0)
-                                .translationX(0).translationY(0).translationZBy(10)
+                                .translationY(0).translationZBy(10)
                 );
             } else {
                 toTargetChord.add(
-                        chromatic.animate()
+                        halfStep.animate()
                                 .translationY(0)
                                 .alpha(0)
                 );
             }
+        }
+        if(v.selectedChord != v.halfStepDown && v.selectedChord != v.halfStepUp) {
+            animateHeight(v.halfStepBackground, 5);
         }
         for(TopologyView.SequenceViews sv : v.sequences) {
 
@@ -99,7 +112,7 @@ public class TopologyAnimations {
             oppositeConn = sv.connectForward;
         }
         animators.add(targetView.animate().translationX(0).translationY(0).scaleX(2).scaleY(2));
-        animators.add(targetConn.animate().translationXBy(-tX).translationY(tY/2)
+        animators.add(targetConn.animate().translationXBy(-tX).translationY(tY/2).alpha(1)
                 .rotation(oppositeConn.getRotation()));
         animators.add(oppositeView.animate().translationXBy(-tX).translationYBy(tY).alpha(0));
         animators.add(oppositeConn.animate().translationXBy(-tX).translationYBy(tY).alpha(0));
@@ -116,15 +129,19 @@ public class TopologyAnimations {
             chord.setScaleX(0.7f);
             chord.setScaleY(0.7f);
             chord.setTranslationX(0);
-            chord.setTranslationY(0);
-            chord.setTranslationZ(0);
+            if(v.selectedChord != v.halfStepUp && v.selectedChord != v.halfStepDown) {
+                chord.setTranslationY(0);
+            }
+            chord.setZ(4);
             chord.setRotation(-90);
             if(chord == v.selectedChord && chord == v.halfStepUp) {
                 v.halfStepDown.setAlpha(1);
                 v.halfStepDown.setTranslationY(v.getHeight() * 0.15f);
+                v.halfStepUp.setTranslationY(0);
             } else if(chord == v.selectedChord && chord == v.halfStepDown) {
                 v.halfStepUp.setAlpha(1);
                 v.halfStepUp.setTranslationY(-v.getHeight() * 0.15f);
+                v.halfStepDown.setTranslationY(0);
             }
         }
         for(TopologyView.SequenceViews sv : v.sequences) {
@@ -143,7 +160,6 @@ public class TopologyAnimations {
                 layoutParams.width = 0;
                 sv.axis.setLayoutParams(layoutParams);
                 for (View connector : new View[]{sv.connectBack, sv.connectForward}) {
-                    float dpToPx = connector.getContext().getResources().getDisplayMetrics().density;
                     connector.setTranslationX(0);
                     connector.setTranslationY(0);
                     connector.setTranslationZ(0);
@@ -179,6 +195,15 @@ public class TopologyAnimations {
         float maxTY = v.getHeight() * 0.4f;
         v.halfStepUp.animate().translationY(-v.getHeight() * 0.15f).alpha(1).setDuration(DURATION).start();
         v.halfStepDown.animate().translationY(v.getHeight() * 0.15f).alpha(1).setDuration(DURATION).start();
+
+        float density = v.getContext().getResources().getDisplayMetrics().density;
+        animateHeight(v.halfStepBackground,
+                (int) Math.max(350 * density,
+                               v.getHeight() * 0.3f
+                                       + Math.max(v.halfStepUp.getWidth(), v.halfStepDown.getWidth())));
+        animateWidth(v.centralChordBackground,
+                (int) Math.max(200 * density,
+                               2 * v.centralChord.getWidth()));
         for(int i = 0; i < v.sequences.size(); i++) {
             TopologyView.SequenceViews sv = v.sequences.get(i);
             double forwardAngle = (i * theta) - ((Math.PI - theta) / 2);
@@ -280,6 +305,8 @@ public class TopologyAnimations {
             sv.connectBack.setRotation(0);
             setWidth(sv.connectBack, 5);
         }
+        sv.connectBack.setZ(CONNECTOR_Z);
+        sv.connectForward.setZ(CONNECTOR_Z);
     }
 
     private static void animateWidth(final View v, int width) {
@@ -295,8 +322,8 @@ public class TopologyAnimations {
         anim.setDuration(DURATION).start();
     }
 
-    private static void animateHeight(final View v, int width) {
-        ValueAnimator anim = ValueAnimator.ofInt(v.getMeasuredWidth(), width);
+    private static void animateHeight(final View v, int height) {
+        ValueAnimator anim = ValueAnimator.ofInt(v.getMeasuredHeight(), height);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
