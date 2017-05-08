@@ -14,7 +14,7 @@ public class InstrumentThread implements Runnable {
     private static final String TAG = InstrumentThread.class.getSimpleName();
 
     private int beatsPerMinute;
-    private boolean[] subDivisions = {true, false, true};
+    private boolean[] subDivisions = {true, true, true};
 
     private final Instrument instrument;
     private List<Integer> tones;

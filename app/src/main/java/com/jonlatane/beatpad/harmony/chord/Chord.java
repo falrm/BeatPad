@@ -13,13 +13,13 @@ import java.util.List;
 
 public class Chord implements Parcelable {
     static final String[] NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
-    public static final int[] MAJOR = {0, 4, 7};
-    public static final int[] MAJOR_6 = {0, 4, 7, 9};
-    public static final int[] MAJOR_6_9 = {0, 2, 4, 7, 9};
-    public static final int[] MAJOR_7 = {0, 4, 7, 11};
-    public static final int[] MINOR = {0, 3, 7};
-    public static final int[] MINOR_7 = {0, 3, 7, 10};
-    public static final int[] MINOR__MAJOR_7 = {0, 3, 7, 11};
+    public static final int[] MAJ = {0, 4, 7};
+    public static final int[] MAJ_6 = {0, 4, 7, 9};
+    public static final int[] MAJ_6_9 = {0, 2, 4, 7, 9};
+    public static final int[] MAJ_7 = {0, 4, 7, 11};
+    public static final int[] MIN = {0, 3, 7};
+    public static final int[] MIN_7 = {0, 3, 7, 10};
+    public static final int[] MIN_MAJ_7 = {0, 3, 7, 11};
     public static final int[] DOM_7 = {0, 4, 7, 10};
     public static final int[] DIM = {0, 3, 6};
     public static final int[] AUG = {0, 4, 8};
