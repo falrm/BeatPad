@@ -4,12 +4,16 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.jonlatane.beatpad.audio.AudioTrackCache;
 import com.jonlatane.beatpad.harmony.chord.Chord;
 import com.jonlatane.beatpad.instrument.InstrumentThread;
 import com.jonlatane.beatpad.instrument.MIDIInstrument;
+import com.jonlatane.beatpad.midi.MIDIUtilities;
 import com.jonlatane.beatpad.sensors.Orientation;
 import com.jonlatane.beatpad.view.TopologyView;
 
@@ -116,5 +120,27 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable("currentChord", topology.getChord());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.select_instrument:
+                MIDIUtilities.showInstrumentPicker(this, new MIDIUtilities.InstrumentPickerHandler() {
+                    @Override
+                    public void onSelect(byte choice) {
+                        instrument.selectInstrument(choice);
+                    }
+                });
+                break;
+        }
+        return true;
     }
 }
