@@ -27,7 +27,7 @@ import static com.jonlatane.beatpad.view.TopologyView.CONNECTOR_Z;
  * Created by jonlatane on 5/7/17.
  */
 public class TopologyAnimations {
-    private static final long DURATION = 250;
+    private static final long DURATION = 200;
 
     static void animateCentralChordClick(final TopologyView v) {
         v.centralChord.animate().scaleX(2.5f).scaleY(2.5f).setDuration(DURATION/2).withEndAction(new Runnable() {
@@ -203,7 +203,7 @@ public class TopologyAnimations {
                                        + Math.max(v.halfStepUp.getWidth(), v.halfStepDown.getWidth())));
         animateWidth(v.centralChordBackground,
                 (int) Math.max(200 * density,
-                               2 * v.centralChord.getWidth()));
+                               2 * v.centralChord.getWidth() - 20 * density));
         for(int i = 0; i < v.sequences.size(); i++) {
             TopologyView.SequenceViews sv = v.sequences.get(i);
             double forwardAngle = (i * theta) - ((Math.PI - theta) / 2);

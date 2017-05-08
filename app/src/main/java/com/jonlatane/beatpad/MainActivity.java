@@ -13,7 +13,6 @@ import com.jonlatane.beatpad.audio.AudioTrackCache;
 import com.jonlatane.beatpad.harmony.chord.Chord;
 import com.jonlatane.beatpad.instrument.InstrumentThread;
 import com.jonlatane.beatpad.instrument.MIDIInstrument;
-import com.jonlatane.beatpad.midi.MIDIUtilities;
 import com.jonlatane.beatpad.sensors.Orientation;
 import com.jonlatane.beatpad.view.TopologyView;
 
@@ -133,12 +132,10 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.select_instrument:
-                MIDIUtilities.showInstrumentPicker(this, new MIDIUtilities.InstrumentPickerHandler() {
-                    @Override
-                    public void onSelect(byte choice) {
-                        instrument.instrument = choice;
-                    }
-                });
+                Dialogs.showInstrumentPicker(this);
+                break;
+            case R.id.select_tempo:
+                Dialogs.showTempoPicker(this);
                 break;
         }
         return true;

@@ -1,8 +1,9 @@
-package com.jonlatane.beatpad.midi;
+package com.jonlatane.beatpad;
 
-import android.content.Context;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
+import android.widget.NumberPicker;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.text.WordUtils;
@@ -13,15 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Utility class for things selected by dialog
  * Created by jonlatane on 5/8/17.
  */
-
-public class MIDIUtilities {
-
-    public interface InstrumentPickerHandler {
-        void onSelect(byte choice);
-    }
-    public static void showInstrumentPicker(Context c, final InstrumentPickerHandler after) {
+class Dialogs {
+    static void showInstrumentPicker(final MainActivity c) {
         CharSequence choices[] = getMidiInstruments();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(c);
@@ -29,10 +26,28 @@ public class MIDIUtilities {
         builder.setItems(choices, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                after.onSelect((byte)which);
+                c.instrument.instrument = (byte) which;
             }
         });
         builder.show();
+    }
+
+    static void showTempoPicker(final MainActivity a) {
+        final Dialog d = new Dialog(a);
+        d.setTitle("Select Tempo");
+        d.setContentView(R.layout.number_picker_dialog);
+        final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
+        np.setMaxValue(480);
+        np.setMinValue(15);
+        np.setValue(a.instrumentThread.beatsPerMinute);
+        np.setWrapSelectorWheel(false);
+        np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                a.instrumentThread.beatsPerMinute = np.getValue();
+            }
+        });
+        d.show();
     }
 
     private static String[] getMidiInstruments() {

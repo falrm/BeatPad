@@ -10,12 +10,13 @@ import java.util.List;
 public class InstrumentThread implements Runnable {
     private static final String TAG = InstrumentThread.class.getSimpleName();
 
-    private int beatsPerMinute;
-    private boolean[] subDivisions = {true, true};
+    public volatile int beatsPerMinute;
+    public volatile boolean stopped = false;
+
+    private boolean[] subDivisions = {true};
 
     private final Instrument instrument;
     private List<Integer> tones;
-    public volatile boolean stopped = false;
 
     private int toneSpread = 5;
     private int numSimultaneousTones = 5;
