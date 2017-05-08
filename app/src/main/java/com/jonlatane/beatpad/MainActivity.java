@@ -17,7 +17,6 @@ import com.jonlatane.beatpad.midi.MIDIUtilities;
 import com.jonlatane.beatpad.sensors.Orientation;
 import com.jonlatane.beatpad.view.TopologyView;
 
-import org.billthefarmer.mididriver.GeneralMidiConstants;
 import org.billthefarmer.mididriver.MidiDriver;
 
 import java.util.concurrent.Executors;
@@ -42,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        instrument = new MIDIInstrument();
         //instrumentThread = new InstrumentThread(new HarmonicOvertoneSeriesGenerator(), 120);
         instrumentThread = new InstrumentThread(instrument = new MIDIInstrument(), 120);
 
@@ -82,12 +80,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        MIDIInstrument.DRIVER.setOnMidiStartListener(new MidiDriver.OnMidiStartListener() {
-            @Override
-            public void onMidiStart() {
-                instrument.selectInstrument(GeneralMidiConstants.BRIGHT_ACOUSTIC_PIANO);
-            }
-        });
         MIDIInstrument.DRIVER.start();
 
         // Get the configuration.
@@ -114,12 +106,20 @@ public class MainActivity extends AppCompatActivity {
         if(chord != null) {
             topology.setChord(chord);
         }
+        final byte instrument = savedInstanceState.getByte("currentInstrument");
+        MIDIInstrument.DRIVER.setOnMidiStartListener(new MidiDriver.OnMidiStartListener() {
+            @Override
+            public void onMidiStart() {
+                MainActivity.this.instrument.instrument = instrument;
+            }
+        });
     }
 
     // invoked when the activity may be temporarily destroyed, save the instance state here
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable("currentChord", topology.getChord());
+        outState.putByte("currentInstrument", instrument.instrument);
     }
 
     @Override
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 MIDIUtilities.showInstrumentPicker(this, new MIDIUtilities.InstrumentPickerHandler() {
                     @Override
                     public void onSelect(byte choice) {
-                        instrument.selectInstrument(choice);
+                        instrument.instrument = choice;
                     }
                 });
                 break;

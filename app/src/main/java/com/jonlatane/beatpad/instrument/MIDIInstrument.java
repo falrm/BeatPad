@@ -16,17 +16,11 @@ public class MIDIInstrument implements Instrument {
     private final LinkedList<Integer> tones = new LinkedList<>();
     private final byte[] event = new byte[3];
     byte channel = 0;
-
-    public MIDIInstrument selectInstrument(byte instrument) {
-        byte[] changeEvent = new byte[2];
-        changeEvent[0] = (byte) (0xC0 | channel);  // STATUS byte: Change, 0x00 = channel 1
-        changeEvent[1] = instrument;
-        DRIVER.write(changeEvent);
-        return this;
-    }
+    public byte instrument = 0;
 
     @Override
     public void play(int tone) {// Construct a note ON message for the middle C at maximum velocity on channel 1:
+        selectInstrument(instrument);
         event[0] = (byte) (0x90 | channel);  // STATUS byte: note On, 0x00 = channel 1
         event[1] = (byte) (tone + 60);  // DATA byte: middle C = 60
         event[2] = (byte) 64;  // DATA byte: maximum velocity = 127
@@ -51,5 +45,14 @@ public class MIDIInstrument implements Instrument {
             DRIVER.write(event);
         }
         tones.clear();
+    }
+
+    private MIDIInstrument selectInstrument(byte instrument) {
+        this.instrument = instrument;
+        byte[] changeEvent = new byte[2];
+        changeEvent[0] = (byte) (0xC0 | channel);  // STATUS byte: Change, 0x00 = channel 1
+        changeEvent[1] = instrument;
+        DRIVER.write(changeEvent);
+        return this;
     }
 }
