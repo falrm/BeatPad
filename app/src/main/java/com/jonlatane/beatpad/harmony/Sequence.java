@@ -8,6 +8,7 @@ import com.jonlatane.beatpad.harmony.chord.Heptatonics;
 
 import static com.jonlatane.beatpad.harmony.chord.Chord.AUG;
 import static com.jonlatane.beatpad.harmony.chord.Chord.DIM;
+import static com.jonlatane.beatpad.harmony.chord.Chord.DOM_7;
 import static com.jonlatane.beatpad.harmony.chord.Chord.MAJ_7;
 import static com.jonlatane.beatpad.harmony.chord.Chord.MIN_7;
 import static com.jonlatane.beatpad.harmony.chord.Heptatonics.NONEXISTENT;
@@ -61,6 +62,9 @@ public abstract class Sequence {
                 return new Chord(c.root, MIN_7);
             }
             if(c.isMinor()) {
+                return new Chord(c.root, DOM_7);
+            }
+            if(c.isDominant()) {
                 return new Chord(c.root, MAJ_7);
             }
             return new Chord(c.root, AUG);
@@ -73,6 +77,9 @@ public abstract class Sequence {
             }
             if(c.isMinor()) {
                 return new Chord(c.root, DIM);
+            }
+            if(c.isMajor() && !c.isDominant()) {
+                return new Chord(c.root, DOM_7);
             }
             return new Chord(c.root, MIN_7);
         }

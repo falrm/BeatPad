@@ -211,20 +211,18 @@ public class TopologyAnimations {
             double cos = Math.cos(forwardAngle);
             float x = (float)(maxTX * cos);
             float y = (float)(maxTY * sin);
-            sv.forward.animate()
-                    .translationX(x).translationY(y).alpha(1).setDuration(DURATION).start();
-            sv.back.animate()
-                    .translationX(-x).translationY(y).alpha(1).setDuration(DURATION).start();
-            animateChordsToSelectionPhase(sv, x, y);
+            animateChordsToSelectionPhase(v, sv, x, y);
             animateAxisToSelectionPhase(sv.axis, x, y);
-            animateConnectorsToSelectionPhase(sv, x, y, forwardAngle);
+            animateConnectorsToSelectionPhase(v, sv, x, y, forwardAngle);
         }
     }
-    private static void animateChordsToSelectionPhase(TopologyView.SequenceViews sv, float tX, float tY) {
+    private static void animateChordsToSelectionPhase(TopologyView v, TopologyView.SequenceViews sv, float tX, float tY) {
+        float forwardAlpha = v.centralChord.getText().equals(sv.forward.getText()) ? 0.2f : 1;
+        float backAlpha = v.centralChord.getText().equals(sv.back.getText()) ? 0.2f : 1;
         sv.forward.animate()
-                .translationX(tX).translationY(tY).alpha(1).setDuration(DURATION).start();
+                .translationX(tX).translationY(tY).alpha(forwardAlpha).setDuration(DURATION).start();
         sv.back.animate()
-                .translationX(-tX).translationY(tY).alpha(1).setDuration(DURATION).start();
+                .translationX(-tX).translationY(tY).alpha(backAlpha).setDuration(DURATION).start();
     }
     private static void skipChordsToSelectionPhase(TopologyView.SequenceViews sv, float tX, float tY, TextView target) {
         if(target == sv.forward) {
@@ -270,13 +268,15 @@ public class TopologyAnimations {
         setWidth(axis, width);
     }
 
-    private static void animateConnectorsToSelectionPhase(TopologyView.SequenceViews sv, float tX, float tY, double forwardAngle) {
+    private static void animateConnectorsToSelectionPhase(TopologyView v, TopologyView.SequenceViews sv, float tX, float tY, double forwardAngle) {
         int connectorWidth = (int) (Math.sqrt(tX * tX + tY * tY) * .7f);
+        float forwardAlpha = v.centralChord.getText().equals(sv.forward.getText()) ? 0.1f : 0.3f;
+        float backAlpha = v.centralChord.getText().equals(sv.back.getText()) ? 0.1f : 0.3f;
         sv.connectForward.animate().translationX(tX/2).translationY(tY/2)
-                .rotation((float)Math.toDegrees(forwardAngle)).alpha(0.3f).start();
+                .rotation((float)Math.toDegrees(forwardAngle)).alpha(forwardAlpha).start();
         animateWidth(sv.connectForward, connectorWidth);
         sv.connectBack.animate().translationX(-tX/2).translationY(tY/2)
-                .rotation((float)-Math.toDegrees(forwardAngle)).alpha(0.3f).start();
+                .rotation((float)-Math.toDegrees(forwardAngle)).alpha(backAlpha).start();
         animateWidth(sv.connectBack, connectorWidth);
     }
 

@@ -47,16 +47,20 @@ public class TopologyView extends RelativeLayout {
             forward.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    selectedChord = (TextView) v;
-                    setChord(sequence.forward(chord));
+                    if(!forward.getText().equals(centralChord.getText())) {
+                        selectedChord = (TextView) v;
+                        setChord(sequence.forward(chord));
+                    }
                 }
             });
             forward.setText(sequence.forward(chord).getName());
             back.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    selectedChord = (TextView) v;
-                    setChord(sequence.back(chord));
+                    if(!back.getText().equals(centralChord.getText())) {
+                        selectedChord = (TextView) v;
+                        setChord(sequence.back(chord));
+                    }
                 }
             });
             back.setText(sequence.back(chord).getName());
