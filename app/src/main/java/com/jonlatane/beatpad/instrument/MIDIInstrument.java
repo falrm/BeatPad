@@ -15,7 +15,7 @@ public class MIDIInstrument implements Instrument {
 
     private final LinkedList<Integer> tones = new LinkedList<>();
     private final byte[] event = new byte[3];
-    byte channel = 0;
+    public byte channel = 0;
     public byte instrument = 0;
 
     @Override

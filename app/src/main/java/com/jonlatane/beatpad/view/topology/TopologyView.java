@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.view;
+package com.jonlatane.beatpad.view.topology;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -9,13 +9,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.jonlatane.beatpad.R;
-import com.jonlatane.beatpad.harmony.Sequence;
+import com.jonlatane.beatpad.harmony.ChordAxis;
 import com.jonlatane.beatpad.harmony.chord.Chord;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jonlatane.beatpad.harmony.Sequence.CHROMATIC;
+import static com.jonlatane.beatpad.harmony.ChordAxis.CHROMATIC;
 import static com.jonlatane.beatpad.harmony.chord.Chord.MAJ_7;
 
 /**
@@ -30,6 +30,7 @@ public class TopologyView extends RelativeLayout {
     TextView selectedChord;
     TextView centralChord;
     ImageView centralChordBackground;
+    ImageView centralChordThrobber;
     TextView halfStepUp;
     TextView halfStepDown;
     ImageView halfStepBackground;
@@ -41,8 +42,8 @@ public class TopologyView extends RelativeLayout {
         final ImageView connectBack = inflateConnectorView();
         final TextView forward = inflateChordView();
         final TextView back = inflateChordView();
-        final Sequence sequence;
-        SequenceViews(final Sequence s) {
+        final ChordAxis sequence;
+        SequenceViews(final ChordAxis s) {
             this.sequence = s;
             forward.setOnClickListener(new OnClickListener() {
                 @Override
@@ -94,7 +95,7 @@ public class TopologyView extends RelativeLayout {
         centralChord.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                TopologyAnimations.animateCentralChordClick(TopologyView.this);
+                NavigationAnimations.animateCentralChordClick(TopologyView.this);
                 listener.onClick(v);
             }
         });
@@ -102,8 +103,7 @@ public class TopologyView extends RelativeLayout {
 
     private void init() {
         chord = new Chord(0, MAJ_7);
-        inflateBG();
-        centralChord = inflateChordView(6);
+        centralChord = inflateChordView(7);
         halfStepUp = inflateChordView(4);
         halfStepDown = inflateChordView(4);
         halfStepUp.setOnClickListener(new OnClickListener() {
@@ -120,12 +120,13 @@ public class TopologyView extends RelativeLayout {
                 setChord(CHROMATIC.back(chord));
             }
         });
+        inflateBG();
         updateChordText();
         post(new Runnable() {
             @Override
             public void run() {
-                TopologyAnimations.skipToInitialState(TopologyView.this);
-                TopologyAnimations.animateToSelectionPhase(TopologyView.this);
+                NavigationAnimations.skipToInitialState(TopologyView.this);
+                NavigationAnimations.animateToSelectionPhase(TopologyView.this);
             }
         });
     }
@@ -137,7 +138,7 @@ public class TopologyView extends RelativeLayout {
     public void setChord(Chord c) {
         chord = c;
         if(selectedChord != null) {
-            TopologyAnimations.animateToTargetChord(this);
+            NavigationAnimations.animateToTargetChord(this);
         } else {
             updateChordText();
         }
@@ -187,13 +188,20 @@ public class TopologyView extends RelativeLayout {
         centralChordBackground = (ImageView) findViewWithTag("newBG");
         centralChordBackground.setZ(5);
         centralChordBackground.setTag(null);
+
         LayoutInflater.from(getContext()).inflate(R.layout.topology_bg_axis, this, true);
         halfStepBackground = (ImageView) findViewWithTag("newBG");
         halfStepBackground.setZ(3);
         halfStepBackground.setTag(null);
+
+        LayoutInflater.from(getContext()).inflate(R.layout.topology_bg_highlight, this, true);
+        centralChordThrobber =  (ImageView) findViewWithTag("newBG");
+        centralChordThrobber.setZ(6);
+        centralChordThrobber.setTag(null);
+        centralChordThrobber.setAlpha(0f);
     }
 
-    public void addSequence(Sequence sequence) {
+    public void addSequence(ChordAxis sequence) {
         sequences.add(new SequenceViews(sequence));
     }
 }

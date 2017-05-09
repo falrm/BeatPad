@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context="com.jonlatane.beatpad.MainActivity">
 
-    <com.jonlatane.beatpad.view.TopologyView
+    <com.jonlatane.beatpad.view.topology.TopologyView
         android:id="@+id/topology"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

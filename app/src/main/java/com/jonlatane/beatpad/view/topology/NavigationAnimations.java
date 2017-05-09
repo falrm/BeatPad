@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.view;
+package com.jonlatane.beatpad.view.topology;
 
 import android.animation.ValueAnimator;
 import android.view.View;
@@ -10,8 +10,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.jonlatane.beatpad.view.TopologyView.CONNECTOR_Z;
 
 /**
  * TopologyView works with three states for animation consistency.
@@ -26,7 +24,7 @@ import static com.jonlatane.beatpad.view.TopologyView.CONNECTOR_Z;
  *
  * Created by jonlatane on 5/7/17.
  */
-public class TopologyAnimations {
+public class NavigationAnimations {
     private static final long DURATION = 200;
 
     static void animateCentralChordClick(final TopologyView v) {
@@ -201,9 +199,10 @@ public class TopologyAnimations {
                 (int) Math.max(350 * density,
                                v.getHeight() * 0.3f
                                        + Math.max(v.halfStepUp.getWidth(), v.halfStepDown.getWidth())));
-        animateWidth(v.centralChordBackground,
-                (int) Math.max(200 * density,
-                               2 * v.centralChord.getWidth() - 20 * density));
+        int centralBGWidth = (int) Math.max(200 * density,
+                                            2 * v.centralChord.getWidth() - 20 * density);
+        animateWidth(v.centralChordBackground, centralBGWidth);
+        animateWidth(v.centralChordThrobber, centralBGWidth);
         for(int i = 0; i < v.sequences.size(); i++) {
             TopologyView.SequenceViews sv = v.sequences.get(i);
             double forwardAngle = (i * theta) - ((Math.PI - theta) / 2);
@@ -305,8 +304,8 @@ public class TopologyAnimations {
             sv.connectBack.setRotation(0);
             setWidth(sv.connectBack, 5);
         }
-        sv.connectBack.setZ(CONNECTOR_Z);
-        sv.connectForward.setZ(CONNECTOR_Z);
+        sv.connectBack.setZ(TopologyView.CONNECTOR_Z);
+        sv.connectForward.setZ(TopologyView.CONNECTOR_Z);
     }
 
     private static void animateWidth(final View v, int width) {

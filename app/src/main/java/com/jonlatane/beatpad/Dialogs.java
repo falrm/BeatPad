@@ -26,7 +26,8 @@ class Dialogs {
         builder.setItems(choices, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                c.instrument.instrument = (byte) which;
+                c.sequencerInstrument.instrument = (byte) which;
+                c.melodicInstrument.instrument = (byte) which;
             }
         });
         builder.show();
@@ -39,12 +40,12 @@ class Dialogs {
         final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
         np.setMaxValue(480);
         np.setMinValue(15);
-        np.setValue(a.instrumentThread.beatsPerMinute);
+        np.setValue(a.sequencerThread.beatsPerMinute);
         np.setWrapSelectorWheel(false);
         np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                a.instrumentThread.beatsPerMinute = np.getValue();
+                a.sequencerThread.beatsPerMinute = np.getValue();
             }
         });
         d.show();

@@ -7,72 +7,86 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.jonlatane.beatpad.audio.AudioTrackCache;
 import com.jonlatane.beatpad.harmony.chord.Chord;
-import com.jonlatane.beatpad.instrument.InstrumentThread;
+import com.jonlatane.beatpad.instrument.DeviceOrientationInstrument;
+import com.jonlatane.beatpad.instrument.SequencerThread;
 import com.jonlatane.beatpad.instrument.MIDIInstrument;
 import com.jonlatane.beatpad.sensors.Orientation;
-import com.jonlatane.beatpad.view.TopologyView;
+import com.jonlatane.beatpad.view.topology.RhythmAnimations;
+import com.jonlatane.beatpad.view.topology.TopologyView;
 
 import org.billthefarmer.mididriver.MidiDriver;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.jonlatane.beatpad.harmony.Sequence.AUG_DIM;
-import static com.jonlatane.beatpad.harmony.Sequence.REL_MINOR_MAJOR;
-import static com.jonlatane.beatpad.harmony.Sequence.TWO_FIVE_ONE;
+import static com.jonlatane.beatpad.harmony.ChordAxis.AUG_DIM;
+import static com.jonlatane.beatpad.harmony.ChordAxis.REL_MINOR_MAJOR;
+import static com.jonlatane.beatpad.harmony.ChordAxis.TWO_FIVE_ONE;
 import static com.jonlatane.beatpad.harmony.chord.Chord.MAJ_7;
 
 public class MainActivity extends AppCompatActivity {
     private AtomicBoolean playing = new AtomicBoolean(false);
     private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
     private Snackbar playingAdvice;
-    InstrumentThread instrumentThread;
-    MIDIInstrument instrument;
+    SequencerThread sequencerThread;
+    MIDIInstrument melodicInstrument;
+    MIDIInstrument sequencerInstrument;
     TopologyView topology;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //instrumentThread = new InstrumentThread(new HarmonicOvertoneSeriesGenerator(), 120);
-        instrumentThread = new InstrumentThread(instrument = new MIDIInstrument(), 120);
-
         topology = (TopologyView) findViewById(R.id.topology);
+
+        //sequencerThread = new SequencerThread(new HarmonicOvertoneSeriesGenerator(), 120);
+        sequencerInstrument = new MIDIInstrument();
+        sequencerThread = new SequencerThread(sequencerInstrument, 120);
+        melodicInstrument = new MIDIInstrument();
+        melodicInstrument.channel = 1;
+
         playingAdvice = Snackbar.make(topology,
                 "Tap the center chord to stop playback.", Snackbar.LENGTH_LONG);
+
+
         topology.addSequence(AUG_DIM);
         //topology.addSequence(CIRCLE_OF_FIFTHS);
         topology.addSequence(TWO_FIVE_ONE);
         topology.addSequence(REL_MINOR_MAJOR);
         //topology.addSequence(NINES);
+
+
+        final DeviceOrientationInstrument melodyController = new DeviceOrientationInstrument(melodicInstrument);
         topology.setOnChordChangedListener(new TopologyView.OnChordChangedListener() {
             @Override
             public void onChordChanged(Chord c) {
-                instrumentThread.setTones(c.getTones(-60, 60));
+                List<Integer> tones = c.getTones(-60, 60);
+                melodyController.setTones(tones);
+                sequencerThread.setTones(tones);
             }
         });
         topology.setChord(new Chord(0, MAJ_7));
-        topology.setCurrentChordClickListener(new View.OnClickListener() {
+        RhythmAnimations.wireMelodicControl(topology, melodyController);
+        /*topology.setCurrentChordClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(!playing.getAndSet(true)) {
-                    instrumentThread.stopped = false;
-                    executorService.execute(instrumentThread);
+                    sequencerThread.stopped = false;
+                    executorService.execute(sequencerThread);
                     playingAdvice.show();
                 } else {
-                    instrumentThread.stopped = true;
+                    sequencerThread.stopped = true;
                     AudioTrackCache.releaseAll();
                     playing.set(false);
                     playingAdvice.dismiss();
                 }
             }
-        });
+        });*/
         Orientation.initialize(this);
     }
 
@@ -94,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        instrumentThread.stopped = true;
+        sequencerThread.stopped = true;
         AudioTrackCache.releaseAll();
         MIDIInstrument.DRIVER.stop();
     }
@@ -109,7 +123,8 @@ public class MainActivity extends AppCompatActivity {
         MIDIInstrument.DRIVER.setOnMidiStartListener(new MidiDriver.OnMidiStartListener() {
             @Override
             public void onMidiStart() {
-                MainActivity.this.instrument.instrument = instrument;
+                MainActivity.this.sequencerInstrument.instrument = instrument;
+                MainActivity.this.melodicInstrument.instrument = instrument;
             }
         });
     }
@@ -118,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable("currentChord", topology.getChord());
-        outState.putByte("currentInstrument", instrument.instrument);
+        outState.putByte("currentInstrument", sequencerInstrument.instrument);
     }
 
     @Override
