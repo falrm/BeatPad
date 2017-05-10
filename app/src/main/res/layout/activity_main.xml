@@ -22,8 +22,7 @@
         android:textSize="12dp"
         android:layout_below="@id/sequencerToggle"
         android:layout_alignParentRight="true"
-        android:text="TEMPO
- 120"
+        android:text="TEMPO"
         android:id="@+id/tempoTapper"
         />
 
