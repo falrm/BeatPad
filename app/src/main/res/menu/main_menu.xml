@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="Instrument"
-        android:id="@+id/select_instrument"
+    <item android:title="Melody Instrument"
+        android:id="@+id/melody_instrument"
         android:orderInCategory="1"/>
-    <item android:title="Tempo"
+    <item android:title="Harmony Instrument"
+        android:id="@+id/harmony_instrument"
+        android:orderInCategory="1"/>
+    <item android:title="Sequencer Instrument"
+        android:id="@+id/sequencer_instrument"
+        android:orderInCategory="1"/>
+    <item android:title="Manual Tempo"
         android:id="@+id/select_tempo"
         android:orderInCategory="2"/>
 </menu>

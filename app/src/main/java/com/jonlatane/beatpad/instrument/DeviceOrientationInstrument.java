@@ -24,7 +24,7 @@ public class DeviceOrientationInstrument {
         // Play the notes
         if (tones != null) {
             // Normalize device's physical pitch to a number between 0 and 1
-            float relativePitch = (-Orientation.pitch + 1.58f) / 3.14f;
+            float relativePitch = Orientation.normalizedDevicePitch();
             //Log.i(TAG, String.format("Relative pitch: %.2f", relativePitch));
             int toneIndex = Math.round((tones.size() - toneSpread) * relativePitch);
             for (int i = 0; i < numSimultaneousTones; i++) {

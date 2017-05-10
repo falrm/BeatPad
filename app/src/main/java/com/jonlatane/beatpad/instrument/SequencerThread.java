@@ -11,7 +11,7 @@ public class SequencerThread extends DeviceOrientationInstrument implements Runn
     public volatile int beatsPerMinute;
     public volatile boolean stopped = false;
 
-    private boolean[] subDivisions = {true};
+    private boolean[] subDivisions = {true, true};
 
 
 
@@ -64,12 +64,8 @@ public class SequencerThread extends DeviceOrientationInstrument implements Runn
      * @return
      */
     private float getRollForArticulation() {
-        float relativeRoll = Orientation.roll;
-        if(relativeRoll > 1.62) relativeRoll -= 1.62;
-        if(relativeRoll <-1.62) relativeRoll += 1.62;
-        relativeRoll /= 3.14;
         // Roll is in the range [-0.5. 0.5] Normalize it to the range [0.3f, 1.0f]
-        relativeRoll = Math.min(Math.max(0.3f, (3f * relativeRoll * 0.7f) + 0.65f), 1.0f);
-        return relativeRoll;
+        float result = Math.min(Math.max(0.3f, (3f * Orientation.normalizedDeviceRoll() * 0.7f) + 0.65f), 1.0f);
+        return result;
     }
 }

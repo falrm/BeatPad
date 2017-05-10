@@ -37,4 +37,24 @@ public class Orientation {
             public void onAccuracyChanged(Sensor sensor, int accuracy) {}
         }, sensor, 10000);
     }
+
+    /**
+     * Device pitch as a float between 0 and 1
+     * @return
+     */
+    public static float normalizedDevicePitch() {
+        return (-pitch + 1.58f) / 3.14f;
+    }
+
+    /**
+     * Device roll as a float between -0.5 (left) and 0.5 (right)
+     * @return
+     */
+    public static float normalizedDeviceRoll() {
+        float relativeRoll = roll;
+        while(relativeRoll > 1.62) relativeRoll -= 1.62;
+        while(relativeRoll <-1.62) relativeRoll += 1.62;
+        relativeRoll /= 3.14;
+        return relativeRoll;
+    }
 }

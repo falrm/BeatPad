@@ -31,6 +31,7 @@ public class TopologyView extends RelativeLayout {
     TextView centralChord;
     ImageView centralChordBackground;
     ImageView centralChordThrobber;
+    ImageView centralChordTouchPoint;
     TextView halfStepUp;
     TextView halfStepDown;
     ImageView halfStepBackground;
@@ -199,6 +200,12 @@ public class TopologyView extends RelativeLayout {
         centralChordThrobber.setZ(6);
         centralChordThrobber.setTag(null);
         centralChordThrobber.setAlpha(0f);
+
+        LayoutInflater.from(getContext()).inflate(R.layout.topology_bg, this, true);
+        centralChordTouchPoint = (ImageView) findViewWithTag("newBG");
+        centralChordTouchPoint.setZ(1000);
+        centralChordTouchPoint.setAlpha(0f);
+        centralChordTouchPoint.setTag(null);
     }
 
     public void addSequence(ChordAxis sequence) {

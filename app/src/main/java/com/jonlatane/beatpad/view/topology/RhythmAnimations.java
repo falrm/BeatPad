@@ -13,7 +13,7 @@ import com.jonlatane.beatpad.instrument.DeviceOrientationInstrument;
 
 public class RhythmAnimations {
     public static void wireMelodicControl(final TopologyView v, final DeviceOrientationInstrument instrument) {
-        v.centralChordBackground.setOnTouchListener(new View.OnTouchListener() {
+        v.centralChordTouchPoint.setOnTouchListener(new View.OnTouchListener() {
             private ViewPropertyAnimator animator = null;
             @Override
             public boolean onTouch(View view, MotionEvent event) {

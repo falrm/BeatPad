@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.topology;
 
 import android.animation.ValueAnimator;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
@@ -55,7 +56,6 @@ public class NavigationAnimations {
                 toTargetChord.add(
                         halfStep.animate()
                                 .scaleX(2).scaleY(2)
-                                .rotation(0)
                                 .translationY(0).translationZBy(10)
                 );
             } else {
@@ -127,21 +127,23 @@ public class NavigationAnimations {
             chord.setScaleX(0.7f);
             chord.setScaleY(0.7f);
             chord.setTranslationX(0);
-            if(v.selectedChord != v.halfStepUp && v.selectedChord != v.halfStepDown) {
-                chord.setTranslationY(0);
-            }
             chord.setZ(4);
-            chord.setRotation(-90);
+            if(v.selectedChord != v.halfStepUp && v.selectedChord != v.halfStepDown) {
+                //chord.setTranslationY(0);
+            }
             if(chord == v.selectedChord && chord == v.halfStepUp) {
                 v.halfStepDown.setAlpha(1);
-                v.halfStepDown.setTranslationY(v.getHeight() * 0.15f);
-                v.halfStepUp.setTranslationY(0);
+                v.halfStepDown.setTranslationY(-(50 + (v.centralChordBackground.getHeight())/2f));
+                //v.halfStepUp.setTranslationY(0);
             } else if(chord == v.selectedChord && chord == v.halfStepDown) {
                 v.halfStepUp.setAlpha(1);
-                v.halfStepUp.setTranslationY(-v.getHeight() * 0.15f);
-                v.halfStepDown.setTranslationY(0);
+                Log.i("hi", "Setting TranslationY "+ (50 + (v.centralChordBackground.getHeight())/2f));
+                v.halfStepUp.setTranslationY(50 + (v.centralChordBackground.getHeight())/2f);
+                //v.halfStepDown.setTranslationY(0);
+                Log.i("hi", "hsU tY = " + v.halfStepUp.getTranslationY());
             }
         }
+        Log.i("hi", "hsU tY = " + v.halfStepUp.getTranslationY());
         for(TopologyView.SequenceViews sv : v.sequences) {
             if(sv.forward == v.selectedChord || sv.back == v.selectedChord) {
                 skipToSelectionPhase(v, sv);
@@ -165,6 +167,7 @@ public class NavigationAnimations {
                 }
             }
         }
+        Log.i("hi", "hsU tY = " + v.halfStepUp.getTranslationY());
     }
 
     private static void skipToSelectionPhase(TopologyView v, TopologyView.SequenceViews sv) {
@@ -191,17 +194,26 @@ public class NavigationAnimations {
         double theta = Math.PI / v.sequences.size();
         float maxTX = v.getWidth() * 0.4f;
         float maxTY = v.getHeight() * 0.4f;
-        v.halfStepUp.animate().translationY(-v.getHeight() * 0.15f).alpha(1).setDuration(DURATION).start();
-        v.halfStepDown.animate().translationY(v.getHeight() * 0.15f).alpha(1).setDuration(DURATION).start();
-
         float density = v.getContext().getResources().getDisplayMetrics().density;
+
+
+        Log.i("hi", "hsU tY = " + v.halfStepUp.getTranslationY());
+        Log.i("hi", "Animating TranslationY "+ (50 + (v.centralChordBackground.getHeight())/2f));
+        v.halfStepUp.animate()
+                .translationY(-(50 + (v.centralChordBackground.getHeight())/2f))
+                .alpha(1).setDuration(DURATION).start();
+        v.halfStepDown.animate()
+                .translationY(50 + (v.centralChordBackground.getHeight())/2f)
+                .alpha(1).setDuration(DURATION).start();
+
         animateHeight(v.halfStepBackground,
-                (int) Math.max(350 * density,
-                               v.getHeight() * 0.3f
-                                       + Math.max(v.halfStepUp.getWidth(), v.halfStepDown.getWidth())));
+                (int) Math.max(100 * density, 200 + v.centralChordBackground.getHeight())
+        );
+        animateWidth(v.halfStepBackground, Math.max(v.halfStepUp.getWidth(), v.halfStepDown.getWidth()));
         int centralBGWidth = (int) Math.max(200 * density,
                                             2 * v.centralChord.getWidth() - 20 * density);
         animateWidth(v.centralChordBackground, centralBGWidth);
+        animateWidth(v.centralChordTouchPoint, centralBGWidth);
         animateWidth(v.centralChordThrobber, centralBGWidth);
         for(int i = 0; i < v.sequences.size(); i++) {
             TopologyView.SequenceViews sv = v.sequences.get(i);
