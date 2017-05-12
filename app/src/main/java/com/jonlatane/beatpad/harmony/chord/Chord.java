@@ -12,6 +12,7 @@ import java.util.List;
  */
 
 public class Chord implements Parcelable {
+    private static final String TAG = Chord.class.getSimpleName();
     static final String[] NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
     public static final int[] MAJ = {0, 4, 7};
     public static final int[] MAJ_6 = {0, 4, 7, 9};
@@ -98,7 +99,7 @@ public class Chord implements Parcelable {
         while(currentRoot + 12 < bottom) {
             currentRoot += 12;
         }
-        while(currentRoot + 24 < top) {
+        while(currentRoot + 12 <= top) {
             for(int color : extension) {
                 int tone = currentRoot + color;
                 if(tone >= bottom && tone <= top) {
@@ -124,6 +125,18 @@ public class Chord implements Parcelable {
 
     public boolean isDominant() {
         return heptatonics.isDominant();
+    }
+
+    public boolean containsTone(int tone) {
+        return containsColor(tone - root);
+    }
+
+    public boolean containsColor(int color) {
+        color = (1200 + color) % 12;
+        for(int i : extension) {
+            if(color == i) return true;
+        }
+        return false;
     }
 
     @Override

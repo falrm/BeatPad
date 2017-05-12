@@ -29,7 +29,7 @@
     <com.jonlatane.beatpad.view.melody.MelodyView
         android:id="@+id/melody"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="@dimen/key_height_white"
         android:layout_alignParentBottom="true"/>
 
     <com.jonlatane.beatpad.view.topology.TopologyView
@@ -38,5 +38,11 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_above="@id/melody"/>
+
+    <com.jonlatane.beatpad.view.keyboard.KeyboardView
+        android:id="@+id/keyboard"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/key_height_white"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

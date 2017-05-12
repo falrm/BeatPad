@@ -5,11 +5,14 @@
         android:orderInCategory="1"/>
     <item android:title="Harmony Instrument"
         android:id="@+id/harmony_instrument"
-        android:orderInCategory="1"/>
+        android:orderInCategory="2"/>
     <item android:title="Sequencer Instrument"
         android:id="@+id/sequencer_instrument"
-        android:orderInCategory="1"/>
-    <item android:title="Manual Tempo"
-        android:id="@+id/select_tempo"
-        android:orderInCategory="2"/>
+        android:orderInCategory="3"/>
+    <item android:title="Keyboard/BeatBoard"
+        android:id="@+id/keyboard_toggle"
+        android:orderInCategory="4"/>
+    <item android:title="Choose Tempo"
+        android:id="@+id/choose_tempo"
+        android:orderInCategory="5"/>
 </menu>

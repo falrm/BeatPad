@@ -40,12 +40,12 @@ public class Orientation {
     }
 
     /**
-     * Device pitch as a float between 0 and 1.  Only really allows tilts up to +/-45 degrees above/below
+     * Device pitch as a float between 0 and 1.  Only really allows tilts up to +/-75 degrees above/below
      * the ground.
      * @return
      */
     public static float normalizedDevicePitch() {
-        float normalizedPitch = Math.max(0f, Math.min(1f, (1.58f - pitch * 2) / 3.14f));
+        float normalizedPitch = Math.max(0f, Math.min(1f, (1.58f - pitch * 1.2f) / 3.14f));
         return normalizedPitch;
     }
 

@@ -9,13 +9,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.jonlatane.beatpad.R;
-import com.jonlatane.beatpad.harmony.ChordAxis;
+import com.jonlatane.beatpad.harmony.ChordSequence;
 import com.jonlatane.beatpad.harmony.chord.Chord;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jonlatane.beatpad.harmony.ChordAxis.CHROMATIC;
+import static com.jonlatane.beatpad.harmony.ChordSequence.CHROMATIC;
 import static com.jonlatane.beatpad.harmony.chord.Chord.MAJ_7;
 
 /**
@@ -43,8 +43,8 @@ public class TopologyView extends RelativeLayout {
         final ImageView connectBack = inflateConnectorView();
         final TextView forward = inflateChordView();
         final TextView back = inflateChordView();
-        final ChordAxis sequence;
-        SequenceViews(final ChordAxis s) {
+        final ChordSequence sequence;
+        SequenceViews(final ChordSequence s) {
             this.sequence = s;
             forward.setOnClickListener(new OnClickListener() {
                 @Override
@@ -208,7 +208,31 @@ public class TopologyView extends RelativeLayout {
         centralChordTouchPoint.setTag(null);
     }
 
-    public void addSequence(ChordAxis sequence) {
+    public void addSequence(int index, ChordSequence sequence) {
+        sequences.add(index, new SequenceViews(sequence));
+    }
+
+    public void addSequence(ChordSequence sequence) {
         sequences.add(new SequenceViews(sequence));
+        NavigationAnimations.animateToSelectionPhase(this);
+    }
+
+    public void removeSequence(ChordSequence sequence) {
+        for(int index = 0; index < sequences.size(); index++) {
+            if(sequences.get(index).sequence == sequence) {
+                sequences.remove(index);
+                NavigationAnimations.animateToSelectionPhase(this);
+                break;
+            }
+        }
+    }
+
+    public boolean containsSequence(ChordSequence sequence) {
+        for(int index = 0; index < sequences.size(); index++) {
+            if(sequences.get(index).sequence == sequence) {
+                return true;
+            }
+        }
+        return false;
     }
 }

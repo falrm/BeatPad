@@ -13,8 +13,19 @@ import static com.jonlatane.beatpad.harmony.chord.Chord.MAJ_7;
 import static com.jonlatane.beatpad.harmony.chord.Chord.MIN_7;
 import static com.jonlatane.beatpad.harmony.chord.Heptatonics.NONEXISTENT;
 
-public abstract class ChordAxis {
-    public static ChordAxis NINES = new ChordAxis() {
+public abstract class ChordSequence {
+    public static ChordSequence WHOLE_STEPS = new ChordSequence() {
+        @Override
+        public Chord forward(Chord c) {
+            return new Chord(c.root + 2, c.extension);
+        }
+
+        @Override
+        public Chord back(Chord c) {
+            return new Chord(c.root - 2, c.extension);
+        }
+    };
+    public static ChordSequence NINES = new ChordSequence() {
         @Override
         public Chord forward(Chord c) {
             switch(c.heptatonics.second()) {
@@ -37,7 +48,7 @@ public abstract class ChordAxis {
             }
         }
     };
-    public static ChordAxis REL_MINOR_MAJOR = new ChordAxis() {
+    public static ChordSequence REL_MINOR_MAJOR = new ChordSequence() {
         @Override
         public Chord forward(Chord c) {
             if(c.isMinor()) {
@@ -55,7 +66,7 @@ public abstract class ChordAxis {
         }
     };
 
-    public static ChordAxis AUG_DIM = new ChordAxis() {
+    public static ChordSequence AUG_DIM = new ChordSequence() {
         @Override
         public Chord forward(Chord c) {
             if(c.isMinor() && c.heptatonics.fifth() == Heptatonics.DIMINISHED) {
@@ -84,7 +95,7 @@ public abstract class ChordAxis {
             return new Chord(c.root, MIN_7);
         }
     };
-    public static ChordAxis CHROMATIC = new ChordAxis() {
+    public static ChordSequence CHROMATIC = new ChordSequence() {
         @Override
         public Chord forward(Chord c) {
             return new Chord(c.root + 1, c.extension);
@@ -95,7 +106,7 @@ public abstract class ChordAxis {
             return new Chord(c.root - 1, c.extension);
         }
     };
-    public static ChordAxis CIRCLE_OF_FIFTHS = new ChordAxis() {
+    public static ChordSequence CIRCLE_OF_FIFTHS = new ChordSequence() {
         @Override
         public Chord forward(Chord c) {
             return new Chord(c.root - 7, c.extension);
@@ -106,7 +117,7 @@ public abstract class ChordAxis {
             return new Chord(c.root + 7, c.extension);
         }
     };
-    public static ChordAxis CIRCLE_OF_FOURTHS = new ChordAxis() {
+    public static ChordSequence CIRCLE_OF_FOURTHS = new ChordSequence() {
         @Override
         public Chord forward(Chord c) {
             return new Chord(c.root + 7, c.extension);
@@ -117,7 +128,7 @@ public abstract class ChordAxis {
             return new Chord(c.root - 7, c.extension);
         }
     };
-    public static ChordAxis TWO_FIVE_ONE = new ChordAxis() {
+    public static ChordSequence TWO_FIVE_ONE = new ChordSequence() {
         @Override
         public Chord forward(Chord c) {
             if(c.isMinor()) {

@@ -28,7 +28,7 @@ class Dialogs {
     static void showTempoPicker(final MainActivity a) {
         final Dialog d = new Dialog(a);
         d.setTitle("Select Tempo");
-        d.setContentView(R.layout.number_picker_dialog);
+        d.setContentView(R.layout.dialog_choose_tempo);
         final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
         np.setMaxValue(960);
         np.setMinValue(15);
@@ -37,7 +37,9 @@ class Dialogs {
         np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                a.sequencerThread.beatsPerMinute = np.getValue();
+                int bpm = np.getValue();
+                a.sequencerThread.beatsPerMinute = bpm;
+                a.updateTempoButton();
             }
         });
         d.show();

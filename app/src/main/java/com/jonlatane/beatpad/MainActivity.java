@@ -16,6 +16,8 @@ import com.jonlatane.beatpad.instrument.DeviceOrientationInstrument;
 import com.jonlatane.beatpad.instrument.MIDIInstrument;
 import com.jonlatane.beatpad.instrument.SequencerThread;
 import com.jonlatane.beatpad.sensors.Orientation;
+import com.jonlatane.beatpad.view.keyboard.KeyboardIOHandler;
+import com.jonlatane.beatpad.view.keyboard.KeyboardView;
 import com.jonlatane.beatpad.view.melody.MelodyView;
 import com.jonlatane.beatpad.view.tempo.TempoTracking;
 import com.jonlatane.beatpad.view.topology.RhythmAnimations;
@@ -29,9 +31,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.jonlatane.beatpad.harmony.ChordAxis.AUG_DIM;
-import static com.jonlatane.beatpad.harmony.ChordAxis.REL_MINOR_MAJOR;
-import static com.jonlatane.beatpad.harmony.ChordAxis.TWO_FIVE_ONE;
+import static com.jonlatane.beatpad.harmony.ChordSequence.AUG_DIM;
+import static com.jonlatane.beatpad.harmony.ChordSequence.REL_MINOR_MAJOR;
+import static com.jonlatane.beatpad.harmony.ChordSequence.TWO_FIVE_ONE;
 import static com.jonlatane.beatpad.harmony.chord.Chord.MAJ_7;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     MIDIInstrument melodicInstrument;
     MIDIInstrument harmonicInstrument;
     MIDIInstrument sequencerInstrument;
+    KeyboardIOHandler keyboardIOHandler;
+    KeyboardView keyboard;
     MelodyView melody;
     TopologyView topology;
     Button seqButton;
@@ -53,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        keyboard = (KeyboardView) findViewById(R.id.keyboard);
         melody = (MelodyView) findViewById(R.id.melody);
         topology = (TopologyView) findViewById(R.id.topology);
         seqButton = (Button) findViewById(R.id.sequencerToggle);
@@ -70,14 +75,17 @@ public class MainActivity extends AppCompatActivity {
         harmonicInstrument.instrument = GeneralMidiConstants.SYNTHBRASS_1;
         sequencerInstrument.instrument = GeneralMidiConstants.STRING_ENSEMBLE_0;
 
+        melody.setInstrument(melodicInstrument);
+        final DeviceOrientationInstrument harmonyController = new DeviceOrientationInstrument(harmonicInstrument);
+        RhythmAnimations.wireMelodicControl(topology, harmonyController);
+        keyboardIOHandler = new KeyboardIOHandler(keyboard, melodicInstrument);
+
         topology.addSequence(AUG_DIM);
         //topology.addSequence(CIRCLE_OF_FIFTHS);
         topology.addSequence(TWO_FIVE_ONE);
+        //topology.addSequence(WHOLE_STEPS);
         topology.addSequence(REL_MINOR_MAJOR);
         //topology.addSequence(NINES);
-
-
-        final DeviceOrientationInstrument harmonyController = new DeviceOrientationInstrument(harmonicInstrument);
         topology.setOnChordChangedListener(new TopologyView.OnChordChangedListener() {
             @Override
             public void onChordChanged(Chord c) {
@@ -85,11 +93,10 @@ public class MainActivity extends AppCompatActivity {
                 melody.setTones(tones);
                 harmonyController.setTones(tones);
                 sequencerThread.setTones(tones);
+                keyboardIOHandler.highlightChord(c);
             }
         });
         topology.setChord(new Chord(0, MAJ_7));
-        RhythmAnimations.wireMelodicControl(topology, harmonyController);
-        melody.setInstrument(melodicInstrument);
 
 
         playingAdvice = Snackbar.make(topology,
@@ -120,11 +127,18 @@ public class MainActivity extends AppCompatActivity {
                 int bpm = Math.round(tempo);
                 if(bpm > 20) {
                     sequencerThread.beatsPerMinute = bpm;
-                    tempoButton.setText("TEMPO\n" + bpm);
+                    updateTempoButton();
                 }
             }
         });
+        updateTempoButton();
         Orientation.initialize(this);
+        keyboard.post(new Runnable() {
+            @Override
+            public void run() {
+                keyboard.toggleVisibility();
+            }
+        });
     }
 
     @Override
@@ -203,8 +217,11 @@ public class MainActivity extends AppCompatActivity {
             case R.id.sequencer_instrument:
                 Dialogs.showInstrumentPicker(this, sequencerInstrument);
                 break;
-            case R.id.select_tempo:
+            case R.id.choose_tempo:
                 Dialogs.showTempoPicker(this);
+                break;
+            case R.id.keyboard_toggle:
+                keyboard.toggleVisibility();
                 break;
         }
         return true;
@@ -216,5 +233,9 @@ public class MainActivity extends AppCompatActivity {
             menu.findItem(R.id.harmony_instrument).setTitle("Harmony: " + harmonicInstrument.getInstrumentName());
             menu.findItem(R.id.sequencer_instrument).setTitle("Sequencer: " + sequencerInstrument.getInstrumentName());
         }
+    }
+
+    void updateTempoButton() {
+        tempoButton.setText("TEMPO\n" + sequencerThread.beatsPerMinute);
     }
 }
