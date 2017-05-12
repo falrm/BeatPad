@@ -133,12 +133,6 @@ public class MainActivity extends AppCompatActivity {
         });
         updateTempoButton();
         Orientation.initialize(this);
-        keyboard.post(new Runnable() {
-            @Override
-            public void run() {
-                keyboard.toggleVisibility();
-            }
-        });
     }
 
     @Override
@@ -221,6 +215,13 @@ public class MainActivity extends AppCompatActivity {
                 Dialogs.showTempoPicker(this);
                 break;
             case R.id.keyboard_toggle:
+                if(keyboard.isHidden()) {
+                    keyboard.show();
+                    item.setTitle("Use Color Keyboard");
+                } else {
+                    keyboard.hide();
+                    item.setTitle("Use Piano Keyboard");
+                }
                 keyboard.toggleVisibility();
                 break;
         }

@@ -2,9 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/keyboard"
 	android:layout_width="wrap_content"
-	android:layout_height="wrap_content"
-	android:descendantFocusability="beforeDescendants"
-	android:focusableInTouchMode="true" >
+	android:layout_height="wrap_content" >
 	<!-- Octave 0 -->
 	<!-- White keys -->
 	<Button
@@ -17,7 +15,7 @@
 	<!-- Black keys -->
 	<Button
 		android:id="@+id/keyAS0"
-		style="@style/AS0" />
+		style="@style/AS0"/>
 	<!-- Octave 1 -->
 	<!-- White keys -->
 	<Button

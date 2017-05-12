@@ -9,7 +9,7 @@
     <item android:title="Sequencer Instrument"
         android:id="@+id/sequencer_instrument"
         android:orderInCategory="3"/>
-    <item android:title="Keyboard/BeatBoard"
+    <item android:title="Use Piano Keyboard"
         android:id="@+id/keyboard_toggle"
         android:orderInCategory="4"/>
     <item android:title="Choose Tempo"

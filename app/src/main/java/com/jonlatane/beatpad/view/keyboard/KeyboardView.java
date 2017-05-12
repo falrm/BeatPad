@@ -7,29 +7,29 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.widget.HorizontalScrollView;
 
 import com.jonlatane.beatpad.R;
-import com.jonlatane.beatpad.view.NonDelayedHorizontalScrollView;
 
-public class KeyboardView extends NonDelayedHorizontalScrollView {
+public class KeyboardView extends HorizontalScrollView {
 	private static final String TAG = KeyboardView.class.getSimpleName();
 	public int margin;
 	
 	public KeyboardView(Context context) {
 		super(context);
-		onCreate(context);
+		init(context);
 	}
 	public KeyboardView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		onCreate(context);
+		init(context);
 	}
 	
 	public KeyboardView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		onCreate(context);
+		init(context);
 	}
 	
-	void onCreate(Context c){
+	void init(Context c){
 		margin = c.getResources().getDisplayMetrics().densityDpi / 5;
 		LayoutInflater.from(c).inflate(R.layout.view_keyboard, this, true);
 	}
@@ -39,7 +39,7 @@ public class KeyboardView extends NonDelayedHorizontalScrollView {
 		if(event.getX() < margin || event.getX() > getWidth() - margin)
 			enableScrolling();
 		
-		if(_enableScrolling && event.getPointerCount() < 2)
+		if(enableScrolling && event.getPointerCount() < 2)
 			super.onTouchEvent(event);
 		
 		if(event.getActionMasked() == MotionEvent.ACTION_UP && event.getPointerCount() < 2)
@@ -57,58 +57,66 @@ public class KeyboardView extends NonDelayedHorizontalScrollView {
 	/*
 	 * onDraw and these types and variables are used to render the drop shadows on the right and left.
 	 */
-	private int _leftShadowAlpha = 255, _rightShadowAlpha = 255;
-	private class LeftShadowEvaluator extends IntEvaluator {
-	    private KeyboardView v;
-	    public LeftShadowEvaluator(KeyboardView v) {
-	        this.v = v;
-	    }
+	private int leftShadowAlpha = 255, rightShadowAlpha = 255;
+	private final IntEvaluator leftShadowEvaluator = new IntEvaluator() {
 		@Override
-	    public Integer evaluate(float fraction, Integer startValue, Integer endValue) {
-	        int num = super.evaluate(fraction, startValue, endValue);
-	        v._leftShadowAlpha = num;
-	        return num;
-	    }
-	}
-	private class RightShadowEvaluator extends IntEvaluator {
-	    private KeyboardView v;
-	    public RightShadowEvaluator(KeyboardView v) {
-	        this.v = v;
-	    }
+		public Integer evaluate(float fraction, Integer startValue, Integer endValue) {
+			int num = super.evaluate(fraction, startValue, endValue);
+			leftShadowAlpha = num;
+			return num;
+		}
+	};
+	private final IntEvaluator rightShadowEvaluator = new IntEvaluator() {
 		@Override
-	    public Integer evaluate(float fraction, Integer startValue, Integer endValue) {
-	        int num = super.evaluate(fraction, startValue, endValue);
-	        v._rightShadowAlpha = num;
-	        return num;
-	    }
-	}
+		public Integer evaluate(float fraction, Integer startValue, Integer endValue) {
+			int num = super.evaluate(fraction, startValue, endValue);
+			rightShadowAlpha = num;
+			return num;
+		}
+	};
 	@Override
     protected void onDraw(Canvas c) {
 		super.onDraw(c);
 		
 		if(canScrollHorizontally(-1))
-			ValueAnimator.ofObject(new LeftShadowEvaluator(this), _leftShadowAlpha, 255).start();
+			ValueAnimator.ofObject(leftShadowEvaluator, leftShadowAlpha, 255).start();
 		else
-			ValueAnimator.ofObject(new LeftShadowEvaluator(this), _leftShadowAlpha, 255).start();
+			ValueAnimator.ofObject(leftShadowEvaluator, leftShadowAlpha, 255).start();
 		if(canScrollHorizontally(1))
-			ValueAnimator.ofObject(new RightShadowEvaluator(this), _rightShadowAlpha, 255).start();
+			ValueAnimator.ofObject(rightShadowEvaluator, rightShadowAlpha, 255).start();
 		else
-			ValueAnimator.ofObject(new RightShadowEvaluator(this), _rightShadowAlpha, 255).start();
+			ValueAnimator.ofObject(rightShadowEvaluator, rightShadowAlpha, 255).start();
+	}
+	@Override
+	public boolean shouldDelayChildPressedState() {
+		return false;
 	}
 
 	public void toggleVisibility() {
-		if(getTranslationY() != 0) {
-			animate().translationY(0).start();
+		if(isHidden()) {
+			show();
 		} else {
-			animate().translationY(getHeight()).start();
+			hide();
 		}
 	}
+
+	public void show() {
+		animate().translationY(0).alpha(1f).start();
+	}
+
+	public void hide() {
+		animate().translationY(getHeight()).alpha(0f).start();
+	}
+
+	public boolean isHidden() {
+		return getTranslationY() != 0;
+	}
 	
-	private boolean _enableScrolling = false;
+	private boolean enableScrolling = false;
 	public void enableScrolling() {
-		_enableScrolling = true;
+		enableScrolling = true;
 	}
 	public void disableScrolling() {
-		_enableScrolling = false;
+		enableScrolling = false;
 	}
 }
