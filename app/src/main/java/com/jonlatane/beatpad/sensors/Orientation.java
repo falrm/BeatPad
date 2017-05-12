@@ -11,6 +11,7 @@ import android.hardware.SensorManager;
  */
 
 public class Orientation {
+    private static final String TAG = Orientation.class.getSimpleName();
     public static Float azimuth = 0f;
     public static Float pitch = 0f;
     public static Float roll = 0f;
@@ -36,5 +37,27 @@ public class Orientation {
             @Override
             public void onAccuracyChanged(Sensor sensor, int accuracy) {}
         }, sensor, 10000);
+    }
+
+    /**
+     * Device pitch as a float between 0 and 1.  Only really allows tilts up to +/-75 degrees above/below
+     * the ground.
+     * @return
+     */
+    public static float normalizedDevicePitch() {
+        float normalizedPitch = Math.max(0f, Math.min(1f, (1.58f - pitch * 1.2f) / 3.14f));
+        return normalizedPitch;
+    }
+
+    /**
+     * Device roll as a float between -0.5 (left) and 0.5 (right)
+     * @return
+     */
+    public static float normalizedDeviceRoll() {
+        float relativeRoll = roll;
+        while(relativeRoll > 1.62) relativeRoll -= 1.62;
+        while(relativeRoll <-1.62) relativeRoll += 1.62;
+        relativeRoll /= 3.14;
+        return relativeRoll;
     }
 }

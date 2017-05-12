@@ -1,14 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.jonlatane.beatpad.MainActivity">
 
-    <com.jonlatane.beatpad.view.TopologyView
+    <Button
+        android:layout_width="90dp"
+        android:layout_height="50dp"
+        android:textSize="12dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:text="SEQ"
+        android:id="@+id/sequencerToggle"
+        />
+
+    <Button
+        android:layout_width="90dp"
+        android:layout_height="80dp"
+        android:textSize="12dp"
+        android:layout_below="@id/sequencerToggle"
+        android:layout_alignParentRight="true"
+        android:text="TEMPO"
+        android:id="@+id/tempoTapper"
+        />
+
+    <com.jonlatane.beatpad.view.melody.MelodyView
+        android:id="@+id/melody"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/key_height_white"
+        android:layout_alignParentBottom="true"/>
+
+    <com.jonlatane.beatpad.view.topology.TopologyView
         android:id="@+id/topology"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_above="@id/melody"/>
 
-</android.support.constraint.ConstraintLayout>
+    <com.jonlatane.beatpad.view.keyboard.KeyboardView
+        android:id="@+id/keyboard"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/key_height_white"
+        android:translationY="150dp"
+        android:alpha="0"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

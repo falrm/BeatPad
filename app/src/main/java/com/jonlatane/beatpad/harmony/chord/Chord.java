@@ -12,14 +12,15 @@ import java.util.List;
  */
 
 public class Chord implements Parcelable {
+    private static final String TAG = Chord.class.getSimpleName();
     static final String[] NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
-    public static final int[] MAJOR = {0, 4, 7};
-    public static final int[] MAJOR_6 = {0, 4, 7, 9};
-    public static final int[] MAJOR_6_9 = {0, 2, 4, 7, 9};
-    public static final int[] MAJOR_7 = {0, 4, 7, 11};
-    public static final int[] MINOR = {0, 3, 7};
-    public static final int[] MINOR_7 = {0, 3, 7, 10};
-    public static final int[] MINOR__MAJOR_7 = {0, 3, 7, 11};
+    public static final int[] MAJ = {0, 4, 7};
+    public static final int[] MAJ_6 = {0, 4, 7, 9};
+    public static final int[] MAJ_6_9 = {0, 2, 4, 7, 9};
+    public static final int[] MAJ_7 = {0, 4, 7, 11};
+    public static final int[] MIN = {0, 3, 7};
+    public static final int[] MIN_7 = {0, 3, 7, 10};
+    public static final int[] MIN_MAJ_7 = {0, 3, 7, 11};
     public static final int[] DOM_7 = {0, 4, 7, 10};
     public static final int[] DIM = {0, 3, 6};
     public static final int[] AUG = {0, 4, 8};
@@ -98,7 +99,7 @@ public class Chord implements Parcelable {
         while(currentRoot + 12 < bottom) {
             currentRoot += 12;
         }
-        while(currentRoot + 24 < top) {
+        while(currentRoot + 12 <= top) {
             for(int color : extension) {
                 int tone = currentRoot + color;
                 if(tone >= bottom && tone <= top) {
@@ -124,6 +125,18 @@ public class Chord implements Parcelable {
 
     public boolean isDominant() {
         return heptatonics.isDominant();
+    }
+
+    public boolean containsTone(int tone) {
+        return containsColor(tone - root);
+    }
+
+    public boolean containsColor(int color) {
+        color = (1200 + color) % 12;
+        for(int i : extension) {
+            if(color == i) return true;
+        }
+        return false;
     }
 
     @Override

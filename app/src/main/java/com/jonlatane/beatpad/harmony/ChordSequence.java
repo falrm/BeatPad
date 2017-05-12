@@ -8,12 +8,24 @@ import com.jonlatane.beatpad.harmony.chord.Heptatonics;
 
 import static com.jonlatane.beatpad.harmony.chord.Chord.AUG;
 import static com.jonlatane.beatpad.harmony.chord.Chord.DIM;
-import static com.jonlatane.beatpad.harmony.chord.Chord.MAJOR_6;
-import static com.jonlatane.beatpad.harmony.chord.Chord.MINOR_7;
+import static com.jonlatane.beatpad.harmony.chord.Chord.DOM_7;
+import static com.jonlatane.beatpad.harmony.chord.Chord.MAJ_7;
+import static com.jonlatane.beatpad.harmony.chord.Chord.MIN_7;
 import static com.jonlatane.beatpad.harmony.chord.Heptatonics.NONEXISTENT;
 
-public abstract class Sequence {
-    public static Sequence NINES = new Sequence() {
+public abstract class ChordSequence {
+    public static ChordSequence WHOLE_STEPS = new ChordSequence() {
+        @Override
+        public Chord forward(Chord c) {
+            return new Chord(c.root + 2, c.extension);
+        }
+
+        @Override
+        public Chord back(Chord c) {
+            return new Chord(c.root - 2, c.extension);
+        }
+    };
+    public static ChordSequence NINES = new ChordSequence() {
         @Override
         public Chord forward(Chord c) {
             switch(c.heptatonics.second()) {
@@ -36,26 +48,35 @@ public abstract class Sequence {
             }
         }
     };
-    public static Sequence REL_MINOR_MAJOR = new Sequence() {
+    public static ChordSequence REL_MINOR_MAJOR = new ChordSequence() {
         @Override
         public Chord forward(Chord c) {
-            return new Chord(c.root + 3, MAJOR_6);
+            if(c.isMinor()) {
+                return new Chord(c.root + 3, MAJ_7);
+            }
+            return new Chord(c.root + 4, MIN_7);
         }
 
         @Override
         public Chord back(Chord c) {
-            return new Chord(c.root - 3, MINOR_7);
+            if(c.isMinor()) {
+                return new Chord(c.root - 4, MAJ_7);
+            }
+            return new Chord(c.root - 3, MIN_7);
         }
     };
 
-    public static Sequence AUG_DIM = new Sequence() {
+    public static ChordSequence AUG_DIM = new ChordSequence() {
         @Override
         public Chord forward(Chord c) {
             if(c.isMinor() && c.heptatonics.fifth() == Heptatonics.DIMINISHED) {
-                return new Chord(c.root, MINOR_7);
+                return new Chord(c.root, MIN_7);
             }
             if(c.isMinor()) {
-                return new Chord(c.root, MAJOR_6);
+                return new Chord(c.root, DOM_7);
+            }
+            if(c.isDominant()) {
+                return new Chord(c.root, MAJ_7);
             }
             return new Chord(c.root, AUG);
         }
@@ -63,15 +84,18 @@ public abstract class Sequence {
         @Override
         public Chord back(Chord c) {
             if(c.isMajor() && c.heptatonics.fifth() == Heptatonics.AUGMENTED) {
-                return new Chord(c.root, MAJOR_6);
+                return new Chord(c.root, MAJ_7);
             }
             if(c.isMinor()) {
                 return new Chord(c.root, DIM);
             }
-            return new Chord(c.root, MINOR_7);
+            if(c.isMajor() && !c.isDominant()) {
+                return new Chord(c.root, DOM_7);
+            }
+            return new Chord(c.root, MIN_7);
         }
     };
-    public static Sequence CHROMATIC = new Sequence() {
+    public static ChordSequence CHROMATIC = new ChordSequence() {
         @Override
         public Chord forward(Chord c) {
             return new Chord(c.root + 1, c.extension);
@@ -82,7 +106,18 @@ public abstract class Sequence {
             return new Chord(c.root - 1, c.extension);
         }
     };
-    public static Sequence CIRCLE_OF_FIFTHS = new Sequence() {
+    public static ChordSequence CIRCLE_OF_FIFTHS = new ChordSequence() {
+        @Override
+        public Chord forward(Chord c) {
+            return new Chord(c.root - 7, c.extension);
+        }
+
+        @Override
+        public Chord back(Chord c) {
+            return new Chord(c.root + 7, c.extension);
+        }
+    };
+    public static ChordSequence CIRCLE_OF_FOURTHS = new ChordSequence() {
         @Override
         public Chord forward(Chord c) {
             return new Chord(c.root + 7, c.extension);
@@ -93,25 +128,25 @@ public abstract class Sequence {
             return new Chord(c.root - 7, c.extension);
         }
     };
-    public static Sequence TWO_FIVE_ONE = new Sequence() {
+    public static ChordSequence TWO_FIVE_ONE = new ChordSequence() {
         @Override
         public Chord forward(Chord c) {
             if(c.isMinor()) {
                 return new Chord(c.root - 7, Chord.DOM_7);
             }
             if(c.isDominant()) {
-                return new Chord(c.root - 7, Chord.MAJOR_6);
+                return new Chord(c.root - 7, Chord.MAJ_7);
             }
-            return new Chord(c.root + 2, Chord.MINOR_7);
+            return new Chord(c.root + 2, Chord.MIN_7);
         }
 
         @Override
         public Chord back(Chord c) {
             if(c.isDominant()) {
-                return new Chord(c.root + 7, Chord.MINOR_7);
+                return new Chord(c.root + 7, Chord.MIN_7);
             }
             if(c.isMinor()) {
-                return new Chord(c.root - 2, Chord.MAJOR_6);
+                return new Chord(c.root - 2, Chord.MAJ_7);
             }
             return new Chord(c.root + 7, Chord.DOM_7);
         }

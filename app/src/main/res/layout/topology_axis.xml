@@ -5,5 +5,5 @@
     android:layout_centerInParent="true"
     android:tag="newConnector"
     android:layout_width="5dp"
-    android:layout_height="3dp"
-    android:src="@drawable/topology_connector"/>
+    android:layout_height="50dp"
+    android:src="@drawable/topology_axis"/>
