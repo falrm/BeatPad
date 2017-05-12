@@ -53,7 +53,6 @@ public class KeyboardIOHandler {
 					boolean result = false;
 					if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
 						pressNote(KEY_IDS_INVERSE.get(touchedKey.getId()));
-						touchedKey.setTranslationZ(-10);
 					} else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
 						liftNote(KEY_IDS_INVERSE.get(touchedKey.getId()));
 					} else if (event.getActionMasked() == MotionEvent.ACTION_MOVE
