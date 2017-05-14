@@ -209,22 +209,39 @@ public class TopologyView extends RelativeLayout {
     }
 
     public void addSequence(int index, ChordSequence sequence) {
-        sequences.add(index, new SequenceViews(sequence));
+        if(!containsSequence(sequence)) {
+            sequences.add(index, new SequenceViews(sequence));
+            NavigationAnimations.animateToSelectionPhase(this);
+        }
     }
 
     public void addSequence(ChordSequence sequence) {
-        sequences.add(new SequenceViews(sequence));
-        NavigationAnimations.animateToSelectionPhase(this);
+        addSequence(sequences.size(), sequence);
     }
 
     public void removeSequence(ChordSequence sequence) {
         for(int index = 0; index < sequences.size(); index++) {
-            if(sequences.get(index).sequence == sequence) {
+            SequenceViews views = sequences.get(index);
+            if(views.sequence == sequence) {
+                animateViewOut(views.axis);
+                animateViewOut(views.forward);
+                animateViewOut(views.back);
+                animateViewOut(views.connectForward);
+                animateViewOut(views.connectBack);
                 sequences.remove(index);
                 NavigationAnimations.animateToSelectionPhase(this);
                 break;
             }
         }
+    }
+
+    private void animateViewOut(final View child) {
+        child.animate().alpha(0f).withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                TopologyView.this.removeView(child);
+            }
+        });
     }
 
     public boolean containsSequence(ChordSequence sequence) {

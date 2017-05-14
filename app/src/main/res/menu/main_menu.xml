@@ -15,4 +15,13 @@
     <item android:title="Choose Tempo"
         android:id="@+id/choose_tempo"
         android:orderInCategory="5"/>
+    <item android:title="Basic Mode"
+        android:id="@+id/basic_mode"
+        android:orderInCategory="5"/>
+    <item android:title="Intermediate Mode"
+        android:id="@+id/intermediate_mode"
+        android:orderInCategory="5"/>
+    <item android:title="Advanced Mode"
+        android:id="@+id/advanced_mode"
+        android:orderInCategory="5"/>
 </menu>

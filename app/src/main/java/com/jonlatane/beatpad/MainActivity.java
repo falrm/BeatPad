@@ -32,8 +32,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.jonlatane.beatpad.harmony.ChordSequence.AUG_DIM;
+import static com.jonlatane.beatpad.harmony.ChordSequence.CIRCLE_OF_FIFTHS;
 import static com.jonlatane.beatpad.harmony.ChordSequence.REL_MINOR_MAJOR;
 import static com.jonlatane.beatpad.harmony.ChordSequence.TWO_FIVE_ONE;
+import static com.jonlatane.beatpad.harmony.ChordSequence.WHOLE_STEPS;
 import static com.jonlatane.beatpad.harmony.chord.Chord.MAJ_7;
 
 public class MainActivity extends AppCompatActivity {
@@ -80,12 +82,6 @@ public class MainActivity extends AppCompatActivity {
         RhythmAnimations.wireMelodicControl(topology, harmonyController);
         keyboardIOHandler = new KeyboardIOHandler(keyboard, melodicInstrument);
 
-        topology.addSequence(AUG_DIM);
-        //topology.addSequence(CIRCLE_OF_FIFTHS);
-        topology.addSequence(TWO_FIVE_ONE);
-        //topology.addSequence(WHOLE_STEPS);
-        topology.addSequence(REL_MINOR_MAJOR);
-        //topology.addSequence(NINES);
         topology.setOnChordChangedListener(new TopologyView.OnChordChangedListener() {
             @Override
             public void onChordChanged(Chord c) {
@@ -133,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
         });
         updateTempoButton();
         Orientation.initialize(this);
+        intermediateMode();
     }
 
     @Override
@@ -224,6 +221,15 @@ public class MainActivity extends AppCompatActivity {
                 }
                 keyboard.toggleVisibility();
                 break;
+            case R.id.basic_mode:
+                basicMode();
+                break;
+            case R.id.intermediate_mode:
+                intermediateMode();
+                break;
+            case R.id.advanced_mode:
+                advancedMode();
+                break;
         }
         return true;
     }
@@ -238,5 +244,29 @@ public class MainActivity extends AppCompatActivity {
 
     void updateTempoButton() {
         tempoButton.setText("TEMPO\n" + sequencerThread.beatsPerMinute);
+    }
+
+    void basicMode() {
+        topology.removeSequence(AUG_DIM);
+        topology.removeSequence(CIRCLE_OF_FIFTHS);
+        topology.removeSequence(WHOLE_STEPS);
+        topology.removeSequence(REL_MINOR_MAJOR);
+        topology.addSequence(0,TWO_FIVE_ONE);
+    }
+
+    void intermediateMode() {
+        topology.addSequence(0,AUG_DIM);
+        topology.removeSequence(CIRCLE_OF_FIFTHS);
+        topology.addSequence(1,TWO_FIVE_ONE);
+        topology.removeSequence(WHOLE_STEPS);
+        topology.addSequence(2,REL_MINOR_MAJOR);
+    }
+
+    void advancedMode() {
+        topology.addSequence(0,AUG_DIM);
+        topology.addSequence(1,CIRCLE_OF_FIFTHS);
+        topology.addSequence(2,TWO_FIVE_ONE);
+        topology.addSequence(3,WHOLE_STEPS);
+        topology.addSequence(4,REL_MINOR_MAJOR);
     }
 }
