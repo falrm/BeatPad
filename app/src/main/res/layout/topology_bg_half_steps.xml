@@ -6,4 +6,4 @@
     android:tag="newBG"
     android:layout_width="35dp"
     android:layout_height="2dp"
-    android:src="@drawable/topology_bg_axis"/>
+    android:src="@drawable/topology_bg_half_steps"/>

@@ -24,6 +24,9 @@ import static com.jonlatane.beatpad.harmony.chord.Chord.MAJ_7;
 public class TopologyView extends RelativeLayout {
     private static final String TAG = TopologyView.class.getSimpleName();
     static final float CONNECTOR_Z = 1;
+    static final float CENTRAL_CHORD_SCALE = 2.2f;
+    static final float HALF_STEP_SCALE = 0.7f;
+    static final float CHORD_PADDING_DP = 20f;
     private Chord chord;
     private OnChordChangedListener onChordChangedListener;
 
@@ -90,16 +93,6 @@ public class TopologyView extends RelativeLayout {
 
     public void setOnChordChangedListener(OnChordChangedListener onChordChangedListener) {
         this.onChordChangedListener = onChordChangedListener;
-    }
-
-    public void setCurrentChordClickListener(final OnClickListener listener) {
-        centralChord.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavigationAnimations.animateCentralChordClick(TopologyView.this);
-                listener.onClick(v);
-            }
-        });
     }
 
     private void init() {
@@ -190,7 +183,7 @@ public class TopologyView extends RelativeLayout {
         centralChordBackground.setZ(5);
         centralChordBackground.setTag(null);
 
-        LayoutInflater.from(getContext()).inflate(R.layout.topology_bg_axis, this, true);
+        LayoutInflater.from(getContext()).inflate(R.layout.topology_bg_half_steps, this, true);
         halfStepBackground = (ImageView) findViewWithTag("newBG");
         halfStepBackground.setZ(3);
         halfStepBackground.setTag(null);

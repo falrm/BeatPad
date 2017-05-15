@@ -12,6 +12,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.jonlatane.beatpad.view.topology.TopologyView.CENTRAL_CHORD_SCALE;
+import static com.jonlatane.beatpad.view.topology.TopologyView.CHORD_PADDING_DP;
+import static com.jonlatane.beatpad.view.topology.TopologyView.HALF_STEP_SCALE;
+
 /**
  * TopologyView works with three states for animation consistency.
  *
@@ -27,15 +31,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class NavigationAnimations {
     private static final long DURATION = 200;
-
-    static void animateCentralChordClick(final TopologyView v) {
-        v.centralChord.animate().scaleX(2.5f).scaleY(2.5f).setDuration(DURATION/2).withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                v.centralChord.animate().scaleX(2f).scaleY(2f).setDuration(DURATION/2).start();
-            }
-        }).start();
-    }
 
     static void animateToTargetChord(final TopologyView v) {
         View target = v.selectedChord;
@@ -55,7 +50,7 @@ public class NavigationAnimations {
             if(halfStep == v.selectedChord) {
                 toTargetChord.add(
                         halfStep.animate()
-                                .scaleX(2).scaleY(2)
+                                .scaleX(CENTRAL_CHORD_SCALE).scaleY(CENTRAL_CHORD_SCALE)
                                 .translationY(0).translationZBy(10)
                 );
             } else {
@@ -109,7 +104,7 @@ public class NavigationAnimations {
             oppositeView = sv.forward;
             oppositeConn = sv.connectForward;
         }
-        animators.add(targetView.animate().translationX(0).translationY(0).scaleX(2).scaleY(2));
+        animators.add(targetView.animate().translationX(0).translationY(0).scaleX(CENTRAL_CHORD_SCALE).scaleY(CENTRAL_CHORD_SCALE));
         animators.add(targetConn.animate().translationXBy(-tX).translationY(tY/2).alpha(1)
                 .rotation(oppositeConn.getRotation()));
         animators.add(oppositeView.animate().translationXBy(-tX).translationYBy(tY).alpha(0));
@@ -117,33 +112,26 @@ public class NavigationAnimations {
     }
 
     static void skipToInitialState(TopologyView v) {
-        v.centralChord.setScaleX(2);
-        v.centralChord.setScaleY(2);
+        v.centralChord.setScaleX(CENTRAL_CHORD_SCALE);
+        v.centralChord.setScaleY(CENTRAL_CHORD_SCALE);
         v.centralChord.setTranslationX(0);
         v.centralChord.setTranslationY(0);
         v.centralChord.setRotation(0);
         v.centralChord.setAlpha(1);
-        for(TextView chord : new TextView [] {v.halfStepUp, v.halfStepDown}) {
-            chord.setScaleX(0.7f);
-            chord.setScaleY(0.7f);
-            chord.setTranslationX(0);
-            chord.setZ(4);
-            if(v.selectedChord != v.halfStepUp && v.selectedChord != v.halfStepDown) {
-                //chord.setTranslationY(0);
-            }
-            if(chord == v.selectedChord && chord == v.halfStepUp) {
-                v.halfStepDown.setAlpha(1);
-                v.halfStepDown.setTranslationY(-(50 + (v.centralChordBackground.getHeight())/2f));
-                //v.halfStepUp.setTranslationY(0);
-            } else if(chord == v.selectedChord && chord == v.halfStepDown) {
-                v.halfStepUp.setAlpha(1);
-                Log.i("hi", "Setting TranslationY "+ (50 + (v.centralChordBackground.getHeight())/2f));
-                v.halfStepUp.setTranslationY(50 + (v.centralChordBackground.getHeight())/2f);
-                //v.halfStepDown.setTranslationY(0);
-                Log.i("hi", "hsU tY = " + v.halfStepUp.getTranslationY());
-            }
+        for(TextView halfStep : new TextView [] {v.halfStepUp, v.halfStepDown}) {
+            halfStep.clearAnimation();
+            halfStep.setScaleX(HALF_STEP_SCALE);
+            halfStep.setScaleY(HALF_STEP_SCALE);
+            halfStep.setTranslationX(0);
+            halfStep.setTranslationY(0);
+            halfStep.setAlpha(1);
+            halfStep.setZ(4);
         }
-        Log.i("hi", "hsU tY = " + v.halfStepUp.getTranslationY());
+        if(v.selectedChord == v.halfStepDown) {
+            v.halfStepUp.setTranslationY(-(50 + (v.centralChordBackground.getHeight())/2f));
+        } else if(v.selectedChord == v.halfStepUp) {
+            v.halfStepDown.setTranslationY(50 + (v.centralChordBackground.getHeight())/2f);
+        }
         for(TopologyView.SequenceViews sv : v.sequences) {
             if(sv.forward == v.selectedChord || sv.back == v.selectedChord) {
                 skipToSelectionPhase(v, sv);
@@ -167,7 +155,6 @@ public class NavigationAnimations {
                 }
             }
         }
-        Log.i("hi", "hsU tY = " + v.halfStepUp.getTranslationY());
     }
 
     private static void skipToSelectionPhase(TopologyView v, TopologyView.SequenceViews sv) {
@@ -185,7 +172,7 @@ public class NavigationAnimations {
                 y = (float) (maxTY * sin);
             }
         }
-        skipAxisToSelectionPhase(sv.axis, x, y);
+        //skipAxisToSelectionPhase(sv.axis, x, y);
         skipConnectorsToSelectionPhase(sv, x, y, forwardAngle, v.selectedChord);
         skipChordsToSelectionPhase(sv, x, y, v.selectedChord);
     }
@@ -200,18 +187,18 @@ public class NavigationAnimations {
         Log.i("hi", "hsU tY = " + v.halfStepUp.getTranslationY());
         Log.i("hi", "Animating TranslationY "+ (50 + (v.centralChordBackground.getHeight())/2f));
         v.halfStepUp.animate()
-                .translationY(-(50 + (v.centralChordBackground.getHeight())/2f))
-                .alpha(1).setDuration(DURATION).start();
+            .translationY(-(50 + (v.centralChordBackground.getHeight()) / 2f))
+            .alpha(1).setDuration(DURATION).start();
         v.halfStepDown.animate()
-                .translationY(50 + (v.centralChordBackground.getHeight())/2f)
-                .alpha(1).setDuration(DURATION).start();
+            .translationY(50 + (v.centralChordBackground.getHeight())/2f)
+            .alpha(1).setDuration(DURATION).start();
 
-        animateHeight(v.halfStepBackground,
-                (int) Math.max(100 * density, 200 + v.centralChordBackground.getHeight())
-        );
-        animateWidth(v.halfStepBackground, Math.max(v.halfStepUp.getWidth(), v.halfStepDown.getWidth()));
-        int centralBGWidth = (int) Math.max(200 * density,
-                                            2 * v.centralChord.getWidth() - 20 * density);
+        animateHeight(v.halfStepBackground, Math.round(200 + v.centralChordBackground.getHeight()));
+        animateWidth(v.halfStepBackground, Math.round(Math.max(
+                HALF_STEP_SCALE * v.halfStepUp.getWidth(), HALF_STEP_SCALE * v.halfStepDown.getWidth()
+        )));
+        int centralBGWidth = Math.round(
+                CENTRAL_CHORD_SCALE * (v.centralChord.getWidth() - (density * CHORD_PADDING_DP)));
         animateWidth(v.centralChordBackground, centralBGWidth);
         animateWidth(v.centralChordTouchPoint, centralBGWidth);
         animateWidth(v.centralChordThrobber, centralBGWidth);
@@ -223,7 +210,7 @@ public class NavigationAnimations {
             float x = (float)(maxTX * cos);
             float y = (float)(maxTY * sin);
             animateChordsToSelectionPhase(v, sv, x, y);
-            animateAxisToSelectionPhase(sv.axis, x, y);
+            animateAxisToSelectionPhase(sv, x, y);
             animateConnectorsToSelectionPhase(v, sv, x, y, forwardAngle);
         }
     }
@@ -263,20 +250,12 @@ public class NavigationAnimations {
         sv.back.setTranslationZ(0);
     }
 
-    private static void animateAxisToSelectionPhase(final View axis, float tX, float tY) {
-        float density = axis.getContext().getResources().getDisplayMetrics().density;
-        int width = (int) (density * (tX + 50));
-        ViewPropertyAnimator propertyAnimator = axis.animate().translationY(tY).alpha(0.4f);
-        animateWidth(axis, width);
+    private static void animateAxisToSelectionPhase(final TopologyView.SequenceViews sv, float tX, float tY) {
+        float density = sv.axis.getContext().getResources().getDisplayMetrics().density;
+        int width = Math.round((density * tX) + Math.max(sv.forward.getWidth(), sv.back.getWidth())/2);
+        ViewPropertyAnimator propertyAnimator = sv.axis.animate().translationY(tY).translationX(0).alpha(0.4f);
+        animateWidth(sv.axis, width);
         propertyAnimator.setDuration(DURATION).start();
-    }
-
-    private static void skipAxisToSelectionPhase(final View axis, float tX, float tY) {
-        float density = axis.getContext().getResources().getDisplayMetrics().density;
-        int width = (int) (density * (tX + 50));
-        axis.setTranslationY(tY);
-        axis.setTranslationZ(0);
-        setWidth(axis, width);
     }
 
     private static void animateConnectorsToSelectionPhase(TopologyView v, TopologyView.SequenceViews sv, float tX, float tY, double forwardAngle) {

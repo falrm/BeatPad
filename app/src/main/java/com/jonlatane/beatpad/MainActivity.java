@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void updateTempoButton() {
-        tempoButton.setText("TEMPO\n" + sequencerThread.beatsPerMinute);
+        tempoButton.setText(sequencerThread.beatsPerMinute + " BPM");
     }
 
     void basicMode() {
