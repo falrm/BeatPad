@@ -17,6 +17,7 @@ public class Chord implements Parcelable {
     public static final int[] MAJ = {0, 4, 7};
     public static final int[] MAJ_6 = {0, 4, 7, 9};
     public static final int[] MAJ_6_9 = {0, 2, 4, 7, 9};
+    public static final int[] MAJ_ADD_9 = {0, 2, 4, 7};
     public static final int[] MAJ_7 = {0, 4, 7, 11};
     public static final int[] MIN = {0, 3, 7};
     public static final int[] MIN_7 = {0, 3, 7, 10};
@@ -24,6 +25,7 @@ public class Chord implements Parcelable {
     public static final int[] DOM_7 = {0, 4, 7, 10};
     public static final int[] DIM = {0, 3, 6};
     public static final int[] AUG = {0, 4, 8};
+    public static final int[] SUS = {0, 5, 7};
 
     public final int root;
     public final int[] extension;
@@ -115,18 +117,6 @@ public class Chord implements Parcelable {
         return NAMES[root]+ heptatonics.getColorString();
     }
 
-    public boolean isMinor() {
-        return heptatonics.isMinor();
-    }
-
-    public boolean isMajor() {
-        return heptatonics.isMajor();
-    }
-
-    public boolean isDominant() {
-        return heptatonics.isDominant();
-    }
-
     public boolean containsTone(int tone) {
         return containsColor(tone - root);
     }
@@ -162,4 +152,24 @@ public class Chord implements Parcelable {
             return new Chord[size];
         }
     };
+
+    public boolean isMinor() {
+        return heptatonics.isMinor();
+    }
+
+    public boolean isMajor() {
+        return heptatonics.isMajor();
+    }
+
+    public boolean isSus() {
+        return heptatonics.isSus();
+    }
+
+    public boolean hasMinor7() {
+        return heptatonics.hasMinor7();
+    }
+
+    public boolean isDominant() {
+        return heptatonics.isDominant();
+    }
 }

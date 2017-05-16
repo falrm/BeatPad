@@ -151,7 +151,7 @@ public class MelodyView extends View {
         return "";
     }
 
-    final int backgroundColor = getResources().getColor(R.color.colorAccent);
+    final int backgroundColor = getResources().getColor(R.color.colorAccent, getContext().getTheme());
     final float[] hsl = new float[3];
     Paint paint = new Paint();
     @Override

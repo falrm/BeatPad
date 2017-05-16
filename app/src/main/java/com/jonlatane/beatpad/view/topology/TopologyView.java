@@ -201,6 +201,10 @@ public class TopologyView extends RelativeLayout {
         centralChordTouchPoint.setTag(null);
     }
 
+    public void onResume() {
+        NavigationAnimations.animateToSelectionPhase(this);
+    }
+
     public void addSequence(int index, ChordSequence sequence) {
         if(!containsSequence(sequence)) {
             sequences.add(index, new SequenceViews(sequence));

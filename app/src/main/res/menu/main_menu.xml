@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:title="Melody Instrument"
-        android:id="@+id/melody_instrument"
-        android:orderInCategory="1"/>
+        android:id="@+id/melody_instrument"/>
     <item android:title="Harmony Instrument"
-        android:id="@+id/harmony_instrument"
-        android:orderInCategory="2"/>
+        android:id="@+id/harmony_instrument"/>
     <item android:title="Sequencer Instrument"
-        android:id="@+id/sequencer_instrument"
-        android:orderInCategory="3"/>
-    <item android:title="Use Piano Keyboard"
-        android:id="@+id/keyboard_toggle"
-        android:orderInCategory="4"/>
+        android:id="@+id/sequencer_instrument"/>
     <item android:title="Choose Tempo"
-        android:id="@+id/choose_tempo"
-        android:orderInCategory="5"/>
-    <item android:title="Basic Mode"
-        android:id="@+id/basic_mode"
-        android:orderInCategory="5"/>
-    <item android:title="Intermediate Mode"
-        android:id="@+id/intermediate_mode"
-        android:orderInCategory="5"/>
-    <item android:title="Advanced Mode"
-        android:id="@+id/advanced_mode"
-        android:orderInCategory="5"/>
+        android:id="@+id/choose_tempo"/>
+    <item android:title="Use Piano Keyboard"
+        android:id="@+id/keyboard_toggle"/>
+    <item android:title="Topology Mode">
+        <menu>
+            <item android:title="Basic Mode"
+                android:id="@+id/basic_mode"/>
+            <item android:title="Intermediate Mode"
+                android:id="@+id/intermediate_mode"/>
+            <item android:title="Advanced Mode"
+                android:id="@+id/advanced_mode"/>
+            <item android:title="Chainsmokers Mode"
+                android:id="@+id/chainsmokers_mode"/>
+        </menu>
+    </item>
 </menu>

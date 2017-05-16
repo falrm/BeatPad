@@ -32,6 +32,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.jonlatane.beatpad.harmony.ChordSequence.AUG_DIM;
+import static com.jonlatane.beatpad.harmony.ChordSequence.CHAINSMOKERS;
 import static com.jonlatane.beatpad.harmony.ChordSequence.CIRCLE_OF_FIFTHS;
 import static com.jonlatane.beatpad.harmony.ChordSequence.REL_MINOR_MAJOR;
 import static com.jonlatane.beatpad.harmony.ChordSequence.TWO_FIVE_ONE;
@@ -145,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(this.getClass().getName(), "numChannels: " + config[1]);
         Log.d(this.getClass().getName(), "sampleRate: " + config[2]);
         Log.d(this.getClass().getName(), "mixBufferSize: " + config[3]);
+        topology.onResume();
     }
 
     @Override
@@ -161,6 +163,8 @@ public class MainActivity extends AppCompatActivity {
         if(chord != null) {
             topology.setChord(chord);
         }
+        sequencerThread.beatsPerMinute = savedInstanceState.getInt("tempo");
+        updateTempoButton();
         final byte melodicInstrument = savedInstanceState.getByte("melodicInstrument");
         final byte harmonicInstrument = savedInstanceState.getByte("harmonicInstrument");
         final byte sequencerInstrument = savedInstanceState.getByte("sequencerInstrument");
@@ -182,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable("currentChord", topology.getChord());
+        outState.putInt("tempo", sequencerThread.beatsPerMinute);
         outState.putByte("melodicInstrument", melodicInstrument.instrument);
         outState.putByte("harmonicInstrument", harmonicInstrument.instrument);
         outState.putByte("sequencerInstrument", sequencerInstrument.instrument);
@@ -230,6 +235,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.advanced_mode:
                 advancedMode();
                 break;
+            case R.id.chainsmokers_mode:
+                chainsmokersMode();
+                break;
         }
         return true;
     }
@@ -247,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void basicMode() {
+        topology.removeSequence(CHAINSMOKERS);
         topology.removeSequence(AUG_DIM);
         topology.removeSequence(CIRCLE_OF_FIFTHS);
         topology.removeSequence(WHOLE_STEPS);
@@ -255,18 +264,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void intermediateMode() {
-        topology.addSequence(0,AUG_DIM);
+        topology.removeSequence(CHAINSMOKERS);
         topology.removeSequence(CIRCLE_OF_FIFTHS);
-        topology.addSequence(1,TWO_FIVE_ONE);
         topology.removeSequence(WHOLE_STEPS);
+        topology.addSequence(0,AUG_DIM);
+        topology.addSequence(1,TWO_FIVE_ONE);
         topology.addSequence(2,REL_MINOR_MAJOR);
     }
 
     void advancedMode() {
+        topology.removeSequence(CHAINSMOKERS);
         topology.addSequence(0,AUG_DIM);
         topology.addSequence(1,CIRCLE_OF_FIFTHS);
         topology.addSequence(2,TWO_FIVE_ONE);
         topology.addSequence(3,WHOLE_STEPS);
         topology.addSequence(4,REL_MINOR_MAJOR);
+    }
+
+    void chainsmokersMode() {
+        topology.removeSequence(AUG_DIM);
+        topology.removeSequence(WHOLE_STEPS);
+        topology.removeSequence(TWO_FIVE_ONE);
+        topology.addSequence(0,CIRCLE_OF_FIFTHS);
+        topology.addSequence(1,CHAINSMOKERS);
+        topology.addSequence(2,REL_MINOR_MAJOR);
     }
 }

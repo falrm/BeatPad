@@ -100,7 +100,7 @@ public final class Heptatonics {
             colorString += "(b11)";
         } else if(degreeColors[4] == AUGMENTED){
             colorString += "(#11)";
-        } else if(degreeColors[4] == PERFECT && !namedColors[4]) {
+        } else if(degreeColors[4] == PERFECT && !namedColors[4] && degreeColors[3] != NONEXISTENT) {
             colorString += "(11)";
         }
         namedColors[4] = true;
@@ -128,6 +128,17 @@ public final class Heptatonics {
             colorString = "m" + colorString;
         }
 
+        // Name sus chords
+        if(degreeColors[3] == NONEXISTENT) {
+            if(degreeColors[4] == PERFECT) {
+                colorString = "sus" + colorString;
+            } else if(degreeColors[2] == MAJOR) {
+                colorString = "sus2" + colorString;
+            } else {
+                colorString = "5" + colorString;
+            }
+        }
+
         return colorString;
     }
 
@@ -136,11 +147,19 @@ public final class Heptatonics {
     }
 
     public boolean isMajor() {
-        return colors.contains(4) || !isMinor();
+        return colors.contains(4);
+    }
+
+    public boolean isSus() {
+        return third() == NONEXISTENT;
     }
 
     public boolean isDominant() {
-        return isMajor() && colors.contains(10);
+        return isMajor() && hasMinor7();
+    }
+
+    public boolean hasMinor7() {
+        return seventh() == MINOR;
     }
 
     /**  @return {@link #MINOR}, {@link #MAJOR} or {@link #NONEXISTENT} */

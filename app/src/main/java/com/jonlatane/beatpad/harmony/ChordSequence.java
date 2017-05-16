@@ -9,11 +9,53 @@ import com.jonlatane.beatpad.harmony.chord.Heptatonics;
 import static com.jonlatane.beatpad.harmony.chord.Chord.AUG;
 import static com.jonlatane.beatpad.harmony.chord.Chord.DIM;
 import static com.jonlatane.beatpad.harmony.chord.Chord.DOM_7;
+import static com.jonlatane.beatpad.harmony.chord.Chord.MAJ;
 import static com.jonlatane.beatpad.harmony.chord.Chord.MAJ_7;
+import static com.jonlatane.beatpad.harmony.chord.Chord.MAJ_ADD_9;
+import static com.jonlatane.beatpad.harmony.chord.Chord.MIN;
 import static com.jonlatane.beatpad.harmony.chord.Chord.MIN_7;
+import static com.jonlatane.beatpad.harmony.chord.Chord.SUS;
 import static com.jonlatane.beatpad.harmony.chord.Heptatonics.NONEXISTENT;
 
 public abstract class ChordSequence {
+    // Based on "Something Just Like This"
+    public static ChordSequence CHAINSMOKERS = new ChordSequence() {
+        @Override
+        public Chord forward(Chord c) {
+            // D -> G(9)
+            if(c.isMajor() && c.heptatonics.second() == NONEXISTENT) {
+                return new Chord(c.root - 7, MAJ_ADD_9);
+            }
+            // Bm -> D
+            if(c.isMinor() && !c.hasMinor7()) {
+                return new Chord(c.root + 3, MAJ);
+            }
+            // Asus -> Bm
+            if(c.isSus()) {
+                return new Chord(c.root + 2, MIN);
+            }
+            // G(9) -> Asus
+            return new Chord(c.root + 2, SUS);
+        }
+
+        @Override
+        public Chord back(Chord c) {
+            // D -> Bm
+            if(c.isMajor() && c.heptatonics.second() == NONEXISTENT) {
+                return new Chord(c.root - 3, MIN);
+            }
+            // Bm -> Asus
+            if(c.isMinor() && !c.hasMinor7()) {
+                return new Chord(c.root - 2, SUS);
+            }
+            // Asus -> G(9)
+            if(c.isSus()) {
+                return new Chord(c.root - 2, MAJ_ADD_9);
+            }
+            // G(9) -> D
+            return new Chord(c.root + 7, MAJ);
+        }
+    };
     public static ChordSequence WHOLE_STEPS = new ChordSequence() {
         @Override
         public Chord forward(Chord c) {
