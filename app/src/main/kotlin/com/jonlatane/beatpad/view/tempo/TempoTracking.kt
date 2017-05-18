@@ -27,7 +27,7 @@ object TempoTracking {
             internal var samples = LongArray(sampleWindowSize)
             internal var samplesTaken = 0
             override fun onTouch(v: View, event: MotionEvent): Boolean {
-                if (event.getAction() === MotionEvent.ACTION_DOWN) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     samples[samplesTaken % sampleWindowSize] = System.currentTimeMillis()
                     if (++samplesTaken >= sampleWindowSize) {
                         reportTempo()

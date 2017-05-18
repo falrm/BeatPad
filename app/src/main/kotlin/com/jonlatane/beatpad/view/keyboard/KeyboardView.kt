@@ -11,24 +11,15 @@ import android.widget.HorizontalScrollView
 
 import com.jonlatane.beatpad.R
 
-class KeyboardView : HorizontalScrollView {
-    var margin: Int = 0
+class KeyboardView @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyle: Int = 0
+) : HorizontalScrollView(context, attrs, defStyle) {
+    val margin: Int = context.resources.displayMetrics.densityDpi/5
 
-    constructor(context: Context) : super(context) {
-        init(context)
-    }
-
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        init(context)
-    }
-
-    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
-        init(context)
-    }
-
-    internal fun init(c: Context) {
-        margin = c.getResources().getDisplayMetrics().densityDpi / 5
-        LayoutInflater.from(c).inflate(R.layout.view_keyboard, this, true)
+    init {
+        LayoutInflater.from(context).inflate(R.layout.view_keyboard, this, true)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -38,20 +29,16 @@ class KeyboardView : HorizontalScrollView {
         if (enableScrolling && event.getPointerCount() < 2)
             super.onTouchEvent(event)
 
-        if (event.getActionMasked() === MotionEvent.ACTION_UP && event.getPointerCount() < 2)
+        if (event.getActionMasked() == MotionEvent.ACTION_UP && event.getPointerCount() < 2)
             disableScrolling()
         return true
     }
 
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
-        if (event.getActionMasked() === MotionEvent.ACTION_DOWN && event.getX() < margin || event.getX() > getWidth() - margin)
+        if (event.getActionMasked() == MotionEvent.ACTION_DOWN && event.getX() < margin || event.getX() > getWidth() - margin)
             return true
         return false
     }
-
-    /*
-	 * onDraw and these types and variables are used to render the drop shadows on the right and left.
-	 */
     private var leftShadowAlpha = 255
     private var rightShadowAlpha = 255
     private val leftShadowEvaluator = object : IntEvaluator() {
@@ -69,7 +56,7 @@ class KeyboardView : HorizontalScrollView {
         }
     }
 
-    override     protected fun onDraw(c: Canvas) {
+    override protected fun onDraw(c: Canvas) {
         super.onDraw(c)
 
         if (canScrollHorizontally(-1))
@@ -103,7 +90,7 @@ class KeyboardView : HorizontalScrollView {
     }
 
     val isHidden: Boolean
-        get() = getTranslationY() !== 0f
+        get() = getTranslationY() != 0f
 
     private var enableScrolling = false
     fun enableScrolling() {
@@ -115,6 +102,6 @@ class KeyboardView : HorizontalScrollView {
     }
 
     companion object {
-        private val TAG = KeyboardView::class.java!!.getSimpleName()
+        private val TAG = KeyboardView::class.simpleName
     }
 }

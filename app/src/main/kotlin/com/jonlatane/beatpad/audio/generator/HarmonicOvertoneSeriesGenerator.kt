@@ -53,15 +53,15 @@ class HarmonicOvertoneSeriesGenerator @JvmOverloads constructor(internal var ove
         }
     }
 
-    override fun getAudioTrackFor(n: Int): AudioTrack {
-        val pitchClass = (12 * 100 + n) % 12
-        val octavesFromMiddle = (n - pitchClass) / 12
+    override fun getAudioTrackFor(note: Int): AudioTrack {
+        val pitchClass = (12 * 100 + note) % 12
+        val octavesFromMiddle = (note - pitchClass) / 12
         val freq = FREQUENCIES[pitchClass] * Math.pow(2.toDouble(), octavesFromMiddle.toDouble())
 
         val period = 1.toDouble() / freq
         val numFrames = Math.round(period * AudioTrackGenerator.NATIVE_OUTPUT_SAMPLE_RATE).toInt()
 
-        Log.d(TAG, "Creating track for note $n length $numFrames")
+        Log.d(TAG, "Creating track for note $note length $numFrames")
 
         // Generate the audio sample from a sine wave
         val sample = DoubleArray(numFrames)

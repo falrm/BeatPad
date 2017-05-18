@@ -11,7 +11,7 @@ import android.hardware.SensorManager
  */
 
 object Orientation {
-    private val TAG = Orientation::class.java!!.getSimpleName()
+    private val TAG = Orientation::class.simpleName
     var azimuth = 0f
     var pitch = 0f
     var roll = 0f
@@ -24,7 +24,7 @@ object Orientation {
         val orientationValues = FloatArray(3)
         sensorManager.registerListener(object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent) {
-                if (event.sensor.getType() === Sensor.TYPE_ROTATION_VECTOR) {
+                if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
                     SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
                     SensorManager.getOrientation(rotationMatrix, orientationValues)
                     azimuth = orientationValues[0]

@@ -65,7 +65,7 @@ class MIDIInstrument : Instrument {
     }
 
     companion object {
-        private val TAG = MIDIInstrument::class.java!!.getSimpleName()
+        private val TAG = MIDIInstrument::class.simpleName
         val DRIVER = MidiDriver()
         val NOTE_ON = 0x90.toByte()
         val NOTE_OFF: Byte = 0x80.toByte()
@@ -73,7 +73,7 @@ class MIDIInstrument : Instrument {
         val DEFAULT_VELOCITY = 64
         val MIDI_INSTRUMENT_NAMES: List<String> by lazy {
             val instrumentNames = arrayOfNulls<String>(128)
-            val declaredFields = GeneralMidiConstants::class.java!!.declaredFields
+            val declaredFields = GeneralMidiConstants::class.java.declaredFields
             for (field in declaredFields) {
                 if (java.lang.reflect.Modifier.isStatic(field.modifiers)) {
                     val name = WordUtils.capitalizeFully(field.name.replace('_', ' '))

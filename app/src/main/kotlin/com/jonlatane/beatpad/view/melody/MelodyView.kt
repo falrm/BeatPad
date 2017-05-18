@@ -28,37 +28,13 @@ class MelodyView @JvmOverloads constructor(
         attrs: AttributeSet? = null,
         defStyle: Int = 0
 ) : View(context, attrs, defStyle) {
-    internal var density: Float = 0.toFloat()
-    private var instrument: MIDIInstrument? = null
-
-    private var tones = listOf<Int>()
-    internal var lowest = -60
-    internal var highest = 28
-
-    /**
-     * After calling this, you should not reuse the instrument elsewhere.
-
-     * @param instrument
-     * *
-     * @return
-     */
-    fun setInstrument(instrument: MIDIInstrument): MelodyView {
-        this.instrument?.stop()
-        this.instrument = instrument
-        return this
-    }
-
-    fun setTones(tones: List<Int>) {
-        this.tones = tones
-    }
-
-    internal fun init() {
-        density = getContext().getResources().getDisplayMetrics().density
-    }
-
+    val instrument = MIDIInstrument()
+    var tones = listOf<Int>()
+    internal val density = context.resources.displayMetrics.density
     internal var activePointers: SparseArray<PointF> = SparseArray()
     internal var pointerTones = SparseIntArray()
     internal var pointerVelocities = SparseIntArray()
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         // get pointer index from the event object
         val pointerIndex = event.getActionIndex()
@@ -91,22 +67,20 @@ class MelodyView @JvmOverloads constructor(
                 pointerTones.put(pointerId, tone)
                 pointerVelocities.put(pointerId, velocity)
                 Log.i(TAG, "playing $tone with velocity $velocity")
-                instrument!!.play(tone, velocity)
+                instrument.play(tone, velocity)
             }
             MotionEvent.ACTION_MOVE -> { // a pointer was moved
                 val size = event.getPointerCount()
                 var i = 0
                 while (i < size) {
                     val point = activePointers.get(event.getPointerId(i))
-                    if (point != null) {
-                        point!!.x = event.getX(i)
-                        point!!.y = event.getY(i)
-                    }
+                    point?.x = event.getX(i)
+                    point?.y = event.getY(i)
                     i++
                 }
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> {
-                instrument!!.stop(pointerTones.get(pointerId))
+                instrument.stop(pointerTones.get(pointerId))
                 activePointers.remove(pointerId)
             }
         }
@@ -137,7 +111,7 @@ class MelodyView @JvmOverloads constructor(
     }
 
     companion object {
-        private val TAG = MelodyView::class.java!!.getSimpleName()
+        private val TAG = MelodyView::class.simpleName
 
         fun actionToString(action: Int): String {
             when (action) {

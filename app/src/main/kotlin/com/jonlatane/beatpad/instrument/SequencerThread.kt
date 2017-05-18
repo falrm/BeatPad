@@ -62,6 +62,6 @@ class SequencerThread(instrument: Instrument, beatsPerMinute: Int) : DeviceOrien
         }
 
     companion object {
-        private val TAG = SequencerThread::class.java!!.getSimpleName()
+        private val TAG = SequencerThread::class.simpleName
     }
 }
