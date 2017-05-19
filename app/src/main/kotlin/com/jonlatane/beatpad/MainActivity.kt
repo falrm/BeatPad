@@ -86,16 +86,14 @@ class MainActivity : BaseActivity() {
                 }
             }
         })
-        TempoTracking.trackTempo(tempoTapper, object : TempoTracking.TempoChangeListener {
-            override fun onTempoChanged(tempo: Float) {
-                Log.i(TAG, "onTempoChanged:" + tempo)
-                val bpm = Math.round(tempo)
-                if (bpm > 20) {
-                    sequencerThread.beatsPerMinute = bpm
-                    updateTempoButton()
-                }
+        TempoTracking.trackTempo(tempoTapper) { tempo: Float ->
+            Log.i(TAG, "onTempoChanged:" + tempo)
+            val bpm = Math.round(tempo)
+            if (bpm > 20) {
+                sequencerThread.beatsPerMinute = bpm
+                updateTempoButton()
             }
-        })
+        }
         updateTempoButton()
         Orientation.initialize(this)
         intermediateMode()

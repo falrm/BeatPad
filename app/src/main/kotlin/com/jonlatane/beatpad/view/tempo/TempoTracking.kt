@@ -10,18 +10,15 @@ import java.util.Arrays
  */
 
 object TempoTracking {
-    interface TempoChangeListener {
-        fun onTempoChanged(tempo: Float)
-    }
 
-    fun trackTempo(v: View, onTempoChanged: TempoChangeListener) {
+    fun trackTempo(v: View, onTempoChanged: (Float) -> Unit) {
         trackTempo(v, 2, onTempoChanged)
     }
 
     fun trackTempo(
             v: View,
             sampleWindowSize: Int,
-            onTempoChanged: TempoChangeListener
+            onTempoChanged: (Float) -> Unit
     ) {
         v.setOnTouchListener(object : View.OnTouchListener {
             internal var samples = LongArray(sampleWindowSize)
@@ -50,7 +47,7 @@ object TempoTracking {
                 }
                 avgBpm /= partialBpms.size.toFloat()
 
-                onTempoChanged.onTempoChanged(avgBpm)
+                onTempoChanged(avgBpm)
             }
         })
     }
