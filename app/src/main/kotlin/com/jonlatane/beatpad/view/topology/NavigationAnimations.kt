@@ -1,12 +1,9 @@
 package com.jonlatane.beatpad.view.topology
 
 import android.animation.ValueAnimator
-import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.widget.TextView
-import java.util.LinkedList
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -63,21 +60,15 @@ object NavigationAnimations {
             if (sv.forward === target || sv.back === target) {
                 animateToTargetChord(v, sv, toTargetChord, tX, tY)
             } else {
-                for (notAlongTarget in arrayOf<View>(sv.connectBack, sv.connectForward, sv.axis, sv.forward, sv.back)) {
-                    toTargetChord.add(notAlongTarget.animate().translationXBy(-tX).translationYBy(-tY).alpha(0f))
+                arrayOf(sv.connectBack, sv.connectForward, sv.axis, sv.forward, sv.back).mapTo(toTargetChord) {
+                    it.animate().translationXBy(-tX).translationYBy(-tY).alpha(0f)
                 }
             }
         }
-        afterAll(toTargetChord, object : Runnable {
-            override fun run() {
-                v.updateChordText()
-                skipToInitialState(v)
-                v.post(object : Runnable {
-                    override fun run() {
-                        animateToSelectionPhase(v)
-                    }
-                })
-            }
+        afterAll(toTargetChord, Runnable {
+            v.updateChordText()
+            skipToInitialState(v)
+            v.post { animateToSelectionPhase(v) }
         })
     }
 
@@ -218,7 +209,7 @@ object NavigationAnimations {
 
     private fun skipChordsToSelectionPhase(sv: TopologyView.SequenceViews, tX: Float, tY: Float, target: TextView?) {
         if (target === sv.forward) {
-            sv.back.setTranslationX(-tX)
+            sv.back.translationX = -tX
             sv.back.setTranslationY(tY)
             sv.back.setScaleX(1f)
             sv.back.setScaleY(1f)
@@ -245,8 +236,8 @@ object NavigationAnimations {
     }
 
     private fun animateAxisToSelectionPhase(sv: TopologyView.SequenceViews, tX: Float, tY: Float) {
-        val density = sv.axis.getContext().getResources().getDisplayMetrics().density
-        val width = Math.round(density * tX + Math.max(sv.forward.getWidth(), sv.back.getWidth()) / 2)
+        //val density = sv.axis.getContext().getResources().getDisplayMetrics().density
+        val width = Math.round(2f*tX + Math.max(sv.forward.width, sv.back.width))
         val propertyAnimator = sv.axis.animate().translationY(tY).translationX(0f).alpha(0.4f)
         animateWidth(sv.axis, width)
         propertyAnimator.setDuration(DURATION).start()
@@ -254,8 +245,8 @@ object NavigationAnimations {
 
     private fun animateConnectorsToSelectionPhase(v: TopologyView, sv: TopologyView.SequenceViews, tX: Float, tY: Float, forwardAngle: Double) {
         val connectorWidth = (Math.sqrt((tX * tX + tY * tY).toDouble()) * .7f).toInt()
-        val forwardAlpha = if (v.centralChord.getText().equals(sv.forward.getText())) 0.1f else 0.3f
-        val backAlpha = if (v.centralChord.getText().equals(sv.back.getText())) 0.1f else 0.3f
+        val forwardAlpha = if (v.centralChord.text == sv.forward.text) 0.1f else 0.3f
+        val backAlpha = if (v.centralChord.text == sv.back.text) 0.1f else 0.3f
         sv.connectForward.animate().translationX(tX / 2).translationY(tY / 2)
                 .rotation(Math.toDegrees(forwardAngle).toFloat()).alpha(forwardAlpha).start()
         animateWidth(sv.connectForward, connectorWidth)
@@ -267,66 +258,60 @@ object NavigationAnimations {
     private fun skipConnectorsToSelectionPhase(sv: TopologyView.SequenceViews, tX: Float, tY: Float, forwardAngle: Double, target: TextView?) {
         val connectorWidth = (Math.sqrt((tX * tX + tY * tY).toDouble()) * .7f).toInt()
         if (sv.forward === target) {
-            sv.connectBack.setTranslationX(-tX / 2f)
-            sv.connectBack.setTranslationY(tY / 2f)
-            sv.connectBack.setAlpha(1f)
-            sv.connectBack.setRotation(-Math.toDegrees(forwardAngle).toFloat())
+            sv.connectBack.translationX = -tX / 2f
+            sv.connectBack.translationY = tY / 2f
+            sv.connectBack.alpha = 1f
+            sv.connectBack.rotation = -Math.toDegrees(forwardAngle).toFloat()
             setWidth(sv.connectBack, connectorWidth)
-            sv.connectForward.setTranslationX(0f)
-            sv.connectForward.setTranslationY(0f)
-            sv.connectForward.setAlpha(0f)
-            sv.connectForward.setRotation(0f)
+            sv.connectForward.translationX = 0f
+            sv.connectForward.translationY = 0f
+            sv.connectForward.alpha = 0f
+            sv.connectForward.rotation = 0f
             setWidth(sv.connectForward, 5)
         } else {
-            sv.connectForward.setTranslationX(tX / 2)
-            sv.connectForward.setTranslationY(tY / 2)
-            sv.connectForward.setAlpha(1f)
-            sv.connectForward.setRotation(Math.toDegrees(forwardAngle).toFloat())
+            sv.connectForward.translationX = tX / 2
+            sv.connectForward.translationY = tY / 2
+            sv.connectForward.alpha = 1f
+            sv.connectForward.rotation = Math.toDegrees(forwardAngle).toFloat()
             setWidth(sv.connectForward, connectorWidth)
-            sv.connectBack.setTranslationX(0f)
-            sv.connectBack.setTranslationY(0f)
-            sv.connectBack.setAlpha(0f)
-            sv.connectBack.setRotation(0f)
+            sv.connectBack.translationX = 0f
+            sv.connectBack.translationY = 0f
+            sv.connectBack.alpha = 0f
+            sv.connectBack.rotation = 0f
             setWidth(sv.connectBack, 5)
         }
-        sv.connectBack.setZ(CONNECTOR_Z)
-        sv.connectForward.setZ(CONNECTOR_Z)
+        sv.connectBack.z = CONNECTOR_Z
+        sv.connectForward.z = CONNECTOR_Z
     }
 
     private fun animateWidth(v: View, width: Int) {
-        val anim = ValueAnimator.ofInt(v.getMeasuredWidth(), width)
-        anim.addUpdateListener(object : ValueAnimator.AnimatorUpdateListener {
-            override fun onAnimationUpdate(valueAnimator: ValueAnimator) {
-                val `val` = valueAnimator.getAnimatedValue() as Int
-                setWidth(v, `val`)
-            }
-        })
-        anim.setDuration(DURATION)
+        val anim = ValueAnimator.ofInt(v.measuredWidth, width)
+        anim.addUpdateListener { valueAnimator ->
+            val value = valueAnimator.animatedValue as Int
+            setWidth(v, value)
+        }
         anim.setDuration(DURATION).start()
     }
 
     private fun animateHeight(v: View, height: Int) {
-        val anim = ValueAnimator.ofInt(v.getMeasuredHeight(), height)
-        anim.addUpdateListener(object : ValueAnimator.AnimatorUpdateListener {
-            override fun onAnimationUpdate(valueAnimator: ValueAnimator) {
-                val `val` = valueAnimator.getAnimatedValue() as Int
-                setHeight(v, `val`)
-            }
-        })
-        anim.setDuration(DURATION)
+        val anim = ValueAnimator.ofInt(v.measuredHeight, height)
+        anim.addUpdateListener { valueAnimator ->
+            val value = valueAnimator.animatedValue as Int
+            setHeight(v, value)
+        }
         anim.setDuration(DURATION).start()
     }
 
     private fun setWidth(v: View, `val`: Int) {
-        val layoutParams = v.getLayoutParams()
+        val layoutParams = v.layoutParams
         layoutParams.width = `val`
-        v.setLayoutParams(layoutParams)
+        v.layoutParams = layoutParams
     }
 
     private fun setHeight(v: View, `val`: Int) {
-        val layoutParams = v.getLayoutParams()
+        val layoutParams = v.layoutParams
         layoutParams.height = `val`
-        v.setLayoutParams(layoutParams)
+        v.layoutParams = layoutParams
     }
 
     private fun afterAll(animators: Collection<ViewPropertyAnimator>, action: Runnable) {

@@ -5,13 +5,13 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import org.jetbrains.anko.AnkoLogger
 
 /**
  * Created by jonlatane on 5/5/17.
  */
 
-object Orientation {
-    private val TAG = Orientation::class.simpleName
+object Orientation: AnkoLogger {
     var azimuth = 0f
     var pitch = 0f
     var roll = 0f
@@ -24,7 +24,7 @@ object Orientation {
         val orientationValues = FloatArray(3)
         sensorManager.registerListener(object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent) {
-                if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+                if (event.sensor.type == Sensor.TYPE_ROTATION_VECTOR) {
                     SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
                     SensorManager.getOrientation(rotationMatrix, orientationValues)
                     azimuth = orientationValues[0]
@@ -36,7 +36,7 @@ object Orientation {
 
             override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
             }
-        }, sensor, 10000)
+        }, sensor, 50000)
     }
 
     /**
@@ -54,7 +54,7 @@ object Orientation {
      * @return
      */
     fun normalizedDeviceRoll(): Float {
-        var relativeRoll = roll.toFloat()
+        var relativeRoll = roll
         while (relativeRoll > 1.62) relativeRoll -= 1.62f
         while (relativeRoll < -1.62) relativeRoll += 1.62f
         relativeRoll /= 3.14f
