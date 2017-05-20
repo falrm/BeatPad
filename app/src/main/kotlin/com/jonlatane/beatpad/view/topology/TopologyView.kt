@@ -58,21 +58,16 @@ class TopologyView : RelativeLayout {
                     chord = sequence.forward(chord)
                 }
             }
-            forward.setText(sequence.forward(chord).name)
+            forward.text = sequence.forward(chord).name
             back.setOnClickListener { v: View ->
                 if (!back.getText().equals(centralChord.text)) {
                     selectedChord = v as TextView
                     chord = sequence.back(chord)
                 }
             }
-            back.setText(sequence.back(chord).name)
+            back.text = sequence.back(chord).name
         }
     }
-
-    interface OnChordChangedListener {
-        fun onChordChanged(c: Chord)
-    }
-
 
     constructor(context: Context) : super(context) {
         init()

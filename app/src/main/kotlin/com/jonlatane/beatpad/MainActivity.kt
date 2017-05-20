@@ -2,55 +2,43 @@ package com.jonlatane.beatpad
 
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-
 import com.jonlatane.beatpad.audio.AudioTrackCache
 import com.jonlatane.beatpad.harmony.chord.Chord
-import com.jonlatane.beatpad.instrument.*
+import com.jonlatane.beatpad.instrument.DeviceOrientationInstrument
+import com.jonlatane.beatpad.instrument.MIDIInstrument
+import com.jonlatane.beatpad.instrument.SequencerThread
 import com.jonlatane.beatpad.sensors.Orientation
-import com.jonlatane.beatpad.view.keyboard.*
-import com.jonlatane.beatpad.view.melody.MelodyView
+import com.jonlatane.beatpad.view.keyboard.KeyboardIOHandler
 import com.jonlatane.beatpad.view.tempo.TempoTracking
 import com.jonlatane.beatpad.view.topology.*
-
-import org.billthefarmer.mididriver.GeneralMidiConstants
-import org.billthefarmer.mididriver.MidiDriver
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.android.synthetic.main.activity_main.*
-
-import com.jonlatane.beatpad.harmony.*
-import com.jonlatane.beatpad.harmony.chord.*
+import org.billthefarmer.mididriver.GeneralMidiConstants
+import org.jetbrains.anko.startActivity
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity : BaseActivity() {
+    override val menuResource: Int = R.menu.main_menu
     private val playing = AtomicBoolean(false)
     private val executorService = Executors.newScheduledThreadPool(2)
     private lateinit var playingAdvice: Snackbar
-    internal lateinit var sequencerThread: SequencerThread
-    internal lateinit var harmonicInstrument: MIDIInstrument
-    internal lateinit var sequencerInstrument: MIDIInstrument
-    internal lateinit var keyboardIOHandler: KeyboardIOHandler
-    internal lateinit var menu: Menu
+    private val harmonicInstrument = MIDIInstrument()
+    private val sequencerInstrument = MIDIInstrument()
+    private lateinit var keyboardIOHandler: KeyboardIOHandler
+    internal val sequencerThread = SequencerThread(sequencerInstrument, 120)
 
-    override protected fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        sequencerInstrument = MIDIInstrument()
-        sequencerThread = SequencerThread(sequencerInstrument, 120)
-        harmonicInstrument = MIDIInstrument()
-
-        melody.instrument.channel = 2
-        melody.instrument.instrument = GeneralMidiConstants.ELECTRIC_PIANO_0
+        melody.instrument.channel = 0
         harmonicInstrument.channel = 1
+        sequencerInstrument.channel = 2
 
+        melody.instrument.instrument = GeneralMidiConstants.ELECTRIC_PIANO_0
         harmonicInstrument.instrument = GeneralMidiConstants.SYNTHBRASS_1
         sequencerInstrument.instrument = GeneralMidiConstants.STRING_ENSEMBLE_0
 
@@ -66,8 +54,7 @@ class MainActivity : BaseActivity() {
             keyboardIOHandler.highlightChord(c)
         }
 
-        playingAdvice = Snackbar.make(topology,
-                "Tap the SEQ button again to stop playback.", Snackbar.LENGTH_SHORT)
+        playingAdvice = Snackbar.make(topology, "Tap the SEQ button again to stop playback.", Snackbar.LENGTH_SHORT)
         sequencerToggle.setOnClickListener(object : View.OnClickListener {
             internal var shown = false
             override fun onClick(v: View) {
@@ -96,29 +83,17 @@ class MainActivity : BaseActivity() {
         }
         updateTempoButton()
         Orientation.initialize(this)
-        intermediateMode()
+        topology.intermediateMode()
     }
 
-    override protected fun onResume() {
+    override fun onResume() {
         super.onResume()
-        MIDIInstrument.DRIVER.start()
-
-        // Get the configuration.
-        val config = MIDIInstrument.DRIVER.config()
-
-        // Print out the details.
-        Log.d(TAG, "maxVoices: " + config[0])
-        Log.d(TAG, "numChannels: " + config[1])
-        Log.d(TAG, "sampleRate: " + config[2])
-        Log.d(TAG, "mixBufferSize: " + config[3])
         topology.onResume()
     }
 
     override fun onPause() {
         super.onPause()
         sequencerThread.stopped = true
-        AudioTrackCache.releaseAll()
-        MIDIInstrument.DRIVER.stop()
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -144,82 +119,40 @@ class MainActivity : BaseActivity() {
         outState.putByte("sequencerInstrument", sequencerInstrument.instrument)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = getMenuInflater()
-        inflater.inflate(R.menu.main_menu, menu)
-        this.menu = menu
-        updateInstrumentNames()
-        return true
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.getItemId()) {
-            R.id.melody_instrument -> Dialogs.showInstrumentPicker(this, melody.instrument)
-            R.id.harmony_instrument -> Dialogs.showInstrumentPicker(this, harmonicInstrument)
-            R.id.sequencer_instrument -> Dialogs.showInstrumentPicker(this, sequencerInstrument)
-            R.id.choose_tempo -> Dialogs.showTempoPicker(this)
+        when (item.itemId) {
+            R.id.melody_instrument -> showInstrumentPicker(this, melody.instrument)
+            R.id.harmony_instrument -> showInstrumentPicker(this, harmonicInstrument)
+            R.id.sequencer_instrument -> showInstrumentPicker(this, sequencerInstrument)
+            R.id.choose_tempo -> showTempoPicker(this)
             R.id.keyboard_toggle -> {
                 if (keyboard.isHidden) {
                     keyboard.show()
-                    item.setTitle("Use Color Keyboard")
+                    item.title = "Use Color Keyboard"
                 } else {
                     keyboard.hide()
-                    item.setTitle("Use Piano Keyboard")
+                    item.title = "Use Piano Keyboard"
                 }
                 keyboard.toggleVisibility()
             }
-            R.id.basic_mode -> basicMode()
-            R.id.intermediate_mode -> intermediateMode()
-            R.id.advanced_mode -> advancedMode()
-            R.id.chainsmokers_mode -> chainsmokersMode()
+            R.id.basic_mode -> topology.basicMode()
+            R.id.intermediate_mode -> topology.intermediateMode()
+            R.id.advanced_mode -> topology.advancedMode()
+            R.id.chainsmokers_mode -> topology.chainsmokersMode()
+            R.id.conduct -> startActivity<ConductorActivity>()
+            R.id.play -> startActivity<InstrumentActivity>()
         }
         return true
     }
 
     override fun updateInstrumentNames() {
-        menu.findItem(R.id.melody_instrument).setTitle("Melody: ${melody.instrument.instrumentName}")
-        menu.findItem(R.id.harmony_instrument).setTitle("Harmony: ${harmonicInstrument.instrumentName}")
-        menu.findItem(R.id.sequencer_instrument).setTitle("Sequencer: ${sequencerInstrument.instrumentName}")
+        menu.findItem(R.id.melody_instrument).title = "Melody: ${melody.instrument.instrumentName}"
+        menu.findItem(R.id.harmony_instrument).title = "Harmony: ${harmonicInstrument.instrumentName}"
+        menu.findItem(R.id.sequencer_instrument).title = "Sequencer: ${sequencerInstrument.instrumentName}"
     }
 
     internal fun updateTempoButton() {
-        tempoTapper.setText("${sequencerThread.beatsPerMinute} BPM")
-    }
-
-    private fun basicMode() {
-        topology.removeSequence(CHAINSMOKERS)
-        topology.removeSequence(AUG_DIM)
-        topology.removeSequence(CIRCLE_OF_FIFTHS)
-        topology.removeSequence(WHOLE_STEPS)
-        topology.removeSequence(REL_MINOR_MAJOR)
-        topology.addSequence(0, TWO_FIVE_ONE)
-    }
-
-    private fun intermediateMode() {
-        topology.removeSequence(CHAINSMOKERS)
-        topology.removeSequence(CIRCLE_OF_FIFTHS)
-        topology.removeSequence(WHOLE_STEPS)
-        topology.addSequence(0, AUG_DIM)
-        topology.addSequence(1, TWO_FIVE_ONE)
-        topology.addSequence(2, REL_MINOR_MAJOR)
-    }
-
-    private fun advancedMode() {
-        topology.removeSequence(CHAINSMOKERS)
-        topology.addSequence(0, AUG_DIM)
-        topology.addSequence(1, CIRCLE_OF_FIFTHS)
-        topology.addSequence(2, TWO_FIVE_ONE)
-        topology.addSequence(3, WHOLE_STEPS)
-        topology.addSequence(4, REL_MINOR_MAJOR)
-    }
-
-    private fun chainsmokersMode() {
-        topology.removeSequence(AUG_DIM)
-        topology.removeSequence(WHOLE_STEPS)
-        topology.removeSequence(TWO_FIVE_ONE)
-        topology.addSequence(0, CIRCLE_OF_FIFTHS)
-        topology.addSequence(1, CHAINSMOKERS)
-        topology.addSequence(2, REL_MINOR_MAJOR)
+        tempoTapper.text = "${sequencerThread.beatsPerMinute} BPM"
     }
 
     companion object {

@@ -22,4 +22,12 @@
                 android:id="@+id/chainsmokers_mode"/>
         </menu>
     </item>
+    <item android:title="Collaborate">
+        <menu>
+            <item android:title="Conduct"
+                android:id="@+id/conduct"/>
+            <item android:title="Play"
+                android:id="@+id/play"/>
+        </menu>
+    </item>
 </menu>
