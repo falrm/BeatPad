@@ -10,20 +10,27 @@ import com.jonlatane.beatpad.instrument.MIDIInstrument
 import com.jonlatane.beatpad.sensors.Orientation
 import com.jonlatane.beatpad.view.topology.*
 import kotlinx.android.synthetic.main.activity_conductor.*
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 import org.jetbrains.anko.nsdManager
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.PrintWriter
 import java.net.ServerSocket
+import java.util.concurrent.Executors
 
-class ConductorActivity : BaseActivity() {
+class ConductorActivity : BaseActivity(), AnkoLogger {
     override val menuResource: Int = R.menu.conduct_menu
     private val conductorInstrument = MIDIInstrument()
-    private var serviceName = "TopologicaConductor"
-    private val socket = ServerSocket(0)
+    private var serviceName = SERVICE_NAME
+    private val serverSocket = ServerSocket(0)
+    private val executorService = Executors.newScheduledThreadPool(2)
     private val registrationListener = object: NsdManager.RegistrationListener {
         override fun onServiceRegistered(serviceInfo: NsdServiceInfo) {
             // Save the service name.  Android may have changed it in order to
             // resolve a conflict, so update the name you initially requested
             // with the name Android actually used.
-            serviceName = serviceInfo.serviceName;
+            serviceName = serviceInfo.serviceName
         }
         override fun onRegistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
             // Registration failed!  Put debugging code here to determine why.
@@ -57,10 +64,28 @@ class ConductorActivity : BaseActivity() {
         // The name is subject to change based on conflicts
         // with other services advertised on the same network.
         serviceInfo.serviceName = serviceName
-        serviceInfo.serviceType = "topologica.conductor"
-        serviceInfo.port = socket.localPort
+        serviceInfo.serviceType = SERVICE_TYPE
+        serviceInfo.port = serverSocket.localPort
 
         nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener)
+        executorService.execute {
+            while(true) {
+                info("Awaiting connection on $serverSocket")
+                val socket = serverSocket.accept()
+                val chord = topology.chord
+                val chordString = "${chord.root}:${chord.extension.joinToString(",")}"
+                info("Sending $chordString to $socket")
+                try {
+                    val output = PrintWriter(socket.getOutputStream(), true)
+                    val input = BufferedReader(InputStreamReader(socket.getInputStream()))
+                    output.println(chordString)
+                    output.close()
+                    input.close()
+                } catch(ignored: Throwable) {} finally {
+                    socket.close()
+                }
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -81,10 +106,20 @@ class ConductorActivity : BaseActivity() {
 
     override fun onPause() {
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        serverSocket.close()
         nsdManager.unregisterService(registrationListener)
     }
 
     override fun updateInstrumentNames() {
         menu.findItem(R.id.conductorInstrument).title = "Instrument: ${conductorInstrument.instrumentName}"
+    }
+
+    companion object {
+        val SERVICE_NAME = "Topologica Conductor"
+        val SERVICE_TYPE = "_topologica._tcp."
     }
 }
