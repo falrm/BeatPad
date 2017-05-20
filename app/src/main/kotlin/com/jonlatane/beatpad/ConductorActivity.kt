@@ -11,6 +11,7 @@ import com.jonlatane.beatpad.sensors.Orientation
 import com.jonlatane.beatpad.view.topology.*
 import kotlinx.android.synthetic.main.activity_conductor.*
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.contentView
 import org.jetbrains.anko.info
 import org.jetbrains.anko.nsdManager
 import java.io.BufferedReader
@@ -31,6 +32,9 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
             // resolve a conflict, so update the name you initially requested
             // with the name Android actually used.
             serviceName = serviceInfo.serviceName
+            contentView?.post {
+                title = serviceName
+            }
         }
         override fun onRegistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
             // Registration failed!  Put debugging code here to determine why.
@@ -63,7 +67,7 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
 
         // The name is subject to change based on conflicts
         // with other services advertised on the same network.
-        serviceInfo.serviceName = serviceName
+        serviceInfo.serviceName = SERVICE_NAME
         serviceInfo.serviceType = SERVICE_TYPE
         serviceInfo.port = serverSocket.localPort
 

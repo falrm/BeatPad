@@ -23,3 +23,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keep class kotlin.reflect.** { *; }
+-keep class org.jetbrains.annotations.** { *; }
+-keep class java.lang.reflect.** { *; }
+-keep class jp.kshoji.javax.sound.** { *; }
