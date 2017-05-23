@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.view.topology
 
+internal val ANIMATION_DURATION: Long = 200
 internal val CONNECTOR_Z = 1f
 internal val CENTRAL_CHORD_SCALE = 2.2f
 internal val HALF_STEP_SCALE = 0.7f

@@ -3,8 +3,10 @@ package com.jonlatane.beatpad.view.topology
 import com.jonlatane.beatpad.harmony.*
 
 /**
+ * Convenient usage modes for [TopologyView].
  * Created by jonlatane on 5/19/17.
  */
+
 fun TopologyView.basicMode() {
     removeSequence(CHAINSMOKERS)
     removeSequence(AUG_DIM)

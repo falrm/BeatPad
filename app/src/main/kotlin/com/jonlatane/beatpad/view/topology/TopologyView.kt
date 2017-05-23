@@ -7,16 +7,13 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.harmony.CHROMATIC
 import com.jonlatane.beatpad.harmony.ChordSequence
 import com.jonlatane.beatpad.harmony.chord.Chord
-import kotlin.properties.Delegates.observable
-
-import java.util.ArrayList
-
-import com.jonlatane.beatpad.harmony.CHROMATIC
 import com.jonlatane.beatpad.harmony.chord.MAJ_7
+import java.util.*
+import kotlin.properties.Delegates.observable
 
 /**
  * Created by jonlatane on 5/5/17.
@@ -28,7 +25,7 @@ class TopologyView : RelativeLayout {
     }
     var chord: Chord by observable(Chord(0, MAJ_7)) { _, _, chord ->
         if (selectedChord != null) {
-            NavigationAnimations.animateToTargetChord(this)
+            animateTo(InitialState)
         } else {
             updateChordText()
         }
@@ -53,14 +50,14 @@ class TopologyView : RelativeLayout {
 
         init {
             forward.setOnClickListener { v: View ->
-                if (!forward.getText().equals(centralChord.text)) {
+                if (forward.text != centralChord.text) {
                     selectedChord = v as TextView
                     chord = sequence.forward(chord)
                 }
             }
             forward.text = sequence.forward(chord).name
             back.setOnClickListener { v: View ->
-                if (!back.getText().equals(centralChord.text)) {
+                if (back.text != centralChord.text) {
                     selectedChord = v as TextView
                     chord = sequence.back(chord)
                 }
@@ -96,82 +93,79 @@ class TopologyView : RelativeLayout {
         inflateBG()
         updateChordText()
         post {
-            NavigationAnimations.skipToInitialState(this@TopologyView)
-            NavigationAnimations.animateToSelectionPhase(this@TopologyView)
+            skipTo(InitialState)
+            animateTo(SelectionState)
         }
     }
 
     internal fun updateChordText() {
-        centralChord.setText(chord.name)
-        halfStepUp.setText(CHROMATIC.forward(chord).name)
-        halfStepDown.setText(CHROMATIC.back(chord).name)
+        centralChord.text = chord.name
+        halfStepUp.text = CHROMATIC.forward(chord).name
+        halfStepDown.text = CHROMATIC.back(chord).name
         for (sv in sequences) {
-            sv.forward.setText(sv.sequence.forward(chord).name)
-            sv.back.setText(sv.sequence.back(chord).name)
+            sv.forward.text = sv.sequence.forward(chord).name
+            sv.back.text = sv.sequence.back(chord).name
         }
     }
 
     private fun inflateChordView(defaultZ: Float = 2f): TextView {
-        LayoutInflater.from(getContext()).inflate(R.layout.topology_chord, this, true)
+        LayoutInflater.from(context).inflate(R.layout.topology_chord, this, true)
         val result = findViewWithTag("newChord") as TextView
-        result.setTag(null)
-        result.setZ(defaultZ)
+        result.tag = null
+        result.z = defaultZ
         return result
     }
 
     private fun inflateAxisView(): ImageView {
-        LayoutInflater.from(getContext()).inflate(R.layout.topology_axis, this, true)
+        LayoutInflater.from(context).inflate(R.layout.topology_axis, this, true)
         val result = findViewWithTag("newConnector") as ImageView
-        result.setZ(0f)
-        result.setTag(null)
+        result.z = 0f
+        result.tag = null
         return result
     }
 
     private fun inflateConnectorView(): ImageView {
-        LayoutInflater.from(getContext()).inflate(R.layout.topology_connector, this, true)
+        LayoutInflater.from(context).inflate(R.layout.topology_connector, this, true)
         val result = findViewWithTag("newConnector") as ImageView
-        result.setZ(CONNECTOR_Z)
-        result.setTag(null)
+        result.z = CONNECTOR_Z
+        result.tag = null
         return result
     }
 
     private fun inflateBG() {
-        LayoutInflater.from(getContext()).inflate(R.layout.topology_bg, this, true)
+        LayoutInflater.from(context).inflate(R.layout.topology_bg, this, true)
         centralChordBackground = findViewWithTag("newBG") as ImageView
-        centralChordBackground.setZ(5f)
-        centralChordBackground.setTag(null)
+        centralChordBackground.z = 5f
+        centralChordBackground.tag = null
 
-        LayoutInflater.from(getContext()).inflate(R.layout.topology_bg_half_steps, this, true)
+        LayoutInflater.from(context).inflate(R.layout.topology_bg_half_steps, this, true)
         halfStepBackground = findViewWithTag("newBG") as ImageView
-        halfStepBackground.setZ(3f)
-        halfStepBackground.setTag(null)
+        halfStepBackground.z = 3f
+        halfStepBackground.tag = null
 
-        LayoutInflater.from(getContext()).inflate(R.layout.topology_bg_highlight, this, true)
+        LayoutInflater.from(context).inflate(R.layout.topology_bg_highlight, this, true)
         centralChordThrobber = findViewWithTag("newBG") as ImageView
-        centralChordThrobber.setZ(6f)
-        centralChordThrobber.setTag(null)
-        centralChordThrobber.setAlpha(0f)
+        centralChordThrobber.z = 6f
+        centralChordThrobber.tag = null
+        centralChordThrobber.alpha = 0f
 
-        LayoutInflater.from(getContext()).inflate(R.layout.topology_bg, this, true)
+        LayoutInflater.from(context).inflate(R.layout.topology_bg, this, true)
         centralChordTouchPoint = findViewWithTag("newBG") as ImageView
-        centralChordTouchPoint.setZ(1000f)
-        centralChordTouchPoint.setAlpha(0f)
-        centralChordTouchPoint.setTag(null)
+        centralChordTouchPoint.z = 1000f
+        centralChordTouchPoint.alpha = 0f
+        centralChordTouchPoint.tag = null
     }
 
     fun onResume() {
-        NavigationAnimations.animateToSelectionPhase(this)
+        animateTo(SelectionState)
     }
 
     fun addSequence(index: Int, sequence: ChordSequence) {
         if (!containsSequence(sequence)) {
             sequences.add(index, SequenceViews(sequence))
-            NavigationAnimations.animateToSelectionPhase(this)
+            updateChordText()
+            post { animateTo(SelectionState) }
         }
-    }
-
-    fun addSequence(sequence: ChordSequence) {
-        addSequence(sequences.size, sequence)
     }
 
     fun removeSequence(sequence: ChordSequence) {
@@ -184,7 +178,7 @@ class TopologyView : RelativeLayout {
                 animateViewOut(views.connectForward)
                 animateViewOut(views.connectBack)
                 sequences.removeAt(index)
-                NavigationAnimations.animateToSelectionPhase(this)
+                animateTo(SelectionState)
                 break
             }
         }
@@ -197,14 +191,6 @@ class TopologyView : RelativeLayout {
     }
 
     fun containsSequence(sequence: ChordSequence): Boolean {
-        for (index in 0..sequences.size - 1) {
-            if (sequences[index].sequence === sequence) {
-                return true
-            }
-        }
-        return false
-    }
-    companion object {
-        private val TAG = TopologyView::class.simpleName
+        return (0..sequences.size - 1).any { sequences[it].sequence === sequence }
     }
 }
