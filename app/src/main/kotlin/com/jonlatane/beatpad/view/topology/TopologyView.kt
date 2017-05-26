@@ -10,6 +10,7 @@ import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.harmony.CHROMATIC
 import com.jonlatane.beatpad.harmony.ChordSequence
+import com.jonlatane.beatpad.harmony.Topology
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.MAJ_7
 import java.util.*
@@ -18,7 +19,7 @@ import kotlin.properties.Delegates.observable
 /**
  * Created by jonlatane on 5/5/17.
  */
-class TopologyView : RelativeLayout {
+class TopologyView : RelativeLayout, Topology.TopologyViewer {
     var onChordChangedListener: ((Chord) -> Unit)? by observable<((Chord) -> Unit)?>(null) {
         _, _, listener ->
         listener?.invoke(chord)
@@ -160,7 +161,7 @@ class TopologyView : RelativeLayout {
         animateTo(SelectionState)
     }
 
-    fun addSequence(index: Int, sequence: ChordSequence) {
+    override fun addSequence(index: Int, sequence: ChordSequence) {
         if (!containsSequence(sequence)) {
             sequences.add(index, SequenceViews(sequence))
             updateChordText()
@@ -168,7 +169,7 @@ class TopologyView : RelativeLayout {
         }
     }
 
-    fun removeSequence(sequence: ChordSequence) {
+    override fun removeSequence(sequence: ChordSequence) {
         for (index in 0..sequences.size - 1) {
             val views = sequences[index]
             if (views.sequence === sequence) {

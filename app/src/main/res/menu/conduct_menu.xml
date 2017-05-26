@@ -10,4 +10,6 @@
         android:id="@+id/advanced_mode"/>
     <item android:title="Chainsmokers Mode"
         android:id="@+id/chainsmokers_mode"/>
+    <item android:title="Pop Mode"
+        android:id="@+id/pop_mode"/>
 </menu>

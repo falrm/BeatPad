@@ -5,10 +5,11 @@ import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
 import android.view.MenuItem
+import com.jonlatane.beatpad.harmony.Topology.*
 import com.jonlatane.beatpad.instrument.DeviceOrientationInstrument
 import com.jonlatane.beatpad.instrument.MIDIInstrument
 import com.jonlatane.beatpad.sensors.Orientation
-import com.jonlatane.beatpad.view.topology.*
+import com.jonlatane.beatpad.view.topology.RhythmAnimations
 import kotlinx.android.synthetic.main.activity_conductor.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.contentView
@@ -57,7 +58,7 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
         topology.onChordChangedListener = { chord ->
             harmonyController.setTones(chord.getTones(-60, 28))
         }
-        topology.intermediateMode()
+        topology.useTopology(intermediate)
         registerService()
     }
 
@@ -95,10 +96,11 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.conductorInstrument -> showInstrumentPicker(this, conductorInstrument)
-            R.id.basic_mode -> topology.basicMode()
-            R.id.intermediate_mode -> topology.intermediateMode()
-            R.id.advanced_mode -> topology.advancedMode()
-            R.id.chainsmokers_mode -> topology.chainsmokersMode()
+            R.id.basic_mode -> topology.useTopology(basic)
+            R.id.intermediate_mode -> topology.useTopology(intermediate)
+            R.id.advanced_mode -> topology.useTopology(advanced)
+            R.id.chainsmokers_mode -> topology.useTopology(chainsmokers)
+            R.id.pop_mode -> topology.useTopology(pop)
         }
         return true
     }

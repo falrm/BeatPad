@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.jonlatane.beatpad.audio.AudioTrackCache
+import com.jonlatane.beatpad.harmony.Topology.*
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.instrument.DeviceOrientationInstrument
 import com.jonlatane.beatpad.instrument.MIDIInstrument
@@ -13,7 +14,7 @@ import com.jonlatane.beatpad.instrument.SequencerThread
 import com.jonlatane.beatpad.sensors.Orientation
 import com.jonlatane.beatpad.view.keyboard.KeyboardIOHandler
 import com.jonlatane.beatpad.view.tempo.TempoTracking
-import com.jonlatane.beatpad.view.topology.*
+import com.jonlatane.beatpad.view.topology.RhythmAnimations
 import kotlinx.android.synthetic.main.activity_main.*
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.startActivity
@@ -83,7 +84,7 @@ class MainActivity : BaseActivity() {
         }
         updateTempoButton()
         Orientation.initialize(this)
-        topology.intermediateMode()
+        topology.useTopology(intermediate)
     }
 
     override fun onResume() {
@@ -135,10 +136,11 @@ class MainActivity : BaseActivity() {
                 }
                 keyboard.toggleVisibility()
             }
-            R.id.basic_mode -> topology.basicMode()
-            R.id.intermediate_mode -> topology.intermediateMode()
-            R.id.advanced_mode -> topology.advancedMode()
-            R.id.chainsmokers_mode -> topology.chainsmokersMode()
+            R.id.basic_mode -> topology.useTopology(basic)
+            R.id.intermediate_mode -> topology.useTopology(intermediate)
+            R.id.advanced_mode -> topology.useTopology(advanced)
+            R.id.chainsmokers_mode -> topology.useTopology(chainsmokers)
+            R.id.pop_mode -> topology.useTopology(pop)
             R.id.conduct -> startActivity<ConductorActivity>()
             R.id.play -> startActivity<InstrumentActivity>()
         }

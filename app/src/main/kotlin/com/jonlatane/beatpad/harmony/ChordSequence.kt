@@ -71,7 +71,22 @@ var NINES: ChordSequence = object : ChordSequence {
         }
     }
 }
-var REL_MINOR_MAJOR: ChordSequence = object : ChordSequence {
+var MAJOR_MINOR_SECONDS: ChordSequence = object : ChordSequence {
+    override fun forward(c: Chord): Chord {
+        if (c.isMinor) {
+            return Chord(c.root + 3, MAJ_7)
+        }
+        return Chord(c.root + 2, MIN_7)
+    }
+
+    override fun back(c: Chord): Chord {
+        if (c.isMinor) {
+            return Chord(c.root - 2, MAJ_7)
+        }
+        return Chord(c.root - 3, MIN_7)
+    }
+}
+var MAJOR_MINOR_THIRDS: ChordSequence = object : ChordSequence {
     override fun forward(c: Chord): Chord {
         if (c.isMinor) {
             return Chord(c.root + 3, MAJ_7)
