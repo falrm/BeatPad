@@ -10,7 +10,7 @@ import android.widget.Button
 
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.harmony.chord.Chord
-import com.jonlatane.beatpad.instrument.MIDIInstrument
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 
 import java.util.Collections
 import java.util.HashSet

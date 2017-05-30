@@ -1,5 +1,6 @@
-package com.jonlatane.beatpad.instrument
+package com.jonlatane.beatpad.output.controller
 
+import com.jonlatane.beatpad.output.instrument.Instrument
 import com.jonlatane.beatpad.sensors.Orientation
 
 /**

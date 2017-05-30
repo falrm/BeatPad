@@ -5,12 +5,12 @@ import android.support.design.widget.Snackbar
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import com.jonlatane.beatpad.audio.AudioTrackCache
+import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.harmony.Topology.*
 import com.jonlatane.beatpad.harmony.chord.Chord
-import com.jonlatane.beatpad.instrument.DeviceOrientationInstrument
-import com.jonlatane.beatpad.instrument.MIDIInstrument
-import com.jonlatane.beatpad.instrument.SequencerThread
+import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.output.controller.SequencerThread
 import com.jonlatane.beatpad.sensors.Orientation
 import com.jonlatane.beatpad.view.keyboard.KeyboardIOHandler
 import com.jonlatane.beatpad.view.tempo.TempoTracking

@@ -2,8 +2,8 @@ package com.jonlatane.beatpad
 
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
-import com.jonlatane.beatpad.audio.AudioTrackCache
-import com.jonlatane.beatpad.instrument.MIDIInstrument
+import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.debug
 

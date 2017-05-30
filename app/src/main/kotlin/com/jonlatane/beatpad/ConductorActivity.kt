@@ -6,8 +6,8 @@ import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
 import android.view.MenuItem
 import com.jonlatane.beatpad.harmony.Topology.*
-import com.jonlatane.beatpad.instrument.DeviceOrientationInstrument
-import com.jonlatane.beatpad.instrument.MIDIInstrument
+import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.sensors.Orientation
 import com.jonlatane.beatpad.view.topology.RhythmAnimations
 import kotlinx.android.synthetic.main.activity_conductor.*

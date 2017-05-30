@@ -13,7 +13,7 @@ import android.util.SparseIntArray
 import android.view.MotionEvent
 import android.view.View
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.instrument.MIDIInstrument
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.sensors.Orientation
 import com.jonlatane.beatpad.sensors.Orientation.normalizedDevicePitch
 

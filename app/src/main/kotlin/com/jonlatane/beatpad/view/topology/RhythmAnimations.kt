@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewPropertyAnimator
 import android.view.animation.DecelerateInterpolator
 
-import com.jonlatane.beatpad.instrument.DeviceOrientationInstrument
+import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 
 /**
  * Created by jonlatane on 5/8/17.

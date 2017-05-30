@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.instrument
+package com.jonlatane.beatpad.output.instrument
 
 /**
  * Created by jonlatane on 5/8/17.

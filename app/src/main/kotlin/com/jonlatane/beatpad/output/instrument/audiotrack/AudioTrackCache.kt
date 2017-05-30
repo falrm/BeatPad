@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.audio
+package com.jonlatane.beatpad.output.instrument.audiotrack
 
 import android.media.AudioTrack
 import android.os.Build

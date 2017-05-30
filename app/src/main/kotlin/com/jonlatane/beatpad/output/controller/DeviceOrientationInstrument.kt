@@ -1,7 +1,7 @@
-package com.jonlatane.beatpad.instrument
+package com.jonlatane.beatpad.output.controller
 
+import com.jonlatane.beatpad.output.instrument.Instrument
 import com.jonlatane.beatpad.sensors.Orientation
-import android.util.Log
 
 /**
  * Created by jonlatane on 5/8/17.
@@ -22,10 +22,9 @@ open class DeviceOrientationInstrument(val instrument: Instrument) {
             val relativePitch = Orientation.normalizedDevicePitch()
             //Log.i(TAG, String.format("Relative pitch: %.2f", relativePitch));
             val toneIndex = Math.round((tones!!.size - toneSpread) * relativePitch).toInt()
-            for (i in 0..numSimultaneousTones - 1) {
-                val tone = tones!![toneIndex + i * toneSpread / numSimultaneousTones]
-                instrument.play(tone)
-            }
+            (0..numSimultaneousTones - 1)
+              .map { tones!![toneIndex + it * toneSpread / numSimultaneousTones] }
+              .forEach { instrument.play(it) }
         }
     }
 

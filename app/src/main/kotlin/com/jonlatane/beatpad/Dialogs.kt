@@ -12,7 +12,7 @@ import android.widget.NumberPicker
 import android.widget.TextView
 import com.jonlatane.beatpad.ConductorActivity.Companion.SERVICE_NAME
 import com.jonlatane.beatpad.ConductorActivity.Companion.SERVICE_TYPE
-import com.jonlatane.beatpad.instrument.MIDIInstrument
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import org.jetbrains.anko.contentView
 import org.jetbrains.anko.nsdManager
 
