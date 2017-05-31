@@ -20,7 +20,7 @@ object RhythmAnimations {
                     v.centralChordThrobber.alpha = 0.1f
                     v.centralChordThrobber.scaleX = 0.5f
                     v.centralChordThrobber.scaleY = 0.5f
-                    v.centralChordThrobber.z = 6f
+                    v.centralChordThrobber.z = Float.MAX_VALUE
                     v.post {
                         animator = v.centralChordThrobber.animate().scaleX(1f).scaleY(1f).alpha(0.3f)
                                 .setDuration(2000).setInterpolator(DecelerateInterpolator(2f))
@@ -29,10 +29,11 @@ object RhythmAnimations {
                     return true
                 } else if (event.action == MotionEvent.ACTION_UP) {
                     instrument.stop()
-                    v.centralChordThrobber.z = 1f
+                    v.centralChordThrobber.z = Float.MIN_VALUE
                     if (animator != null) {
                         animator!!.cancel()
                     }
+                    v.centralChordThrobber.alpha = 0f
                 }
                 return false
             }

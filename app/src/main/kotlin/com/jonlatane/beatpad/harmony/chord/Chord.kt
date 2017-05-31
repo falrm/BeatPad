@@ -2,9 +2,7 @@ package com.jonlatane.beatpad.harmony.chord
 
 import android.os.Parcel
 import android.os.Parcelable
-
-import java.util.Arrays
-import java.util.LinkedList
+import java.util.*
 
 /**
  * Created by jonlatane on 5/5/17.
@@ -110,20 +108,19 @@ class Chord : Parcelable {
         return false
     }
 
-    val isMinor: Boolean
-        get() = heptatonics.isMinor
+    val isMinor: Boolean get() = heptatonics.isMinor
 
-    val isMajor: Boolean
-        get() = heptatonics.isMajor
+    val isMajor: Boolean get() = heptatonics.isMajor
 
-    val isSus: Boolean
-        get() = heptatonics.isSus
+    val isSus: Boolean get() = heptatonics.isSus
 
-    val hasMinor7: Boolean
-        get() = heptatonics.hasMinor7
+    val hasMinor7: Boolean get() = heptatonics.hasMinor7
 
-    val isDominant: Boolean
-        get() = heptatonics.isDominant
+    val isDominant: Boolean get() = heptatonics.isDominant
+
+    val isAugmented: Boolean get() = isMajor && heptatonics.fifth == AUGMENTED
+
+    val isDiminished: Boolean get() = isMinor && heptatonics.fifth == DIMINISHED
 
     companion object {
         private val TAG = Chord::class.java.simpleName

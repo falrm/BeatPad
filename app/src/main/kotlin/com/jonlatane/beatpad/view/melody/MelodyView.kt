@@ -87,7 +87,8 @@ class MelodyView @JvmOverloads constructor(
         super.onDraw(canvas)
         paint.color = 0xCCFFFFFF.toInt()
         ColorUtils.colorToHSL(backgroundColor, hsl)
-        hsl[1] = Orientation.normalizedDevicePitch()
+        hsl[1] = (Orientation.normalizedDevicePitch() + 0.5f) * 0.5f
+        hsl[2] = (Orientation.normalizedDevicePitch() + 0.5f) * 0.5f
         canvas.drawColor(ColorUtils.HSLToColor(hsl))
         for (i in 0..activePointers.size() - 1) {
             val key = activePointers.keyAt(i)
