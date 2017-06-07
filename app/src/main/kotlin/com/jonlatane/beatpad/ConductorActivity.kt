@@ -99,6 +99,7 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
             R.id.basic_mode -> topology.useTopology(basic)
             R.id.intermediate_mode -> topology.useTopology(intermediate)
             R.id.advanced_mode -> topology.useTopology(advanced)
+            R.id.master_mode -> topology.useTopology(master)
             R.id.chainsmokers_mode -> topology.useTopology(chainsmokers)
             R.id.pop_mode -> topology.useTopology(pop)
         }
@@ -120,7 +121,7 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
         nsdManager.unregisterService(registrationListener)
     }
 
-    override fun updateInstrumentNames() {
+    override fun updateMenuOptions() {
         menu.findItem(R.id.conductorInstrument).title = "Instrument: ${conductorInstrument.instrumentName}"
     }
 

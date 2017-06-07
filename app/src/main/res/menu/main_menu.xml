@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="Melody Instrument"
-        android:id="@+id/melody_instrument"/>
+    <item android:title="Piano Board Instrument"
+          android:id="@+id/piano_board_instrument"/>
+    <item android:title="Color Board Instrument"
+        android:id="@+id/color_board_instrument"/>
     <item android:title="Harmony Instrument"
         android:id="@+id/harmony_instrument"/>
     <item android:title="Sequencer Instrument"
         android:id="@+id/sequencer_instrument"/>
     <item android:title="Choose Tempo"
         android:id="@+id/choose_tempo"/>
-    <item android:title="Use Piano Keyboard"
+    <item android:title="Hide Piano Board"
         android:id="@+id/keyboard_toggle"/>
+    <item android:title="Hide Color Board"
+          android:id="@+id/color_keyboard_toggle"/>
     <item android:title="Topology Mode">
         <menu>
             <item android:title="Basic Mode"
@@ -18,6 +22,8 @@
                 android:id="@+id/intermediate_mode"/>
             <item android:title="Advanced Mode"
                 android:id="@+id/advanced_mode"/>
+            <item android:title="Master Mode"
+                  android:id="@+id/master_mode"/>
             <item android:title="Chainsmokers Mode"
                 android:id="@+id/chainsmokers_mode"/>
             <item android:title="Pop Mode"

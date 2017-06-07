@@ -11,11 +11,11 @@ abstract class BaseActivity : AppCompatActivity(), AnkoLogger {
     lateinit var menu: Menu
     abstract val menuResource: Int
 
-    abstract fun updateInstrumentNames()
+    abstract fun updateMenuOptions()
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(menuResource, menu)
         this.menu = menu
-        updateInstrumentNames()
+        updateMenuOptions()
         return true
     }
 

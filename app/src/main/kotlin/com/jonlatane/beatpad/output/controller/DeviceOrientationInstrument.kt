@@ -8,27 +8,27 @@ import com.jonlatane.beatpad.sensors.Orientation
  */
 
 open class DeviceOrientationInstrument(val instrument: Instrument) {
-    var toneSpread = 5
-    var numSimultaneousTones = 5
-    private var tones: List<Int>? = null
-    fun setTones(tones: List<Int>) {
-        this.tones = tones
-    }
+	var toneSpread = 5
+	var numSimultaneousTones = 5
+	private var tones: List<Int>? = null
+	fun setTones(tones: List<Int>) {
+		this.tones = tones
+	}
 
-    fun play() {
-        // Play the notes
-        if (tones != null) {
-            // Normalize device's physical pitch to a number between 0 and 1
-            val relativePitch = Orientation.normalizedDevicePitch()
-            //Log.i(TAG, String.format("Relative pitch: %.2f", relativePitch));
-            val toneIndex = Math.round((tones!!.size - toneSpread) * relativePitch).toInt()
-            (0..numSimultaneousTones - 1)
-              .map { tones!![toneIndex + it * toneSpread / numSimultaneousTones] }
-              .forEach { instrument.play(it) }
-        }
-    }
+	fun play() {
+		// Play the notes
+		if (tones != null) {
+			// Normalize device's physical pitch to a number between 0 and 1
+			val relativePitch = Orientation.normalizedDevicePitch()
+			//Log.i(TAG, String.format("Relative pitch: %.2f", relativePitch));
+			val toneIndex = Math.round((tones!!.size - toneSpread) * relativePitch).toInt()
+			(0..numSimultaneousTones - 1)
+				.map { tones!![toneIndex + it * toneSpread / numSimultaneousTones] }
+				.forEach { instrument.play(it) }
+		}
+	}
 
-    fun stop() {
-        instrument.stop()
-    }
+	fun stop() {
+		instrument.stop()
+	}
 }

@@ -90,7 +90,7 @@ class InstrumentActivity : BaseActivity(), AnkoLogger {
         }
         return true
     }
-    override fun updateInstrumentNames() {
+    override fun updateMenuOptions() {
         menu.findItem(R.id.color_instrument).title = "Color Instrument: ${melody.instrument.instrumentName}"
         menu.findItem(R.id.keyboard_instrument).title = "Keyboard Instrument: ${keyboardInstrument.instrumentName}"
 

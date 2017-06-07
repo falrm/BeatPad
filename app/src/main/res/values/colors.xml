@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#424242</color>
     <color name="colorAccent">#EC407A</color>
 
+    <color name="brown">#5D4037</color>
+
     <!-- The colors work as such: Dominant is common to both schemes -->
     <color name="dominant">#FFEBEE</color>
 

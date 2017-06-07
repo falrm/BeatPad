@@ -26,7 +26,7 @@ fun showInstrumentPicker(activity: BaseActivity, instrument: MIDIInstrument) {
     builder.setTitle("Choose an instrument")
     builder.setItems(MIDIInstrument.MIDI_INSTRUMENT_NAMES.toTypedArray()) { _, which ->
         instrument.instrument = which.toByte()
-        activity.updateInstrumentNames()
+        activity.updateMenuOptions()
     }
     builder.show()
 }

@@ -7,11 +7,12 @@ import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.harmony.CHROMATIC
 import com.jonlatane.beatpad.harmony.ChordSequence
 import com.jonlatane.beatpad.harmony.Topology
 import com.jonlatane.beatpad.harmony.chord.Chord
-import com.jonlatane.beatpad.harmony.chord.MAJ_7
+import com.jonlatane.beatpad.harmony.chord.Maj7
+import com.jonlatane.beatpad.harmony.sequences.Chromatic
+import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.backgroundResource
 import java.util.*
 import kotlin.properties.Delegates.observable
@@ -28,7 +29,7 @@ class TopologyView @JvmOverloads constructor(
     _, _, listener ->
     listener?.invoke(chord)
   }
-  var chord: Chord by observable(Chord(0, MAJ_7)) { _, _, chord ->
+  var chord: Chord by observable(Chord(0, Maj7)) { _, _, chord ->
     if (selectedChord != null) {
       animateTo(InitialState)
     } else {
@@ -71,6 +72,7 @@ class TopologyView @JvmOverloads constructor(
   }
 
   init {
+    backgroundColor = R.color.brown
     clipToPadding = false
     clipChildren = false
     centralChord = inflateChordView(centralChordElevation)
@@ -78,11 +80,11 @@ class TopologyView @JvmOverloads constructor(
     halfStepDown = inflateChordView(halfStepChordElevation)
     halfStepUp.setOnClickListener { v: View ->
       selectedChord = v as TextView
-      chord = CHROMATIC.forward(chord)
+      chord = Chromatic.forward(chord)
     }
     halfStepDown.setOnClickListener { v: View ->
       selectedChord = v as TextView
-      chord = CHROMATIC.back(chord)
+      chord = Chromatic.back(chord)
     }
     inflateBG()
     updateChordText()
@@ -107,8 +109,8 @@ class TopologyView @JvmOverloads constructor(
     }
 
     centralChord.chordify(chord)
-    halfStepUp.chordify(CHROMATIC.forward(chord))
-    halfStepDown.chordify(CHROMATIC.back(chord))
+    halfStepUp.chordify(Chromatic.forward(chord))
+    halfStepDown.chordify(Chromatic.back(chord))
     for (sv in sequences) {
       sv.forward.chordify(sv.sequence.forward(chord))
       sv.back.chordify(sv.sequence.back(chord))
