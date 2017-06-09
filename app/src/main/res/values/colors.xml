@@ -3,5 +3,19 @@
     <color name="colorPrimary">#616161</color>
     <color name="colorPrimaryDark">#424242</color>
     <color name="colorAccent">#EC407A</color>
-    <color name="purple">#9575cd</color>
+
+    <color name="brown">#5D4037</color>
+
+    <!-- The colors work as such: Dominant is common to both schemes -->
+    <color name="dominant">#FFEBEE</color>
+
+    <!-- Tonic-Subdominant-Dominant is green-yellow-red -->
+    <color name="tonic">#A5D6A7</color>
+    <color name="subDominant">#FFF59D</color>
+
+    <!-- Major-Minor-Dominant is blue-purple-red -->
+    <color name="major">#E3F2FD</color>
+    <color name="minor">#EDE7F6</color>
+    <color name="augmented">#E0F7FA</color>
+    <color name="diminished">#F3E5F5</color>
 </resources>

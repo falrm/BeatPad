@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Instrument"
+        android:id="@+id/conductorInstrument"/>
+    <item android:title="Basic Mode"
+        android:id="@+id/basic_mode"/>
+    <item android:title="Intermediate Mode"
+        android:id="@+id/intermediate_mode"/>
+    <item android:title="Advanced Mode"
+        android:id="@+id/advanced_mode"/>
+    <item android:title="Master Mode"
+          android:id="@+id/master_mode"/>
+    <item android:title="Chainsmokers Mode"
+        android:id="@+id/chainsmokers_mode"/>
+    <item android:title="Pop Mode"
+        android:id="@+id/pop_mode"/>
+</menu>

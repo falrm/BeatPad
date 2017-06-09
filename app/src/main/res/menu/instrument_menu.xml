@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Color Instrument"
+        android:id="@+id/color_instrument"/>
+    <item android:title="Keyboard Instrument"
+        android:id="@+id/keyboard_instrument"/>
+    <item android:title="Choose Conductor..."
+        android:id="@+id/choose_conductor"/>
+</menu>
