@@ -5,6 +5,7 @@ import android.support.design.widget.Snackbar
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import com.jonlatane.beatpad.harmony.Topology
 import com.jonlatane.beatpad.harmony.Topology.*
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
@@ -50,7 +51,7 @@ class MainActivity : BaseActivity() {
 		melody.instrument.instrument = GeneralMidiConstants.ELECTRIC_PIANO_0
 		harmonicInstrument.instrument = GeneralMidiConstants.SYNTHBRASS_1
 		sequencerInstrument.instrument = GeneralMidiConstants.STRING_ENSEMBLE_0
-		pianoBoardInstrument.instrument = GeneralMidiConstants.BRIGHT_ACOUSTIC_PIANO
+		pianoBoardInstrument.instrument = GeneralMidiConstants.SYNTH_BASS_1
 
 		val harmonyController = DeviceOrientationInstrument(harmonicInstrument)
 		RhythmAnimations.wireMelodicControl(topology, harmonyController)
@@ -58,7 +59,7 @@ class MainActivity : BaseActivity() {
 
 		topology.onChordChangedListener = { c: Chord ->
 			val tones = c.getTones(-60, 28)
-			melody.tones = tones
+			melody.chord = c
 			harmonyController.setTones(tones)
 			sequencerThread.setTones(tones)
 			keyboardIOHandler.highlightChord(c)
@@ -93,7 +94,6 @@ class MainActivity : BaseActivity() {
 		}
 		updateTempoButton()
 		Orientation.initialize(this)
-		topology.useTopology(advanced)
 	}
 
 	override fun onResume() {
@@ -113,13 +113,11 @@ class MainActivity : BaseActivity() {
 		}
 		sequencerThread.beatsPerMinute = savedInstanceState.getInt("tempo")
 		updateTempoButton()
-		this.melody.instrument.instrument = savedInstanceState.getByte("melodicInstrument")
-		val harmonicInstrument = savedInstanceState.getByte("harmonicInstrument")
-		val sequencerInstrument = savedInstanceState.getByte("sequencerInstrument")
-		val pianoInstrument = savedInstanceState.getByte("pianoInstrument")
-		this@MainActivity.harmonicInstrument.instrument = harmonicInstrument
-		this@MainActivity.sequencerInstrument.instrument = sequencerInstrument
-		this@MainActivity.pianoBoardInstrument.instrument = pianoInstrument
+		melody.instrument.instrument = savedInstanceState.getByte("melodicInstrument")
+		harmonicInstrument.instrument = savedInstanceState.getByte("harmonicInstrument")
+		sequencerInstrument.instrument = savedInstanceState.getByte("sequencerInstrument")
+		pianoBoardInstrument.instrument = savedInstanceState.getByte("pianoInstrument")
+		topology.topology = Topology.values().find { it.ordinal == savedInstanceState.getInt("topologyMode") }!!
 		if(savedInstanceState.getBoolean("pianoHidden")) {
 			keyboard.hide(animated = false)
 			updateTopology()
@@ -140,6 +138,7 @@ class MainActivity : BaseActivity() {
 		outState.putByte("pianoInstrument", pianoBoardInstrument.instrument)
 		outState.putBoolean("pianoHidden", keyboard.isHidden)
 		outState.putBoolean("melodyHidden", melody.isHidden)
+		outState.putInt("topologyMode", topology.topology.ordinal)
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -167,12 +166,12 @@ class MainActivity : BaseActivity() {
 					updateTopology()
 				}
 			}
-			R.id.basic_mode -> topology.useTopology(basic)
-			R.id.intermediate_mode -> topology.useTopology(intermediate)
-			R.id.advanced_mode -> topology.useTopology(advanced)
-			R.id.master_mode -> topology.useTopology(master)
-			R.id.chainsmokers_mode -> topology.useTopology(chainsmokers)
-			R.id.pop_mode -> topology.useTopology(pop)
+			R.id.basic_mode -> topology.topology = basic
+			R.id.intermediate_mode -> topology.topology = intermediate
+			R.id.advanced_mode -> topology.topology = advanced
+			R.id.master_mode -> topology.topology = master
+			R.id.chainsmokers_mode -> topology.topology = chainsmokers
+			R.id.pop_mode -> topology.topology = pop
 			R.id.conduct -> startActivity<ConductorActivity>()
 			R.id.play -> startActivity<InstrumentActivity>()
 		}

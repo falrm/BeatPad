@@ -1,10 +1,10 @@
 package com.jonlatane.beatpad.harmony
 
 import com.jonlatane.beatpad.harmony.chord.Chord
-import com.jonlatane.beatpad.harmony.chord.Chord.Companion.mod12
 import com.jonlatane.beatpad.harmony.chord.Dom7
 import com.jonlatane.beatpad.harmony.chord.Maj7
 import com.jonlatane.beatpad.harmony.chord.min7
+import com.jonlatane.beatpad.util.mod12
 
 /**
  * Created by jonlatane on 5/26/17.

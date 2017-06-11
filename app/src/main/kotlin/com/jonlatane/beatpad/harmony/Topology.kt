@@ -1,6 +1,5 @@
 package com.jonlatane.beatpad.harmony
 
-import com.jonlatane.beatpad.harmony.Topology.TopologyViewer
 import com.jonlatane.beatpad.harmony.sequences.*
 
 /**
@@ -17,20 +16,7 @@ enum class Topology(vararg sequences : ChordSequence) : List<ChordSequence> by l
     chainsmokers(CircleOfFifths, Chainsmokers, AlternatingMajorMinorThirds),
     pop(SubdominantOptions, WholeSteps, AlternatingMajorMinorSeconds);
 
-    interface TopologyViewer {
-        fun addSequence(index: Int, sequence: ChordSequence)
-        fun removeSequence(sequence: ChordSequence)
-        fun useTopology(topology: Topology) {
-            (allSequences - topology).forEach {
-                removeSequence(it)
-            }
-            topology.indices.forEach {
-                addSequence(it, topology[it])
-            }
-        }
-    }
-
     companion object {
-        private val allSequences: List<ChordSequence> = Topology.values().flatMap { it }
+        internal val allSequences: List<ChordSequence> = Topology.values().flatMap { it }
     }
 }

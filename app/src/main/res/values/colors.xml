@@ -1,21 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#616161</color>
-    <color name="colorPrimaryDark">#424242</color>
-    <color name="colorAccent">#EC407A</color>
+	<color name="colorPrimary">#616161</color>
+	<color name="colorPrimaryDark">#424242</color>
+	<color name="colorAccent">#EC407A</color>
 
-    <color name="brown">#5D4037</color>
+	<color name="brown">#5D4037</color>
 
-    <!-- The colors work as such: Dominant is common to both schemes -->
-    <color name="dominant">#FFEBEE</color>
+	<!-- The colors work as such: Dominant is common to both schemes -->
+	<color name="dominant">#FFEBEE</color>
 
-    <!-- Tonic-Subdominant-Dominant is green-yellow-red -->
-    <color name="tonic">#A5D6A7</color>
-    <color name="subDominant">#FFF59D</color>
+	<!-- Tonic-Subdominant-Dominant is green-yellow-red -->
+	<color name="tonic">#A5D6A7</color>
+	<color name="subDominant">#FFF59D</color>
 
-    <!-- Major-Minor-Dominant is blue-purple-red -->
-    <color name="major">#E3F2FD</color>
-    <color name="minor">#EDE7F6</color>
-    <color name="augmented">#E0F7FA</color>
-    <color name="diminished">#F3E5F5</color>
+	<!-- Major-Minor-Dominant is blue-purple-red -->
+	<color name="major">#E3F2FD</color>
+	<color name="minor">#EDE7F6</color>
+	<color name="augmented">#E0F7FA</color>
+	<color name="diminished">#F3E5F5</color>
+
+	<color name="flatTwo">@color/diminished</color>
+	<color name="two">@color/subDominant</color>
+	<color name="flatThree">@color/minor</color>
+	<color name="three">@color/major</color>
+	<color name="four">@color/subDominant</color>
+	<color name="flatFive">@color/diminished</color>
+	<color name="five">@color/dominant</color>
+	<color name="sharpFive">@color/augmented</color>
+	<color name="six">@color/major</color>
+	<color name="flatSeven">@color/minor</color>
+	<color name="seven">@color/augmented</color>
+
 </resources>

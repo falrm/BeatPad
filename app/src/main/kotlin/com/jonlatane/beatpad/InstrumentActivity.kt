@@ -56,7 +56,7 @@ class InstrumentActivity : BaseActivity(), AnkoLogger {
                         val chord = Chord(root, extension.toIntArray())
                         contentView?.post {
                             keyboardIOHandler.highlightChord(chord)
-                            melody.tones = chord.getTones(-60, 28)
+                            melody.chord = chord
                         }
                     } catch(e: Throwable) {
                         Snackbar.make(contentView!!, "Failed to connect to conductor", Snackbar.LENGTH_SHORT).show()
@@ -64,7 +64,6 @@ class InstrumentActivity : BaseActivity(), AnkoLogger {
                         conductor = null
                         contentView?.post {
                             keyboardIOHandler.highlightChord(null)
-                            melody.tones = emptyList()
                         }
                     }
                 } else if(!requestedConductor) {

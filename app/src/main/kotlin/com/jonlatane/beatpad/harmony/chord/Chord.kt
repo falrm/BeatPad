@@ -3,6 +3,7 @@ package com.jonlatane.beatpad.harmony.chord
 import android.os.Parcel
 import android.os.Parcelable
 import com.jonlatane.beatpad.harmony.chord.heptatonics.Heptatonics
+import com.jonlatane.beatpad.util.mod12
 
 /**
  * Created by jonlatane on 5/5/17.
@@ -70,7 +71,12 @@ class Chord : Parcelable {
 	 * @return
 	 */
 	fun getTones(bottom: Int, top: Int): List<Int> {
-		val tones = mutableListOf<Int>()
+		val middleRoot = root.mod12
+		return (-5..5).flatMap {
+			val rootInOctave = middleRoot + 12 * it
+			extension.map { rootInOctave + it }
+		}.filter { it in bottom..top }
+		/*val tones = mutableListOf<Int>()
 		var currentRoot = root - 144
 		while (currentRoot + 12 < bottom) {
 			currentRoot += 12
@@ -81,7 +87,7 @@ class Chord : Parcelable {
 				.filterTo(tones) { it in bottom..top }
 			currentRoot += 12
 		}
-		return tones
+		return tones.filter { it in bottom..top }*/
 	}
 
 	val name: String
@@ -112,8 +118,6 @@ class Chord : Parcelable {
 	val isDiminished: Boolean get() = isMinor && heptatonics.fifth == DIMINISHED
 
 	companion object {
-		val Int.mod12 get() = ((this % 12) + 12) % 12
-		val Int.mod7 get() = ((this % 12) + 12) % 12
 		private val mod12Names = arrayOf("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 		private val mod7Names = arrayOf("C", "D", "E", "F", "G", "A", "B")
 

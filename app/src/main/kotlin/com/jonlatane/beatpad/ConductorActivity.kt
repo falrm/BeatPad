@@ -58,7 +58,6 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
         topology.onChordChangedListener = { chord ->
             harmonyController.setTones(chord.getTones(-60, 28))
         }
-        topology.useTopology(intermediate)
         registerService()
     }
 
@@ -96,12 +95,12 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.conductorInstrument -> showInstrumentPicker(this, conductorInstrument)
-            R.id.basic_mode -> topology.useTopology(basic)
-            R.id.intermediate_mode -> topology.useTopology(intermediate)
-            R.id.advanced_mode -> topology.useTopology(advanced)
-            R.id.master_mode -> topology.useTopology(master)
-            R.id.chainsmokers_mode -> topology.useTopology(chainsmokers)
-            R.id.pop_mode -> topology.useTopology(pop)
+            R.id.basic_mode -> topology.topology = basic
+            R.id.intermediate_mode -> topology.topology = intermediate
+            R.id.advanced_mode -> topology.topology = advanced
+            R.id.master_mode -> topology.topology = master
+            R.id.chainsmokers_mode -> topology.topology = chainsmokers
+            R.id.pop_mode -> topology.topology = pop
         }
         return true
     }
