@@ -76,6 +76,7 @@ class Chord : Parcelable {
 
 	/**
 	 * Retrieves the closest tone in this chord to the given tone.
+	 * If two tones in the chord are equally close, returns the lower one.
 	 */
 	fun closestTone(tone: Int): Int {
 		return getTones(tone - 12, tone + 12).minBy {
