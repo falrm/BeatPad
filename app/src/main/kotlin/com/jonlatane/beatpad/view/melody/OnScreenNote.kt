@@ -29,7 +29,7 @@ internal val MelodyView.onScreenNotes: List<OnScreenNote> get() {
 	val bottomMostNote: Int = Math.floor(bottomMostPoint.toDouble()).toInt()
 	var noteIndex = 0
 	var currentScreenNote = getOrCreateNote(
-		tone = closestToneInChord(bottomMostNote),
+		tone = chord.closestTone(bottomMostNote),
 		pressed = false,
 		xMin = 0f,
 		xMax = (bottomMostNote - bottomMostPoint) * width.toFloat() / halfStepsOnScreen,
@@ -37,7 +37,7 @@ internal val MelodyView.onScreenNotes: List<OnScreenNote> get() {
 	)
 	(bottomMostNote..(bottomMostNote + halfStepsOnScreen + 1)).forEach {
 		toneMaybeNotInChord ->
-		val toneInChord = closestToneInChord(toneMaybeNotInChord)
+		val toneInChord = chord.closestTone(toneMaybeNotInChord)
 		if(toneInChord != currentScreenNote.tone) {
 			result.add(currentScreenNote)
 			currentScreenNote = getOrCreateNote(

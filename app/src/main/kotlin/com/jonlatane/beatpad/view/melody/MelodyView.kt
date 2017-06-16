@@ -28,7 +28,6 @@ class MelodyView @JvmOverloads constructor(
 ) : View(context, attrs, defStyle), HideableView, AnkoLogger {
 	val instrument = MIDIInstrument()
 	var chord = Chord(0, Maj7)
-	val tones get() = chord.getTones(BOTTOM, TOP)
 	override var initialHeight: Int? = null
 	internal val onScreenNoteCache = ConcurrentHashMap<Int, OnScreenNote>()
 	private val density = context.resources.displayMetrics.density
@@ -127,12 +126,6 @@ class MelodyView @JvmOverloads constructor(
 			resources.getColor(resId, context.theme)
 		else @Suppress("Deprecated")
 			resources.getColor(resId)
-
-	internal fun closestToneInChord(tone: Int): Int {
-		return tones.minBy {
-			Math.abs(tone - it)
-		}!!
-	}
 
 	internal val halfStepsOnScreen = 15
 

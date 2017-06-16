@@ -63,12 +63,8 @@ class Chord : Parcelable {
 	}
 
 	/**
-
 	 * @param bottom lowest allowed note, inclusive
-	 * *
 	 * @param top highest allowed note, inclusive
-	 * *
-	 * @return
 	 */
 	fun getTones(bottom: Int, top: Int): List<Int> {
 		val middleRoot = root.mod12
@@ -76,6 +72,15 @@ class Chord : Parcelable {
 			val rootInOctave = middleRoot + 12 * it
 			extension.map { rootInOctave + it }
 		}.filter { it in bottom..top }
+	}
+
+	/**
+	 * Retrieves the closest tone in this chord to the given tone.
+	 */
+	fun closestTone(tone: Int): Int {
+		return getTones(tone - 12, tone + 12).minBy {
+			Math.abs(tone - it)
+		}!!
 	}
 
 	val name: String

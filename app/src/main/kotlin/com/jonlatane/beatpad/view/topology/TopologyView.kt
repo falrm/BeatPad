@@ -37,7 +37,7 @@ class TopologyView @JvmOverloads constructor(
 		}
 		onChordChangedListener?.invoke(chord)
 	}
-	var topology: Topology by observable(Topology.intermediate) {
+	var topology: Topology by observable(Topology.basic) {
 		_, _, new ->
 		(Topology.allSequences - new).forEach {
 			removeSequence(it)
