@@ -2,6 +2,7 @@ package com.jonlatane.beatpad.view.topology
 
 import android.view.View
 import android.view.ViewPropertyAnimator
+import com.jonlatane.beatpad.util.*
 import com.jonlatane.beatpad.view.topology.SelectionState.skipToSelectionPhase
 
 /**
@@ -40,7 +41,7 @@ object InitialState : NavigationState {
       }
     }
     if (v.selectedChord !== v.halfStepDown && v.selectedChord !== v.halfStepUp) {
-      v.halfStepBackground.animateHeight(5)
+      v.halfStepBackground.animateHeight(5, ANIMATION_DURATION)
     }
     for (sv in v.sequences) {
 
@@ -53,7 +54,7 @@ object InitialState : NavigationState {
         })
       }
     }
-    afterAll(toTargetChord) {
+    afterAll(toTargetChord, ANIMATION_DURATION) {
       v.updateChordText()
       v.skipTo(InitialState)
       v.post { v.animateTo(SelectionState) }

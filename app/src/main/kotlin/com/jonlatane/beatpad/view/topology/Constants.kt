@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.topology
 
 import android.view.View
+import com.jonlatane.beatpad.util.density
 
 internal val ANIMATION_DURATION: Long = 200
 internal val CENTRAL_CHORD_SCALE = 2.2f

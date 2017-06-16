@@ -76,18 +76,6 @@ class Chord : Parcelable {
 			val rootInOctave = middleRoot + 12 * it
 			extension.map { rootInOctave + it }
 		}.filter { it in bottom..top }
-		/*val tones = mutableListOf<Int>()
-		var currentRoot = root - 144
-		while (currentRoot + 12 < bottom) {
-			currentRoot += 12
-		}
-		while (currentRoot + 12 <= top) {
-			extension
-				.map { currentRoot + it }
-				.filterTo(tones) { it in bottom..top }
-			currentRoot += 12
-		}
-		return tones.filter { it in bottom..top }*/
 	}
 
 	val name: String

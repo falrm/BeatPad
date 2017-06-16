@@ -15,12 +15,11 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.Maj7
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.sensors.Orientation.normalizedDevicePitch
 import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.util.mod12
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
-import java.lang.Math.floor
+import java.util.concurrent.ConcurrentHashMap
 
 class MelodyView @JvmOverloads constructor(
 	context: Context,
@@ -31,6 +30,7 @@ class MelodyView @JvmOverloads constructor(
 	var chord = Chord(0, Maj7)
 	val tones get() = chord.getTones(BOTTOM, TOP)
 	override var initialHeight: Int? = null
+	internal val onScreenNoteCache = ConcurrentHashMap<Int, OnScreenNote>()
 	private val density = context.resources.displayMetrics.density
 	private var activePointers: SparseArray<PointF> = SparseArray()
 	private var pointerTones = SparseIntArray()
@@ -109,7 +109,6 @@ class MelodyView @JvmOverloads constructor(
 		invalidate()
 	}
 
-	private fun getVelocity(y: Int) = getVelocity(y.toFloat())
 	private fun getVelocity(y: Float): Int {
 		var velocity01: Float = (height - y) / height
 		velocity01 = Math.sqrt(Math.sqrt(Math.max(0.1f, velocity01).toDouble())).toFloat()
@@ -119,18 +118,8 @@ class MelodyView @JvmOverloads constructor(
 		return velocity
 	}
 
-	private fun getTone(x: Int) = getTone(x.toFloat())
 	private fun getTone(x: Float): Int {
 		return onScreenNotes.find { x in (it.xMin..it.xMax) }!!.tone
-		/*var tone = 0
-		if (!tones.isEmpty()) {
-			val screenWidth = tones.size / 4f
-			info("x=$x, width=$width")
-			// An array index between 0 and
-			val basePitch: Float = normalizedDevicePitch() * (tones.size - screenWidth) + screenWidth * x / width
-			tone = tones[Math.max(0, Math.min(tones.size - 1, Math.round(basePitch)))]
-		}
-		return tone*/
 	}
 
 	fun color(resId: Int) =
@@ -139,51 +128,16 @@ class MelodyView @JvmOverloads constructor(
 		else @Suppress("Deprecated")
 			resources.getColor(resId)
 
-	private data class OnScreenNote(
-		val tone: Int,
-		var pressed: Boolean,
-		var xMin: Float,
-		var xMax: Float
-	)
-	private val onScreenNotes: List<OnScreenNote> get() {
-		val result = mutableListOf<OnScreenNote>()
-		val orientationRange = TOP - BOTTOM - halfStepsOnScreen
-		val bottomMostPoint: Float = BOTTOM + (normalizedDevicePitch() * orientationRange)
-		val bottomMostNote: Int = floor(bottomMostPoint.toDouble()).toInt()
-		var currentScreenNote = OnScreenNote(
-			tone = closestToneInChord(bottomMostNote),
-			pressed = false,
-			xMin = 0f,
-			xMax = (bottomMostNote - bottomMostPoint) * width.toFloat() / halfStepsOnScreen
-		)
-		(bottomMostNote..(bottomMostNote + halfStepsOnScreen + 1)).forEach {
-			toneMaybeNotInChord ->
-			val toneInChord = closestToneInChord(toneMaybeNotInChord)
-			if(toneInChord != currentScreenNote.tone) {
-				result.add(currentScreenNote)
-				currentScreenNote = OnScreenNote(
-					tone = toneInChord,
-					pressed = false,
-					xMin = currentScreenNote.xMax,
-					xMax = currentScreenNote.xMax
-				)
-			}
-			currentScreenNote.xMax += width.toFloat() / halfStepsOnScreen
-		}
-		result.add(currentScreenNote)
-		return result
-	}
-
-	private fun closestToneInChord(tone: Int): Int {
+	internal fun closestToneInChord(tone: Int): Int {
 		return tones.minBy {
 			Math.abs(tone - it)
 		}!!
 	}
 
-	private val halfStepsOnScreen = 15
+	internal val halfStepsOnScreen = 15
 
 	companion object {
-		private val BOTTOM = -60
-		private val TOP = 29
+		internal val BOTTOM = -60
+		internal val TOP = 29
 	}
 }

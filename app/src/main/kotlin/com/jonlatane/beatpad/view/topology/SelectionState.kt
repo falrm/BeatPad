@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.topology
 
 import android.widget.TextView
+import com.jonlatane.beatpad.util.*
 
 /**
  * Created by jonlatane on 5/23/17.
@@ -20,13 +21,23 @@ object SelectionState : NavigationState {
       .translationZ(0f)
       .alpha(1f).setDuration(ANIMATION_DURATION).start()
 
-    v.halfStepBackground.animateHeight(v.halfStepUp.scaledHeight + v.halfStepDown.scaledHeight
-      + v.centralChord.scaledHeight + Math.round(15 * v.density))
-    v.halfStepBackground.animateWidth(Math.max(
-      v.halfStepUp.scaledWidth, v.halfStepDown.scaledWidth
-    ) + Math.round(15 * v.density))
-    v.centralChordTouchPoint.animateWidth(v.centralChord.scaledWidth)
-    v.centralChordThrobber.animateWidth(v.centralChord.scaledWidth)
+    v.halfStepBackground.animateHeight(
+      height = v.halfStepUp.scaledHeight + v.halfStepDown.scaledHeight
+        + v.centralChord.scaledHeight + Math.round(15 * v.density),
+      duration = ANIMATION_DURATION
+    )
+    v.halfStepBackground.animateWidth(
+      width = Math.max(v.halfStepUp.scaledWidth, v.halfStepDown.scaledWidth) + Math.round(15 * v.density),
+      duration = ANIMATION_DURATION
+    )
+    v.centralChordTouchPoint.animateWidth(
+      width = v.centralChord.scaledWidth,
+      duration = ANIMATION_DURATION
+    )
+    v.centralChordThrobber.animateWidth(
+      width = v.centralChord.scaledWidth,
+      duration = ANIMATION_DURATION
+    )
     for (i in 0..v.sequences.size - 1) {
       val sv = v.sequences[i]
       val forwardAngle = i * theta - (Math.PI - theta) / 2
@@ -144,10 +155,10 @@ object SelectionState : NavigationState {
     val backAlpha = if (v.centralChord.text == sv.back.text) 0.1f else 0.3f
     sv.connectForward.animate().translationX(tX / 2).translationY(tY / 2)
       .rotation(Math.toDegrees(forwardAngle).toFloat()).alpha(forwardAlpha).start()
-    sv.connectForward.animateWidth(connectorWidth)
+    sv.connectForward.animateWidth(connectorWidth, ANIMATION_DURATION)
     sv.connectBack.animate().translationX(-tX / 2).translationY(tY / 2)
       .rotation(-Math.toDegrees(forwardAngle).toFloat()).alpha(backAlpha).start()
-    sv.connectBack.animateWidth(connectorWidth)
+    sv.connectBack.animateWidth(connectorWidth, ANIMATION_DURATION)
   }
 
 
