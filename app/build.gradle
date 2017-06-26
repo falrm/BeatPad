@@ -1,12 +1,12 @@
 buildscript {
-    ext.kotlin_version = '1.1.2'
-    ext.anko_version = '0.10.0'
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
+	ext.kotlin_version = '1.1.2'
+	ext.anko_version = '0.10.0'
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+	}
 }
 
 apply plugin: 'com.android.application'
@@ -14,51 +14,51 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
-    defaultConfig {
-        applicationId "com.jonlatane.beatpad"
-        minSdkVersion 21
-        targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
-    }
+	compileSdkVersion 25
+	buildToolsVersion "25.0.2"
+	defaultConfig {
+		applicationId "com.jonlatane.beatpad"
+		minSdkVersion 21
+		targetSdkVersion 25
+		versionCode 1
+		versionName "1.0"
+		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+	}
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		}
+	}
+	sourceSets {
+		main.java.srcDirs += 'src/main/kotlin'
+		test.java.srcDirs += 'src/test/kotlin'
+	}
 }
 
 repositories {
-    jcenter()
-    maven { url 'https://jitpack.io' }
-    maven { url 'https://github.com/kshoji/USB-MIDI-Driver/raw/master/MIDIDriver/snapshots' }
+	jcenter()
+	maven { url 'https://jitpack.io' }
+	maven { url 'https://github.com/kshoji/USB-MIDI-Driver/raw/master/MIDIDriver/snapshots' }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    //compile 'jp.kshoji:midi-driver:0.1.4:@aar'
-    compile("org.jetbrains.anko:anko:$anko_version") {
-        exclude group: 'com.google.android', module: 'android'
-    }
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.github.billthefarmer:mididriver:v1.13'
-    compile 'org.apache.commons:commons-lang3:3.5'
-    testCompile("io.damo.aspen:aspen:2.0.0") {
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
-    }
-    testCompile 'org.assertj:assertj-core:2.8.0'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+	compile fileTree(include: ['*.jar'], dir: 'libs')
+	//compile 'jp.kshoji:midi-driver:0.1.4:@aar'
+	compile("org.jetbrains.anko:anko:$anko_version") {
+		exclude group: 'com.google.android', module: 'android'
+	}
+	compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+	compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+	compile 'com.android.support:appcompat-v7:25.3.1'
+	compile 'com.android.support:design:25.3.1'
+	compile 'com.github.billthefarmer:mididriver:v1.13'
+	compile 'org.apache.commons:commons-lang3:3.5'
+	testCompile("io.damo.aspen:aspen:2.0.0") {
+		exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
+	}
+	testCompile 'org.assertj:assertj-core:2.8.0'
+	androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+		exclude group: 'com.android.support', module: 'support-annotations'
+	})
 }

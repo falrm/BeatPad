@@ -5,9 +5,6 @@ import android.os.Parcelable
 import com.jonlatane.beatpad.harmony.chord.heptatonics.Heptatonics
 import com.jonlatane.beatpad.util.mod12
 
-/**
- * Created by jonlatane on 5/5/17.
- */
 class Chord : Parcelable {
 	val root: Int
 	val extension: IntArray

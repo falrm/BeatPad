@@ -19,6 +19,7 @@ import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.util.mod12
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
+import java.lang.Thread.sleep
 import java.util.concurrent.ConcurrentHashMap
 
 class MelodyView @JvmOverloads constructor(
@@ -105,7 +106,10 @@ class MelodyView @JvmOverloads constructor(
 			paint.alpha = pointerVelocities[key] * 2
 			canvas.drawCircle(pointer.x, pointer.y, 25f * density, paint)
 		}
-		invalidate()
+		post {
+			sleep(10L)
+			invalidate()
+		}
 	}
 
 	private fun getVelocity(y: Float): Int {

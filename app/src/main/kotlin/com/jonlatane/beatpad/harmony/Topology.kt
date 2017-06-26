@@ -1,6 +1,6 @@
 package com.jonlatane.beatpad.harmony
 
-import com.jonlatane.beatpad.harmony.sequences.*
+import com.jonlatane.beatpad.harmony.chordsequence.*
 
 /**
  * A [Topology] is literally just a list of [ChordSequence]s. The [TopologyViewer] interface should

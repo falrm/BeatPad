@@ -5,6 +5,8 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import com.jonlatane.beatpad.sensors.Orientation.pitch
+import com.jonlatane.beatpad.sensors.Orientation.roll
 import org.jetbrains.anko.AnkoLogger
 
 /**
@@ -12,19 +14,19 @@ import org.jetbrains.anko.AnkoLogger
  */
 
 object Orientation: AnkoLogger {
-    var azimuth = 0f
-    var pitch = 0f
-    var roll = 0f
-    var inclination = 0f
+    @Volatile var azimuth = 0f
+    @Volatile var pitch = 0f
+    @Volatile var roll = 0f
+    @Volatile var inclination = 0f
 
     fun initialize(c: Context) {
         val sensorManager = c.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        val sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
-        val rotationMatrix = FloatArray(16)
+        val sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR)
+        val rotationMatrix = FloatArray(9)
         val orientationValues = FloatArray(3)
         sensorManager.registerListener(object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent) {
-                if (event.sensor.type == Sensor.TYPE_ROTATION_VECTOR) {
+                if (event.sensor.type == Sensor.TYPE_GAME_ROTATION_VECTOR) {
                     SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
                     SensorManager.getOrientation(rotationMatrix, orientationValues)
                     azimuth = orientationValues[0]

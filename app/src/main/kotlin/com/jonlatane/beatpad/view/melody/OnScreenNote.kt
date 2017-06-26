@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.melody
 
 import com.jonlatane.beatpad.sensors.Orientation
+import org.jetbrains.anko.info
 
 internal data class OnScreenNote(
 	var tone: Int = 0,
@@ -26,6 +27,7 @@ internal val MelodyView.onScreenNotes: List<OnScreenNote> get() {
 	val result = mutableListOf<OnScreenNote>()
 	val orientationRange = MelodyView.TOP - MelodyView.BOTTOM - halfStepsOnScreen
 	val bottomMostPoint: Float = MelodyView.BOTTOM + (Orientation.normalizedDevicePitch() * orientationRange)
+	info("pitch: ${Orientation.pitch}")
 	val bottomMostNote: Int = Math.floor(bottomMostPoint.toDouble()).toInt()
 	var noteIndex = 0
 	var currentScreenNote = getOrCreateNote(

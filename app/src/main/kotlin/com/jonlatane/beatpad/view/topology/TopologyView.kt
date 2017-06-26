@@ -11,7 +11,7 @@ import com.jonlatane.beatpad.harmony.ChordSequence
 import com.jonlatane.beatpad.harmony.Topology
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.Maj7
-import com.jonlatane.beatpad.harmony.sequences.Chromatic
+import com.jonlatane.beatpad.harmony.chordsequence.Chromatic
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.backgroundResource
 import java.util.*

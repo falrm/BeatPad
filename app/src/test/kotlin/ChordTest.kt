@@ -29,5 +29,6 @@ class ChordTest : Test({
 		assertThat(Chord(0, Maj).closestTone(0)).isEqualTo(0)
 		assertThat(Chord(0, Maj).closestTone(2)).isEqualTo(0)
 		assertThat(Chord(0, Maj).closestTone(3)).isEqualTo(4)
+		assertThat(Chord(6, Maj).closestTone(6)).isEqualTo(6)
 	}
 })
