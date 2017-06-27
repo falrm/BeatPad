@@ -40,7 +40,7 @@ fun showTempoPicker(activity: MainActivity) {
     picker.minValue = 15
     picker.value = activity.sequencerThread.beatsPerMinute
     picker.wrapSelectorWheel = false
-    picker.setOnValueChangedListener { picker, _, _ ->
+    picker.setOnValueChangedListener { _, _, _ ->
         val bpm = picker.value
         activity.sequencerThread.beatsPerMinute = bpm
         activity.updateTempoButton()

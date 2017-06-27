@@ -10,14 +10,12 @@ import android.util.AttributeSet
 import android.util.SparseArray
 import android.util.SparseIntArray
 import android.view.MotionEvent
-import android.view.View
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.Maj7
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.util.mod12
-import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import java.lang.Thread.sleep
 import java.util.concurrent.ConcurrentHashMap
@@ -26,10 +24,10 @@ class MelodyView @JvmOverloads constructor(
 	context: Context,
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
-) : View(context, attrs, defStyle), HideableView, AnkoLogger {
+) : BaseMelodyView(context, attrs, defStyle), HideableView {
+	override var initialHeight: Int? = null
 	val instrument = MIDIInstrument()
 	var chord = Chord(0, Maj7)
-	override var initialHeight: Int? = null
 	internal val onScreenNoteCache = ConcurrentHashMap<Int, OnScreenNote>()
 	private val density = context.resources.displayMetrics.density
 	private var activePointers: SparseArray<PointF> = SparseArray()
@@ -122,7 +120,7 @@ class MelodyView @JvmOverloads constructor(
 	}
 
 	private fun getTone(x: Float): Int {
-		return onScreenNotes.find { x in (it.xMin..it.xMax) }!!.tone
+		return onScreenNotes.find { x in (it.bottom..it.top) }!!.tone
 	}
 
 	fun color(resId: Int) =

@@ -174,6 +174,7 @@ class MainActivity : BaseActivity() {
 			R.id.pop_mode -> topology.topology = pop
 			R.id.conduct -> startActivity<ConductorActivity>()
 			R.id.play -> startActivity<InstrumentActivity>()
+			R.id.sequence_editor -> startActivity<SequenceEditorActivity>()
 		}
 		return true
 	}

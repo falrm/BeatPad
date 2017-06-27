@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="key_height_white">150dp</dimen>
-    <dimen name="key_highlight_bottom_white">0dp</dimen> <!-- Gives a 20dp tall highlight -->
-    <dimen name="key_height_black">75dp</dimen>
-    <dimen name="key_highlight_bottom_black">0dp</dimen> <!-- Gives a 20dp tall highlight -->
+	<dimen name="subdivision_controller_size">75dp</dimen>
+	<dimen name="key_height_white">150dp</dimen>
+	<dimen name="key_highlight_bottom_white">0dp</dimen> <!-- Gives a 20dp tall highlight -->
+	<dimen name="key_height_black">75dp</dimen>
+	<dimen name="key_highlight_bottom_black">0dp</dimen> <!-- Gives a 20dp tall highlight -->
 </resources>

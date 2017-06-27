@@ -38,4 +38,6 @@
                 android:id="@+id/play"/>
         </menu>
     </item>
+    <item android:title="Sequence Editor"
+          android:id="@+id/sequence_editor"/>
 </menu>
