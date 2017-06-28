@@ -79,9 +79,7 @@ class ToneSequenceView : AnkoComponent<SequenceEditorActivity> {
 					linearLayout {
 						orientation = HORIZONTAL
 						repeat(50) {
-							view {
-								background = ctx.getDrawable(R.drawable.red_blue_gradient)
-							}.lparams {
+							toneSequenceElement().lparams {
 								width = dimen(com.jonlatane.beatpad.R.dimen.subdivision_controller_size)
 								height = dip(1000f)
 							}

@@ -9,30 +9,32 @@ internal data class OnScreenNote(
 	var top: Float = 0f
 )
 
-internal fun MelodyView.getOrCreateNote(
+internal fun BaseMelodyView.getOrCreateNote(
 	tone: Int,
 	pressed: Boolean,
-	xMin: Float,
-	xMax: Float,
+	bottom: Float,
+	top: Float,
 	index: Int
 ) = onScreenNoteCache.getOrPut(index, { OnScreenNote() }).apply {
 	this.tone = tone
 	this.pressed = pressed
-	this.bottom = xMin
-	this.top = xMax
+	this.bottom = bottom
+	this.top = top
 }
 
-internal val MelodyView.onScreenNotes: List<OnScreenNote> get() {
+private val BaseMelodyView.axisLength get() = (if(renderVertically) height else width).toFloat()
+
+internal val BaseMelodyView.onScreenNotes: List<OnScreenNote> get() {
 	val result = mutableListOf<OnScreenNote>()
-	val orientationRange = MelodyView.TOP - MelodyView.BOTTOM - halfStepsOnScreen
-	val bottomMostPoint: Float = MelodyView.BOTTOM + (Orientation.normalizedDevicePitch() * orientationRange)
+	val orientationRange = BaseMelodyView.TOP - BaseMelodyView.BOTTOM - halfStepsOnScreen
+	val bottomMostPoint: Float = BaseMelodyView.BOTTOM + (Orientation.normalizedDevicePitch() * orientationRange)
 	val bottomMostNote: Int = Math.floor(bottomMostPoint.toDouble()).toInt()
 	var noteIndex = 0
 	var currentScreenNote = getOrCreateNote(
 		tone = chord.closestTone(bottomMostNote),
 		pressed = false,
-		xMin = 0f,
-		xMax = (bottomMostNote - bottomMostPoint) * width.toFloat() / halfStepsOnScreen,
+		bottom = 0f,
+		top = (bottomMostNote - bottomMostPoint) * axisLength/ halfStepsOnScreen,
 		index = noteIndex++
 	)
 	(bottomMostNote..(bottomMostNote + halfStepsOnScreen + 1)).forEach {
@@ -43,12 +45,12 @@ internal val MelodyView.onScreenNotes: List<OnScreenNote> get() {
 			currentScreenNote = getOrCreateNote(
 				tone = toneInChord,
 				pressed = false,
-				xMin = currentScreenNote.top,
-				xMax = currentScreenNote.top,
+				bottom = currentScreenNote.top,
+				top = currentScreenNote.top,
 				index = noteIndex++
 			)
 		}
-		currentScreenNote.top += width.toFloat() / halfStepsOnScreen
+		currentScreenNote.top += axisLength / halfStepsOnScreen
 	}
 	result.add(currentScreenNote)
 	return result

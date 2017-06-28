@@ -1,12 +1,12 @@
 package com.jonlatane.beatpad.util
 
 import android.animation.ValueAnimator
+import android.os.Build
 import android.view.View
 import android.view.ViewPropertyAnimator
 import java.util.concurrent.atomic.AtomicInteger
 
 private val defaultDuration get() = android.R.integer.config_mediumAnimTime.toLong()
-
 
 interface HideableView {
 	var initialHeight: Int?
@@ -110,3 +110,9 @@ fun View.hide(animated: Boolean = true) {
 		layoutHeight = 0
 	}
 }
+
+fun View.color(resId: Int) =
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+		resources.getColor(resId, context.theme)
+	else @Suppress("Deprecated")
+		resources.getColor(resId)

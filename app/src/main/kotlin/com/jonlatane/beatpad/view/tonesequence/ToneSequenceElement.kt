@@ -1,39 +1,37 @@
-package com.jonlatane.beatpad.view.melody
+package com.jonlatane.beatpad.view.tonesequence
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Paint
 import android.graphics.PointF
-import android.graphics.Rect
-import android.os.Build
 import android.util.AttributeSet
 import android.util.SparseArray
 import android.util.SparseIntArray
 import android.view.MotionEvent
-import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.harmony.chord.Chord
-import com.jonlatane.beatpad.harmony.chord.Maj7
+import android.view.ViewManager
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.HideableView
-import com.jonlatane.beatpad.util.density
-import com.jonlatane.beatpad.util.mod12
+import com.jonlatane.beatpad.view.melody.BaseMelodyView
+import com.jonlatane.beatpad.view.melody.onScreenNotes
+import com.jonlatane.beatpad.view.topology.TopologyView
+import com.jonlatane.beatpad.view.topology.topologyView
+import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.info
-import java.lang.Thread.sleep
-import java.util.concurrent.ConcurrentHashMap
 
-class MelodyView @JvmOverloads constructor(
+class ToneSequenceElement @JvmOverloads constructor(
 	context: Context,
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
 ) : BaseMelodyView(context, attrs, defStyle), HideableView {
 	override var initialHeight: Int? = null
 	val instrument = MIDIInstrument()
+	override val renderVertically = true
+	override val halfStepsOnScreen = 88
+	override val drawPadding = 30
+/*
 	private val density = context.resources.displayMetrics.density
 	private var activePointers: SparseArray<PointF> = SparseArray()
 	private var pointerTones = SparseIntArray()
 	private var pointerVelocities = SparseIntArray()
-	override val renderVertically = false
-	override val halfStepsOnScreen = 15
 
 	override fun onDraw(canvas: Canvas) {
 		super.onDraw(canvas)
@@ -44,10 +42,6 @@ class MelodyView @JvmOverloads constructor(
 			val pointer = activePointers[key]
 			paint.alpha = pointerVelocities[key] * 2
 			canvas.drawCircle(pointer.x, pointer.y, 25f * density, paint)
-		}
-		post {
-			Thread.sleep(10L)
-			invalidate()
 		}
 	}
 
@@ -96,4 +90,12 @@ class MelodyView @JvmOverloads constructor(
 	private fun getTone(x: Float): Int {
 		return onScreenNotes.find { x in (it.bottom..it.top) }!!.tone
 	}
+*/
 }
+
+
+inline fun ViewManager.toneSequenceElement(theme: Int = 0)
+	= toneSequenceElement(theme) {}
+
+inline fun ViewManager.toneSequenceElement(theme: Int = 0, init: ToneSequenceElement.() -> Unit)
+	= ankoView({ ToneSequenceElement(it) }, theme, init)
