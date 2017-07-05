@@ -19,15 +19,15 @@ abstract class BaseMelodyView @JvmOverloads constructor(
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
 ) : View(context, attrs, defStyle), AnkoLogger {
-	var chord = Chord(0, Maj7)
+	open var chord = Chord(0, Maj7)
+	var showSteps = true
 	open val drawPadding = 0
 	abstract val renderVertically: Boolean
+	val axisLength get() = (if(renderVertically) height else width).toFloat()
 	abstract val halfStepsOnScreen: Int
 
-	internal val onScreenNoteCache = ConcurrentHashMap<Int, OnScreenNote>()
-
 	internal var paint = Paint()
-	private var bounds = Rect()
+	internal var bounds = Rect()
 
 	override fun onDraw(canvas: Canvas) {
 		super.onDraw(canvas)
@@ -51,9 +51,9 @@ abstract class BaseMelodyView @JvmOverloads constructor(
 			if(renderVertically) {
 				canvas.drawRect(
 					bounds.left.toFloat() + drawPadding,
-					rectTop,
+					bounds.height() - rectBottom,
 					bounds.right.toFloat() - drawPadding,
-					rectBottom,
+					bounds.height() - rectTop, // backwards y-axis bullshittery
 					paint
 				)
 			} else {
@@ -66,10 +66,39 @@ abstract class BaseMelodyView @JvmOverloads constructor(
 				)
 			}
 		}
+		renderSteps(canvas)
+	}
+
+	private fun renderSteps(canvas: Canvas) {
+		paint.color = R.color.colorPrimaryDark
+		if(showSteps) {
+			val halfStepWidth: Float = axisLength / halfStepsOnScreen
+			var linePosition = onScreenNotes.first().top - 12 * halfStepWidth //TODO gross hack
+			while(linePosition < axisLength) {
+				if(renderVertically) {
+					canvas.drawLine(
+						bounds.left.toFloat(),
+						linePosition,
+						bounds.right.toFloat(),
+						linePosition,
+						Paint()
+					)
+				} else {
+					canvas.drawLine(
+						linePosition,
+						bounds.top.toFloat(),
+						linePosition,
+						bounds.bottom.toFloat(),
+						paint
+					)
+				}
+				linePosition += halfStepWidth
+			}
+		}
 	}
 
 	companion object {
-		internal val BOTTOM = -60
-		internal val TOP = 28
+		val BOTTOM = -39
+		val TOP = 48
 	}
 }

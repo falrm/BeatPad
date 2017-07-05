@@ -58,7 +58,7 @@ class MainActivity : BaseActivity() {
 		keyboardIOHandler = KeyboardIOHandler(keyboard, pianoBoardInstrument)
 
 		topology.onChordChangedListener = { c: Chord ->
-			val tones = c.getTones(-60, 28)
+			val tones = c.getTones()
 			melody.chord = c
 			harmonyController.setTones(tones)
 			sequencerThread.setTones(tones)

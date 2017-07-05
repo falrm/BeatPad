@@ -4,6 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.jonlatane.beatpad.harmony.chord.heptatonics.Heptatonics
 import com.jonlatane.beatpad.util.mod12
+import com.jonlatane.beatpad.view.melody.BaseMelodyView
 
 class Chord : Parcelable {
 	val root: Int
@@ -63,20 +64,18 @@ class Chord : Parcelable {
 	 * @param bottom lowest allowed note, inclusive
 	 * @param top highest allowed note, inclusive
 	 */
-	fun getTones(bottom: Int, top: Int): List<Int> {
-		val middleRoot = root.mod12
-		return (-5..5).flatMap {
-			val rootInOctave = middleRoot + 12 * it
-			extension.map { rootInOctave + it }
-		}.filter { it in bottom..top }
+	fun getTones(bottom: Int = BaseMelodyView.BOTTOM, top: Int = BaseMelodyView.TOP): List<Int> {
+		return (bottom..top).filter {
+			it.mod12 in extension.map { (root + it).mod12 }
+		}
 	}
 
 	/**
 	 * Retrieves the closest tone in this chord to the given tone.
 	 * If two tones in the chord are equally close, returns the lower one.
 	 */
-	fun closestTone(tone: Int): Int {
-		return getTones(tone - 12, tone + 12).minBy {
+	fun closestTone(tone: Int, bottom: Int = BaseMelodyView.BOTTOM, top: Int = BaseMelodyView.TOP): Int {
+		return getTones(Math.max(bottom, tone - 12), Math.min(top, tone + 12)).minBy {
 			Math.abs(tone - it)
 		}!!
 	}

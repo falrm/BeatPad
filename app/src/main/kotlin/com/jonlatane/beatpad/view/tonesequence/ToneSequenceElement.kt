@@ -2,48 +2,79 @@ package com.jonlatane.beatpad.view.tonesequence
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.PointF
 import android.util.AttributeSet
 import android.util.SparseArray
-import android.util.SparseIntArray
 import android.view.MotionEvent
 import android.view.ViewManager
+import collections.forEach
+import com.jonlatane.beatpad.harmony.ToneSequence
+import com.jonlatane.beatpad.harmony.ToneSequence.Step
+import com.jonlatane.beatpad.harmony.ToneSequence.Step.*
+import com.jonlatane.beatpad.harmony.chord.Chord
+import com.jonlatane.beatpad.harmony.chord.Maj7
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.view.melody.BaseMelodyView
-import com.jonlatane.beatpad.view.melody.onScreenNotes
-import com.jonlatane.beatpad.view.topology.TopologyView
-import com.jonlatane.beatpad.view.topology.topologyView
+import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.info
+import org.jetbrains.anko.warn
+import kotlin.properties.Delegates.observable
+
 
 class ToneSequenceElement @JvmOverloads constructor(
 	context: Context,
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
-) : BaseMelodyView(context, attrs, defStyle), HideableView {
+) : BaseMelodyView(context, attrs, defStyle), HideableView, AnkoLogger {
+	init { showSteps = true }
+	var step: Step by observable<Step>(Rest) { _, _, _-> invalidate() }
 	override var initialHeight: Int? = null
-	val instrument = MIDIInstrument()
 	override val renderVertically = true
 	override val halfStepsOnScreen = 88
 	override val drawPadding = 30
-/*
-	private val density = context.resources.displayMetrics.density
-	private var activePointers: SparseArray<PointF> = SparseArray()
-	private var pointerTones = SparseIntArray()
-	private var pointerVelocities = SparseIntArray()
+
+	override var chord = Chord(0, Maj7)
 
 	override fun onDraw(canvas: Canvas) {
 		super.onDraw(canvas)
-		paint.color = 0xCC000000.toInt()
-		for (i in 0..activePointers.size() - 1) {
-			val key = activePointers.keyAt(i)
-			// get the object by the key.
-			val pointer = activePointers[key]
-			paint.alpha = pointerVelocities[key] * 2
-			canvas.drawCircle(pointer.x, pointer.y, 25f * density, paint)
+		drawStepNotes(canvas)
+	}
+
+	private val p = Paint()
+	private fun drawStepNotes(canvas: Canvas) {
+		p.color = when(step) {
+			is Note -> 0xAA212121.toInt()
+			is Sustain -> 0xAA424242.toInt()
+			Rest -> 0x00FFFFFF
+		}
+		try {
+			val tones = when (step) {
+				is Note -> (step as Note).tones
+				is Sustain -> (step as Sustain).note.tones
+				Rest -> emptySet()
+			}
+			tones.forEach { tone ->
+				val top = height - height * (tone - BaseMelodyView.BOTTOM) / 88f
+				val bottom = height - height * (tone - BaseMelodyView.BOTTOM + 1) / 88f
+				canvas.drawRect(
+					bounds.left.toFloat(),
+					top,
+					bounds.right.toFloat(),
+					bottom,
+					p
+				)
+			}
+		} catch(t: Throwable) {
+			warn("Error drawing pressed notes in sequence", t)
+			invalidate()
 		}
 	}
+
+
+	private var activePointers: SparseArray<PointF> = SparseArray()
 
 	override fun onTouchEvent(event: MotionEvent): Boolean {
 		// get pointer index from the event object
@@ -59,17 +90,12 @@ class ToneSequenceElement @JvmOverloads constructor(
 				f.x = event.getX(pointerIndex)
 				f.y = event.getY(pointerIndex)
 				activePointers.put(pointerId, f)
-
-				val tone = getTone(f.x)
-				info("tone: $tone")
-				val velocity = getVelocity(f.y)
-				pointerTones.put(pointerId, tone)
-				pointerVelocities.put(pointerId, velocity)
-				info("playing $tone with velocity $velocity")
-				instrument.play(tone, velocity)
+				syncPointersToTones()
+			}
+			MotionEvent.ACTION_MOVE -> {
+				syncPointersToTones()
 			}
 			MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> {
-				instrument.stop(pointerTones.get(pointerId))
 				activePointers.remove(pointerId)
 			}
 		}
@@ -77,24 +103,20 @@ class ToneSequenceElement @JvmOverloads constructor(
 		return true
 	}
 
-
-	private fun getVelocity(y: Float): Int {
-		var velocity01: Float = (height - y) / height
-		velocity01 = Math.sqrt(Math.sqrt(Math.max(0.1f, velocity01).toDouble())).toFloat()
-		val velocity: Int = Math.min(127, Math.max(10, Math.round(
-			velocity01 * 127
-		)))
-		return velocity
+	private fun syncPointersToTones() {
+		val tones = mutableSetOf<Int>()
+		activePointers.forEach { _, pointF ->
+			val tone = Math.round(-39 + 88 * (height - pointF.y) / height)
+			tones.add(tone)
+		}
+		step = Note(
+			tones
+		)
 	}
-
-	private fun getTone(x: Float): Int {
-		return onScreenNotes.find { x in (it.bottom..it.top) }!!.tone
-	}
-*/
 }
 
 
-inline fun ViewManager.toneSequenceElement(theme: Int = 0)
+fun ViewManager.toneSequenceElement(theme: Int = 0)
 	= toneSequenceElement(theme) {}
 
 inline fun ViewManager.toneSequenceElement(theme: Int = 0, init: ToneSequenceElement.() -> Unit)
