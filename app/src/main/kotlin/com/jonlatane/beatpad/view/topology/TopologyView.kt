@@ -17,9 +17,6 @@ import org.jetbrains.anko.backgroundResource
 import java.util.*
 import kotlin.properties.Delegates.observable
 
-/**
- * Created by jonlatane on 5/5/17.
- */
 class TopologyView @JvmOverloads constructor(
 	context: Context,
 	attrs: AttributeSet? = null,
@@ -37,7 +34,7 @@ class TopologyView @JvmOverloads constructor(
 		}
 		onChordChangedListener?.invoke(chord)
 	}
-	var topology: Topology by observable(Topology.basic) {
+	var topology: Topology by observable(Topology.intermediate) {
 		_, _, new ->
 		(Topology.allSequences - new).forEach {
 			removeSequence(it)

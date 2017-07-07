@@ -2,8 +2,10 @@ package com.jonlatane.beatpad.harmony
 
 class ToneSequence(
 	steps: List<Step> = emptyList(),
-	var stepsPerBeat: Int = 1,
-	var octave: Int = 4
+	/**
+	 * A value of 4 would indicate sixteenth notes in 4/4 time
+	 */
+	var stepsPerBeat: Int = 1
 ) {
 	val steps = steps.toMutableList()
 	sealed class Step {

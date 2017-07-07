@@ -25,8 +25,8 @@ class ChordTest : Test({
 			assertThat(Chord(6, min).getTones(12, 24)).contains(18, 21, 13)
 		}
 		test("spans") {
-			val chord = Chord(0, intArrayOf(0))
-			assertThat(chord.getTones(BaseMelodyView.BOTTOM, BaseMelodyView.TOP).equals(8))
+			val chord = Chord(0, intArrayOf(0)) // Just middle C
+			assertThat(chord.getTones(BaseMelodyView.BOTTOM, BaseMelodyView.TOP).size).isEqualTo(8)
 		}
 	}
 

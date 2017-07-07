@@ -3,9 +3,6 @@ package com.jonlatane.beatpad.output.controller
 import com.jonlatane.beatpad.output.instrument.Instrument
 import com.jonlatane.beatpad.sensors.Orientation
 
-/**
- * Created by jonlatane on 5/5/17.
- */
 class SequencerThread(instrument: Instrument, beatsPerMinute: Int) : DeviceOrientationInstrument(instrument), Runnable {
 
     @Volatile var beatsPerMinute: Int = 0

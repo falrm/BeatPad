@@ -9,17 +9,14 @@ import android.util.SparseArray
 import android.view.MotionEvent
 import android.view.ViewManager
 import collections.forEach
-import com.jonlatane.beatpad.harmony.ToneSequence
 import com.jonlatane.beatpad.harmony.ToneSequence.Step
 import com.jonlatane.beatpad.harmony.ToneSequence.Step.*
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.Maj7
-import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.view.melody.BaseMelodyView
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.custom.ankoView
-import org.jetbrains.anko.info
 import org.jetbrains.anko.warn
 import kotlin.properties.Delegates.observable
 
@@ -29,18 +26,37 @@ class ToneSequenceElement @JvmOverloads constructor(
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
 ) : BaseMelodyView(context, attrs, defStyle), HideableView, AnkoLogger {
-	init { showSteps = true }
-	var step: Step by observable<Step>(Rest) { _, _, _-> invalidate() }
+	init {
+		showSteps = true
+	}
+	lateinit var viewModel: ToneSequenceViewModel
+
+	// Lazy loaded
+	val seqIndex: Int by lazy {
+		viewModel.elements.indexOf(this)
+	}
+	var step: Step?
+		get() = viewModel.toneSequence.steps[seqIndex]
+		set(value) {
+			if(value != null && isVisible)
+				viewModel.toneSequence.steps[seqIndex] = value
+		}
+	val isVisible: Boolean get() = seqIndex < viewModel.toneSequence.steps.size
+	val isDownbeat: Boolean get() = seqIndex % viewModel.toneSequence.stepsPerBeat == 0
+
 	override var initialHeight: Int? = null
 	override val renderVertically = true
 	override val halfStepsOnScreen = 88
 	override val drawPadding = 30
-
-	override var chord = Chord(0, Maj7)
+	override var chord: Chord
+		get() = viewModel.topology.chord
+		set(value) { throw UnsupportedOperationException() }
 
 	override fun onDraw(canvas: Canvas) {
 		super.onDraw(canvas)
-		drawStepNotes(canvas)
+		if(isVisible) {
+			drawStepNotes(canvas)
+		}
 	}
 
 	private val p = Paint()
@@ -48,13 +64,13 @@ class ToneSequenceElement @JvmOverloads constructor(
 		p.color = when(step) {
 			is Note -> 0xAA212121.toInt()
 			is Sustain -> 0xAA424242.toInt()
-			Rest -> 0x00FFFFFF
+			Rest, null -> 0x00FFFFFF
 		}
 		try {
 			val tones = when (step) {
 				is Note -> (step as Note).tones
 				is Sustain -> (step as Sustain).note.tones
-				Rest -> emptySet()
+				Rest, null -> emptySet()
 			}
 			tones.forEach { tone ->
 				val top = height - height * (tone - BaseMelodyView.BOTTOM) / 88f
@@ -77,6 +93,7 @@ class ToneSequenceElement @JvmOverloads constructor(
 	private var activePointers: SparseArray<PointF> = SparseArray()
 
 	override fun onTouchEvent(event: MotionEvent): Boolean {
+		if(!viewModel.bottomScroller.isHeldDown) return false
 		// get pointer index from the event object
 		val pointerIndex = event.actionIndex
 		// get pointer ID

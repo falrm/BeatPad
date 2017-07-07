@@ -26,7 +26,7 @@
 	<color name="four">@color/subDominant</color>
 	<color name="flatFive">@color/diminished</color>
 	<color name="five">@color/dominant</color>
-	<color name="sharpFive">@color/augmented</color>
+	<color name="sharpFive">@color/minor</color>
 	<color name="six">@color/major</color>
 	<color name="flatSeven">@color/minor</color>
 	<color name="seven">@color/augmented</color>

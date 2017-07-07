@@ -8,7 +8,7 @@ import android.widget.HorizontalScrollView
 import org.jetbrains.anko._HorizontalScrollView
 import org.jetbrains.anko.custom.ankoView
 
-class NonDelayedHorizontalScrollView(
+open class NonDelayedHorizontalScrollView(
 	context: Context,
 	var scrollingEnabled: Boolean = true
 ): _HorizontalScrollView(context) {
