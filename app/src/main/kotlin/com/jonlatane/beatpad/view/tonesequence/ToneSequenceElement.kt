@@ -9,16 +9,16 @@ import android.util.SparseArray
 import android.view.MotionEvent
 import android.view.ViewManager
 import collections.forEach
+import com.jonlatane.beatpad.harmony.Rest
 import com.jonlatane.beatpad.harmony.ToneSequence.Step
-import com.jonlatane.beatpad.harmony.ToneSequence.Step.*
+import com.jonlatane.beatpad.harmony.ToneSequence.Step.Note
+import com.jonlatane.beatpad.harmony.ToneSequence.Step.Sustain
 import com.jonlatane.beatpad.harmony.chord.Chord
-import com.jonlatane.beatpad.harmony.chord.Maj7
 import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.view.melody.BaseMelodyView
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.warn
-import kotlin.properties.Delegates.observable
 
 
 class ToneSequenceElement @JvmOverloads constructor(
@@ -64,13 +64,13 @@ class ToneSequenceElement @JvmOverloads constructor(
 		p.color = when(step) {
 			is Note -> 0xAA212121.toInt()
 			is Sustain -> 0xAA424242.toInt()
-			Rest, null -> 0x00FFFFFF
+			null -> 0x00FFFFFF
 		}
 		try {
 			val tones = when (step) {
 				is Note -> (step as Note).tones
 				is Sustain -> (step as Sustain).note.tones
-				Rest, null -> emptySet()
+				null -> emptySet<Int>()
 			}
 			tones.forEach { tone ->
 				val top = height - height * (tone - BaseMelodyView.BOTTOM) / 88f
@@ -90,7 +90,6 @@ class ToneSequenceElement @JvmOverloads constructor(
 	}
 
 
-	private var activePointers: SparseArray<PointF> = SparseArray()
 
 	override fun onTouchEvent(event: MotionEvent): Boolean {
 		if(!viewModel.bottomScroller.isHeldDown) return false
@@ -102,33 +101,21 @@ class ToneSequenceElement @JvmOverloads constructor(
 		when (maskedAction) {
 
 			MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
-				// We have a new pointer. Lets add it to the list of pointers
-				val f = PointF()
-				f.x = event.getX(pointerIndex)
-				f.y = event.getY(pointerIndex)
-				activePointers.put(pointerId, f)
-				syncPointersToTones()
+				val tone = getTone(event.getY(pointerIndex))
+				if(step is Note) {
+					val tones = (step as Note).tones
+					if(!tones.remove(tone)) tones.add(tone)
+				}
 			}
-			MotionEvent.ACTION_MOVE -> {
-				syncPointersToTones()
-			}
-			MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> {
-				activePointers.remove(pointerId)
-			}
+			MotionEvent.ACTION_MOVE -> {}
+			MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> {}
 		}
 		invalidate()
 		return true
 	}
 
-	private fun syncPointersToTones() {
-		val tones = mutableSetOf<Int>()
-		activePointers.forEach { _, pointF ->
-			val tone = Math.round(-39 + 88 * (height - pointF.y) / height)
-			tones.add(tone)
-		}
-		step = Note(
-			tones
-		)
+	private fun getTone(y: Float): Int {
+		return Math.round(-39 + 88 * (height - y) / height)
 	}
 }
 

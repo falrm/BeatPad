@@ -9,9 +9,6 @@ import android.view.animation.DecelerateInterpolator
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 import java.util.concurrent.atomic.AtomicInteger
 
-/**
- * Created by jonlatane on 5/8/17.
- */
 object RhythmAnimations {
 	fun wireMelodicControl(v: TopologyView, instrument: DeviceOrientationInstrument) {
 		v.centralChordTouchPoint.setOnTouchListener(object : View.OnTouchListener {

@@ -7,7 +7,6 @@ import android.widget.LinearLayout.HORIZONTAL
 import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.SequenceEditorActivity
-import com.jonlatane.beatpad.output.controller.SequencerThread
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.view.nonDelayedHorizontalScrollView
@@ -27,11 +26,11 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 		channel = 4
 		instrument = GeneralMidiConstants.SYNTH_BASS_1
 	}
-	val instrument = MIDIInstrument().apply {
+	val sequencerInstrument = MIDIInstrument().apply {
 		channel = 5
 		instrument = GeneralMidiConstants.SYNTH_BASS_1
 	}
-	internal val sequencerThread = ToneSequencePlayerThread(instrument, viewModel, 104)
+	internal val sequencerThread = ToneSequencePlayerThread(sequencerInstrument, viewModel, 104)
 
 
 	override fun createView(ui: AnkoContext<SequenceEditorActivity>) = with(ui) {
@@ -83,7 +82,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 			}
 			holdToEdit = textView {
 				text = "Hold To Edit"
-				textSize = sp(16).toFloat()
+				textSize = 10f
 				gravity = Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL
 			}.lparams {
 				alignParentBottom()

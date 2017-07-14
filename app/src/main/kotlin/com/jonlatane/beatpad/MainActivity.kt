@@ -54,7 +54,7 @@ class MainActivity : BaseActivity() {
 		pianoBoardInstrument.instrument = GeneralMidiConstants.SYNTH_BASS_1
 
 		val harmonyController = DeviceOrientationInstrument(harmonicInstrument)
-		RhythmAnimations.wireMelodicControl(topology, harmonyController)
+		//RhythmAnimations.wireMelodicControl(topology, harmonyController)
 		keyboardIOHandler = KeyboardIOHandler(keyboard, pianoBoardInstrument)
 
 		topology.onChordChangedListener = { c: Chord ->

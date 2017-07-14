@@ -12,15 +12,21 @@ import android.widget.NumberPicker
 import android.widget.TextView
 import com.jonlatane.beatpad.ConductorActivity.Companion.SERVICE_NAME
 import com.jonlatane.beatpad.ConductorActivity.Companion.SERVICE_TYPE
+import com.jonlatane.beatpad.harmony.Topology
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.view.topology.TopologyView
 import org.jetbrains.anko.contentView
 import org.jetbrains.anko.nsdManager
 
+fun showTopologyPicker(topology: TopologyView) {
+    val builder = AlertDialog.Builder(topology.context)
+    builder.setTitle("Choose a Topology Mode")
+    builder.setItems(Topology.values().map { it.title }.toTypedArray()) { _, which ->
+        topology.topology = Topology.values()[which]
+    }
+    builder.show()
+}
 
-/**
- * Utility class for things selected by dialog
- * Created by jonlatane on 5/8/17.
- */
 fun showInstrumentPicker(activity: BaseActivity, instrument: MIDIInstrument) {
     val builder = AlertDialog.Builder(activity)
     builder.setTitle("Choose an instrument")

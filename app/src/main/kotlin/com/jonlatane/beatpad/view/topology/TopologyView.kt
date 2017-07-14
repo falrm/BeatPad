@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
@@ -12,8 +13,9 @@ import com.jonlatane.beatpad.harmony.Topology
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.Maj7
 import com.jonlatane.beatpad.harmony.chordsequence.Chromatic
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.backgroundResource
+import com.jonlatane.beatpad.showTopologyPicker
+import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.util.*
 import kotlin.properties.Delegates.observable
 
@@ -98,6 +100,17 @@ class TopologyView @JvmOverloads constructor(
 			skipTo(InitialState)
 			this.topology = topology
 			animateTo(SelectionState)
+		}
+		val topology = this
+		button {
+			text = "Mode"
+			onClick {
+				showTopologyPicker(topology)
+			}
+			layoutParams = RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+				addRule(ALIGN_PARENT_BOTTOM)
+				addRule(ALIGN_PARENT_RIGHT)
+			}
 		}
 	}
 
