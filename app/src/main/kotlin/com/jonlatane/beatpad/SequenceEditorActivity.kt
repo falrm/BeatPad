@@ -1,27 +1,51 @@
 package com.jonlatane.beatpad
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import com.jonlatane.beatpad.R.id.topology
 import com.jonlatane.beatpad.harmony.Topology
+import com.jonlatane.beatpad.harmony.Topology.intermediate
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
-import com.jonlatane.beatpad.util.isHidden
+import com.jonlatane.beatpad.storage.ToneSequenceStorage
+import com.jonlatane.beatpad.view.tonesequence.ToneSequencePlayerThread
 import com.jonlatane.beatpad.view.tonesequence.ToneSequenceUI
-import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.debug
-import org.jetbrains.anko.info
-import org.jetbrains.anko.setContentView
+import org.billthefarmer.mididriver.GeneralMidiConstants.*
+import org.jetbrains.anko.*
+import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
 
 class SequenceEditorActivity : Activity(), AnkoLogger {
 	lateinit var ui: ToneSequenceUI
+	val viewModel get() = ui.viewModel
+	val sequencerInstrument get() = ui.sequencerInstrument
+	val topology get() = viewModel.topology
+	var toneSequence get() = viewModel.toneSequence
+		set(value) {
+			viewModel.toneSequence = value
+		}
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+
 		info("hi hi hi hi")
 		ui = ToneSequenceUI().also {
 			it.setContentView(this)
 		}
+		val bundle = savedInstanceState ?: intent.extras.getBundle("playgroundState")
+
+		fun Bundle.formatted(): String {
+			var string = "Bundle{"
+			this.keySet().forEach { key ->
+				string += " " + key + " => " + this.get(key) + ";"
+			}
+			string += " }"
+			return string
+		}
+
+		println("Got intent with extras: ${bundle.formatted()}")
+		onRestoreInstanceState(bundle)
 	}
 
 	override fun onResume() {
@@ -43,41 +67,34 @@ class SequenceEditorActivity : Activity(), AnkoLogger {
 		AudioTrackCache.releaseAll()
 		MIDIInstrument.DRIVER.stop()
 		ui.sequencerThread.stopped = true
+		ToneSequenceStorage.storeSequence(toneSequence, this)
+	}
+
+	override fun onStop() {
+		super.onStop()
+		ToneSequenceStorage.storeSequence(toneSequence, this)
 	}
 
 	override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+		super.onRestoreInstanceState(savedInstanceState)
+		toneSequence = ToneSequenceStorage.loadSequence(this)
+		ui.sequencerInstrument.instrument = savedInstanceState.getByte("sequencerInstrument", SYNTH_BASS_1)
+		topology.topology = Topology.values().find {
+			it.ordinal == (savedInstanceState["topologyMode"] as Int? ?: -1)
+		} ?: intermediate
 		val chord = savedInstanceState.getParcelable<Chord>("currentChord")
 		if (chord != null) {
 			topology.chord = chord
 		}
-		ui.sequencerThread.beatsPerMinute = savedInstanceState.getInt("tempo")
-		//updateTempoButton()
-		melody.instrument.instrument = savedInstanceState.getByte("melodicInstrument")
-		//harmonicInstrument.instrument = savedInstanceState.getByte("harmonicInstrument")
-		ui.sequencerInstrument.instrument = savedInstanceState.getByte("sequencerInstrument")
-		//pianoBoardInstrument.instrument = savedInstanceState.getByte("pianoInstrument")
-		topology.topology = Topology.values().find { it.ordinal == savedInstanceState.getInt("topologyMode") }!!
-		if (savedInstanceState.getBoolean("pianoHidden")) {
-			//keyboard.hide(animated = false)
-			//updateTopology()
-		}
-		if (savedInstanceState.getBoolean("melodyHidden")) {
-			//melody.hide(animated = false)
-			//updateTopology()
-		}
+		viewModel.sequencerThread =  ToneSequencePlayerThread(sequencerInstrument, viewModel, beatsPerMinute = 104)
+		ui.sequencerThread.beatsPerMinute = savedInstanceState.getInt("tempo", 147)
 	}
 
-	// invoked when the activity may be temporarily destroyed, save the instance state here
 	override fun onSaveInstanceState(outState: Bundle) {
+		super.onSaveInstanceState(outState)
 		outState.putParcelable("currentChord", topology.chord)
 		outState.putInt("tempo", ui.sequencerThread.beatsPerMinute)
-		outState.putByte("melodicInstrument", melody.instrument.instrument)
-		//outState.putByte("harmonicInstrument", harmonicInstrument.instrument)
 		outState.putByte("sequencerInstrument", ui.sequencerInstrument.instrument)
-		//outState.putByte("pianoInstrument", pianoBoardInstrument.instrument)
-		//outState.putByte("pianoInstrument", pianoBoardInstrument.instrument)
-		outState.putBoolean("pianoHidden", keyboard.isHidden)
-		outState.putBoolean("melodyHidden", melody.isHidden)
 		outState.putInt("topologyMode", topology.topology.ordinal)
 	}
 }

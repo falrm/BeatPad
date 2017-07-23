@@ -5,6 +5,7 @@ import android.support.design.widget.Snackbar
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import com.jonlatane.beatpad.harmony.ToneSequence
 import com.jonlatane.beatpad.harmony.Topology
 import com.jonlatane.beatpad.harmony.Topology.*
 import com.jonlatane.beatpad.harmony.chord.Chord
@@ -13,11 +14,13 @@ import com.jonlatane.beatpad.output.controller.SequencerThread
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.sensors.Orientation
+import com.jonlatane.beatpad.storage.ToneSequenceStorage
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.util.show
 import com.jonlatane.beatpad.view.keyboard.KeyboardIOHandler
 import com.jonlatane.beatpad.view.tempo.TempoTracking
+import com.jonlatane.beatpad.view.tonesequence.ToneSequencePlayerThread
 import com.jonlatane.beatpad.view.topology.ANIMATION_DURATION
 import com.jonlatane.beatpad.view.topology.RhythmAnimations
 import kotlinx.android.synthetic.main.activity_main.*
@@ -32,12 +35,12 @@ class MainActivity : BaseActivity() {
 	override val menuResource: Int = R.menu.main_menu
 	private val playing = AtomicBoolean(false)
 	private val executorService = Executors.newScheduledThreadPool(2)
-	private lateinit var playingAdvice: Snackbar
 	private val pianoBoardInstrument = MIDIInstrument()
 	private val harmonicInstrument = MIDIInstrument()
 	private val sequencerInstrument = MIDIInstrument()
 	private lateinit var keyboardIOHandler: KeyboardIOHandler
-	internal val sequencerThread = SequencerThread(sequencerInstrument, 120)
+	internal lateinit var sequencerThread: ToneSequencePlayerThread
+	internal lateinit var toneSequence: ToneSequence
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -54,36 +57,35 @@ class MainActivity : BaseActivity() {
 		pianoBoardInstrument.instrument = GeneralMidiConstants.SYNTH_BASS_1
 
 		val harmonyController = DeviceOrientationInstrument(harmonicInstrument)
-		//RhythmAnimations.wireMelodicControl(topology, harmonyController)
+		RhythmAnimations.wireMelodicControl(topology, harmonyController)
 		keyboardIOHandler = KeyboardIOHandler(keyboard, pianoBoardInstrument)
+
+		sequencerThread = ToneSequencePlayerThread(
+			sequencerInstrument,
+			sequenceResolver = { toneSequence },
+			beatsPerMinute = 120,
+			chordResolver = { topology.chord }
+		)
 
 		topology.onChordChangedListener = { c: Chord ->
 			val tones = c.getTones()
 			melody.chord = c
-			harmonyController.setTones(tones)
-			sequencerThread.setTones(tones)
+			harmonyController.tones = tones
 			keyboardIOHandler.highlightChord(c)
 		}
 
-		playingAdvice = Snackbar.make(topology, "Tap the SEQ button again to stop playback.", Snackbar.LENGTH_SHORT)
-		sequencerToggle.setOnClickListener(object : View.OnClickListener {
-			internal var shown = false
-			override fun onClick(v: View) {
-				if (!playing.getAndSet(true)) {
-					sequencerThread.stopped = false
-					executorService.execute(sequencerThread)
-					if (!shown) {
-						playingAdvice.show()
-						shown = true
-					}
-				} else {
-					sequencerThread.stopped = true
-					AudioTrackCache.releaseAll()
-					playing.set(false)
-					playingAdvice.dismiss()
-				}
+		sequencerToggle.setOnClickListener {
+			if (!playing.getAndSet(true)) {
+				sequencerThread.stopped = false
+				executorService.execute(sequencerThread)
+				sequencerToggle.text = "Stop"
+			} else {
+				sequencerThread.stopped = true
+				AudioTrackCache.releaseAll()
+				playing.set(false)
+				sequencerToggle.text = "Seq"
 			}
-		})
+		}
 		TempoTracking.trackTempo(tempoTapper) { tempo: Float ->
 			Log.i(TAG, "onTempoChanged:" + tempo)
 			val bpm = Math.round(tempo)
@@ -99,6 +101,7 @@ class MainActivity : BaseActivity() {
 	override fun onResume() {
 		super.onResume()
 		topology.onResume()
+		toneSequence = ToneSequenceStorage.loadSequence(this)
 	}
 
 	override fun onPause() {
@@ -118,11 +121,11 @@ class MainActivity : BaseActivity() {
 		sequencerInstrument.instrument = savedInstanceState.getByte("sequencerInstrument")
 		pianoBoardInstrument.instrument = savedInstanceState.getByte("pianoInstrument")
 		topology.topology = Topology.values().find { it.ordinal == savedInstanceState.getInt("topologyMode") }!!
-		if(savedInstanceState.getBoolean("pianoHidden")) {
+		if (savedInstanceState.getBoolean("pianoHidden")) {
 			keyboard.hide(animated = false)
 			updateTopology()
 		}
-		if(savedInstanceState.getBoolean("melodyHidden")) {
+		if (savedInstanceState.getBoolean("melodyHidden")) {
 			melody.hide(animated = false)
 			updateTopology()
 		}
@@ -174,7 +177,7 @@ class MainActivity : BaseActivity() {
 			R.id.pop_mode -> topology.topology = pop
 			R.id.conduct -> startActivity<ConductorActivity>()
 			R.id.play -> startActivity<InstrumentActivity>()
-			R.id.sequence_editor -> startActivity<SequenceEditorActivity>()
+			R.id.sequence_editor -> startActivity<SequenceEditorActivity>("playgroundState" to Bundle().also { onSaveInstanceState(it) })
 		}
 		return true
 	}
@@ -184,12 +187,12 @@ class MainActivity : BaseActivity() {
 		menu.findItem(R.id.color_board_instrument).title = "Colorboard: ${melody.instrument.instrumentName}"
 		menu.findItem(R.id.harmony_instrument).title = "Harmony: ${harmonicInstrument.instrumentName}"
 		menu.findItem(R.id.sequencer_instrument).title = "Sequencer: ${sequencerInstrument.instrumentName}"
-		if(melody.isHidden) {
+		if (melody.isHidden) {
 			menu.findItem(R.id.color_keyboard_toggle).title = "Use Colorboard"
 		} else {
 			menu.findItem(R.id.color_keyboard_toggle).title = "Hide Colorboard"
 		}
-		if(keyboard.isHidden) {
+		if (keyboard.isHidden) {
 			menu.findItem(R.id.keyboard_toggle).title = "Use Keyboard"
 		} else {
 			menu.findItem(R.id.keyboard_toggle).title = "Hide Keyboard"

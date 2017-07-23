@@ -2,11 +2,10 @@ package com.jonlatane.beatpad.view.topology
 
 import android.widget.TextView
 import com.jonlatane.beatpad.util.*
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 
-/**
- * Created by jonlatane on 5/23/17.
- */
-object SelectionState : NavigationState {
+object SelectionState : NavigationState, AnkoLogger {
   override fun animateTo(v: TopologyView) {
     val theta = Math.PI / v.sequences.size
     val maxTX = v.width * 0.4f
@@ -144,6 +143,7 @@ object SelectionState : NavigationState {
 
   private fun animateAxisToSelectionPhase(sv: TopologyView.SequenceViews, tX: Float, tY: Float) {
     val width = Math.round(2f * tX + Math.max(sv.forward.width, sv.back.width))
+    info("Animating to axis width $width")
     val propertyAnimator = sv.axis.animate().translationY(tY).translationX(0f).alpha(0.4f)
     sv.axis.animateWidth(width)
     propertyAnimator.setDuration(ANIMATION_DURATION).start()

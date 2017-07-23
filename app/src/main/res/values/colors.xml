@@ -4,12 +4,13 @@
 	<color name="colorPrimaryDark">#424242</color>
 	<color name="colorAccent">#EC407A</color>
 
+	<!-- A Background color for the Topology view -->
 	<color name="brown">#5D4037</color>
 
 	<!-- The colors work as such: Dominant is common to both schemes -->
 	<color name="dominant">#FFEBEE</color>
 
-	<!-- Tonic-Subdominant-Dominant is green-yellow-red -->
+	<!-- Tonic-Subdominant-Dominant is green-yellow-red. This is what's on the "piano" keyboard -->
 	<color name="tonic">#A5D6A7</color>
 	<color name="subDominant">#FFF59D</color>
 
@@ -19,6 +20,10 @@
 	<color name="augmented">#E0F7FA</color>
 	<color name="diminished">#F3E5F5</color>
 
+	<!--
+		These colors, along with the green "tonic" above, are the 12 colors used on the Colorboard
+		and in the Sequence Editor
+	-->
 	<color name="flatTwo">@color/diminished</color>
 	<color name="two">@color/subDominant</color>
 	<color name="flatThree">@color/minor</color>

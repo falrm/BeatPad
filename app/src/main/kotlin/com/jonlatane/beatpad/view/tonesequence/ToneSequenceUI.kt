@@ -30,7 +30,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 		channel = 5
 		instrument = GeneralMidiConstants.SYNTH_BASS_1
 	}
-	internal val sequencerThread = ToneSequencePlayerThread(sequencerInstrument, viewModel, 104)
+	val sequencerThread get() = viewModel.sequencerThread
 
 
 	override fun createView(ui: AnkoContext<SequenceEditorActivity>) = with(ui) {
@@ -41,12 +41,13 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				id = IDSeq++
 				onChordChangedListener = { viewModel.elements.forEach { it.invalidate() } }
 			}.lparams {
-				height = dip(210f)
 				if(configuration.portrait) {
 					width = MATCH_PARENT
+					height = dip(210f)
 					alignParentTop()
 				} else {
 					width = dip(350f)
+					height = MATCH_PARENT
 					alignParentLeft()
 				}
 			}
@@ -154,15 +155,17 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 			}
 
 			button {
-				text = "Play/Pause"
+				text = "Play"
 				onClick {
 					if (!viewModel.playing.getAndSet(true)) {
 						sequencerThread.stopped = false
 						executorService.execute(sequencerThread)
+						text = "Stop"
 					} else {
 						sequencerThread.stopped = true
 						AudioTrackCache.releaseAll()
 						viewModel.playing.set(false)
+						text = "Play"
 					}
 				}
 			}.lparams {

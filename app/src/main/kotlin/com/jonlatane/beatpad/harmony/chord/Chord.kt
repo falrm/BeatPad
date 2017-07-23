@@ -92,20 +92,15 @@ class Chord : Parcelable {
 	}
 
 	val isMinor: Boolean get() = heptatonics.isMinor
-
 	val isMajor: Boolean get() = heptatonics.isMajor
-
-	val isSus: Boolean get() = heptatonics.isSus
-
-	val hasMinor7: Boolean get() = heptatonics.hasMinor7
-
-	val hasMajor7: Boolean get() = heptatonics.hasMajor7
-
-	val isDominant: Boolean get() = heptatonics.isDominant
-
 	val isAugmented: Boolean get() = isMajor && heptatonics.fifth == AUGMENTED
-
 	val isDiminished: Boolean get() = isMinor && heptatonics.fifth == DIMINISHED
+	val isSus: Boolean get() = heptatonics.isSus
+	val hasMinor7: Boolean get() = heptatonics.hasMinor7
+	val hasMajor7: Boolean get() = heptatonics.hasMajor7
+	val hasDiminished5: Boolean get() = heptatonics.hasDiminished5
+	val hasAugmented5: Boolean get() = heptatonics.hasAugmented5
+	val isDominant: Boolean get() = heptatonics.isDominant
 
 	companion object {
 		private val mod12Names = arrayOf("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")

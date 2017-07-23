@@ -3,6 +3,8 @@ package com.jonlatane.beatpad.util
 import android.animation.ValueAnimator
 import android.os.Build
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.*
 import android.view.ViewPropertyAnimator
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -61,14 +63,23 @@ var View.translationXY: Float
 var View.layoutWidth get() = this.layoutParams.width
 	set(value) {
 		val layoutParams = this.layoutParams
-		layoutParams.width = value
+		layoutParams.width = when {
+			value in listOf(MATCH_PARENT, WRAP_CONTENT) -> value
+			value > 0 -> value
+			else -> 1
+		}
 		this.layoutParams = layoutParams
+		invalidate()
 	}
 
 var View.layoutHeight get() = this.layoutParams.height
 	set(value) {
 		val layoutParams = this.layoutParams
-		layoutParams.height = value
+		layoutParams.width = when {
+			value in listOf(MATCH_PARENT, WRAP_CONTENT) -> value
+			value > 0 -> value
+			else -> 1
+		}
 		this.layoutParams = layoutParams
 	}
 

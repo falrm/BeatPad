@@ -7,14 +7,18 @@ import android.view.ViewPropertyAnimator
 import android.view.animation.DecelerateInterpolator
 
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 import java.util.concurrent.atomic.AtomicInteger
 
-object RhythmAnimations {
+object RhythmAnimations: AnkoLogger {
 	fun wireMelodicControl(v: TopologyView, instrument: DeviceOrientationInstrument) {
+		info("Setting ontouch")
 		v.centralChordTouchPoint.setOnTouchListener(object : View.OnTouchListener {
 			private var animator: ViewPropertyAnimator? = null
 			val pointerCount = AtomicInteger(0)
 			override fun onTouch(view: View, event: MotionEvent): Boolean {
+				info("Rhythm onTouch")
 				return when (event.actionMasked) {
 					ACTION_DOWN, ACTION_POINTER_DOWN -> {
 						pointerCount.incrementAndGet()
