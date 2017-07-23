@@ -152,13 +152,15 @@ class MainActivity : BaseActivity() {
 			R.id.piano_board_instrument -> showInstrumentPicker(this, pianoBoardInstrument)
 			R.id.choose_tempo -> showTempoPicker(this)
 			R.id.keyboard_toggle -> {
-				if (keyboard.isHidden) {
-					keyboard.show()
-					updateTopology()
-				} else {
-					keyboard.hide()
-					updateTopology()
-				}
+				//post {
+					if (keyboard.isHidden) {
+						keyboard.show()
+						updateTopology()
+					} else {
+						keyboard.hide()
+						updateTopology()
+					}
+				//}
 			}
 			R.id.color_keyboard_toggle -> {
 				if (melody.isHidden) {

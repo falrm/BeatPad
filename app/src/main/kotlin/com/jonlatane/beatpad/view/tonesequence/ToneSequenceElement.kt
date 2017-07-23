@@ -55,12 +55,13 @@ class ToneSequenceElement @JvmOverloads constructor(
 	override fun onDraw(canvas: Canvas) {
 		super.onDraw(canvas)
 		if(isVisible) {
-			drawStepNotes(canvas)
+			canvas.drawStepNotes()
+			canvas.drawRhythm()
 		}
 	}
 
 	private val p = Paint()
-	private fun drawStepNotes(canvas: Canvas) {
+	private fun Canvas.drawStepNotes() {
 		p.color = when(step) {
 			is Note -> 0xAA212121.toInt()
 			is Sustain -> 0xAA424242.toInt()
@@ -75,7 +76,7 @@ class ToneSequenceElement @JvmOverloads constructor(
 			tones.forEach { tone ->
 				val top = height - height * (tone - BaseMelodyView.BOTTOM) / 88f
 				val bottom = height - height * (tone - BaseMelodyView.BOTTOM + 1) / 88f
-				canvas.drawRect(
+				drawRect(
 					bounds.left.toFloat(),
 					top,
 					bounds.right.toFloat(),
@@ -89,7 +90,16 @@ class ToneSequenceElement @JvmOverloads constructor(
 		}
 	}
 
-
+	private fun Canvas.drawRhythm() {
+		p.color = 0xAA212121.toInt()
+		drawRect(
+			bounds.left.toFloat(),
+			bounds.top.toFloat(),
+			bounds.left.toFloat() + 5f,
+			bounds.bottom.toFloat(),
+			p
+		)
+	}
 
 	override fun onTouchEvent(event: MotionEvent): Boolean {
 		if(!viewModel.bottomScroller.isHeldDown) return false

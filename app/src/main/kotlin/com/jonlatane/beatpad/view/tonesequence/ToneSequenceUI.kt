@@ -98,9 +98,10 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 			viewModel.leftScroller = nonDelayedScrollView {
 				id = IDSeq++
 				linearLayout {
-					view {
+					toneSequenceAxis()
+					/*view {
 						background = ctx.getDrawable(R.drawable.vertical_keyboard)
-					}.lparams {
+					}*/.lparams {
 						width = dip(30)
 						height = dip(1000f)
 					}

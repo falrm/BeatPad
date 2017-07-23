@@ -12,6 +12,7 @@ import com.jonlatane.beatpad.harmony.chord.Maj7
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.mod12
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.withAlpha
 import java.util.concurrent.ConcurrentHashMap
 
 abstract class BaseMelodyView @JvmOverloads constructor(
@@ -20,6 +21,7 @@ abstract class BaseMelodyView @JvmOverloads constructor(
 	defStyle: Int = 0
 ) : View(context, attrs, defStyle), AnkoLogger {
 	open var chord = Chord(0, Maj7)
+	open var backgroundAlpha = 255
 	var showSteps = true
 	open val drawPadding = 0
 	abstract val renderVertically: Boolean
@@ -47,7 +49,7 @@ abstract class BaseMelodyView @JvmOverloads constructor(
 				10 -> color(R.color.flatSeven)
 				11 -> color(R.color.seven)
 				else -> throw IllegalStateException()
-			}
+			}.withAlpha(backgroundAlpha)
 			if(renderVertically) {
 				canvas.drawRect(
 					bounds.left.toFloat() + drawPadding,
