@@ -29,6 +29,7 @@ class ToneSequencePlayerThread(
 				val pauseDuration = 0L
 
 				println("playing")
+				viewModel?.topology?.post { viewModel.markPlaying(step) }
 				// Interpret the booleans as "play" or "rest"
 				when (step) {
 					is Note -> {

@@ -39,7 +39,10 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 		relativeLayout {
 			viewModel.topology = topologyView {
 				id = IDSeq++
-				onChordChangedListener = { viewModel.elements.forEach { it.invalidate() } }
+				onChordChangedListener = {
+					viewModel.verticalAxis?.chord = it
+					viewModel.redraw()
+				}
 			}.lparams {
 				if(configuration.portrait) {
 					width = MATCH_PARENT
@@ -83,7 +86,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 			}
 			holdToEdit = textView {
 				text = "Hold To Edit"
-				textSize = 10f
+				textSize = 15f
 				gravity = Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL
 			}.lparams {
 				alignParentBottom()
@@ -98,10 +101,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 			viewModel.leftScroller = nonDelayedScrollView {
 				id = IDSeq++
 				linearLayout {
-					toneSequenceAxis()
-					/*view {
-						background = ctx.getDrawable(R.drawable.vertical_keyboard)
-					}*/.lparams {
+					viewModel.verticalAxis = toneSequenceAxis().lparams {
 						width = dip(30)
 						height = dip(1000f)
 					}
@@ -120,6 +120,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				}
 			}
 			viewModel.centerVerticalScroller = nonDelayedScrollView {
+				id = IDSeq++
 				onScrollChange {
 					_, _, scrollY, _, _ ->
 					viewModel.leftScroller.scrollY = scrollY
@@ -174,6 +175,11 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				height = WRAP_CONTENT
 				alignParentLeft()
 				alignParentBottom()
+				if(configuration.portrait) {
+					below(viewModel.centerVerticalScroller)
+					//setVerticalGravity(Gravity.CENTER_VERTICAL)
+					gravity = Gravity.CENTER_VERTICAL
+				}
 			}
 		}
 	}

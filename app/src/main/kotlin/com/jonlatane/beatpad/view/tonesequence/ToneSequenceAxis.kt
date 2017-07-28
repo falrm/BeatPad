@@ -14,6 +14,7 @@ import com.jonlatane.beatpad.harmony.ToneSequence.Step
 import com.jonlatane.beatpad.harmony.ToneSequence.Step.Note
 import com.jonlatane.beatpad.harmony.ToneSequence.Step.Sustain
 import com.jonlatane.beatpad.harmony.chord.Chord
+import com.jonlatane.beatpad.harmony.chord.Maj
 import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.view.melody.BaseMelodyView
 import org.jetbrains.anko.AnkoLogger

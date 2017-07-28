@@ -13,12 +13,13 @@ import kotlin.properties.Delegates.observable
 class ToneSequenceViewModel {
 	var toneSequence: ToneSequence by observable(
 		initialValue = ToneSequenceStorage.defaultSequence,
-		onChange = { _, _, _ -> redraw }
+		onChange = { _, _, _ -> redraw() }
 	)
 	val playing = AtomicBoolean(false)
 	lateinit var topology: TopologyView
+	var verticalAxis: ToneSequenceAxis? = null
 	var chord get() = topology.chord
-		set(value) { topology.chord = value; redraw }
+		set(value) { topology.chord = value; redraw() }
 	lateinit var leftScroller: NonDelayedScrollView
 	lateinit var bottomScroller: BottomScroller
 	lateinit var centerVerticalScroller: NonDelayedScrollView
@@ -27,5 +28,24 @@ class ToneSequenceViewModel {
 	val elements = mutableListOf<ToneSequenceElement>()
 	val bottoms  = mutableListOf<View>()
 
-	private val redraw get() = elements.forEach { it.invalidate() }
+	internal fun redraw() {
+		elements.forEach { it.invalidate() }
+		verticalAxis?.invalidate()
+	}
+
+	internal fun markPlaying(step: ToneSequence.Step) = markPlaying(
+		elements.indexOfFirst { it.step === step }
+	)
+	internal fun markPlaying(index: Int) {
+		elements.forEach {
+			if(it.backgroundAlpha == 255) {
+				it.backgroundAlpha = 166
+				it.invalidate()
+			}
+		}
+		elements[index].apply {
+			backgroundAlpha = 255
+			invalidate()
+		}
+	}
 }

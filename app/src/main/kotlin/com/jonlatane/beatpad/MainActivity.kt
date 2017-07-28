@@ -51,9 +51,11 @@ class MainActivity : BaseActivity() {
 		sequencerInstrument.channel = 2
 		pianoBoardInstrument.channel = 3
 
-		melody.instrument.instrument = GeneralMidiConstants.ELECTRIC_PIANO_0
+		supportActionBar?.elevation = 0f
+
+		melody.instrument.instrument = GeneralMidiConstants.ROCK_ORGAN
 		harmonicInstrument.instrument = GeneralMidiConstants.SYNTHBRASS_1
-		sequencerInstrument.instrument = GeneralMidiConstants.STRING_ENSEMBLE_0
+		sequencerInstrument.instrument = GeneralMidiConstants.ACOUSTIC_GRAND_PIANO
 		pianoBoardInstrument.instrument = GeneralMidiConstants.SYNTH_BASS_1
 
 		val harmonyController = DeviceOrientationInstrument(harmonicInstrument)

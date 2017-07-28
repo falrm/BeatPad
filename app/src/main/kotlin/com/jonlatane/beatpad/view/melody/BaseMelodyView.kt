@@ -24,6 +24,8 @@ abstract class BaseMelodyView @JvmOverloads constructor(
 	open var backgroundAlpha = 255
 	var showSteps = true
 	open val drawPadding = 0
+	open val nonRootPadding = 40
+	open val drawNonRootGlow = true
 	abstract val renderVertically: Boolean
 	val axisLength get() = (if(renderVertically) height else width).toFloat()
 	abstract val halfStepsOnScreen: Int
@@ -34,6 +36,11 @@ abstract class BaseMelodyView @JvmOverloads constructor(
 	override fun onDraw(canvas: Canvas) {
 		super.onDraw(canvas)
 		canvas.getClipBounds(bounds)
+		canvas.drawToneMappedRegions()
+		canvas.renderSteps()
+	}
+
+	fun Canvas.drawToneMappedRegions() {
 		for((tone, _, rectBottom, rectTop) in onScreenNotes) {
 			paint.color = when((tone - chord.root).mod12) {
 				0 -> color(R.color.tonic)
@@ -50,35 +57,38 @@ abstract class BaseMelodyView @JvmOverloads constructor(
 				11 -> color(R.color.seven)
 				else -> throw IllegalStateException()
 			}.withAlpha(backgroundAlpha)
+			val extraPadding = if(tone.mod12 == chord.root) 0 else nonRootPadding
 			if(renderVertically) {
-				canvas.drawRect(
-					bounds.left.toFloat() + drawPadding,
+				drawRect(
+					bounds.left.toFloat() + drawPadding + extraPadding,
 					bounds.height() - rectBottom,
-					bounds.right.toFloat() - drawPadding,
+					bounds.right.toFloat() - drawPadding - extraPadding,
 					bounds.height() - rectTop, // backwards y-axis bullshittery
 					paint
 				)
 			} else {
-				canvas.drawRect(
+				if(drawNonRootGlow) {
+
+				}
+				drawRect(
 					rectBottom,
-					bounds.top.toFloat() - drawPadding,
+					bounds.top.toFloat() + drawPadding + extraPadding,
 					rectTop,
-					bounds.bottom.toFloat() + drawPadding,
+					bounds.bottom.toFloat() - drawPadding - extraPadding,
 					paint
 				)
 			}
 		}
-		renderSteps(canvas)
 	}
 
-	private fun renderSteps(canvas: Canvas) {
+	fun Canvas.renderSteps() {
 		paint.color = R.color.colorPrimaryDark
 		if(showSteps) {
 			val halfStepWidth: Float = axisLength / halfStepsOnScreen
 			var linePosition = onScreenNotes.first().top - 12 * halfStepWidth //TODO gross hack
 			while(linePosition < axisLength) {
 				if(renderVertically) {
-					canvas.drawLine(
+					drawLine(
 						bounds.left.toFloat(),
 						linePosition,
 						bounds.right.toFloat(),
@@ -86,7 +96,7 @@ abstract class BaseMelodyView @JvmOverloads constructor(
 						Paint()
 					)
 				} else {
-					canvas.drawLine(
+					drawLine(
 						linePosition,
 						bounds.top.toFloat(),
 						linePosition,

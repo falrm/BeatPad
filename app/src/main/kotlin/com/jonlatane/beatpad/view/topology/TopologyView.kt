@@ -92,7 +92,6 @@ class TopologyView @JvmOverloads constructor(
 	}
 
 	init {
-		backgroundColor = R.color.brown
 		clipToPadding = false
 		clipChildren = false
 		centralChord = inflateChordView(centralChordElevation)
@@ -124,6 +123,8 @@ class TopologyView @JvmOverloads constructor(
 			alignParentRight()
 			elevation = 1f
 		}
+
+		backgroundColor = resources.getColor(R.color.colorPrimaryDark)
 	}
 
 	internal fun updateChordText() {

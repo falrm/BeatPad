@@ -48,6 +48,8 @@ class ToneSequenceElement @JvmOverloads constructor(
 	override val renderVertically = true
 	override val halfStepsOnScreen = 88
 	override val drawPadding = 30
+	override val nonRootPadding = 20
+	override val drawNonRootGlow = false
 	override var chord: Chord
 		get() = viewModel.topology.chord
 		set(value) { throw UnsupportedOperationException() }
@@ -95,7 +97,7 @@ class ToneSequenceElement @JvmOverloads constructor(
 		drawRect(
 			bounds.left.toFloat(),
 			bounds.top.toFloat(),
-			bounds.left.toFloat() + 5f,
+			bounds.left.toFloat() + if(isDownbeat) 10f else 5f,
 			bounds.bottom.toFloat(),
 			p
 		)

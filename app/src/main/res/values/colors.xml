@@ -1,24 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="colorPrimary">#616161</color>
+	<color name="colorPrimary">#424242</color>
 	<color name="colorPrimaryDark">#424242</color>
-	<color name="colorAccent">#EC407A</color>
+	<color name="colorAccent">#F652F9</color>
 
 	<!-- A Background color for the Topology view -->
 	<color name="brown">#5D4037</color>
 
 	<!-- The colors work as such: Dominant is common to both schemes -->
-	<color name="dominant">#FFEBEE</color>
+	<color name="dominant">#F93730</color>
 
 	<!-- Tonic-Subdominant-Dominant is green-yellow-red. This is what's on the "piano" keyboard -->
-	<color name="tonic">#A5D6A7</color>
-	<color name="subDominant">#FFF59D</color>
+	<color name="tonic">#4DFA90</color>
+	<color name="subDominant">#CFFA53</color>
 
 	<!-- Major-Minor-Dominant is blue-purple-red -->
-	<color name="major">#E3F2FD</color>
-	<color name="minor">#EDE7F6</color>
-	<color name="augmented">#E0F7FA</color>
-	<color name="diminished">#F3E5F5</color>
+	<color name="major">#59F9FF</color>
+	<color name="minor">#884DF2</color>
+	<color name="augmented">#4AFBC1</color>
+	<color name="diminished">#F652F9</color>
+
+	<color name="majorDarker">#00d9e1</color>
+	<color name="minorDarker">#4b0eba</color>
+	<color name="augmentedDarker">#04b97e</color>
+	<color name="diminishedDarker">#c907cd</color>
+	<color name="tonicDarker">#05ba4b</color>
+	<color name="subDominantDarker">#90c006</color>
+	<color name="dominantDarker">#ad0b05</color>
+
+	<color name="majorDarkest">#00878c</color>
+	<color name="minorDarkest">#1f064c</color>
+	<color name="augmentedDarkest">#026645</color>
+	<color name="diminishedDarkest">#69046b</color>
+	<color name="tonicDarkest">#025723</color>
+	<color name="subDominantDarkest">#394c02</color>
+	<color name="dominantDarkest">#5b0603</color>
+
+	<color name="majorLighter">#aefcff</color>
+	<color name="minorLighter">#c7acf9</color>
+	<color name="augmentedLighter">#9dfddd</color>
+	<color name="diminishedLighter">#fbb4fc</color>
+	<color name="tonicLighter">#a0fcc4</color>
+	<color name="subDominantLighter">#ebfdb6</color>
+	<color name="dominantLighter">#fca7a4</color>
 
 	<!--
 		These colors, along with the green "tonic" above, are the 12 colors used on the Colorboard
@@ -31,9 +55,21 @@
 	<color name="four">@color/subDominant</color>
 	<color name="flatFive">@color/diminished</color>
 	<color name="five">@color/dominant</color>
-	<color name="sharpFive">@color/minor</color>
+	<color name="sharpFive">@color/augmented</color>
 	<color name="six">@color/major</color>
 	<color name="flatSeven">@color/minor</color>
 	<color name="seven">@color/augmented</color>
+
+	<color name="flatTwoDark">@color/diminishedDarker</color>
+	<color name="twoDark">@color/subDominantDarker</color>
+	<color name="flatThreeDark">@color/minorDarker</color>
+	<color name="threeDark">@color/majorDarker</color>
+	<color name="fourDark">@color/subDominantDarker</color>
+	<color name="flatFiveDark">@color/diminishedDarker</color>
+	<color name="fiveDark">@color/dominantDarker</color>
+	<color name="sharpFiveDark">@color/augmentedDarker</color>
+	<color name="sixDark">@color/majorDarker</color>
+	<color name="flatSevenDark">@color/minorDarker</color>
+	<color name="sevenDark">@color/augmentedDarker</color>
 
 </resources>
