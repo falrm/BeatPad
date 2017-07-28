@@ -6,51 +6,33 @@ import org.jetbrains.anko.info
 internal data class OnScreenNote(
 	var tone: Int = 0,
 	var pressed: Boolean = false,
-	var xMin: Float = 0f,
-	var xMax: Float = 0f
+	var bottom: Float = 0f,
+	var top: Float = 0f
 )
 
-internal fun MelodyView.getOrCreateNote(
-	tone: Int,
-	pressed: Boolean,
-	xMin: Float,
-	xMax: Float,
-	index: Int
-) = onScreenNoteCache.getOrPut(index, { OnScreenNote() }).apply {
-	this.tone = tone
-	this.pressed = pressed
-	this.xMin = xMin
-	this.xMax = xMax
-}
-
-internal val MelodyView.onScreenNotes: List<OnScreenNote> get() {
+internal val BaseMelodyView.onScreenNotes: List<OnScreenNote> get() {
 	val result = mutableListOf<OnScreenNote>()
-	val orientationRange = MelodyView.TOP - MelodyView.BOTTOM - halfStepsOnScreen
-	val bottomMostPoint: Float = MelodyView.BOTTOM + (Orientation.normalizedDevicePitch() * orientationRange)
-	info("pitch: ${Orientation.pitch}")
+	val orientationRange = BaseMelodyView.TOP - BaseMelodyView.BOTTOM + 1 - halfStepsOnScreen
+	val bottomMostPoint: Float = BaseMelodyView.BOTTOM + (Orientation.normalizedDevicePitch() * orientationRange)
 	val bottomMostNote: Int = Math.floor(bottomMostPoint.toDouble()).toInt()
-	var noteIndex = 0
-	var currentScreenNote = getOrCreateNote(
+	var currentScreenNote = OnScreenNote(
 		tone = chord.closestTone(bottomMostNote),
 		pressed = false,
-		xMin = 0f,
-		xMax = (bottomMostNote - bottomMostPoint) * width.toFloat() / halfStepsOnScreen,
-		index = noteIndex++
+		bottom = 0f,
+		top = (bottomMostNote - bottomMostPoint) * axisLength/ halfStepsOnScreen
 	)
-	(bottomMostNote..(bottomMostNote + halfStepsOnScreen + 1)).forEach {
-		toneMaybeNotInChord ->
+	for(toneMaybeNotInChord in (bottomMostNote..(bottomMostNote + halfStepsOnScreen + 1))) {
 		val toneInChord = chord.closestTone(toneMaybeNotInChord)
 		if(toneInChord != currentScreenNote.tone) {
 			result.add(currentScreenNote)
-			currentScreenNote = getOrCreateNote(
+			currentScreenNote = OnScreenNote(
 				tone = toneInChord,
 				pressed = false,
-				xMin = currentScreenNote.xMax,
-				xMax = currentScreenNote.xMax,
-				index = noteIndex++
+				bottom = currentScreenNote.top,
+				top = currentScreenNote.top
 			)
 		}
-		currentScreenNote.xMax += width.toFloat() / halfStepsOnScreen
+		currentScreenNote.top += axisLength / halfStepsOnScreen
 	}
 	result.add(currentScreenNote)
 	return result

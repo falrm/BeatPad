@@ -27,3 +27,5 @@
 -keep class org.jetbrains.annotations.** { *; }
 -keep class java.lang.reflect.** { *; }
 -keep class jp.kshoji.javax.sound.** { *; }
+-renamesourcefileattribute SourceFile
+-keepattributes SourceFile,LineNumberTable

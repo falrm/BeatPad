@@ -56,7 +56,7 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
         val harmonyController = DeviceOrientationInstrument(conductorInstrument)
         RhythmAnimations.wireMelodicControl(topology, harmonyController)
         topology.onChordChangedListener = { chord ->
-            harmonyController.setTones(chord.getTones(-60, 28))
+            harmonyController.tones = chord.getTones()
         }
         registerService()
     }

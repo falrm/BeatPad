@@ -8,15 +8,16 @@ import com.jonlatane.beatpad.harmony.chordsequence.*
  *
  * Created by jonlatane on 5/26/17.
  */
-enum class Topology(vararg sequences : ChordSequence) : List<ChordSequence> by listOf(*sequences) {
-    basic(TwoFiveOne),
-    intermediate(DimMinDomMajAug, TwoFiveOne, AlternatingMajorMinorThirds),
-    advanced(DimMinDomMajAug, FourFiveOne, TwoFiveOne, AlternatingMajorMinorThirds, AlternatingMajorMinorSeconds),
-    master(DimMinDomMajAug, SubdominantOptions, FourFiveOne, TwoFiveOne, TwoFiveOneMinor, AlternatingMajorMinorThirds, WholeSteps, AlternatingMajorMinorSeconds),
-    chainsmokers(CircleOfFifths, Chainsmokers, AlternatingMajorMinorThirds),
-    pop(SubdominantOptions, WholeSteps, AlternatingMajorMinorSeconds);
+enum class Topology(val title: String, vararg sequences: ChordSequence) : List<ChordSequence> by listOf(*sequences) {
+	basic("Basic", TwoFiveOne),
+	intermediate("Intermediate", DimMinDomMajAug, TwoFiveOne, AlternatingMajorMinorThirds),
+	advanced("Advanced", DimMinDomMajAug, FourFiveOne, TwoFiveOne, AlternatingMajorMinorThirds, AlternatingMajorMinorSeconds),
+	master("Master", DimMinDomMajAug, SubdominantOptions, FourFiveOne, TwoFiveOne, TwoFiveOneMinor, AlternatingMajorMinorThirds, WholeSteps, AlternatingMajorMinorSeconds),
+	chainsmokers("Chainsmokers", CircleOfFifths, Chainsmokers, AlternatingMajorMinorThirds),
+	pop("Pop", SubdominantOptions, WholeSteps, AlternatingMajorMinorSeconds),
+	funk("Funk", FunkDominantStepUp, MinorFunk, FunkDominantSevens);
 
-    companion object {
-        internal val allSequences: List<ChordSequence> = Topology.values().flatMap { it }
-    }
+	companion object {
+		internal val allSequences: List<ChordSequence> = Topology.values().flatMap { it }
+	}
 }

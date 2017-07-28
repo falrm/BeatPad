@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
@@ -12,19 +14,28 @@ import com.jonlatane.beatpad.harmony.Topology
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.Maj7
 import com.jonlatane.beatpad.harmony.chordsequence.Chromatic
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.backgroundResource
+import com.jonlatane.beatpad.showTopologyPicker
+import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.util.*
 import kotlin.properties.Delegates.observable
 
-/**
- * Created by jonlatane on 5/5/17.
- */
 class TopologyView @JvmOverloads constructor(
 	context: Context,
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
 ) : RelativeLayout(context, attrs, defStyle) {
+
+	inline fun <T: View> T.lparams(
+		width: Int = android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+		height: Int = android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+		init: RelativeLayout.LayoutParams.() -> Unit
+	): T {
+		val layoutParams = RelativeLayout.LayoutParams(width, height)
+		layoutParams.init()
+		this@lparams.layoutParams = layoutParams
+		return this
+	}
 	var onChordChangedListener: ((Chord) -> Unit)? by observable<((Chord) -> Unit)?>(null) {
 		_, _, listener ->
 		listener?.invoke(chord)
@@ -37,7 +48,7 @@ class TopologyView @JvmOverloads constructor(
 		}
 		onChordChangedListener?.invoke(chord)
 	}
-	var topology: Topology by observable(Topology.basic) {
+	var topology: Topology by observable(Topology.intermediate) {
 		_, _, new ->
 		(Topology.allSequences - new).forEach {
 			removeSequence(it)
@@ -81,7 +92,6 @@ class TopologyView @JvmOverloads constructor(
 	}
 
 	init {
-		backgroundColor = R.color.brown
 		clipToPadding = false
 		clipChildren = false
 		centralChord = inflateChordView(centralChordElevation)
@@ -102,6 +112,19 @@ class TopologyView @JvmOverloads constructor(
 			this.topology = topology
 			animateTo(SelectionState)
 		}
+		val topology = this
+		button {
+			text = "Mode"
+			onClick {
+				showTopologyPicker(topology)
+			}
+		}.lparams {
+			alignParentBottom()
+			alignParentRight()
+			elevation = 1f
+		}
+
+		backgroundColor = resources.getColor(R.color.colorPrimaryDark)
 	}
 
 	internal fun updateChordText() {
@@ -130,46 +153,52 @@ class TopologyView @JvmOverloads constructor(
 
 	private fun inflateChordView(defaultElevation: Float = defaultChordElevation): TextView {
 		LayoutInflater.from(context).inflate(R.layout.topology_chord, this, true)
-		val result = findViewWithTag("newChord") as TextView
-		result.tag = null
-		result.elevation = defaultElevation
+		val result = findViewWithTag("newChord").apply {
+			elevation = defaultElevation
+			tag = null
+		} as TextView
 		return result
 	}
 
 	private fun inflateAxisView(): View {
 		LayoutInflater.from(context).inflate(R.layout.topology_axis, this, true)
-		val result = findViewWithTag("newConnector")
-		result.elevation = axisElevation
-		result.tag = null
+		val result = findViewWithTag("newConnector").apply {
+			elevation = axisElevation
+			tag = null
+		}
 		return result
 	}
 
 	private fun inflateConnectorView(): View {
 		LayoutInflater.from(context).inflate(R.layout.topology_connector, this, true)
-		val result = findViewWithTag("newConnector")
-		result.elevation = connectorElevation
-		result.tag = null
+		val result = findViewWithTag("newConnector").apply {
+			elevation = connectorElevation
+			tag = null
+		}
 		return result
 	}
 
 	private fun inflateBG() {
 		LayoutInflater.from(context).inflate(R.layout.topology_bg_half_steps, this, true)
-		halfStepBackground = findViewWithTag("newBG")
-		halfStepBackground.elevation = halfStepBackgroundElevation
-		halfStepBackground.tag = null
+		halfStepBackground = findViewWithTag("newBG").apply {
+			elevation = halfStepBackgroundElevation
+			tag = null
+		}
 
 		LayoutInflater.from(context).inflate(R.layout.topology_bg_highlight, this, true)
-		centralChordThrobber = findViewWithTag("newBG")
-		centralChordThrobber.outlineProvider = null
-		centralChordThrobber.elevation = Float.MAX_VALUE
-		centralChordThrobber.tag = null
-		centralChordThrobber.alpha = 0f
+		centralChordThrobber = findViewWithTag("newBG").apply {
+			outlineProvider = null
+			elevation = Float.MAX_VALUE - 1f
+			tag = null
+			alpha = 0f
+		}
 
-		LayoutInflater.from(context).inflate(R.layout.topology_chord, this, true)
-		centralChordTouchPoint = findViewWithTag("newChord")
-		centralChordTouchPoint.elevation = Float.MAX_VALUE
-		centralChordTouchPoint.alpha = 0f
-		centralChordTouchPoint.tag = null
+		LayoutInflater.from(context).inflate(R.layout.topology_bg_highlight, this, true)
+		centralChordTouchPoint = findViewWithTag("newBG").apply {
+			elevation = Float.MAX_VALUE
+			alpha = 0f
+			tag = null
+		}
 	}
 
 	fun onResume() {

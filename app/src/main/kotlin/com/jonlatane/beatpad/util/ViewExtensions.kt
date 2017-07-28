@@ -1,12 +1,14 @@
 package com.jonlatane.beatpad.util
 
 import android.animation.ValueAnimator
+import android.os.Build
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.*
 import android.view.ViewPropertyAnimator
 import java.util.concurrent.atomic.AtomicInteger
 
 private val defaultDuration get() = android.R.integer.config_mediumAnimTime.toLong()
-
 
 interface HideableView {
 	var initialHeight: Int?
@@ -61,14 +63,23 @@ var View.translationXY: Float
 var View.layoutWidth get() = this.layoutParams.width
 	set(value) {
 		val layoutParams = this.layoutParams
-		layoutParams.width = value
+		layoutParams.width = when {
+			value in listOf(MATCH_PARENT, WRAP_CONTENT) -> value
+			value > 0 -> value
+			else -> 0
+		}
 		this.layoutParams = layoutParams
+		invalidate()
 	}
 
 var View.layoutHeight get() = this.layoutParams.height
 	set(value) {
 		val layoutParams = this.layoutParams
-		layoutParams.height = value
+		layoutParams.height = when {
+			value in listOf(MATCH_PARENT, WRAP_CONTENT) -> value
+			value > 0 -> value
+			else -> 0
+		}
 		this.layoutParams = layoutParams
 	}
 
@@ -78,6 +89,7 @@ fun View.animateWidth(width: Int, duration: Long = defaultDuration) {
 	anim.addUpdateListener { valueAnimator ->
 		val value = valueAnimator.animatedValue as Int
 		this.layoutWidth = value
+		this.invalidate()
 	}
 	anim.setDuration(duration).start()
 }
@@ -87,6 +99,7 @@ fun View.animateHeight(height: Int, duration: Long = defaultDuration) {
 	anim.addUpdateListener { valueAnimator ->
 		val value = valueAnimator.animatedValue as Int
 		this.layoutHeight = value
+		this.invalidate()
 	}
 	anim.setDuration(duration).start()
 }
@@ -110,3 +123,9 @@ fun View.hide(animated: Boolean = true) {
 		layoutHeight = 0
 	}
 }
+
+fun View.color(resId: Int) =
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+		resources.getColor(resId, context.theme)
+	else @Suppress("Deprecated")
+		resources.getColor(resId)

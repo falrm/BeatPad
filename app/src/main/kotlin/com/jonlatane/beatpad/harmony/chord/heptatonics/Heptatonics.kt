@@ -15,12 +15,14 @@ import com.jonlatane.beatpad.harmony.chord.*
  * Created by jonlatane on 5/6/17.
  */
 class Heptatonics(private val colors: Set<Int>) {
-	val isMinor: Boolean by lazy { colors.contains(3) }
+	val isMinor: Boolean by lazy { !isMajor && colors.contains(3) }
 	val isDominant: Boolean by lazy { isMajor && hasMinor7 }
 	val isMajor: Boolean by lazy { colors.contains(4) }
 	val isSus: Boolean by lazy { third == NONEXISTENT }
 	val hasMinor7: Boolean by lazy { seventh == MINOR }
 	val hasMajor7: Boolean by lazy { seventh == MAJOR }
+	val hasDiminished5: Boolean by lazy { fifth == DIMINISHED }
+	val hasAugmented5: Boolean by lazy { fifth == AUGMENTED }
 
 	/**  @return [.MINOR], [.MAJOR] or [.NONEXISTENT] */
 	val seventh: Int by lazy {
@@ -109,7 +111,7 @@ class Heptatonics(private val colors: Set<Int>) {
 				namedColors[4] = true
 			}
 			// Then 11 chords
-		} else if (degreeColors[4] == MAJOR && degreeColors[7] != NONEXISTENT) {
+		} else if (degreeColors[4] == PERFECT && degreeColors[7] != NONEXISTENT) {
 			if (degreeColors[7] != MINOR) {
 				colorString += "M"
 			}

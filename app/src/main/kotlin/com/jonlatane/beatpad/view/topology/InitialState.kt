@@ -96,9 +96,7 @@ object InitialState : NavigationState {
             alpha = 0f
           }
         }
-        val layoutParams = sv.axis.layoutParams
-        layoutParams.width = 0
-        sv.axis.layoutParams = layoutParams
+        sv.axis.layoutWidth = 1
         for (connector in arrayOf(sv.connectBack, sv.connectForward)) {
           connector.apply {
             translationXY = 0f

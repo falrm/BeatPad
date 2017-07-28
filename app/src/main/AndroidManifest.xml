@@ -14,7 +14,6 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -22,13 +21,20 @@
             android:name=".ConductorActivity"
             android:label="Topologica: Conduct"
             android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".InstrumentActivity"
             android:label="Topologica: Play"
             android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="landscape">
+            android:screenOrientation="landscape" />
+        <activity
+          android:name=".SequenceEditorActivity"
+          android:label="Sequence Editor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <!--category android:name="android.intent.category.LAUNCHER" /-->
+            </intent-filter>
         </activity>
     </application>
 

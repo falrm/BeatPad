@@ -1,4 +1,5 @@
 import com.jonlatane.beatpad.harmony.chord.*
+import com.jonlatane.beatpad.view.melody.BaseMelodyView
 import io.damo.aspen.*
 import org.assertj.core.api.Assertions.*
 
@@ -23,6 +24,10 @@ class ChordTest : Test({
 			assertThat(Chord(6, min).getTones(0, 12)).contains(6, 9, 1)
 			assertThat(Chord(6, min).getTones(12, 24)).contains(18, 21, 13)
 		}
+		test("spans") {
+			val chord = Chord(0, intArrayOf(0)) // Just middle C
+			assertThat(chord.getTones(BaseMelodyView.BOTTOM, BaseMelodyView.TOP).size).isEqualTo(8)
+		}
 	}
 
 	describe("#closestTone") {
@@ -30,5 +35,7 @@ class ChordTest : Test({
 		assertThat(Chord(0, Maj).closestTone(2)).isEqualTo(0)
 		assertThat(Chord(0, Maj).closestTone(3)).isEqualTo(4)
 		assertThat(Chord(6, Maj).closestTone(6)).isEqualTo(6)
+		assertThat(Chord(5, Maj7).closestTone(7)).isEqualTo(5) // Closest to G in an FMaj7 is F.
+		assertThat(Chord(5, Maj7).closestTone(10)).isEqualTo(9) // Closest to Bb in an FMaj7 is A.
 	}
 })
