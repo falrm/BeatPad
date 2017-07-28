@@ -28,22 +28,6 @@
 	<color name="subDominantDarker">#90c006</color>
 	<color name="dominantDarker">#ad0b05</color>
 
-	<color name="majorDarkest">#00878c</color>
-	<color name="minorDarkest">#1f064c</color>
-	<color name="augmentedDarkest">#026645</color>
-	<color name="diminishedDarkest">#69046b</color>
-	<color name="tonicDarkest">#025723</color>
-	<color name="subDominantDarkest">#394c02</color>
-	<color name="dominantDarkest">#5b0603</color>
-
-	<color name="majorLighter">#aefcff</color>
-	<color name="minorLighter">#c7acf9</color>
-	<color name="augmentedLighter">#9dfddd</color>
-	<color name="diminishedLighter">#fbb4fc</color>
-	<color name="tonicLighter">#a0fcc4</color>
-	<color name="subDominantLighter">#ebfdb6</color>
-	<color name="dominantLighter">#fca7a4</color>
-
 	<!--
 		These colors, along with the green "tonic" above, are the 12 colors used on the Colorboard
 		and in the Sequence Editor
