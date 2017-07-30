@@ -1,5 +1,7 @@
 package com.jonlatane.beatpad.view.tonesequence
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.view.Gravity
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
@@ -7,6 +9,7 @@ import android.widget.LinearLayout.HORIZONTAL
 import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.SequenceEditorActivity
+import com.jonlatane.beatpad.harmony.Rest
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.view.nonDelayedHorizontalScrollView
@@ -19,7 +22,10 @@ import org.jetbrains.anko.sdk25.coroutines.onScrollChange
 import java.util.concurrent.Executors
 
 class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
-	companion object { private val STEPS_TO_ALLOCATE = 16 }
+	companion object {
+		private val STEPS_TO_ALLOCATE = 16
+	}
+
 	private val executorService = Executors.newScheduledThreadPool(2)
 	val viewModel = ToneSequenceViewModel()
 	val previewInstrument = MIDIInstrument().apply {
@@ -44,7 +50,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 					viewModel.redraw()
 				}
 			}.lparams {
-				if(configuration.portrait) {
+				if (configuration.portrait) {
 					width = MATCH_PARENT
 					height = dip(210f)
 					alignParentTop()
@@ -57,7 +63,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 			viewModel.bottomScroller = bottomScroller {
 				id = IDSeq++
 				onHeldDownChanged = { heldDown ->
-					if(heldDown) holdToEdit?.animate()?.alpha(0f)?.translationY(100f)
+					if (heldDown) holdToEdit?.animate()?.alpha(0f)?.translationY(100f)
 					else holdToEdit?.animate()?.alpha(1f)?.translationY(0f)
 				}
 				linearLayout {
@@ -80,7 +86,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				width = MATCH_PARENT
 				height = dimen(R.dimen.subdivision_controller_size)
 				leftMargin = dip(30)
-				if(configuration.landscape) {
+				if (configuration.landscape) {
 					rightOf(viewModel.topology)
 				}
 			}
@@ -94,7 +100,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				width = MATCH_PARENT
 				height = dimen(R.dimen.subdivision_controller_size)
 				leftMargin = dip(30)
-				if(configuration.landscape) {
+				if (configuration.landscape) {
 					rightOf(viewModel.topology)
 				}
 			}
@@ -112,7 +118,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				width = dip(30)
 				height = MATCH_PARENT
 				above(viewModel.bottomScroller)
-				if(configuration.portrait) {
+				if (configuration.portrait) {
 					alignParentLeft()
 					below(viewModel.topology)
 				} else {
@@ -149,7 +155,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				alignParentRight()
 				above(viewModel.bottomScroller)
 				rightOf(viewModel.leftScroller)
-				if(configuration.portrait) {
+				if (configuration.portrait) {
 					below(viewModel.topology)
 				} else {
 					alignParentTop()
@@ -175,9 +181,35 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				height = WRAP_CONTENT
 				alignParentLeft()
 				alignParentBottom()
-				if(configuration.portrait) {
+				if (configuration.portrait) {
 					below(viewModel.centerVerticalScroller)
-					//setVerticalGravity(Gravity.CENTER_VERTICAL)
+					gravity = Gravity.CENTER_VERTICAL
+				}
+			}
+
+			button {
+				text = "Clear"
+				onClick {
+					AlertDialog.Builder(this@button.context)
+						.setIcon(android.R.drawable.ic_dialog_alert)
+						.setTitle("Clear")
+						.setMessage("Really delete all your hard work?")
+						.setPositiveButton("Yes, it's just art") { _, _ ->
+							for (index in viewModel.toneSequence.steps.indices) {
+								viewModel.toneSequence.steps[index] = Rest()
+								viewModel.redraw()
+							}
+						}
+						.setNegativeButton("No", null)
+						.show()
+				}
+			}.lparams {
+				width = WRAP_CONTENT
+				height = WRAP_CONTENT
+				alignParentRight()
+				alignParentBottom()
+				if (configuration.portrait) {
+					below(viewModel.centerVerticalScroller)
 					gravity = Gravity.CENTER_VERTICAL
 				}
 			}
