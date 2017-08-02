@@ -1,6 +1,6 @@
 package com.jonlatane.beatpad.harmony.chordsequence
 
-import com.jonlatane.beatpad.harmony.ChordSequence
+import com.jonlatane.beatpad.harmony.Orbit
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.Dom7
 import com.jonlatane.beatpad.harmony.chord.Maj6
@@ -10,7 +10,7 @@ import com.jonlatane.beatpad.harmony.chord.Maj7
  * Like [TwoFiveOne] but less graceful. Assumes any M7 chord is a IV, any other non-dominant
  * major chord is a I and any minor chord is a iv.
  */
-object FourFiveOne: ChordSequence {
+object FourFiveOne: Orbit {
     override fun forward(c: Chord): Chord {
         return when {
             c.isMinor -> Chord(c.root - 7, Dom7) // ii-V - is a discontinuity

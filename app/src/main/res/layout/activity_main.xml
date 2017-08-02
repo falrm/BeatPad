@@ -37,8 +37,8 @@
 		android:layout_height="@dimen/key_height_white"
 		android:layout_above="@id/keyboard"/>
 
-	<com.jonlatane.beatpad.view.topology.TopologyView
-		android:id="@+id/topology"
+	<com.jonlatane.beatpad.view.orbifold.OrbifoldView
+		android:id="@+id/orbifold"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_above="@id/melody"

@@ -3,12 +3,11 @@ package com.jonlatane.beatpad.harmony
 import com.jonlatane.beatpad.harmony.chordsequence.*
 
 /**
- * A [Topology] is literally just a list of [ChordSequence]s. The [TopologyViewer] interface should
- * allow any given Android View to display a topology.
+ * A [Orbifold] is literally just a list of [Orbit]s.
  *
  * Created by jonlatane on 5/26/17.
  */
-enum class Topology(val title: String, vararg sequences: ChordSequence) : List<ChordSequence> by listOf(*sequences) {
+enum class Orbifold(val title: String, vararg sequences: Orbit) : List<Orbit> by listOf(*sequences) {
 	basic("Basic", TwoFiveOne),
 	intermediate("Intermediate", DimMinDomMajAug, TwoFiveOne, AlternatingMajorMinorThirds),
 	advanced("Advanced", DimMinDomMajAug, FourFiveOne, TwoFiveOne, AlternatingMajorMinorThirds, AlternatingMajorMinorSeconds),
@@ -18,6 +17,6 @@ enum class Topology(val title: String, vararg sequences: ChordSequence) : List<C
 	funk("Funk", FunkDominantStepUp, MinorFunk, FunkDominantSevens);
 
 	companion object {
-		internal val allSequences: List<ChordSequence> = Topology.values().flatMap { it }
+		internal val ALL_SEQUENCEs: List<Orbit> = Orbifold.values().flatMap { it }
 	}
 }

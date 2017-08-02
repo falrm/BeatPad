@@ -25,9 +25,3 @@ open class NonDelayedHorizontalScrollView(
 		return scrollingEnabled && super.onInterceptTouchEvent(ev)
 	}
 }
-
-inline fun ViewManager.nonDelayedHorizontalScrollView(theme: Int = 0)
-	= nonDelayedHorizontalScrollView(theme) {}
-
-inline fun ViewManager.nonDelayedHorizontalScrollView(theme: Int = 0, init: NonDelayedHorizontalScrollView.() -> Unit)
-	= ankoView({ NonDelayedHorizontalScrollView(it) }, theme, init)

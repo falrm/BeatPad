@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.harmony
+package com.jonlatane.beatpad.harmony.jazz
 
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.Dom7

@@ -1,6 +1,6 @@
 package com.jonlatane.beatpad.harmony.chordsequence
 
-import com.jonlatane.beatpad.harmony.ChordSequence
+import com.jonlatane.beatpad.harmony.Orbit
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.Dom7
 import com.jonlatane.beatpad.harmony.chord.Maj7
@@ -9,7 +9,7 @@ import com.jonlatane.beatpad.harmony.chord.min7
 /**
  * Two Five One is simple: Every chord is major, minor or dominant.  Treat these as I, ii and V.
  */
-object TwoFiveOne : ChordSequence {
+object TwoFiveOne : Orbit {
 	override fun forward(c: Chord): Chord {
 		if (c.isMinor) {
 			return Chord(c.root - 7, Dom7)

@@ -5,4 +5,4 @@
     android:tag="newConnector"
     android:layout_width="5dp"
     android:layout_height="35dp"
-    android:background="@drawable/topology_axis"/>
+    android:background="@drawable/orbifold_axis"/>

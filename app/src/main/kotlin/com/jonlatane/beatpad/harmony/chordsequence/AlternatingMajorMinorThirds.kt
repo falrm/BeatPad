@@ -1,11 +1,11 @@
 package com.jonlatane.beatpad.harmony.chordsequence
 
-import com.jonlatane.beatpad.harmony.ChordSequence
+import com.jonlatane.beatpad.harmony.Orbit
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.Maj7
 import com.jonlatane.beatpad.harmony.chord.min7
 
-object AlternatingMajorMinorThirds: ChordSequence {
+object AlternatingMajorMinorThirds: Orbit {
     override fun forward(c: Chord): Chord {
         if (c.isMinor) {
             return Chord(c.root + 3, Maj7)

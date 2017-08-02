@@ -5,7 +5,7 @@ package com.jonlatane.beatpad.harmony
  */
 import com.jonlatane.beatpad.harmony.chord.*
 
-interface ChordSequence {
+interface Orbit {
     fun forward(c: Chord): Chord
     fun back(c: Chord): Chord
 }

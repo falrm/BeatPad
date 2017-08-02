@@ -1,9 +1,9 @@
 package com.jonlatane.beatpad.harmony.chordsequence
 
-import com.jonlatane.beatpad.harmony.ChordSequence
+import com.jonlatane.beatpad.harmony.Orbit
 import com.jonlatane.beatpad.harmony.chord.Chord
 
-object DimMinDomMajAug: ChordSequence {
+object DimMinDomMajAug: Orbit {
     override fun forward(c: Chord): Chord {
         if (c.isDiminished) {
             return c.replaceOrAdd(6, 7)

@@ -1,12 +1,13 @@
-package com.jonlatane.beatpad.view.topology
+package com.jonlatane.beatpad.view.orbifold
 
+import android.view.View
 import android.widget.TextView
 import com.jonlatane.beatpad.util.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 
 object SelectionState : NavigationState, AnkoLogger {
-  override fun animateTo(v: TopologyView) {
+  override fun animateTo(v: OrbifoldView) {
     val theta = Math.PI / v.sequences.size
     val maxTX = v.width * 0.4f
     val maxTY = v.height * 0.4f
@@ -50,11 +51,9 @@ object SelectionState : NavigationState, AnkoLogger {
     }
   }
 
-  override fun skipTo(v: TopologyView) {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
+  override fun skipTo(v: OrbifoldView) = TODO("Not needed")
 
-  internal fun skipToSelectionPhase(v: TopologyView, sv: TopologyView.SequenceViews) {
+  internal fun skipToSelectionPhase(v: OrbifoldView, sv: OrbifoldView.SequenceViews) {
     val theta = Math.PI / v.sequences.size
     val maxTX = v.width * 0.4f
     val maxTY = v.height * 0.4f
@@ -70,40 +69,59 @@ object SelectionState : NavigationState, AnkoLogger {
         y = (maxTY * sin).toFloat()
       }
     }
-    //skipAxisToSelectionPhase(sv.axis, x, y);
+    skipAxisToSelectionPhase(sv, x, y);
     skipConnectorsToSelectionPhase(sv, x, y, forwardAngle, v.selectedChord)
     skipChordsToSelectionPhase(sv, x, y, v.selectedChord)
   }
 
-  private fun skipChordsToSelectionPhase(sv: TopologyView.SequenceViews, tX: Float, tY: Float, target: TextView?) {
+  private fun skipAxisToSelectionPhase(sv: OrbifoldView.SequenceViews, tX: Float, tY: Float) {
+    val width = Math.round(2f * tX + Math.max(sv.forward.width, sv.back.width))
+    info("Setting to axis width $width")
+    sv.axis.apply {
+      alpha = 0.4f
+      translationX = 0f
+      translationY = tY
+      layoutWidth = width
+    }
+  }
+
+  private fun skipChordsToSelectionPhase(sv: OrbifoldView.SequenceViews, tX: Float, tY: Float, target: TextView?) {
     if (target === sv.forward) {
-      sv.back.translationX = -tX
-      sv.back.translationY = tY
-      sv.back.scaleX = 1f
-      sv.back.scaleY = 1f
-      sv.back.alpha = 1f
-      sv.forward.translationX = 0f
-      sv.forward.translationY = 0f
-      sv.forward.scaleX = 1f
-      sv.forward.scaleY = 1f
-      sv.forward.alpha = 0f
+      sv.back.apply {
+        translationX = -tX
+        translationY = tY
+        scaleX = 1f
+        scaleY = 1f
+        alpha = 1f
+      }
+      sv.forward.apply {
+        translationX = 0f
+        translationY = 0f
+        scaleX = 1f
+        scaleY = 1f
+        alpha = 0f
+      }
     } else {
-      sv.forward.translationX = tX
-      sv.forward.translationY = tY
-      sv.forward.scaleX = 1f
-      sv.forward.scaleY = 1f
-      sv.forward.alpha = 1f
-      sv.back.translationX = 0f
-      sv.back.translationY = 0f
-      sv.back.scaleX = 1f
-      sv.back.scaleY = 1f
-      sv.back.alpha = 0f
+      sv.forward.apply {
+        translationX = tX
+        translationY = tY
+        scaleX = 1f
+        scaleY = 1f
+        alpha = 1f
+      }
+      sv.back.apply {
+        translationX = 0f
+        translationY = 0f
+        scaleX = 1f
+        scaleY = 1f
+        alpha = 0f
+      }
     }
     sv.forward.translationZ = 0f
     sv.back.translationZ = 0f
   }
 
-  private fun skipConnectorsToSelectionPhase(sv: TopologyView.SequenceViews, tX: Float, tY: Float, forwardAngle: Double, target: TextView?) {
+  private fun skipConnectorsToSelectionPhase(sv: OrbifoldView.SequenceViews, tX: Float, tY: Float, forwardAngle: Double, target: TextView?) {
     val connectorWidth = (Math.sqrt((tX * tX + tY * tY).toDouble()) * .7f).toInt()
     if (sv.forward === target) {
       sv.connectBack.translationX = -tX / 2f
@@ -132,7 +150,7 @@ object SelectionState : NavigationState, AnkoLogger {
     sv.connectForward.elevation = sv.connectForward.connectorElevation
   }
 
-  private fun animateChordsToSelectionPhase(v: TopologyView, sv: TopologyView.SequenceViews, tX: Float, tY: Float) {
+  private fun animateChordsToSelectionPhase(v: OrbifoldView, sv: OrbifoldView.SequenceViews, tX: Float, tY: Float) {
     val forwardAlpha = if (v.centralChord.text == sv.forward.text) 0.2f else 1f
     val backAlpha = if (v.centralChord.text == sv.back.text) 0.2f else 1f
     sv.forward.animate()
@@ -141,7 +159,7 @@ object SelectionState : NavigationState, AnkoLogger {
       .translationX(-tX).translationY(tY).alpha(backAlpha).setDuration(ANIMATION_DURATION).start()
   }
 
-  private fun animateAxisToSelectionPhase(sv: TopologyView.SequenceViews, tX: Float, tY: Float) {
+  private fun animateAxisToSelectionPhase(sv: OrbifoldView.SequenceViews, tX: Float, tY: Float) {
     val width = Math.round(2f * tX + Math.max(sv.forward.width, sv.back.width))
     info("Animating to axis width $width")
     val propertyAnimator = sv.axis.animate().translationY(tY).translationX(0f).alpha(0.4f)
@@ -149,7 +167,7 @@ object SelectionState : NavigationState, AnkoLogger {
     propertyAnimator.setDuration(ANIMATION_DURATION).start()
   }
 
-  private fun animateConnectorsToSelectionPhase(v: TopologyView, sv: TopologyView.SequenceViews, tX: Float, tY: Float, forwardAngle: Double) {
+  private fun animateConnectorsToSelectionPhase(v: OrbifoldView, sv: OrbifoldView.SequenceViews, tX: Float, tY: Float, forwardAngle: Double) {
     val connectorWidth = (Math.sqrt((tX * tX + tY * tY).toDouble()) * .7f).toInt()
     val forwardAlpha = if (v.centralChord.text == sv.forward.text) 0.1f else 0.3f
     val backAlpha = if (v.centralChord.text == sv.back.text) 0.1f else 0.3f

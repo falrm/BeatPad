@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.harmony
+package com.jonlatane.beatpad.model
 
 import com.jonlatane.beatpad.util.mod12
 
@@ -30,7 +30,7 @@ class ToneSequence(
 					.minBy { Math.abs(it - originalRoot) - 1f/it }!! // the 1f/it factor will make the lower one
 				val difference = nearestNewRootToOriginal - originalRoot
 				return Note(
-					tones = tones.map { it + difference}.toMutableSet(),
+					tones = tones.map { it + difference }.toMutableSet(),
 					velocity = velocity
 				)
 			}
@@ -49,7 +49,3 @@ class ToneSequence(
 
 	}
 }
-
-typealias Rest = ToneSequence.Step.Note
-typealias Note = ToneSequence.Step.Note
-typealias Sustain = ToneSequence.Step.Sustain

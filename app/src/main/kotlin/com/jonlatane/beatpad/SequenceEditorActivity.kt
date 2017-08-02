@@ -1,11 +1,9 @@
 package com.jonlatane.beatpad
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
-import com.jonlatane.beatpad.R.id.topology
-import com.jonlatane.beatpad.harmony.Topology
-import com.jonlatane.beatpad.harmony.Topology.intermediate
+import com.jonlatane.beatpad.harmony.Orbifold
+import com.jonlatane.beatpad.harmony.Orbifold.intermediate
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
@@ -14,13 +12,12 @@ import com.jonlatane.beatpad.view.tonesequence.ToneSequencePlayerThread
 import com.jonlatane.beatpad.view.tonesequence.ToneSequenceUI
 import org.billthefarmer.mididriver.GeneralMidiConstants.*
 import org.jetbrains.anko.*
-import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
 
 class SequenceEditorActivity : Activity(), AnkoLogger {
 	lateinit var ui: ToneSequenceUI
 	val viewModel get() = ui.viewModel
 	val sequencerInstrument get() = ui.sequencerInstrument
-	val topology get() = viewModel.topology
+	val orbifold get() = viewModel.orbifold
 	var toneSequence get() = viewModel.toneSequence
 		set(value) {
 			viewModel.toneSequence = value
@@ -79,12 +76,12 @@ class SequenceEditorActivity : Activity(), AnkoLogger {
 		super.onRestoreInstanceState(savedInstanceState)
 		toneSequence = ToneSequenceStorage.loadSequence(this)
 		ui.sequencerInstrument.instrument = savedInstanceState.getByte("sequencerInstrument", SYNTH_BASS_1)
-		topology.topology = Topology.values().find {
-			it.ordinal == (savedInstanceState["topologyMode"] as Int? ?: -1)
+		orbifold.orbifold = Orbifold.values().find {
+			it.ordinal == (savedInstanceState["orbifoldMode"] as Int? ?: -1)
 		} ?: intermediate
 		val chord = savedInstanceState.getParcelable<Chord>("currentChord")
 		if (chord != null) {
-			topology.chord = chord
+			orbifold.chord = chord
 		}
 		viewModel.sequencerThread =  ToneSequencePlayerThread(sequencerInstrument, viewModel, beatsPerMinute = 104)
 		ui.sequencerThread.beatsPerMinute = savedInstanceState.getInt("tempo", 147)
@@ -92,9 +89,9 @@ class SequenceEditorActivity : Activity(), AnkoLogger {
 
 	override fun onSaveInstanceState(outState: Bundle) {
 		super.onSaveInstanceState(outState)
-		outState.putParcelable("currentChord", topology.chord)
+		outState.putParcelable("currentChord", orbifold.chord)
 		outState.putInt("tempo", ui.sequencerThread.beatsPerMinute)
 		outState.putByte("sequencerInstrument", ui.sequencerInstrument.instrument)
-		outState.putInt("topologyMode", topology.topology.ordinal)
+		outState.putInt("orbifoldMode", orbifold.orbifold.ordinal)
 	}
 }

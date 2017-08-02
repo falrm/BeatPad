@@ -1,12 +1,12 @@
 package com.jonlatane.beatpad.harmony.chordsequence
 
-import com.jonlatane.beatpad.harmony.ChordSequence
+import com.jonlatane.beatpad.harmony.Orbit
 import com.jonlatane.beatpad.harmony.chord.AUGMENTED
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.MAJOR
 import com.jonlatane.beatpad.harmony.chord.NONEXISTENT
 
-object FlatNaturalSharpNine: ChordSequence {
+object FlatNaturalSharpNine: Orbit {
     override fun forward(c: Chord): Chord {
         when (c.heptatonics.second) {
             NONEXISTENT -> return c.plus(2)

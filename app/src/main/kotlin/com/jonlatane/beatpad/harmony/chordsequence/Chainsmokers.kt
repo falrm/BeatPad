@@ -1,10 +1,10 @@
 package com.jonlatane.beatpad.harmony.chordsequence
 
-import com.jonlatane.beatpad.harmony.ChordSequence
+import com.jonlatane.beatpad.harmony.Orbit
 import com.jonlatane.beatpad.harmony.chord.*
 
 // Based on "Something Just Like This"
-object Chainsmokers: ChordSequence {
+object Chainsmokers: Orbit {
     override fun forward(c: Chord): Chord {
         // D -> G(9)
         if (c.isMajor && c.heptatonics.second == NONEXISTENT) {

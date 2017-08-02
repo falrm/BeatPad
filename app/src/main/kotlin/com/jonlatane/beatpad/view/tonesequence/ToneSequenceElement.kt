@@ -3,16 +3,12 @@ package com.jonlatane.beatpad.view.tonesequence
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.PointF
 import android.util.AttributeSet
-import android.util.SparseArray
 import android.view.MotionEvent
 import android.view.ViewManager
-import collections.forEach
-import com.jonlatane.beatpad.harmony.Rest
-import com.jonlatane.beatpad.harmony.ToneSequence.Step
-import com.jonlatane.beatpad.harmony.ToneSequence.Step.Note
-import com.jonlatane.beatpad.harmony.ToneSequence.Step.Sustain
+import com.jonlatane.beatpad.model.ToneSequence.Step
+import com.jonlatane.beatpad.model.ToneSequence.Step.Note
+import com.jonlatane.beatpad.model.ToneSequence.Step.Sustain
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.view.melody.BaseMelodyView
@@ -51,7 +47,7 @@ class ToneSequenceElement @JvmOverloads constructor(
 	override val nonRootPadding = 20
 	override val drawNonRootGlow = false
 	override var chord: Chord
-		get() = viewModel.topology.chord
+		get() = viewModel.orbifold.chord
 		set(value) { throw UnsupportedOperationException() }
 
 	override fun onDraw(canvas: Canvas) {

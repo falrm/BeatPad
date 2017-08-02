@@ -1,7 +1,6 @@
 package com.jonlatane.beatpad.view.tonesequence
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.view.Gravity
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
@@ -9,12 +8,12 @@ import android.widget.LinearLayout.HORIZONTAL
 import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.SequenceEditorActivity
-import com.jonlatane.beatpad.harmony.Rest
+import com.jonlatane.beatpad.model.*
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.view.nonDelayedHorizontalScrollView
 import com.jonlatane.beatpad.view.nonDelayedScrollView
-import com.jonlatane.beatpad.view.topology.topologyView
+import com.jonlatane.beatpad.view.orbifold.orbifoldView
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -43,7 +42,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 		var IDSeq = 1 // Literally just a source of View IDs to make Android happy.
 		var holdToEdit: TextView? = null
 		relativeLayout {
-			viewModel.topology = topologyView {
+			viewModel.orbifold = orbifoldView {
 				id = IDSeq++
 				onChordChangedListener = {
 					viewModel.verticalAxis?.chord = it
@@ -87,7 +86,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				height = dimen(R.dimen.subdivision_controller_size)
 				leftMargin = dip(30)
 				if (configuration.landscape) {
-					rightOf(viewModel.topology)
+					rightOf(viewModel.orbifold)
 				}
 			}
 			holdToEdit = textView {
@@ -101,7 +100,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				height = dimen(R.dimen.subdivision_controller_size)
 				leftMargin = dip(30)
 				if (configuration.landscape) {
-					rightOf(viewModel.topology)
+					rightOf(viewModel.orbifold)
 				}
 			}
 			viewModel.leftScroller = nonDelayedScrollView {
@@ -120,9 +119,9 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				above(viewModel.bottomScroller)
 				if (configuration.portrait) {
 					alignParentLeft()
-					below(viewModel.topology)
+					below(viewModel.orbifold)
 				} else {
-					rightOf(viewModel.topology)
+					rightOf(viewModel.orbifold)
 				}
 			}
 			viewModel.centerVerticalScroller = nonDelayedScrollView {
@@ -156,7 +155,7 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				above(viewModel.bottomScroller)
 				rightOf(viewModel.leftScroller)
 				if (configuration.portrait) {
-					below(viewModel.topology)
+					below(viewModel.orbifold)
 				} else {
 					alignParentTop()
 				}

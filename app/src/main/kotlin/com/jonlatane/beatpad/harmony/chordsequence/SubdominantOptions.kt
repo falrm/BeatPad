@@ -1,11 +1,11 @@
 package com.jonlatane.beatpad.harmony.chordsequence
 
-import com.jonlatane.beatpad.harmony.ChordSequence
+import com.jonlatane.beatpad.harmony.Orbit
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.Maj6
 import com.jonlatane.beatpad.harmony.chord.min7
 
-object SubdominantOptions : ChordSequence {
+object SubdominantOptions : Orbit {
   override fun forward(c: Chord): Chord {
     return when {
     //c.isDominant -> Chord(c.root + 7, min7) // V-ii

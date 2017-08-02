@@ -26,9 +26,3 @@ class NonDelayedScrollView(
 		return scrollingEnabled && super.onInterceptTouchEvent(ev)
 	}
 }
-
-inline fun ViewManager.nonDelayedScrollView(theme: Int = 0)
-	= nonDelayedScrollView(theme) {}
-
-inline fun ViewManager.nonDelayedScrollView(theme: Int = 0, init: NonDelayedScrollView.() -> Unit)
-	= ankoView({ NonDelayedScrollView(it) }, theme, init)

@@ -1,8 +1,7 @@
 package com.jonlatane.beatpad.view.tonesequence
 
-import com.jonlatane.beatpad.harmony.Rest
-import com.jonlatane.beatpad.harmony.ToneSequence
-import com.jonlatane.beatpad.harmony.ToneSequence.Step.Note
+import com.jonlatane.beatpad.model.ToneSequence
+import com.jonlatane.beatpad.model.ToneSequence.Step.Note
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.Instrument
 
@@ -10,7 +9,7 @@ class ToneSequencePlayerThread(
 	val instrument: Instrument,
 	val viewModel: ToneSequenceViewModel? = null,
 	val sequenceResolver: () -> ToneSequence = { viewModel!!.toneSequence },
-	val chordResolver: () -> Chord = { viewModel!!.topology.chord },
+	val chordResolver: () -> Chord = { viewModel!!.orbifold.chord },
 	@Volatile var beatsPerMinute: Int
 ) : Runnable {
 	@Volatile var stopped = false
@@ -29,7 +28,7 @@ class ToneSequencePlayerThread(
 				val pauseDuration = 0L
 
 				println("playing")
-				viewModel?.topology?.post { viewModel.markPlaying(step) }
+				viewModel?.orbifold?.post { viewModel.markPlaying(step) }
 				// Interpret the booleans as "play" or "rest"
 				when (step) {
 					is Note -> {

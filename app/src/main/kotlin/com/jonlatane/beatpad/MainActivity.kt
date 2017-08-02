@@ -1,16 +1,13 @@
 package com.jonlatane.beatpad
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
-import com.jonlatane.beatpad.harmony.ToneSequence
-import com.jonlatane.beatpad.harmony.Topology
-import com.jonlatane.beatpad.harmony.Topology.*
+import com.jonlatane.beatpad.model.ToneSequence
+import com.jonlatane.beatpad.harmony.Orbifold
+import com.jonlatane.beatpad.harmony.Orbifold.*
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
-import com.jonlatane.beatpad.output.controller.SequencerThread
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.sensors.Orientation
@@ -21,8 +18,8 @@ import com.jonlatane.beatpad.util.show
 import com.jonlatane.beatpad.view.keyboard.KeyboardIOHandler
 import com.jonlatane.beatpad.view.tempo.TempoTracking
 import com.jonlatane.beatpad.view.tonesequence.ToneSequencePlayerThread
-import com.jonlatane.beatpad.view.topology.ANIMATION_DURATION
-import com.jonlatane.beatpad.view.topology.RhythmAnimations
+import com.jonlatane.beatpad.view.orbifold.ANIMATION_DURATION
+import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import kotlinx.android.synthetic.main.activity_main.*
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.contentView
@@ -59,17 +56,17 @@ class MainActivity : BaseActivity() {
 		pianoBoardInstrument.instrument = GeneralMidiConstants.SYNTH_BASS_1
 
 		val harmonyController = DeviceOrientationInstrument(harmonicInstrument)
-		RhythmAnimations.wireMelodicControl(topology, harmonyController)
+		RhythmAnimations.wireMelodicControl(orbifold, harmonyController)
 		keyboardIOHandler = KeyboardIOHandler(keyboard, pianoBoardInstrument)
 
 		sequencerThread = ToneSequencePlayerThread(
 			sequencerInstrument,
 			sequenceResolver = { toneSequence },
 			beatsPerMinute = 120,
-			chordResolver = { topology.chord }
+			chordResolver = { orbifold.chord }
 		)
 
-		topology.onChordChangedListener = { c: Chord ->
+		orbifold.onChordChangedListener = { c: Chord ->
 			val tones = c.getTones()
 			melody.chord = c
 			harmonyController.tones = tones
@@ -102,7 +99,7 @@ class MainActivity : BaseActivity() {
 
 	override fun onResume() {
 		super.onResume()
-		topology.onResume()
+		orbifold.onResume()
 		toneSequence = ToneSequenceStorage.loadSequence(this)
 	}
 
@@ -114,7 +111,7 @@ class MainActivity : BaseActivity() {
 	override fun onRestoreInstanceState(savedInstanceState: Bundle) {
 		val chord = savedInstanceState.getParcelable<Chord>("currentChord")
 		if (chord != null) {
-			topology.chord = chord
+			orbifold.chord = chord
 		}
 		sequencerThread.beatsPerMinute = savedInstanceState.getInt("tempo")
 		updateTempoButton()
@@ -122,20 +119,20 @@ class MainActivity : BaseActivity() {
 		harmonicInstrument.instrument = savedInstanceState.getByte("harmonicInstrument")
 		sequencerInstrument.instrument = savedInstanceState.getByte("sequencerInstrument")
 		pianoBoardInstrument.instrument = savedInstanceState.getByte("pianoInstrument")
-		topology.topology = Topology.values().find { it.ordinal == savedInstanceState.getInt("topologyMode") }!!
+		orbifold.orbifold = Orbifold.values().find { it.ordinal == savedInstanceState.getInt("orbifoldMode") }!!
 		if (savedInstanceState.getBoolean("pianoHidden")) {
 			keyboard.hide(animated = false)
-			updateTopology()
+			updateOrbifold()
 		}
 		if (savedInstanceState.getBoolean("melodyHidden")) {
 			melody.hide(animated = false)
-			updateTopology()
+			updateOrbifold()
 		}
 	}
 
 	// invoked when the activity may be temporarily destroyed, save the instance state here
 	override fun onSaveInstanceState(outState: Bundle) {
-		outState.putParcelable("currentChord", topology.chord)
+		outState.putParcelable("currentChord", orbifold.chord)
 		outState.putInt("tempo", sequencerThread.beatsPerMinute)
 		outState.putByte("melodicInstrument", melody.instrument.instrument)
 		outState.putByte("harmonicInstrument", harmonicInstrument.instrument)
@@ -143,7 +140,7 @@ class MainActivity : BaseActivity() {
 		outState.putByte("pianoInstrument", pianoBoardInstrument.instrument)
 		outState.putBoolean("pianoHidden", keyboard.isHidden)
 		outState.putBoolean("melodyHidden", melody.isHidden)
-		outState.putInt("topologyMode", topology.topology.ordinal)
+		outState.putInt("orbifoldMode", orbifold.orbifold.ordinal)
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -157,28 +154,28 @@ class MainActivity : BaseActivity() {
 				//post {
 					if (keyboard.isHidden) {
 						keyboard.show()
-						updateTopology()
+						updateOrbifold()
 					} else {
 						keyboard.hide()
-						updateTopology()
+						updateOrbifold()
 					}
 				//}
 			}
 			R.id.color_keyboard_toggle -> {
 				if (melody.isHidden) {
 					melody.show()
-					updateTopology()
+					updateOrbifold()
 				} else {
 					melody.hide()
-					updateTopology()
+					updateOrbifold()
 				}
 			}
-			R.id.basic_mode -> topology.topology = basic
-			R.id.intermediate_mode -> topology.topology = intermediate
-			R.id.advanced_mode -> topology.topology = advanced
-			R.id.master_mode -> topology.topology = master
-			R.id.chainsmokers_mode -> topology.topology = chainsmokers
-			R.id.pop_mode -> topology.topology = pop
+			R.id.basic_mode -> orbifold.orbifold = basic
+			R.id.intermediate_mode -> orbifold.orbifold = intermediate
+			R.id.advanced_mode -> orbifold.orbifold = advanced
+			R.id.master_mode -> orbifold.orbifold = master
+			R.id.chainsmokers_mode -> orbifold.orbifold = chainsmokers
+			R.id.pop_mode -> orbifold.orbifold = pop
 			R.id.conduct -> startActivity<ConductorActivity>()
 			R.id.play -> startActivity<InstrumentActivity>()
 			R.id.sequence_editor -> startActivity<SequenceEditorActivity>("playgroundState" to Bundle().also { onSaveInstanceState(it) })
@@ -209,11 +206,11 @@ class MainActivity : BaseActivity() {
 		tempoTapper.text = "${sequencerThread.beatsPerMinute} BPM"
 	}
 
-	private fun updateTopology(msDelay: Long = Math.round(1.5 * ANIMATION_DURATION)) {
+	private fun updateOrbifold(msDelay: Long = Math.round(1.5 * ANIMATION_DURATION)) {
 		executorService.schedule({
 			this@MainActivity.contentView?.post {
 				updateMenuOptions()
-				topology.onResume()
+				orbifold.onResume()
 			}
 		}, msDelay, TimeUnit.MILLISECONDS)
 	}

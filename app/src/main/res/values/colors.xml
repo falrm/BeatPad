@@ -4,7 +4,7 @@
 	<color name="colorPrimaryDark">#424242</color>
 	<color name="colorAccent">#F652F9</color>
 
-	<!-- A Background color for the Topology view -->
+	<!-- A Background color for the Orbifold view -->
 	<color name="brown">#5D4037</color>
 
 	<!-- The colors work as such: Dominant is common to both schemes -->

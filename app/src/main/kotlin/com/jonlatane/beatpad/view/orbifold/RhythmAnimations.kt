@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.view.topology
+package com.jonlatane.beatpad.view.orbifold
 
 import android.view.MotionEvent
 import android.view.MotionEvent.*
@@ -12,7 +12,7 @@ import org.jetbrains.anko.info
 import java.util.concurrent.atomic.AtomicInteger
 
 object RhythmAnimations: AnkoLogger {
-	fun wireMelodicControl(v: TopologyView, instrument: DeviceOrientationInstrument) {
+	fun wireMelodicControl(v: OrbifoldView, instrument: DeviceOrientationInstrument) {
 		info("Setting ontouch")
 		v.centralChordTouchPoint.setOnTouchListener(object : View.OnTouchListener {
 			private var animator: ViewPropertyAnimator? = null

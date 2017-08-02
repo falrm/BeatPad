@@ -1,26 +1,24 @@
-package com.jonlatane.beatpad.view.topology
+package com.jonlatane.beatpad.view.orbifold
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.harmony.ChordSequence
-import com.jonlatane.beatpad.harmony.Topology
+import com.jonlatane.beatpad.harmony.Orbit
+import com.jonlatane.beatpad.harmony.Orbifold
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.Maj7
 import com.jonlatane.beatpad.harmony.chordsequence.Chromatic
-import com.jonlatane.beatpad.showTopologyPicker
+import com.jonlatane.beatpad.showOrbifoldPicker
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.util.*
 import kotlin.properties.Delegates.observable
 
-class TopologyView @JvmOverloads constructor(
+class OrbifoldView @JvmOverloads constructor(
 	context: Context,
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
@@ -48,9 +46,9 @@ class TopologyView @JvmOverloads constructor(
 		}
 		onChordChangedListener?.invoke(chord)
 	}
-	var topology: Topology by observable(Topology.intermediate) {
+	var orbifold: Orbifold by observable(Orbifold.intermediate) {
 		_, _, new ->
-		(Topology.allSequences - new).forEach {
+		(Orbifold.ALL_SEQUENCEs - new).forEach {
 			removeSequence(it)
 		}
 		new.indices.forEach {
@@ -66,7 +64,7 @@ class TopologyView @JvmOverloads constructor(
 	internal var selectedChord: TextView? = null
 	internal var sequences: MutableList<SequenceViews> = ArrayList()
 
-	internal inner class SequenceViews(val sequence: ChordSequence) {
+	internal inner class SequenceViews(val sequence: Orbit) {
 		val axis = inflateAxisView()
 		val connectForward = inflateConnectorView()
 		val connectBack = inflateConnectorView()
@@ -109,14 +107,14 @@ class TopologyView @JvmOverloads constructor(
 		updateChordText()
 		post {
 			skipTo(InitialState)
-			this.topology = topology
+			this.orbifold = orbifold
 			animateTo(SelectionState)
 		}
-		val topology = this
+		val orbifold = this
 		button {
 			text = "Mode"
 			onClick {
-				showTopologyPicker(topology)
+				showOrbifoldPicker(orbifold)
 			}
 		}.lparams {
 			alignParentBottom()
@@ -132,12 +130,12 @@ class TopologyView @JvmOverloads constructor(
 			text = c.name
 			val p = arrayOf(paddingLeft, paddingTop, paddingRight, paddingBottom)
 			backgroundResource = when {
-				c.isDominant -> R.drawable.topology_chord_dominant
-				c.isDiminished -> R.drawable.topology_chord_diminished
-				c.isMinor -> R.drawable.topology_chord_minor
-				c.isAugmented -> R.drawable.topology_chord_augmented
-				c.isMajor -> R.drawable.topology_chord_major
-				else -> R.drawable.topology_chord
+				c.isDominant -> R.drawable.orbifold_chord_dominant
+				c.isDiminished -> R.drawable.orbifold_chord_diminished
+				c.isMinor -> R.drawable.orbifold_chord_minor
+				c.isAugmented -> R.drawable.orbifold_chord_augmented
+				c.isMajor -> R.drawable.orbifold_chord_major
+				else -> R.drawable.orbifold_chord
 			}
 			setPadding(p[0], p[1], p[2], p[3])
 		}
@@ -152,7 +150,7 @@ class TopologyView @JvmOverloads constructor(
 	}
 
 	private fun inflateChordView(defaultElevation: Float = defaultChordElevation): TextView {
-		LayoutInflater.from(context).inflate(R.layout.topology_chord, this, true)
+		LayoutInflater.from(context).inflate(R.layout.orbifold_chord, this, true)
 		val result = findViewWithTag("newChord").apply {
 			elevation = defaultElevation
 			tag = null
@@ -161,7 +159,7 @@ class TopologyView @JvmOverloads constructor(
 	}
 
 	private fun inflateAxisView(): View {
-		LayoutInflater.from(context).inflate(R.layout.topology_axis, this, true)
+		LayoutInflater.from(context).inflate(R.layout.orbifold_axis, this, true)
 		val result = findViewWithTag("newConnector").apply {
 			elevation = axisElevation
 			tag = null
@@ -170,7 +168,7 @@ class TopologyView @JvmOverloads constructor(
 	}
 
 	private fun inflateConnectorView(): View {
-		LayoutInflater.from(context).inflate(R.layout.topology_connector, this, true)
+		LayoutInflater.from(context).inflate(R.layout.orbifold_connector, this, true)
 		val result = findViewWithTag("newConnector").apply {
 			elevation = connectorElevation
 			tag = null
@@ -179,13 +177,13 @@ class TopologyView @JvmOverloads constructor(
 	}
 
 	private fun inflateBG() {
-		LayoutInflater.from(context).inflate(R.layout.topology_bg_half_steps, this, true)
+		LayoutInflater.from(context).inflate(R.layout.orbifold_bg_half_steps, this, true)
 		halfStepBackground = findViewWithTag("newBG").apply {
 			elevation = halfStepBackgroundElevation
 			tag = null
 		}
 
-		LayoutInflater.from(context).inflate(R.layout.topology_bg_highlight, this, true)
+		LayoutInflater.from(context).inflate(R.layout.orbifold_bg_highlight, this, true)
 		centralChordThrobber = findViewWithTag("newBG").apply {
 			outlineProvider = null
 			elevation = Float.MAX_VALUE - 1f
@@ -193,7 +191,7 @@ class TopologyView @JvmOverloads constructor(
 			alpha = 0f
 		}
 
-		LayoutInflater.from(context).inflate(R.layout.topology_bg_highlight, this, true)
+		LayoutInflater.from(context).inflate(R.layout.orbifold_bg_highlight, this, true)
 		centralChordTouchPoint = findViewWithTag("newBG").apply {
 			elevation = Float.MAX_VALUE
 			alpha = 0f
@@ -205,7 +203,7 @@ class TopologyView @JvmOverloads constructor(
 		animateTo(SelectionState)
 	}
 
-	private fun addSequence(index: Int, sequence: ChordSequence) {
+	private fun addSequence(index: Int, sequence: Orbit) {
 		if (!containsSequence(sequence)) {
 			sequences.add(index, SequenceViews(sequence))
 			updateChordText()
@@ -213,7 +211,7 @@ class TopologyView @JvmOverloads constructor(
 		}
 	}
 
-	private fun removeSequence(sequence: ChordSequence) {
+	private fun removeSequence(sequence: Orbit) {
 		for (index in 0..sequences.size - 1) {
 			val views = sequences[index]
 			if (views.sequence === sequence) {
@@ -231,11 +229,11 @@ class TopologyView @JvmOverloads constructor(
 
 	private fun animateViewOut(child: View) {
 		child.animate().alpha(0f).withEndAction {
-			this@TopologyView.removeView(child)
+			this@OrbifoldView.removeView(child)
 		}
 	}
 
-	fun containsSequence(sequence: ChordSequence): Boolean {
+	fun containsSequence(sequence: Orbit): Boolean {
 		return (0..sequences.size - 1).any { sequences[it].sequence === sequence }
 	}
 
