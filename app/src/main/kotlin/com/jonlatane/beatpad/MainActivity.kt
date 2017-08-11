@@ -3,6 +3,7 @@ package com.jonlatane.beatpad
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import com.jonlatane.beatpad.R.id.melody
 import com.jonlatane.beatpad.model.ToneSequence
 import com.jonlatane.beatpad.harmony.Orbifold
 import com.jonlatane.beatpad.harmony.Orbifold.*
@@ -151,15 +152,13 @@ class MainActivity : BaseActivity() {
 			R.id.piano_board_instrument -> showInstrumentPicker(this, pianoBoardInstrument)
 			R.id.choose_tempo -> showTempoPicker(this)
 			R.id.keyboard_toggle -> {
-				//post {
-					if (keyboard.isHidden) {
-						keyboard.show()
-						updateOrbifold()
-					} else {
-						keyboard.hide()
-						updateOrbifold()
-					}
-				//}
+				if (keyboard.isHidden) {
+					keyboard.show()
+					updateOrbifold()
+				} else {
+					keyboard.hide()
+					updateOrbifold()
+				}
 			}
 			R.id.color_keyboard_toggle -> {
 				if (melody.isHidden) {

@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.output.instrument
 
+import com.jonlatane.beatpad.output.instrument.midi.MidiDevices
 import org.apache.commons.lang3.reflect.FieldUtils
 import org.apache.commons.lang3.text.WordUtils
 import org.billthefarmer.mididriver.GeneralMidiConstants
@@ -30,24 +31,26 @@ class MIDIInstrument : Instrument {
 
         // Send the MIDI byte3 to the synthesizer.
         DRIVER.write(byte3)
+        MidiDevices.send(byte3)
         tones.add(tone)
     }
 
     override fun stop() {
         for (tone in tones) {
-            stop(tone.toInt())
+            stop(tone)
         }
         tones.clear()
     }
 
     fun stop(tone: Int) {
         // Construct a note OFF message for the middle C at minimum velocity on channel 1:
-        byte3[0] = (NOTE_OFF or channel).toByte()  // STATUS byte: 0x80 = note Off, 0x00 = channel 1
+        byte3[0] = (NOTE_OFF or channel)  // STATUS byte: 0x80 = note Off, 0x00 = channel 1
         byte3[1] = (tone + 60).toByte()  // 0x3C = middle C
         byte3[2] = 0x00.toByte()  // 0x00 = the minimum velocity (0)
 
         // Send the MIDI byte3 to the synthesizer.
         DRIVER.write(byte3)
+        MidiDevices.send(byte3)
     }
 
     val instrumentName: String
@@ -55,7 +58,7 @@ class MIDIInstrument : Instrument {
 
     private fun selectInstrument(instrument: Byte): MIDIInstrument {
         this.instrument = instrument
-        byte2[0] = (SELECT_INSTRUMENT or channel).toByte()  // STATUS byte: Change, 0x00 = channel 1
+        byte2[0] = (SELECT_INSTRUMENT or channel)  // STATUS byte: Change, 0x00 = channel 1
         byte2[1] = instrument
         DRIVER.write(byte2)
         return this

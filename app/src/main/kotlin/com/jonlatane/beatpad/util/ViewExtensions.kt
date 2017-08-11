@@ -2,13 +2,21 @@ package com.jonlatane.beatpad.util
 
 import android.animation.ValueAnimator
 import android.os.Build
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.*
 import android.view.ViewPropertyAnimator
+import android.view.animation.LinearInterpolator
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 import java.util.concurrent.atomic.AtomicInteger
+import android.view.animation.Transformation
+import android.view.animation.Animation
 
-private val defaultDuration get() = android.R.integer.config_mediumAnimTime.toLong()
+
+
+private val defaultDuration get() = 300L
 
 interface HideableView {
 	var initialHeight: Int?
@@ -63,23 +71,14 @@ var View.translationXY: Float
 var View.layoutWidth get() = this.layoutParams.width
 	set(value) {
 		val layoutParams = this.layoutParams
-		layoutParams.width = when {
-			value in listOf(MATCH_PARENT, WRAP_CONTENT) -> value
-			value > 0 -> value
-			else -> 0
-		}
+		layoutParams.width = value
 		this.layoutParams = layoutParams
-		invalidate()
 	}
 
 var View.layoutHeight get() = this.layoutParams.height
 	set(value) {
 		val layoutParams = this.layoutParams
-		layoutParams.height = when {
-			value in listOf(MATCH_PARENT, WRAP_CONTENT) -> value
-			value > 0 -> value
-			else -> 0
-		}
+		layoutParams.height = value
 		this.layoutParams = layoutParams
 	}
 
@@ -89,17 +88,17 @@ fun View.animateWidth(width: Int, duration: Long = defaultDuration) {
 	anim.addUpdateListener { valueAnimator ->
 		val value = valueAnimator.animatedValue as Int
 		this.layoutWidth = value
-		this.invalidate()
 	}
 	anim.setDuration(duration).start()
 }
 
 fun View.animateHeight(height: Int, duration: Long = defaultDuration) {
 	val anim = ValueAnimator.ofInt(this.measuredHeight, height)
+  anim.interpolator = LinearInterpolator()
 	anim.addUpdateListener { valueAnimator ->
 		val value = valueAnimator.animatedValue as Int
 		this.layoutHeight = value
-		this.invalidate()
+		AnkoLogger(View::class.java).info("Animated height: $value")
 	}
 	anim.setDuration(duration).start()
 }
