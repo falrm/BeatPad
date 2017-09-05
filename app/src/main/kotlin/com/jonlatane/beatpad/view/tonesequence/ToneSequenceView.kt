@@ -17,10 +17,11 @@ import org.jetbrains.anko.sdk25.coroutines.onScrollChange
 inline fun ViewManager.toneSequenceView(
   theme: Int = 0,
   viewModel: ToneSequenceViewModel,
-  ui: AnkoContext<Any>,
-  init: RelativeLayout.() -> Unit
+
+  //ui: AnkoContext<Any>,
+  init: _RelativeLayout.() -> Unit
 )
-  = with(ui) {
+  = //with(ui) {
   ankoView({
     _RelativeLayout(it).apply {
       var holdToEdit: TextView? = null
@@ -113,5 +114,5 @@ inline fun ViewManager.toneSequenceView(
       }
     }
   }, theme, init)
-}
+//}
 

@@ -50,7 +50,7 @@ class BottomScroller(
 	}
 }
 
-inline fun ViewManager.bottomScroller(theme: Int = 0)
+fun ViewManager.bottomScroller(theme: Int = 0)
 	= bottomScroller(theme) {}
 
 inline fun ViewManager.bottomScroller(theme: Int = 0, init: BottomScroller.() -> Unit)

@@ -59,7 +59,7 @@ class HyperSequenceUI : AnkoComponent<SequenceEditorActivity> {
 					alignParentLeft()
 				}
 			}
-			toneSequenceView(viewModel = viewModel.toneSequence, ui = ui) {
+			toneSequenceView(viewModel = viewModel.toneSequence) {
 
 			}.lparams {
 

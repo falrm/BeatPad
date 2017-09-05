@@ -58,6 +58,7 @@ class MainActivity : BaseActivity() {
 		val harmonyController = DeviceOrientationInstrument(harmonicInstrument)
 		RhythmAnimations.wireMelodicControl(orbifold, harmonyController)
 		keyboardIOHandler = KeyboardIOHandler(keyboard, pianoBoardInstrument)
+        toneSequence = ToneSequenceStorage.loadSequence(this)
 
 		sequencerThread = ToneSequencePlayerThread(
 			sequencerInstrument,

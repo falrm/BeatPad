@@ -59,107 +59,22 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 					alignParentLeft()
 				}
 			}
-			viewModel.bottomScroller = bottomScroller {
-				id = IDSeq++
-				onHeldDownChanged = { heldDown ->
-					if (heldDown) holdToEdit?.animate()?.alpha(0f)?.translationY(100f)
-					else holdToEdit?.animate()?.alpha(1f)?.translationY(0f)
-				}
-				linearLayout {
-					orientation = HORIZONTAL
-					repeat(STEPS_TO_ALLOCATE) {
-						viewModel.bottoms.add(
-							view {
-								background = ctx.getDrawable(R.drawable.tone_footer)
-							}.lparams {
-								width = dimen(R.dimen.subdivision_controller_size)
-								height = dimen(R.dimen.subdivision_controller_size)
-							}
-						)
-					}
-				}
-				scrollingEnabled = false
-			}.lparams {
-				alignParentBottom()
-				alignParentRight()
-				width = MATCH_PARENT
-				height = dimen(R.dimen.subdivision_controller_size)
-				leftMargin = dip(30)
-				if (configuration.landscape) {
-					rightOf(viewModel.orbifold)
-				}
-			}
-			holdToEdit = textView {
-				text = "Hold To Edit"
-				textSize = 15f
-				gravity = Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL
-			}.lparams {
-				alignParentBottom()
-				alignParentRight()
-				width = MATCH_PARENT
-				height = dimen(R.dimen.subdivision_controller_size)
-				leftMargin = dip(30)
-				if (configuration.landscape) {
-					rightOf(viewModel.orbifold)
-				}
-			}
-			viewModel.leftScroller = nonDelayedScrollView {
-				id = IDSeq++
-				linearLayout {
-					viewModel.verticalAxis = toneSequenceAxis().lparams {
-						width = dip(30)
-						height = dip(1000f)
-					}
-				}
-				scrollingEnabled = false
-				isVerticalScrollBarEnabled = false
-			}.lparams {
-				width = dip(30)
-				height = MATCH_PARENT
-				above(viewModel.bottomScroller)
-				if (configuration.portrait) {
-					alignParentLeft()
+
+            toneSequenceView(viewModel = viewModel) {
+                id = IDSeq++
+            }.lparams {
+	            width = MATCH_PARENT
+	            height = MATCH_PARENT
+				if(configuration.portrait) {
 					below(viewModel.orbifold)
-				} else {
+					alignParentBottom()
+                } else {
 					rightOf(viewModel.orbifold)
-				}
-			}
-			viewModel.centerVerticalScroller = nonDelayedScrollView {
-				id = IDSeq++
-				onScrollChange {
-					_, _, scrollY, _, _ ->
-					viewModel.leftScroller.scrollY = scrollY
-				}
-				viewModel.centerHorizontalScroller = nonDelayedHorizontalScrollView {
-					onScrollChange {
-						_, scrollX, _, _, _ ->
-						viewModel.bottomScroller.scrollX = scrollX
-					}
-					linearLayout {
-						orientation = HORIZONTAL
-						repeat(STEPS_TO_ALLOCATE) {
-							viewModel.elements.add(toneSequenceElement {
-								viewModel = this@ToneSequenceUI.viewModel
-							}.lparams {
-								width = dimen(R.dimen.subdivision_controller_size)
-								height = dip(1000f)
-							})
-						}
-					}
-					isHorizontalScrollBarEnabled = false
-				}
-			}.lparams {
-				width = MATCH_PARENT
-				height = MATCH_PARENT
-				alignParentRight()
-				above(viewModel.bottomScroller)
-				rightOf(viewModel.leftScroller)
-				if (configuration.portrait) {
-					below(viewModel.orbifold)
-				} else {
 					alignParentTop()
-				}
-			}
+					alignParentRight()
+					alignParentBottom()
+                }
+            }
 
 			button {
 				text = "Play"
@@ -178,12 +93,14 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 			}.lparams {
 				width = WRAP_CONTENT
 				height = WRAP_CONTENT
-				alignParentLeft()
+                below(viewModel.centerVerticalScroller)
 				alignParentBottom()
+                gravity = Gravity.CENTER_VERTICAL
 				if (configuration.portrait) {
-					below(viewModel.centerVerticalScroller)
-					gravity = Gravity.CENTER_VERTICAL
-				}
+                    alignParentLeft()
+				} else {
+					rightOf(viewModel.orbifold)
+                }
 			}
 
 			button {
@@ -205,11 +122,9 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				width = WRAP_CONTENT
 				height = WRAP_CONTENT
 				alignParentRight()
+                below(viewModel.centerVerticalScroller)
 				alignParentBottom()
-				if (configuration.portrait) {
-					below(viewModel.centerVerticalScroller)
-					gravity = Gravity.CENTER_VERTICAL
-				}
+                gravity = Gravity.CENTER_VERTICAL
 			}
 		}
 	}
