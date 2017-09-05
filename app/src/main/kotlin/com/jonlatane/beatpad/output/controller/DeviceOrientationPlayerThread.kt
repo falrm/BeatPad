@@ -3,7 +3,10 @@ package com.jonlatane.beatpad.output.controller
 import com.jonlatane.beatpad.output.instrument.Instrument
 import com.jonlatane.beatpad.sensors.Orientation
 
-class SequencerThread(instrument: Instrument, beatsPerMinute: Int) : DeviceOrientationInstrument(instrument), Runnable {
+class DeviceOrientationPlayerThread(
+  instrument: Instrument,
+  beatsPerMinute: Int
+) : DeviceOrientationInstrument(instrument), Runnable {
 
     @Volatile var beatsPerMinute: Int = 0
     @Volatile var stopped = false
@@ -58,8 +61,4 @@ class SequencerThread(instrument: Instrument, beatsPerMinute: Int) : DeviceOrien
             val result = Math.min(Math.max(0.3f, 3f * Orientation.normalizedDeviceRoll() * 0.7f + 0.65f), 1.0f)
             return result
         }
-
-    companion object {
-        private val TAG = SequencerThread::class.simpleName
-    }
 }

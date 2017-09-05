@@ -6,9 +6,9 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewManager
-import com.jonlatane.beatpad.model.ToneSequence.Step
-import com.jonlatane.beatpad.model.ToneSequence.Step.Note
-import com.jonlatane.beatpad.model.ToneSequence.Step.Sustain
+import com.jonlatane.beatpad.model.ToneSequence.Subdivision
+import com.jonlatane.beatpad.model.ToneSequence.Subdivision.Note
+import com.jonlatane.beatpad.model.ToneSequence.Subdivision.Sustain
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.view.melody.BaseMelodyView
@@ -31,21 +31,20 @@ class ToneSequenceElement @JvmOverloads constructor(
 	val seqIndex: Int by lazy {
 		viewModel.elements.indexOf(this)
 	}
-	var step: Step?
-		get() = viewModel.toneSequence.steps[seqIndex]
+	var subdivision: Subdivision?
+		get() = viewModel.toneSequence.subdivisions[seqIndex]
 		set(value) {
 			if(value != null && isVisible)
-				viewModel.toneSequence.steps[seqIndex] = value
+				viewModel.toneSequence.subdivisions[seqIndex] = value
 		}
-	val isVisible: Boolean get() = seqIndex < viewModel.toneSequence.steps.size
-	val isDownbeat: Boolean get() = seqIndex % viewModel.toneSequence.stepsPerBeat == 0
+	val isVisible: Boolean get() = seqIndex < viewModel.toneSequence.subdivisions.size
+	val isDownbeat: Boolean get() = seqIndex % viewModel.toneSequence.subdivisionsPerBeat == 0
 
 	override var initialHeight: Int? = null
 	override val renderVertically = true
 	override val halfStepsOnScreen = 88
 	override val drawPadding = 30
 	override val nonRootPadding = 20
-	override val drawNonRootGlow = false
 	override var chord: Chord
 		get() = viewModel.orbifold.chord
 		set(value) { throw UnsupportedOperationException() }
@@ -60,15 +59,15 @@ class ToneSequenceElement @JvmOverloads constructor(
 
 	private val p = Paint()
 	private fun Canvas.drawStepNotes() {
-		p.color = when(step) {
+		p.color = when(subdivision) {
 			is Note -> 0xAA212121.toInt()
 			is Sustain -> 0xAA424242.toInt()
 			null -> 0x00FFFFFF
 		}
 		try {
-			val tones = when (step) {
-				is Note -> (step as Note).tones
-				is Sustain -> (step as Sustain).note.tones
+			val tones = when (subdivision) {
+				is Note -> (subdivision as Note).tones
+				is Sustain -> (subdivision as Sustain).note.tones
 				null -> emptySet<Int>()
 			}
 			tones.forEach { tone ->
@@ -110,8 +109,8 @@ class ToneSequenceElement @JvmOverloads constructor(
 
 			MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
 				val tone = getTone(event.getY(pointerIndex))
-				if(step is Note) {
-					val tones = (step as Note).tones
+				if(subdivision is Note) {
+					val tones = (subdivision as Note).tones
 					if(!tones.remove(tone)) tones.add(tone)
 				}
 			}

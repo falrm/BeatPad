@@ -3,7 +3,7 @@ package com.jonlatane.beatpad.model
 /**
  * Provided for import convenience.
  */
-typealias Step = ToneSequence.Step
-typealias Rest = ToneSequence.Step.Note
-typealias Note = ToneSequence.Step.Note
-typealias Sustain = ToneSequence.Step.Sustain
+typealias Step = ToneSequence.Subdivision
+typealias Rest = ToneSequence.Subdivision.Note
+typealias Note = ToneSequence.Subdivision.Note
+typealias Sustain = ToneSequence.Subdivision.Sustain

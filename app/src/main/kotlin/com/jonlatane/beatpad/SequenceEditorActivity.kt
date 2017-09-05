@@ -8,7 +8,7 @@ import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.storage.ToneSequenceStorage
-import com.jonlatane.beatpad.view.tonesequence.ToneSequencePlayerThread
+import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
 import com.jonlatane.beatpad.view.tonesequence.ToneSequenceUI
 import org.billthefarmer.mididriver.GeneralMidiConstants.*
 import org.jetbrains.anko.*
@@ -83,7 +83,7 @@ class SequenceEditorActivity : Activity(), AnkoLogger {
 		if (chord != null) {
 			orbifold.chord = chord
 		}
-		viewModel.sequencerThread =  ToneSequencePlayerThread(sequencerInstrument, viewModel, beatsPerMinute = 104)
+		viewModel.sequencerThread = ToneSequencePlayerThread(sequencerInstrument, viewModel, beatsPerMinute = 104)
 		ui.sequencerThread.beatsPerMinute = savedInstanceState.getInt("tempo", 147)
 	}
 

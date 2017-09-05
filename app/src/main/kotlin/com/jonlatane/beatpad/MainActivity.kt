@@ -3,7 +3,6 @@ package com.jonlatane.beatpad
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import com.jonlatane.beatpad.R.id.melody
 import com.jonlatane.beatpad.model.ToneSequence
 import com.jonlatane.beatpad.harmony.Orbifold
 import com.jonlatane.beatpad.harmony.Orbifold.*
@@ -18,7 +17,7 @@ import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.util.show
 import com.jonlatane.beatpad.view.keyboard.KeyboardIOHandler
 import com.jonlatane.beatpad.view.tempo.TempoTracking
-import com.jonlatane.beatpad.view.tonesequence.ToneSequencePlayerThread
+import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
 import com.jonlatane.beatpad.view.orbifold.ANIMATION_DURATION
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import kotlinx.android.synthetic.main.activity_main.*
@@ -62,7 +61,7 @@ class MainActivity : BaseActivity() {
 
 		sequencerThread = ToneSequencePlayerThread(
 			sequencerInstrument,
-			sequenceResolver = { toneSequence },
+			sequence = toneSequence,
 			beatsPerMinute = 120,
 			chordResolver = { orbifold.chord }
 		)

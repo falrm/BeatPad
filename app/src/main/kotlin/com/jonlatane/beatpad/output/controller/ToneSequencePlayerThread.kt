@@ -1,15 +1,17 @@
-package com.jonlatane.beatpad.view.tonesequence
+package com.jonlatane.beatpad.output.controller
 
 import com.jonlatane.beatpad.model.ToneSequence
-import com.jonlatane.beatpad.model.ToneSequence.Step.Note
+import com.jonlatane.beatpad.model.ToneSequence.Subdivision.Note
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.Instrument
+import com.jonlatane.beatpad.view.tonesequence.ToneSequenceViewModel
 
 class ToneSequencePlayerThread(
 	val instrument: Instrument,
 	val viewModel: ToneSequenceViewModel? = null,
-	val sequenceResolver: () -> ToneSequence = { viewModel!!.toneSequence },
+	val sequence:  ToneSequence = viewModel!!.toneSequence,
 	val chordResolver: () -> Chord = { viewModel!!.orbifold.chord },
+	val onFinish: (ToneSequencePlayerThread) -> Unit = {},
 	@Volatile var beatsPerMinute: Int
 ) : Runnable {
 	@Volatile var stopped = false
@@ -23,8 +25,8 @@ class ToneSequencePlayerThread(
 	private fun playBeat() {
 		try {
 
-			for (step in sequenceResolver().steps) {
-				val playDuration = 60000L / (beatsPerMinute * sequenceResolver().stepsPerBeat)
+			for (step in sequence.subdivisions) {
+				val playDuration = 60000L / (beatsPerMinute * sequence.subdivisionsPerBeat)
 				val pauseDuration = 0L
 
 				println("playing")
@@ -50,6 +52,8 @@ class ToneSequencePlayerThread(
 				}
 			}
 		} catch (ignored: InterruptedException) {
+		} finally {
+		  onFinish(this)
 		}
 
 	}

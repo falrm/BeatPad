@@ -22,7 +22,7 @@ import java.util.concurrent.Executors
 
 class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 	companion object {
-		private val STEPS_TO_ALLOCATE = 16
+		val STEPS_TO_ALLOCATE = 16
 	}
 
 	private val executorService = Executors.newScheduledThreadPool(2)
@@ -190,12 +190,11 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				text = "Clear"
 				onClick {
 					AlertDialog.Builder(this@button.context)
-						.setIcon(android.R.drawable.ic_dialog_alert)
-						.setTitle("Clear")
+						.setTitle("Clear Sequence Data")
 						.setMessage("Really delete all your hard work?")
 						.setPositiveButton("Yes, it's just art") { _, _ ->
-							for (index in viewModel.toneSequence.steps.indices) {
-								viewModel.toneSequence.steps[index] = Rest()
+							for (index in viewModel.toneSequence.subdivisions.indices) {
+								viewModel.toneSequence.subdivisions[index] = Rest()
 								viewModel.redraw()
 							}
 						}

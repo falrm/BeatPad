@@ -49,7 +49,7 @@ object ToneSequenceStorage : AnkoLogger {
 		defaultSequence
 	}
 
-	val defaultSequence = ToneSequence(
+	val defaultSequence = RationalToneSequence(
 		listOf(
 			Rest(),
 			Rest(),
@@ -68,6 +68,6 @@ object ToneSequenceStorage : AnkoLogger {
 			Rest(),
 			Rest()
 		),
-		stepsPerBeat = 4
+		subdivisionsPerBeat = 4
 	)
 }

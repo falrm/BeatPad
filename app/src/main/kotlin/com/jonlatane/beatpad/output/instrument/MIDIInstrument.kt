@@ -1,6 +1,6 @@
 package com.jonlatane.beatpad.output.instrument
 
-import com.jonlatane.beatpad.output.instrument.midi.MidiDevices
+import com.jonlatane.beatpad.midi.MidiDevices
 import org.apache.commons.lang3.reflect.FieldUtils
 import org.apache.commons.lang3.text.WordUtils
 import org.billthefarmer.mididriver.GeneralMidiConstants

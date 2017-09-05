@@ -1,13 +1,13 @@
 package com.jonlatane.beatpad
 
 import android.app.Application
-import com.jonlatane.beatpad.output.instrument.midi.MidiDevices
+import com.jonlatane.beatpad.midi.MidiDevices
 
 class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        MidiDevices.initialize()
+        MidiDevices.initialize(this)
     }
 
     companion object {
