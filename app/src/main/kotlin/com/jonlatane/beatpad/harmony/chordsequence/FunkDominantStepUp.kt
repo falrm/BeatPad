@@ -11,14 +11,14 @@ import com.jonlatane.beatpad.harmony.chord.*
  * return to Verse
  */
 object FunkDominantStepUp : Orbit {
-	override fun forward(c: Chord): Chord = when {
+	override fun forward(c: Chord) = when {
 		c.isDominant && !c.hasAugmented5 -> when {
 			else -> Chord(c.root + 2, Dom7Sharp5 + A2)
 		}
 		else -> c
 	}
 
-	override fun back(c: Chord): Chord = when {
+	override fun back(c: Chord) = when {
 		c.isDominant && c.hasAugmented5 -> Chord(c.root - 2, Dom9)
 		else -> c
 	}

@@ -11,7 +11,7 @@ import com.jonlatane.beatpad.harmony.chord.*
  * return to Verse
  */
 object FunkDominantSevens : Orbit {
-	override fun forward(c: Chord): Chord = when {
+	override fun forward(c: Chord) = when {
 		c.isDominant -> when {
 			c.hasDiminished5 -> Chord(c.root + 1, Dom9)
 			else -> Chord(c.root + 1, Dom9Flat5)
@@ -19,7 +19,7 @@ object FunkDominantSevens : Orbit {
 		else -> c
 	}
 
-	override fun back(c: Chord): Chord = when {
+	override fun back(c: Chord) = when {
 		c.isDominant -> when {
 			c.hasDiminished5 -> Chord(c.root - 1, Dom9)
 			else -> Chord(c.root - 1, Dom9Flat5)

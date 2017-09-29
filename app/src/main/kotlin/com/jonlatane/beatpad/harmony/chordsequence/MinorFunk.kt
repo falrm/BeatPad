@@ -11,7 +11,7 @@ import com.jonlatane.beatpad.harmony.chord.*
  * return to Verse
  */
 object MinorFunk : Orbit {
-	override fun forward(c: Chord): Chord = when {
+	override fun forward(c: Chord) = when {
 		c.isMinor -> Chord(c.root + 7, Dom9)
 		c.isDominant -> Chord(c.root - 7, min11)
 		else -> Chord(c.root, min11)
