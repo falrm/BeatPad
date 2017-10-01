@@ -24,22 +24,20 @@ class KeyboardIOHandler(private val keyboardView: KeyboardView, private val inst
 
 	init {
 		for (k in KEY_IDS) {
-			val key = keyboardView.findViewById(k) as Button
-			val keyTouchListener = object : OnTouchListener {
-				override fun onTouch(touchedKey: View, event: MotionEvent): Boolean {
-					catchRogues()
-					var result = false
-					if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-						pressNote(KEY_IDS_INVERSE.get(touchedKey.getId()))
-					} else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
-						liftNote(KEY_IDS_INVERSE.get(touchedKey.getId()))
-					} else if (event.getActionMasked() == MotionEvent.ACTION_MOVE
-						&& event.getPointerCount() != 1
-						&& currentlyPressed.size > 1) {
-						result = true
-					}
-					return result
+			val key = keyboardView.findViewById<Button>(k)
+			val keyTouchListener = OnTouchListener { touchedKey, event ->
+				catchRogues()
+				var result = false
+				if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+					pressNote(KEY_IDS_INVERSE.get(touchedKey.getId()))
+				} else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+					liftNote(KEY_IDS_INVERSE.get(touchedKey.getId()))
+				} else if (event.getActionMasked() == MotionEvent.ACTION_MOVE
+					&& event.getPointerCount() != 1
+					&& currentlyPressed.size > 1) {
+					result = true
 				}
+				result
 			}
 			key.setOnTouchListener(keyTouchListener)
 
@@ -62,7 +60,7 @@ class KeyboardIOHandler(private val keyboardView: KeyboardView, private val inst
 		if (harmonicChord != null) {
 			Log.i(TAG, "Highlighting chord " + harmonicChord.name)
 			for (id in KEY_IDS) {
-				val b = keyboardView.findViewById(id) as Button
+				val b = keyboardView.findViewById<Button>(id)
 				val tone = KEY_IDS_INVERSE.get(id)
 				val toneClass = (1200 + tone) % 12
 				val isInChord = harmonicChord.containsTone(toneClass)
@@ -95,9 +93,9 @@ class KeyboardIOHandler(private val keyboardView: KeyboardView, private val inst
 			for (id in KEY_IDS) {
 				val n = KEY_IDS_INVERSE.get(id)
 				if (isBlack(n)) {
-					keyboardView.findViewById(id).setBackgroundResource(R.drawable.key_standard_black)
+					keyboardView.findViewById<View>(id).setBackgroundResource(R.drawable.key_standard_black)
 				} else {
-					keyboardView.findViewById(id).setBackgroundResource(R.drawable.key_standard_white)
+					keyboardView.findViewById<View>(id).setBackgroundResource(R.drawable.key_standard_white)
 				}
 			}
 		}
@@ -127,8 +125,8 @@ class KeyboardIOHandler(private val keyboardView: KeyboardView, private val inst
 		val iterator = currentlyPressed.iterator()
 		while (iterator.hasNext()) {
 			val n = iterator.next()
-			val b = keyboardView.findViewById(KEY_IDS[n + 39]) as Button
-			if (!b.isPressed()) {
+			val b = keyboardView.findViewById<Button>(KEY_IDS[n + 39])
+			if (!b.isPressed) {
 				iterator.remove()
 				liftNote(n)
 			}

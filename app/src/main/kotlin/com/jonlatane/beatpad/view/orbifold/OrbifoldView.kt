@@ -111,7 +111,7 @@ class OrbifoldView @JvmOverloads constructor(
 			animateTo(SelectionState)
 		}
 		val orbifold = this
-		button {
+		/*button {
 			text = "Mode"
 			onClick {
 				showOrbifoldPicker(orbifold)
@@ -121,6 +121,16 @@ class OrbifoldView @JvmOverloads constructor(
 			alignParentRight()
 			elevation = 1f
 		}
+		button {
+			text = "Custom"
+			onClick {
+				//showOrbifoldPicker(orbifold)
+			}
+		}.lparams {
+			alignParentBottom()
+			alignParentLeft()
+			elevation = 1f
+		}*/
 
 		backgroundColor = resources.getColor(R.color.colorPrimaryDark)
 	}
@@ -151,40 +161,37 @@ class OrbifoldView @JvmOverloads constructor(
 
 	private fun inflateChordView(defaultElevation: Float = defaultChordElevation): TextView {
 		LayoutInflater.from(context).inflate(R.layout.orbifold_chord, this, true)
-		val result = findViewWithTag("newChord").apply {
-			elevation = defaultElevation
-			tag = null
+		return findViewWithTag<View>("newChord").apply {
+			this@OrbifoldView.elevation = defaultElevation
+			this@OrbifoldView.tag = null
 		} as TextView
-		return result
 	}
 
 	private fun inflateAxisView(): View {
 		LayoutInflater.from(context).inflate(R.layout.orbifold_axis, this, true)
-		val result = findViewWithTag("newConnector").apply {
-			elevation = axisElevation
-			tag = null
+		return findViewWithTag<View>("newConnector").apply {
+			this@OrbifoldView.elevation = this@OrbifoldView.axisElevation
+			this@OrbifoldView.tag = null
 		}
-		return result
 	}
 
 	private fun inflateConnectorView(): View {
 		LayoutInflater.from(context).inflate(R.layout.orbifold_connector, this, true)
-		val result = findViewWithTag("newConnector").apply {
-			elevation = connectorElevation
-			tag = null
+		return findViewWithTag<View>("newConnector").apply {
+			this@OrbifoldView.elevation = this@OrbifoldView.connectorElevation
+			this@OrbifoldView.tag = null
 		}
-		return result
 	}
 
 	private fun inflateBG() {
 		LayoutInflater.from(context).inflate(R.layout.orbifold_bg_half_steps, this, true)
-		halfStepBackground = findViewWithTag("newBG").apply {
+		halfStepBackground = findViewWithTag<View>("newBG").apply {
 			elevation = halfStepBackgroundElevation
 			tag = null
 		}
 
 		LayoutInflater.from(context).inflate(R.layout.orbifold_bg_highlight, this, true)
-		centralChordThrobber = findViewWithTag("newBG").apply {
+		centralChordThrobber = findViewWithTag<View>("newBG").apply {
 			outlineProvider = null
 			elevation = Float.MAX_VALUE - 1f
 			tag = null
@@ -192,7 +199,7 @@ class OrbifoldView @JvmOverloads constructor(
 		}
 
 		LayoutInflater.from(context).inflate(R.layout.orbifold_bg_highlight, this, true)
-		centralChordTouchPoint = findViewWithTag("newBG").apply {
+		centralChordTouchPoint = findViewWithTag<View>("newBG").apply {
 			elevation = Float.MAX_VALUE
 			alpha = 0f
 			tag = null
