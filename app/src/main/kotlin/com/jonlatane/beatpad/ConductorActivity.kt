@@ -5,11 +5,11 @@ import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
 import android.view.MenuItem
-import com.jonlatane.beatpad.harmony.Topology.*
+import com.jonlatane.beatpad.harmony.Orbifold.*
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.sensors.Orientation
-import com.jonlatane.beatpad.view.topology.RhythmAnimations
+import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import kotlinx.android.synthetic.main.activity_conductor.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.contentView
@@ -54,8 +54,8 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
         setContentView(R.layout.activity_conductor)
         Orientation.initialize(this)
         val harmonyController = DeviceOrientationInstrument(conductorInstrument)
-        RhythmAnimations.wireMelodicControl(topology, harmonyController)
-        topology.onChordChangedListener = { chord ->
+        RhythmAnimations.wireMelodicControl(orbifold, harmonyController)
+        orbifold.onChordChangedListener = { chord ->
             harmonyController.tones = chord.getTones()
         }
         registerService()
@@ -76,7 +76,7 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
             while(true) {
                 info("Awaiting connection on $serverSocket")
                 val socket = serverSocket.accept()
-                val chord = topology.chord
+                val chord = orbifold.chord
                 val chordString = "${chord.root}:${chord.extension.joinToString(",")}"
                 info("Sending $chordString to $socket")
                 try {
@@ -95,19 +95,19 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.conductorInstrument -> showInstrumentPicker(this, conductorInstrument)
-            R.id.basic_mode -> topology.topology = basic
-            R.id.intermediate_mode -> topology.topology = intermediate
-            R.id.advanced_mode -> topology.topology = advanced
-            R.id.master_mode -> topology.topology = master
-            R.id.chainsmokers_mode -> topology.topology = chainsmokers
-            R.id.pop_mode -> topology.topology = pop
+            R.id.basic_mode -> orbifold.orbifold = basic
+            R.id.intermediate_mode -> orbifold.orbifold = intermediate
+            R.id.advanced_mode -> orbifold.orbifold = advanced
+            R.id.master_mode -> orbifold.orbifold = master
+            R.id.chainsmokers_mode -> orbifold.orbifold = chainsmokers
+            R.id.pop_mode -> orbifold.orbifold = pop
         }
         return true
     }
 
     override fun onResume() {
         super.onResume()
-        topology.onResume()
+        orbifold.onResume()
     }
 
     override fun onPause() {

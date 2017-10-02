@@ -3,14 +3,12 @@ package com.jonlatane.beatpad.storage
 import android.content.Context
 import android.util.Log
 import com.google.gson.*
-import com.jonlatane.beatpad.harmony.*
-import com.jonlatane.beatpad.harmony.ToneSequence.*
+import com.jonlatane.beatpad.model.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.error
 import java.io.*
-import com.jonlatane.beatpad.harmony.ToneSequence
+import com.jonlatane.beatpad.model.ToneSequence
 import org.jetbrains.anko.info
-import java.lang.reflect.Type
 
 object ToneSequenceStorage : AnkoLogger {
 	private val gson: Gson by lazy {
@@ -51,7 +49,7 @@ object ToneSequenceStorage : AnkoLogger {
 		defaultSequence
 	}
 
-	val defaultSequence = ToneSequence(
+	val defaultSequence = RationalToneSequence(
 		listOf(
 			Rest(),
 			Rest(),
@@ -70,6 +68,6 @@ object ToneSequenceStorage : AnkoLogger {
 			Rest(),
 			Rest()
 		),
-		stepsPerBeat = 4
+		subdivisionsPerBeat = 4
 	)
 }

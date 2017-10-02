@@ -1,25 +1,25 @@
 package com.jonlatane.beatpad.view.tonesequence
 
 import android.view.View
-import com.jonlatane.beatpad.harmony.*
+import com.jonlatane.beatpad.model.ToneSequence
+import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
 import com.jonlatane.beatpad.storage.ToneSequenceStorage
 import com.jonlatane.beatpad.view.NonDelayedHorizontalScrollView
 import com.jonlatane.beatpad.view.NonDelayedScrollView
-import com.jonlatane.beatpad.view.topology.TopologyView
+import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.properties.Delegates
 import kotlin.properties.Delegates.observable
 
 class ToneSequenceViewModel {
-	var toneSequence: ToneSequence by observable(
+	var toneSequence: ToneSequence by observable<ToneSequence>(
 		initialValue = ToneSequenceStorage.defaultSequence,
 		onChange = { _, _, _ -> redraw() }
 	)
 	val playing = AtomicBoolean(false)
-	lateinit var topology: TopologyView
+	lateinit var orbifold: OrbifoldView
 	var verticalAxis: ToneSequenceAxis? = null
-	var chord get() = topology.chord
-		set(value) { topology.chord = value; redraw() }
+	var chord get() = orbifold.chord
+		set(value) { orbifold.chord = value; redraw() }
 	lateinit var leftScroller: NonDelayedScrollView
 	lateinit var bottomScroller: BottomScroller
 	lateinit var centerVerticalScroller: NonDelayedScrollView
@@ -33,8 +33,8 @@ class ToneSequenceViewModel {
 		verticalAxis?.invalidate()
 	}
 
-	internal fun markPlaying(step: ToneSequence.Step) = markPlaying(
-		elements.indexOfFirst { it.step === step }
+	internal fun markPlaying(subdivision: ToneSequence.Subdivision) = markPlaying(
+		elements.indexOfFirst { it.subdivision === subdivision }
 	)
 	internal fun markPlaying(index: Int) {
 		elements.forEach {

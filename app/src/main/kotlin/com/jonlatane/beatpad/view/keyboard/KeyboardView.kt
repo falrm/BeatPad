@@ -7,9 +7,13 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.ViewManager
 import android.widget.HorizontalScrollView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.HideableView
+import com.jonlatane.beatpad.view.tonesequence.ToneSequenceElement
+import com.jonlatane.beatpad.view.tonesequence.toneSequenceElement
+import org.jetbrains.anko.custom.ankoView
 
 class KeyboardView @JvmOverloads constructor(
   context: Context,
@@ -84,3 +88,12 @@ class KeyboardView @JvmOverloads constructor(
     enableScrolling = false
   }
 }
+
+
+
+
+fun ViewManager.keyboardView(theme: Int = 0)
+  = toneSequenceElement(theme) {}
+
+inline fun ViewManager.keyboardView(theme: Int = 0, init: KeyboardView.() -> Unit)
+  = ankoView({ KeyboardView(it) }, theme, init)

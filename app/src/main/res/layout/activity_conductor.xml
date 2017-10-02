@@ -6,8 +6,8 @@
     android:layout_height="match_parent"
     tools:context="com.jonlatane.beatpad.ConductorActivity">
 
-    <com.jonlatane.beatpad.view.topology.TopologyView
-        android:id="@+id/topology"
+    <com.jonlatane.beatpad.view.orbifold.OrbifoldView
+        android:id="@+id/orbifold"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

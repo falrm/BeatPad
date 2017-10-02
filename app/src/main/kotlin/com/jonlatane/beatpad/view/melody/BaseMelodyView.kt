@@ -12,6 +12,7 @@ import com.jonlatane.beatpad.harmony.chord.Maj7
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.mod12
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.dip
 import org.jetbrains.anko.withAlpha
 import java.util.concurrent.ConcurrentHashMap
 
@@ -24,8 +25,7 @@ abstract class BaseMelodyView @JvmOverloads constructor(
 	open var backgroundAlpha = 255
 	var showSteps = true
 	open val drawPadding = 0
-	open val nonRootPadding = 40
-	open val drawNonRootGlow = true
+	open val nonRootPadding = dip(13f)
 	abstract val renderVertically: Boolean
 	val axisLength get() = (if(renderVertically) height else width).toFloat()
 	abstract val halfStepsOnScreen: Int
@@ -67,9 +67,6 @@ abstract class BaseMelodyView @JvmOverloads constructor(
 					paint
 				)
 			} else {
-				if(drawNonRootGlow) {
-
-				}
 				drawRect(
 					rectBottom,
 					bounds.top.toFloat() + drawPadding + extraPadding,
