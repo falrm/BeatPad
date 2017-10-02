@@ -41,7 +41,7 @@ fun showTempoPicker(activity: MainActivity) {
     val dialog = Dialog(activity)
     dialog.setTitle("Select Tempo")
     dialog.setContentView(R.layout.dialog_choose_tempo)
-    val picker = dialog.findViewById(R.id.numberPicker1) as NumberPicker
+    val picker = dialog.findViewById<NumberPicker>(R.id.numberPicker1)
     picker.maxValue = 960
     picker.minValue = 15
     picker.value = activity.sequencerThread.beatsPerMinute
@@ -60,7 +60,7 @@ fun showConductorPicker(activity: InstrumentActivity, onClose: () -> Unit = {}) 
     val adapter = object : BaseAdapter() {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val result = convertView ?: activity.layoutInflater.inflate(R.layout.list_item_conductor, null)
-            val txt = result.findViewById(R.id.conductor) as TextView
+            val txt = result.findViewById<TextView>(R.id.conductor)
             txt.text = conductorList[position].serviceName
             return result
         }

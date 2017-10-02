@@ -1,5 +1,5 @@
 buildscript {
-	ext.kotlin_version = '1.1.4-3'
+	ext.kotlin_version = '1.1.51'
 	ext.anko_version = '0.10.0'
 	repositories {
 		jcenter()
@@ -14,12 +14,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-	compileSdkVersion 25
-	buildToolsVersion "25.0.2"
+	compileSdkVersion 26
+	buildToolsVersion "26.0.2"
 	defaultConfig {
 		applicationId "com.jonlatane.beatpad"
 		minSdkVersion 21
-		targetSdkVersion 25
+		targetSdkVersion 26
 		versionCode 4
 		versionName "Alpha 10"
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -62,8 +62,8 @@ dependencies {
 		exclude group: 'com.android.support', module: 'support-annotations'
 	})
 	compile 'com.google.code.gson:gson:2.8.1'
-	compile 'com.android.support:appcompat-v7:25.3.1'
-	compile 'com.android.support:design:25.3.1'
+	compile 'com.android.support:appcompat-v7:26.0.2'
+	compile 'com.android.support:design:26.0.2'
 	compile 'com.github.billthefarmer:mididriver:v1.13'
 	compile 'org.apache.commons:commons-lang3:3.5'
 	compile 'com.android.support.constraint:constraint-layout:1.0.2'
