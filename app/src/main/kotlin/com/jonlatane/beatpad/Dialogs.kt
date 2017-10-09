@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad
 
 import android.app.Dialog
+import android.content.Context
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.support.v7.app.AlertDialog
@@ -27,12 +28,13 @@ fun showOrbifoldPicker(orbifold: OrbifoldView) {
     builder.show()
 }
 
-fun showInstrumentPicker(activity: BaseActivity, instrument: MIDIInstrument) {
-    val builder = AlertDialog.Builder(activity)
+fun showInstrumentPicker(instrument: MIDIInstrument, context: Context, onChosen: () -> Unit = {}) {
+    val builder = AlertDialog.Builder(context)
     builder.setTitle("Choose an instrument")
     builder.setItems(MIDIInstrument.MIDI_INSTRUMENT_NAMES.toTypedArray()) { _, which ->
         instrument.instrument = which.toByte()
-        activity.updateMenuOptions()
+        (context as? BaseActivity)?.updateMenuOptions()
+        onChosen()
     }
     builder.show()
 }

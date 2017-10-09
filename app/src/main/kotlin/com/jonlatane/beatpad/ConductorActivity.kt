@@ -94,7 +94,7 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.conductorInstrument -> showInstrumentPicker(this, conductorInstrument)
+            R.id.conductorInstrument -> showInstrumentPicker(conductorInstrument, this)
             R.id.basic_mode -> orbifold.orbifold = basic
             R.id.intermediate_mode -> orbifold.orbifold = intermediate
             R.id.advanced_mode -> orbifold.orbifold = advanced

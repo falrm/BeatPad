@@ -83,13 +83,9 @@ class Chord : Parcelable {
 	val name: String
 		get() = mod12Names[root] + heptatonics.colorString
 
-	fun containsTone(tone: Int): Boolean {
-		return containsColor(tone - root)
-	}
+	fun containsTone(tone: Int): Boolean = containsColor(tone - root)
 
-	fun containsColor(color: Int): Boolean {
-		return extension.contains(color.mod12)
-	}
+	fun containsColor(color: Int): Boolean = extension.contains(color.mod12)
 
 	val isMinor: Boolean get() = heptatonics.isMinor
 	val isMajor: Boolean get() = heptatonics.isMajor
@@ -118,9 +114,7 @@ class Chord : Parcelable {
 		}
 	}
 
-	override fun describeContents(): Int {
-		return 0
-	}
+	override fun describeContents(): Int = 0
 
 	override fun writeToParcel(dest: Parcel, flags: Int) {
 		dest.writeInt(root)

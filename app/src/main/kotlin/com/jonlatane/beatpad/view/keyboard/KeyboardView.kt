@@ -93,7 +93,7 @@ class KeyboardView @JvmOverloads constructor(
 
 
 fun ViewManager.keyboardView(theme: Int = 0)
-  = toneSequenceElement(theme) {}
+  = keyboardView(theme) {}
 
 inline fun ViewManager.keyboardView(theme: Int = 0, init: KeyboardView.() -> Unit)
   = ankoView({ KeyboardView(it) }, theme, init)

@@ -146,10 +146,10 @@ class MainActivity : BaseActivity() {
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
-			R.id.color_board_instrument -> showInstrumentPicker(this, melody.instrument)
-			R.id.harmony_instrument -> showInstrumentPicker(this, harmonicInstrument)
-			R.id.sequencer_instrument -> showInstrumentPicker(this, sequencerInstrument)
-			R.id.piano_board_instrument -> showInstrumentPicker(this, pianoBoardInstrument)
+			R.id.color_board_instrument -> showInstrumentPicker(melody.instrument, this)
+			R.id.harmony_instrument -> showInstrumentPicker(harmonicInstrument, this)
+			R.id.sequencer_instrument -> showInstrumentPicker(sequencerInstrument, this)
+			R.id.piano_board_instrument -> showInstrumentPicker(pianoBoardInstrument, this)
 			R.id.choose_tempo -> showTempoPicker(this)
 			R.id.keyboard_toggle -> {
 				if (keyboard.isHidden) {
@@ -178,6 +178,7 @@ class MainActivity : BaseActivity() {
 			R.id.conduct -> startActivity<ConductorActivity>()
 			R.id.play -> startActivity<InstrumentActivity>()
 			R.id.sequence_editor -> startActivity<SequenceEditorActivity>("playgroundState" to Bundle().also { onSaveInstanceState(it) })
+			R.id.palette_editor -> startActivity<PaletteEditorActivity>("playgroundState" to Bundle().also { onSaveInstanceState(it) })
 		}
 		return true
 	}

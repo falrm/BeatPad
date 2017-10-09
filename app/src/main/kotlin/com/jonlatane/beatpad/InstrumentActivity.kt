@@ -83,8 +83,8 @@ class InstrumentActivity : BaseActivity(), AnkoLogger {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.color_instrument -> showInstrumentPicker(this, melody.instrument)
-            R.id.keyboard_instrument -> showInstrumentPicker(this, keyboardInstrument)
+            R.id.color_instrument -> showInstrumentPicker(melody.instrument, this)
+            R.id.keyboard_instrument -> showInstrumentPicker(keyboardInstrument, this)
             R.id.choose_conductor -> showConductorPicker(this)
         }
         return true

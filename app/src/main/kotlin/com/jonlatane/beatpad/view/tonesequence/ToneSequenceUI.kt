@@ -46,7 +46,6 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				id = IDSeq++
 				onChordChangedListener = {
 					viewModel.verticalAxis?.chord = it
-					viewModel.redraw()
 				}
 			}.lparams {
 				if (configuration.portrait) {
@@ -60,21 +59,21 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				}
 			}
 
-            toneSequenceView(viewModel = viewModel) {
-                id = IDSeq++
-            }.lparams {
-	            width = MATCH_PARENT
-	            height = MATCH_PARENT
-				if(configuration.portrait) {
+			toneSequenceView(viewModel = viewModel) {
+				id = IDSeq++
+			}.lparams {
+				width = MATCH_PARENT
+				height = MATCH_PARENT
+				if (configuration.portrait) {
 					below(viewModel.orbifold)
 					alignParentBottom()
-                } else {
+				} else {
 					rightOf(viewModel.orbifold)
 					alignParentTop()
 					alignParentRight()
 					alignParentBottom()
-                }
-            }
+				}
+			}
 
 			button {
 				text = "Play"
@@ -93,14 +92,14 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 			}.lparams {
 				width = WRAP_CONTENT
 				height = WRAP_CONTENT
-                below(viewModel.centerVerticalScroller)
+				below(viewModel.centerVerticalScroller)
 				alignParentBottom()
-                gravity = Gravity.CENTER_VERTICAL
+				gravity = Gravity.CENTER_VERTICAL
 				if (configuration.portrait) {
-                    alignParentLeft()
+					alignParentLeft()
 				} else {
 					rightOf(viewModel.orbifold)
-                }
+				}
 			}
 
 			button {
@@ -122,9 +121,9 @@ class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
 				width = WRAP_CONTENT
 				height = WRAP_CONTENT
 				alignParentRight()
-                below(viewModel.centerVerticalScroller)
+				below(viewModel.centerVerticalScroller)
 				alignParentBottom()
-                gravity = Gravity.CENTER_VERTICAL
+				gravity = Gravity.CENTER_VERTICAL
 			}
 		}
 	}

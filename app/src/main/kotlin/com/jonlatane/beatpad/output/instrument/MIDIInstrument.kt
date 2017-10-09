@@ -8,14 +8,11 @@ import org.billthefarmer.mididriver.MidiDriver
 
 import kotlin.experimental.or
 
-/**
- * Created by jonlatane on 5/8/17.
- */
 class MIDIInstrument : Instrument {
 
-    private val tones = mutableListOf<Int>()
-    private val byte2 = ByteArray(2)
-    private val byte3 = ByteArray(3)
+    @Transient private val tones = mutableListOf<Int>()
+    @Transient private val byte2 = ByteArray(2)
+    @Transient private val byte3 = ByteArray(3)
     var channel: Byte = 0
     var instrument: Byte = 0
 

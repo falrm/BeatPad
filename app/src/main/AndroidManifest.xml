@@ -35,8 +35,13 @@
           android:label="Sequence Editor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
-                <!--category android:name="android.intent.category.LAUNCHER" /-->
+            </intent-filter>
+        </activity>
+        <activity
+          android:name=".PaletteEditorActivity"
+          android:label="Palette Editor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
     </application>

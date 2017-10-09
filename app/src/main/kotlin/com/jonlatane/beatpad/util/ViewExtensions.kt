@@ -98,7 +98,6 @@ fun View.animateHeight(height: Int, duration: Long = defaultDuration) {
 	anim.addUpdateListener { valueAnimator ->
 		val value = valueAnimator.animatedValue as Int
 		this.layoutHeight = value
-		AnkoLogger(View::class.java).info("Animated height: $value")
 	}
 	anim.setDuration(duration).start()
 }

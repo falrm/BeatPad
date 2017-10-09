@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.tonesequence
 
 import android.view.View
+import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.model.ToneSequence
 import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
 import com.jonlatane.beatpad.storage.ToneSequenceStorage
@@ -10,8 +11,8 @@ import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.properties.Delegates.observable
 
-class ToneSequenceViewModel {
-	var toneSequence: ToneSequence by observable<ToneSequence>(
+open class ToneSequenceViewModel {
+	var toneSequence by observable<ToneSequence>(
 		initialValue = ToneSequenceStorage.defaultSequence,
 		onChange = { _, _, _ -> redraw() }
 	)

@@ -239,4 +239,7 @@ class OrbifoldView @JvmOverloads constructor(
 
 	fun skipTo(state: NavigationState) = state.skipTo(this)
 	fun animateTo(state: NavigationState) = state.animateTo(this)
+    fun disableNextTransitionAnimation() {
+        selectedChord = null
+    }
 }

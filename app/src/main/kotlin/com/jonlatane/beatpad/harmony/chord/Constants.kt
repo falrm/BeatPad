@@ -36,6 +36,7 @@ val Maj13 = Maj11 + M6
 val Maj13Sharp11 = Maj9 + M6 + A4
 val min = intArrayOf(root, m3, P5)
 val min7 = intArrayOf(root, m3, P5, m7)
+val min7flat5 = intArrayOf(root, m3, d5, m7)
 val min7Add11 = min7 + P4
 val min9 = min7 + M2
 val min11 = min9 + P4
@@ -51,6 +52,8 @@ val Dom9Sharp5 = Dom7Sharp5 + M2
 val Dom11 = Dom9 + P4
 val Dom13 = Dom11 + M6
 val dim = intArrayOf(root, m3, d5)
+val halfDim7 = min7flat5
+val dim7 = dim + d7
 val Aug = intArrayOf(root, M3, A5)
 val sus = intArrayOf(root, P4, P5)
 
