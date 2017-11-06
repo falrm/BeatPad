@@ -13,6 +13,6 @@ class PartHolder(
 	}
 	//lateinit var instrumentText: TextView
 	//lateinit var recycler: View
-	val instrumentText by lazy { layout.findViewById(instrumentTextId) as TextView }
-	val recycler by lazy { layout.findViewById(sequenceRecyclerId) as RecyclerView }
+	val instrumentText by lazy { layout.findViewById<TextView>(instrumentTextId) }
+	val recycler by lazy { layout.findViewById<RecyclerView>(sequenceRecyclerId) }
 }

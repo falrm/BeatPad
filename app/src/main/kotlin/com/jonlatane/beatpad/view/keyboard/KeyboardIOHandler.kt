@@ -5,18 +5,13 @@ import android.util.SparseIntArray
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
-import android.view.ViewTreeObserver
 import android.widget.Button
-
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.mod12
 import org.jetbrains.anko.backgroundResource
-
-import java.util.Collections
-import java.util.HashSet
+import java.util.*
 
 class KeyboardIOHandler(private val keyboardView: KeyboardView, private val instrument: MIDIInstrument) {
 
@@ -24,33 +19,29 @@ class KeyboardIOHandler(private val keyboardView: KeyboardView, private val inst
 
 	init {
 		for (k in KEY_IDS) {
-			val key = keyboardView.findViewById(k) as Button
-			val keyTouchListener = object : OnTouchListener {
-				override fun onTouch(touchedKey: View, event: MotionEvent): Boolean {
-					catchRogues()
-					var result = false
-					if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-						pressNote(KEY_IDS_INVERSE.get(touchedKey.getId()))
-					} else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
-						liftNote(KEY_IDS_INVERSE.get(touchedKey.getId()))
-					} else if (event.getActionMasked() == MotionEvent.ACTION_MOVE
-						&& event.getPointerCount() != 1
-						&& currentlyPressed.size > 1) {
-						result = true
-					}
-					return result
+			val key = keyboardView.findViewById<Button>(k)
+			val keyTouchListener = OnTouchListener { touchedKey, event ->
+				catchRogues()
+				var result = false
+				if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+					pressNote(KEY_IDS_INVERSE.get(touchedKey.id))
+				} else if (event.actionMasked == MotionEvent.ACTION_UP) {
+					liftNote(KEY_IDS_INVERSE.get(touchedKey.id))
+				} else if (event.actionMasked == MotionEvent.ACTION_MOVE
+					&& event.pointerCount != 1
+					&& currentlyPressed.size > 1) {
+					result = true
 				}
+				result
 			}
 			key.setOnTouchListener(keyTouchListener)
 
 			// Make sure we don't get stuck keys
-			val observer = key.getViewTreeObserver()
-			observer.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-				override fun onPreDraw(): Boolean {
-					catchRogues()
-					return true
-				}
-			})
+			val observer = key.viewTreeObserver
+			observer.addOnPreDrawListener {
+				catchRogues()
+				true
+			}
 		}
 	}
 
@@ -62,7 +53,7 @@ class KeyboardIOHandler(private val keyboardView: KeyboardView, private val inst
 		if (harmonicChord != null) {
 			Log.i(TAG, "Highlighting chord " + harmonicChord.name)
 			for (id in KEY_IDS) {
-				val b = keyboardView.findViewById(id) as Button
+				val b = keyboardView.findViewById<Button>(id)
 				val tone = KEY_IDS_INVERSE.get(id)
 				val toneClass = (1200 + tone) % 12
 				val isInChord = harmonicChord.containsTone(toneClass)
@@ -95,9 +86,9 @@ class KeyboardIOHandler(private val keyboardView: KeyboardView, private val inst
 			for (id in KEY_IDS) {
 				val n = KEY_IDS_INVERSE.get(id)
 				if (isBlack(n)) {
-					keyboardView.findViewById(id).setBackgroundResource(R.drawable.key_standard_black)
+					keyboardView.findViewById<View>(id).setBackgroundResource(R.drawable.key_standard_black)
 				} else {
-					keyboardView.findViewById(id).setBackgroundResource(R.drawable.key_standard_white)
+					keyboardView.findViewById<View>(id).setBackgroundResource(R.drawable.key_standard_white)
 				}
 			}
 		}
@@ -127,8 +118,8 @@ class KeyboardIOHandler(private val keyboardView: KeyboardView, private val inst
 		val iterator = currentlyPressed.iterator()
 		while (iterator.hasNext()) {
 			val n = iterator.next()
-			val b = keyboardView.findViewById(KEY_IDS[n + 39]) as Button
-			if (!b.isPressed()) {
+			val b = keyboardView.findViewById<Button>(KEY_IDS[n + 39])
+			if (!b.isPressed) {
 				iterator.remove()
 				liftNote(n)
 			}
@@ -145,7 +136,7 @@ class KeyboardIOHandler(private val keyboardView: KeyboardView, private val inst
 			var i = 0
 			while (i < KEY_IDS.size) {
 				KEY_IDS_INVERSE.put(KEY_IDS[i], i - 39)
-				i = i + 1
+				i += 1
 			}
 		}
 	}
