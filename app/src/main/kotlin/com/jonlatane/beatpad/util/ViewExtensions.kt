@@ -113,7 +113,8 @@ fun View.show(animated: Boolean = true) {
 
 fun View.hide(animated: Boolean = true) {
 	if ((this as HideableView).initialHeight == null) {
-		initialHeight = if (height > 0) height else layoutHeight
+		measure(width, height)
+		initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
 	}
 	if (animated) {
 		animateHeight(0)

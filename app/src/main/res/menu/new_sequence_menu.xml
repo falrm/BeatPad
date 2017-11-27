@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Draw Visual Sequence"
+        android:id="@+id/newDrawnPart"/>
+    <item android:title="Record MIDI Sequence"
+        android:id="@+id/newMidiPart"/>
+    <item android:title="Record Audio Sequence"
+        android:id="@+id/newAudioPart"/>
+</menu>

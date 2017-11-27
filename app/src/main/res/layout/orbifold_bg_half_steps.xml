@@ -5,5 +5,4 @@
     android:tag="newBG"
     android:layout_width="35dp"
     android:layout_height="2dp"
-    android:alpha="0.5"
-    android:background="@drawable/orbifold_bg_half_steps"/>
+    android:alpha="0.5"/>

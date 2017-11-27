@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
+import be.tarsos.dsp.beatroot.Peaks.post
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.harmony.Orbit
 import com.jonlatane.beatpad.harmony.Orbifold
@@ -13,6 +14,7 @@ import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.harmony.chord.Maj7
 import com.jonlatane.beatpad.harmony.chordsequence.Chromatic
 import com.jonlatane.beatpad.showOrbifoldPicker
+import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.util.*
@@ -129,13 +131,21 @@ class OrbifoldView @JvmOverloads constructor(
 		fun TextView.chordify(c: Chord) {
 			text = c.name
 			val p = arrayOf(paddingLeft, paddingTop, paddingRight, paddingBottom)
-			backgroundResource = when {
+			/*backgroundResource = when {
 				c.isDominant -> R.drawable.orbifold_chord_dominant
 				c.isDiminished -> R.drawable.orbifold_chord_diminished
 				c.isMinor -> R.drawable.orbifold_chord_minor
 				c.isAugmented -> R.drawable.orbifold_chord_augmented
 				c.isMajor -> R.drawable.orbifold_chord_major
 				else -> R.drawable.orbifold_chord
+			}*/
+			textColor = when {
+				c.isDominant -> color(R.color.dominant)
+				c.isDiminished -> color(R.color.diminished)
+				c.isMinor -> color(R.color.minor)
+				c.isAugmented -> color(R.color.augmented)
+				c.isMajor -> color(R.color.major)
+				else -> color(android.R.color.white)
 			}
 			setPadding(p[0], p[1], p[2], p[3])
 		}

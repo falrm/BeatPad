@@ -29,9 +29,9 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
     private val executorService = Executors.newScheduledThreadPool(2)
     private val registrationListener = object: NsdManager.RegistrationListener {
         override fun onServiceRegistered(serviceInfo: NsdServiceInfo) {
-            // Save the service name.  Android may have changed it in order to
-            // resolve a conflict, so update the name you initially requested
-            // with the name Android actually used.
+            // Save the service partName.  Android may have changed it in order to
+            // resolve a conflict, so update the partName you initially requested
+            // with the partName Android actually used.
             serviceName = serviceInfo.serviceName
             contentView?.post {
                 title = serviceName
@@ -65,7 +65,7 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
         // Create the NsdServiceInfo object, and populate it.
         val serviceInfo = NsdServiceInfo()
 
-        // The name is subject to change based on conflicts
+        // The partName is subject to change based on conflicts
         // with other services advertised on the same network.
         serviceInfo.serviceName = SERVICE_NAME
         serviceInfo.serviceType = SERVICE_TYPE

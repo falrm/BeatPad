@@ -15,3 +15,9 @@ fun ViewManager.nonDelayedScrollView(theme: Int = 0)
 
 inline fun ViewManager.nonDelayedScrollView(theme: Int = 0, init: NonDelayedScrollView.() -> Unit)
 	= ankoView({ NonDelayedScrollView(it) }, theme, init)
+
+fun ViewManager.noDefaultSpinner(theme: Int = 0)
+	= noDefaultSpinner(theme) {}
+
+inline fun ViewManager.noDefaultSpinner(theme: Int = 0, init: NoDefaultSpinner.() -> Unit)
+	= ankoView({ NoDefaultSpinner(it) }, theme, init)

@@ -66,7 +66,7 @@
 	</style>
 	
     <style name="AS0" parent="BlackKey">
-        <!-- <item name="android:layout_marginLeft">78dp</item> -->
+        <!-- <ipartNamename="android:layout_marginLeft">78dp</item> -->
         <item name="android:layout_width">36dp</item>
         <item name="android:layout_marginLeft">48dp</item>
         <item name="android:layout_marginRight">36dp</item>

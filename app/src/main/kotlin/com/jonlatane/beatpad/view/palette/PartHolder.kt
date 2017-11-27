@@ -3,16 +3,23 @@ package com.jonlatane.beatpad.view.palette
 import android.support.v7.widget.RecyclerView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import org.jetbrains.anko.recyclerview.v7._RecyclerView
+import kotlin.properties.Delegates
 
 class PartHolder(
-	val layout: RelativeLayout
+	val viewModel: PaletteViewModel,
+	val layout: RelativeLayout,
+	val patternRecycler: _RecyclerView,
+	val partName: TextView,
+	initialPart: Int = 0
 ) : RecyclerView.ViewHolder(layout) {
-	companion object {
-		val instrumentTextId = 1001
-		val sequenceRecyclerId = 1002
+	var partPosition by Delegates.observable(initialPart) {
+		_, _, new -> patternAdapter.partPosition = new
 	}
-	//lateinit var instrumentText: TextView
-	//lateinit var recycler: View
-	val instrumentText by lazy { layout.findViewById<TextView>(instrumentTextId) }
-	val recycler by lazy { layout.findViewById<RecyclerView>(sequenceRecyclerId) }
+	val part get() = viewModel.palette.parts[partPosition]
+	val patternAdapter = PatternAdapter(viewModel, patternRecycler, 0)
+
+	init {
+		patternRecycler.adapter = patternAdapter
+	}
 }

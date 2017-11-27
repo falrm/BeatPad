@@ -49,6 +49,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 					id = IDSeq++
 				}.lparams {
 					below(viewModel.orbifold)
+					elevation=5f
 					width = matchParent
 					height = wrapContent
 				}
@@ -94,6 +95,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 					below(viewModel.toolbarView)
 					width = leftSideWidth
 					height = matchParent
+					elevation = 5f
 				}
 			}
 
@@ -126,7 +128,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 			}
 
 			viewModel.keyboardView = keyboardView {
-
+				//translationY = dimen(R.dimen.key_height_white).toFloat()
 			}.lparams {
 				height = dimen(R.dimen.key_height_white)
 				width = matchParent
