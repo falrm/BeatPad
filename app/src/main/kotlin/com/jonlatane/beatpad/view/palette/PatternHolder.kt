@@ -4,7 +4,10 @@ import android.support.v7.widget.RecyclerView
 import android.widget.PopupMenu
 import android.widget.TextView
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.model.RationalToneSequence
+import org.jetbrains.anko.appcompat.v7.alertDialogLayout
 import org.jetbrains.anko.backgroundResource
+import org.jetbrains.anko.toast
 import kotlin.properties.Delegates
 
 class PatternHolder(
@@ -19,22 +22,29 @@ class PatternHolder(
 		_, _, _ -> onPositionChanged()
 	}
 	val pattern get() = part.segments[patternPosition]
+	private val context get() = textView.context
 
-	val newItemMenu = PopupMenu(textView.context, textView)
-	val editItemMenu = PopupMenu(textView.context, textView)
+	private val newPatternMenu = PopupMenu(textView.context, textView)
+	private val editPatternMenu = PopupMenu(textView.context, textView)
 
 	init {
-		newItemMenu.inflate(R.menu.new_sequence_menu)
-		newItemMenu.setOnMenuItemClickListener { item ->
+		newPatternMenu.inflate(R.menu.pattern_new_menu)
+		newPatternMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
-				R.id.newDrawnPart -> adapter.newSequence()
+				R.id.newDrawnPattern ->
+					viewModel.editingSequence = adapter.insert(RationalToneSequence())
+				R.id.newMidiPattern -> context.toast("TODO!")
+				R.id.newAudioPattern -> context.toast("TODO!")
+				else -> context.toast("Impossible!")
 			}
 			true
 		}
-		editItemMenu.inflate(R.menu.new_sequence_menu)
-		editItemMenu.setOnMenuItemClickListener { item ->
+		editPatternMenu.inflate(R.menu.pattern_edit_menu)
+		editPatternMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
-				R.id.newDrawnPart -> adapter.newSequence()
+				R.id.editPattern -> viewModel.editingSequence = pattern
+				R.id.removePattern -> context.toast("TODO!")
+				else -> context.toast("TODO!")
 			}
 			true
 		}
@@ -53,7 +63,7 @@ class PatternHolder(
 			text = ""
 			backgroundResource = R.drawable.orbifold_chord
 			setOnClickListener {
-				editItemMenu.show()
+				editPatternMenu.show()
 			}
 			setOnLongClickListener {
 				true
@@ -66,7 +76,7 @@ class PatternHolder(
 			text = "+"
 			backgroundResource = R.drawable.orbifold_chord
 			setOnClickListener {
-				newItemMenu.show()
+				newPatternMenu.show()
 			}
 			setOnLongClickListener {
 				true

@@ -12,6 +12,8 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.RationalToneSequence
 import com.jonlatane.beatpad.showInstrumentPicker
+import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.view.HideableRecyclerView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
@@ -20,11 +22,11 @@ import org.jetbrains.anko.recyclerview.v7.recyclerView
 inline fun ViewManager.partListView(
 	theme: Int = 0,
 	viewModel: PaletteViewModel,
-	init: _RecyclerView.() -> Unit
-): _RecyclerView = ankoView({
-	_RecyclerView(it).apply {
+	init: HideableRecyclerView.() -> Unit
+): HideableRecyclerView = ankoView({
+	HideableRecyclerView(it).apply {
 		val orientation = LinearLayoutManager.HORIZONTAL
-		backgroundColor = resources.getColor(R.color.colorPrimaryDark)
+		backgroundColor = context.color(R.color.colorPrimaryDark)
 		layoutManager = LinearLayoutManager(context, orientation, false)
 		overScrollMode = View.OVER_SCROLL_NEVER
 		adapter = PartListAdapter(viewModel, this)

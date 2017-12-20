@@ -2,11 +2,13 @@ package com.jonlatane.beatpad.view.palette
 
 import android.app.AlertDialog
 import android.view.Gravity
+import android.view.View
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Rest
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
+import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.view.keyboard.keyboardView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
 import com.jonlatane.beatpad.view.tonesequence.toneSequenceView
@@ -114,26 +116,40 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 				}
 			}
 
-			toneSequenceView(viewModel = viewModel) {
+			viewModel.toneSequenceView = toneSequenceView(viewModel = viewModel) {
 				id = IDSeq++
+				alpha = 0f
 			}.lparams {
 				width = matchParent
-				height = matchParent
-				below(viewModel.partListView)
+				height = wrapContent
 				alignParentBottom()
-				alignParentRight()
-				if(configuration.landscape) {
+				if (configuration.portrait) {
+					below(viewModel.toolbarView)
+				} else {
 					rightOf(viewModel.orbifold)
+					alignParentTop()
+					alignParentRight()
 				}
 			}
 
 			viewModel.keyboardView = keyboardView {
+				elevation = 10f
 				//translationY = dimen(R.dimen.key_height_white).toFloat()
 			}.lparams {
 				height = dimen(R.dimen.key_height_white)
 				width = matchParent
-				elevation = 10f
 				alignParentBottom()
+			}
+
+			post {
+				viewModel.partListView.animate()
+					.alpha(1f)
+					.start()
+				viewModel.toneSequenceView.animate()
+					.translationX(viewModel.toneSequenceView.width.toFloat())
+					.withEndAction { viewModel.toneSequenceView.alpha = 1f }
+					.start()
+				viewModel.keyboardView.hide()
 			}
 		}
 	}

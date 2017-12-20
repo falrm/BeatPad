@@ -9,6 +9,7 @@ import android.view.ViewManager
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.util.show
@@ -60,6 +61,6 @@ inline fun ViewManager.paletteToolbar(
 			else
 				viewModel.keyboardView.hide()
 		}
-		backgroundColor = resources.getColor(R.color.colorPrimaryDark)
+		backgroundColor = context.color(R.color.colorPrimaryDark)
 	}
 }, theme, init)

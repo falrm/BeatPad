@@ -2,6 +2,7 @@ package com.jonlatane.beatpad.harmony.chord
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.jonlatane.beatpad.BuildConfig
 import com.jonlatane.beatpad.harmony.chord.heptatonics.Heptatonics
 import com.jonlatane.beatpad.util.mod12
 import com.jonlatane.beatpad.view.melody.BaseMelodyView
@@ -13,7 +14,9 @@ class Chord : Parcelable {
 
 	constructor(root: Int, extension: IntArray) {
 		this.root = root.mod12
-		this.extension = extension.map { it.mod12 }.toIntArray()
+		this.extension = (extension + root).map { it.mod12 }.toSet().let {
+			if(BuildConfig.DEBUG) it.sorted() else it
+		}.toIntArray()
 		this.heptatonics = Heptatonics(setOf(*this.extension.toTypedArray()))
 	}
 
@@ -43,22 +46,29 @@ class Chord : Parcelable {
 	 */
 	fun replaceOrAdd(outTone: Int, inTone: Int): Chord {
 		var found = false
-		val newExtension = IntArray(extension.size)
-		for (i in extension.indices) {
-			val tone = extension[i]
-			if (tone == outTone) {
+		val newExtension = (extension.map {
+			if(it == outTone) {
 				found = true
-				newExtension[i] = inTone
-			} else {
-				newExtension[i] = tone
-			}
-		}
+				inTone
+			} else it
+		} + inTone).toSet().toIntArray()
 		var result = Chord(root, newExtension)
 		if (!found) {
 			result = result.plus(inTone)
 		}
 		return result
 	}
+
+	fun remove(tone: Int) = replaceOrAdd(tone, 0)
+
+	fun changeRoot(interval: Int) = Chord(
+		root = root + interval,
+	  extension = extension.map { it - interval }.toIntArray()
+	)
+
+	fun with(extra: Int) = Chord(root, extension + extra)
+
+	fun with(vararg extras: Int) = Chord(root, extension + extras)
 
 	/**
 	 * @param bottom lowest allowed note, inclusive
@@ -92,10 +102,19 @@ class Chord : Parcelable {
 	val isAugmented: Boolean get() = isMajor && heptatonics.fifth == AUGMENTED
 	val isDiminished: Boolean get() = isMinor && heptatonics.fifth == DIMINISHED
 	val isSus: Boolean get() = heptatonics.isSus
-	val hasMinor7: Boolean get() = heptatonics.hasMinor7
 	val hasMajor7: Boolean get() = heptatonics.hasMajor7
-	val hasDiminished5: Boolean get() = heptatonics.hasDiminished5
+	val hasMinor7: Boolean get() = heptatonics.hasMinor7
+	val hasMajor6: Boolean get() = heptatonics.hasMajor6
+	val hasMinor6: Boolean get() = heptatonics.hasMinor6
 	val hasAugmented5: Boolean get() = heptatonics.hasAugmented5
+	val hasDiminished5: Boolean get() = heptatonics.hasDiminished5
+	val hasAugmented4: Boolean get() = heptatonics.hasAugmented4
+	val hasDiminished4: Boolean get() = heptatonics.hasDiminished4
+	val hasMajor3: Boolean get() = heptatonics.hasMajor3
+	val hasMinor3: Boolean get() = heptatonics.hasMinor3
+	val hasAugmented2: Boolean get() = heptatonics.hasAugmented2
+	val hasMajor2: Boolean get() = heptatonics.hasMajor2
+	val hasMinor2: Boolean get() = heptatonics.hasMinor2
 	val isDominant: Boolean get() = heptatonics.isDominant
 
 	companion object {

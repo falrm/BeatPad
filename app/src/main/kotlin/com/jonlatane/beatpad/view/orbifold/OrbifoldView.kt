@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
-import be.tarsos.dsp.beatroot.Peaks.post
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.harmony.Orbit
 import com.jonlatane.beatpad.harmony.Orbifold
@@ -50,7 +49,7 @@ class OrbifoldView @JvmOverloads constructor(
 	}
 	var orbifold: Orbifold by observable(Orbifold.intermediate) {
 		_, _, new ->
-		(Orbifold.ALL_SEQUENCEs - new).forEach {
+		(Orbifold.ALL_ORBITS - new).forEach {
 			removeSequence(it)
 		}
 		new.indices.forEach {
@@ -124,7 +123,7 @@ class OrbifoldView @JvmOverloads constructor(
 			elevation = 1f
 		}
 
-		backgroundColor = resources.getColor(R.color.colorPrimaryDark)
+		backgroundColor = context.color(R.color.colorPrimaryDark)
 	}
 
 	internal fun updateChordText() {

@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.nonDelayedHorizontalScrollView
 import com.jonlatane.beatpad.view.nonDelayedScrollView
 import org.jetbrains.anko.*
@@ -19,11 +20,11 @@ inline fun ViewManager.toneSequenceView(
   viewModel: ToneSequenceViewModel,
 
   //ui: AnkoContext<Any>,
-  init: _RelativeLayout.() -> Unit
+  init: HideableRelativeLayout.() -> Unit
 )
   = //with(ui) {
   ankoView({
-    _RelativeLayout(it).apply {
+    viewModel.toneSequenceView = HideableRelativeLayout(it).apply {
       var holdToEdit: TextView? = null
       var IDSeq = 1
       viewModel.bottomScroller = bottomScroller {
@@ -112,7 +113,9 @@ inline fun ViewManager.toneSequenceView(
         rightOf(viewModel.leftScroller)
         alignParentTop()
       }
+
     }
+    viewModel.toneSequenceView
   }, theme, init)
 //}
 

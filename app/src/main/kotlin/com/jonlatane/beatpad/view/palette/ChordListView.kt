@@ -9,6 +9,7 @@ import android.view.ViewManager
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.view.nonDelayedHorizontalScrollView
 import com.jonlatane.beatpad.view.nonDelayedScrollView
 import com.jonlatane.beatpad.view.tonesequence.*
@@ -94,7 +95,7 @@ inline fun ViewManager.chordListView(
 		}
 
 		val orientation = LinearLayoutManager.HORIZONTAL
-		backgroundColor = resources.getColor(R.color.colorPrimaryDark)
+		backgroundColor = context.color(R.color.colorPrimaryDark)
 		layoutManager = LinearLayoutManager(context, orientation, false)
 		overScrollMode = View.OVER_SCROLL_NEVER
 		adapter = listAdapter

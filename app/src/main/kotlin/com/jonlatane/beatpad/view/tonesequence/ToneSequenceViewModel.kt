@@ -5,9 +5,11 @@ import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.model.ToneSequence
 import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
 import com.jonlatane.beatpad.storage.ToneSequenceStorage
+import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.NonDelayedHorizontalScrollView
 import com.jonlatane.beatpad.view.NonDelayedScrollView
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
+import org.jetbrains.anko._RelativeLayout
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.properties.Delegates.observable
 
@@ -21,6 +23,7 @@ open class ToneSequenceViewModel {
 	var verticalAxis: ToneSequenceAxis? = null
 	var chord get() = orbifold.chord
 		set(value) { orbifold.chord = value; redraw() }
+	lateinit var toneSequenceView: HideableRelativeLayout
 	lateinit var leftScroller: NonDelayedScrollView
 	lateinit var bottomScroller: BottomScroller
 	lateinit var centerVerticalScroller: NonDelayedScrollView

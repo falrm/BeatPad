@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.RationalToneSequence
+import com.jonlatane.beatpad.model.ToneSequence
 import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
@@ -44,9 +45,10 @@ class PatternAdapter(
 		holder.patternPosition = patternPosition
 	}
 
-	fun newSequence() {
-		part.segments.add(RationalToneSequence())
+	fun insert(sequence: ToneSequence): ToneSequence {
+		part.segments.add(sequence)
 		notifyItemInserted(part.segments.size - 1)
+		return sequence
 	}
 
 	override fun getItemCount(): Int = viewModel.palette.parts[partPosition].segments.size + 1

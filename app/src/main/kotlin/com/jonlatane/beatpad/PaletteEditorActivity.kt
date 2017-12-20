@@ -2,6 +2,7 @@ package com.jonlatane.beatpad
 
 import android.app.Activity
 import android.os.Bundle
+import com.jonlatane.beatpad.R.id.orbifold
 import com.jonlatane.beatpad.harmony.Orbifold
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
@@ -43,6 +44,10 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 			println("Got intent with extras: ${bundle.formatted()}")
 			onRestoreInstanceState(bundle)
 		}
+	}
+
+	override fun onBackPressed() {
+		if(!viewModel.onBackPressed()) super.onBackPressed()
 	}
 
 	override fun onResume() {

@@ -123,8 +123,4 @@ fun View.hide(animated: Boolean = true) {
 	}
 }
 
-fun View.color(resId: Int) =
-	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-		resources.getColor(resId, context.theme)
-	else @Suppress("Deprecated")
-		resources.getColor(resId)
+fun View.color(resId: Int) = context.color(resId)

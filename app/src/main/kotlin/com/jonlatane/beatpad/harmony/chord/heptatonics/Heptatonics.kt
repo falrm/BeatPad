@@ -15,14 +15,33 @@ import com.jonlatane.beatpad.harmony.chord.*
  * Created by jonlatane on 5/6/17.
  */
 class Heptatonics(private val colors: Set<Int>) {
-	val isMinor: Boolean by lazy { !isMajor && colors.contains(3) }
-	val isDominant: Boolean by lazy { isMajor && hasMinor7 }
-	val isMajor: Boolean by lazy { colors.contains(4) }
-	val isSus: Boolean by lazy { third == NONEXISTENT }
-	val hasMinor7: Boolean by lazy { seventh == MINOR }
-	val hasMajor7: Boolean by lazy { seventh == MAJOR }
-	val hasDiminished5: Boolean by lazy { fifth == DIMINISHED }
-	val hasAugmented5: Boolean by lazy { fifth == AUGMENTED }
+	val isMinor get() = !isMajor && colors.contains(3)
+	val isDominant get() = isMajor && hasMinor7
+	val isMajor get() = colors.contains(4)
+
+	val isSus get() = third == NONEXISTENT
+
+	val hasMajor7 get() = seventh == MAJOR
+	val hasMinor7 get() = seventh == MINOR
+	val has7 get() = seventh != NONEXISTENT
+	val hasMajor6 get() = sixth == MAJOR
+	val hasMinor6 get() = sixth == MINOR
+	val has6 get() = sixth != NONEXISTENT
+	val hasAugmented5 get() = fifth == AUGMENTED
+	val hasPerfect5 get() = fifth == PERFECT
+	val hasDiminished5 get() = fifth == DIMINISHED
+	val has5 get() = fifth != NONEXISTENT
+	val hasAugmented4 get() = fourth == AUGMENTED
+	val hasPerfect4 get() = fourth == PERFECT
+	val hasDiminished4 get() = fourth == DIMINISHED
+	val has4 get() = fifth != NONEXISTENT
+	val hasMajor3 get() = third == MAJOR
+	val hasMinor3 get() = third == MINOR
+	val has3 get() = third != NONEXISTENT
+	val hasAugmented2 get() = second == AUGMENTED
+	val hasMajor2 get() = second == MAJOR
+	val hasMinor2 get() = second == MINOR
+	val has2 get() = second != NONEXISTENT
 
 	/**  @return [.MINOR], [.MAJOR] or [.NONEXISTENT] */
 	val seventh: Int by lazy {
