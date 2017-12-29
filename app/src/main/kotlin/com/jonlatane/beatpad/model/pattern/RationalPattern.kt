@@ -1,5 +1,6 @@
-package com.jonlatane.beatpad.model
+package com.jonlatane.beatpad.model.pattern
 
+import com.jonlatane.beatpad.model.Pattern
 import com.jonlatane.beatpad.model.Pattern.Subdivision
 
 class RationalPattern(

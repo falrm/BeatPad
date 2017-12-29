@@ -1,6 +1,6 @@
 package com.jonlatane.beatpad.output.controller
 
-import com.jonlatane.beatpad.output.instrument.Instrument
+import com.jonlatane.beatpad.model.Instrument
 import com.jonlatane.beatpad.sensors.Orientation
 
 open class DeviceOrientationInstrument(val instrument: Instrument) {

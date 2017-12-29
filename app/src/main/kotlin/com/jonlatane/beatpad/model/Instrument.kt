@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.output.instrument
+package com.jonlatane.beatpad.model
 
 interface Instrument {
     fun play(tone: Int)

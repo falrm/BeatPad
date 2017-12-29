@@ -8,9 +8,10 @@ import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.error
 import java.io.*
 import com.jonlatane.beatpad.model.Pattern
+import com.jonlatane.beatpad.model.pattern.RationalPattern
 import org.jetbrains.anko.info
 
-object ToneSequenceStorage : AnkoLogger {
+object PatternStorage : AnkoLogger {
 	private val gson: Gson by lazy {
 		GsonBuilder()
 			.registerTypeAdapter(Step::class.java, JsonDeserializer<Step> { element, _, _ ->

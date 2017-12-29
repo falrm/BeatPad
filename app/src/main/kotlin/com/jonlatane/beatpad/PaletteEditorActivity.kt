@@ -7,7 +7,7 @@ import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
-import com.jonlatane.beatpad.storage.ToneSequenceStorage
+import com.jonlatane.beatpad.storage.PatternStorage
 import com.jonlatane.beatpad.util.formatted
 import com.jonlatane.beatpad.view.palette.PaletteUI
 import org.billthefarmer.mididriver.GeneralMidiConstants
@@ -66,17 +66,17 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
         AudioTrackCache.releaseAll()
 		MIDIInstrument.DRIVER.stop()
 		ui.sequencerThread.stopped = true
-        ToneSequenceStorage.storeSequence(toneSequence, this)
+        PatternStorage.storeSequence(toneSequence, this)
 	}
 
 	override fun onStop() {
 		super.onStop()
-        ToneSequenceStorage.storeSequence(toneSequence, this)
+        PatternStorage.storeSequence(toneSequence, this)
 	}
 
 	override fun onRestoreInstanceState(savedInstanceState: Bundle) {
 		super.onRestoreInstanceState(savedInstanceState)
-		toneSequence = ToneSequenceStorage.loadSequence(this)
+		toneSequence = PatternStorage.loadSequence(this)
 		ui.sequencerInstrument.instrument = savedInstanceState.getByte("sequencerInstrument", GeneralMidiConstants.SYNTH_BASS_1)
 		orbifold.orbifold = Orbifold.values().find {
 			it.ordinal == (savedInstanceState["orbifoldMode"] as Int? ?: -1)

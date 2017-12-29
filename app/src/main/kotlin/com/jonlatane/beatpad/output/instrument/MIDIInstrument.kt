@@ -1,10 +1,10 @@
 package com.jonlatane.beatpad.output.instrument
 
 import com.jonlatane.beatpad.midi.MidiDevices
+import com.jonlatane.beatpad.model.Instrument
 import org.apache.commons.lang3.reflect.FieldUtils
 import org.apache.commons.lang3.text.WordUtils
 import org.billthefarmer.mididriver.GeneralMidiConstants
-import org.billthefarmer.mididriver.MidiConstants.NOTE_OFF
 import org.billthefarmer.mididriver.MidiDriver
 import java.util.*
 

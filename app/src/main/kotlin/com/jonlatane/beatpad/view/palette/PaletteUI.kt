@@ -1,20 +1,14 @@
 package com.jonlatane.beatpad.view.palette
 
-import android.app.AlertDialog
-import android.view.Gravity
-import android.view.View
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.Rest
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.view.keyboard.keyboardView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
-import com.jonlatane.beatpad.view.tonesequence.toneSequenceView
+import com.jonlatane.beatpad.view.pattern.toneSequenceView
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.util.concurrent.Executors
 
 class PaletteUI : AnkoComponent<PaletteEditorActivity> {

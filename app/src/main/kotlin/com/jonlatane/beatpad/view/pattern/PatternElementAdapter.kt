@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.view.tonesequence
+package com.jonlatane.beatpad.view.pattern
 
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
@@ -27,7 +27,8 @@ class PatternElementAdapter(
 	}
 
 	override fun onBindViewHolder(holder: PatternElementHolder, elementPosition: Int) {
-		holder.elementPosition = elementPosition
+		holder.element.elementPosition = elementPosition
+		holder.element.invalidate()
 	}
 
 	override fun getItemCount(): Int = viewModel.toneSequence.subdivisions.size

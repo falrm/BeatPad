@@ -7,12 +7,11 @@ import android.widget.PopupMenu
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.Palette
+import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showInstrumentPicker
 import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import kotlin.properties.Delegates
 
@@ -89,7 +88,7 @@ class PartHolder(
 			text = "+"
 			setOnClickListener {
 				viewModel.palette.parts.add(
-					Palette.Part(
+					Part(
 						MIDIInstrument.randomInstrument(
 							channel = viewModel.palette.parts.size.toByte(),
 							exceptions = viewModel.palette.parts.mapNotNull {

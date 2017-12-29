@@ -3,8 +3,8 @@ package com.jonlatane.beatpad.output.controller
 import com.jonlatane.beatpad.model.Pattern
 import com.jonlatane.beatpad.model.Pattern.Subdivision.Note
 import com.jonlatane.beatpad.harmony.chord.Chord
-import com.jonlatane.beatpad.output.instrument.Instrument
-import com.jonlatane.beatpad.view.tonesequence.PatternViewModel
+import com.jonlatane.beatpad.model.Instrument
+import com.jonlatane.beatpad.view.pattern.PatternViewModel
 
 class ToneSequencePlayerThread(
 	val instrument: Instrument,

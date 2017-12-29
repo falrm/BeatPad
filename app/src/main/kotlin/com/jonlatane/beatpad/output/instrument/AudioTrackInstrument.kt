@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.output.instrument
 
 import android.media.AudioTrack
+import com.jonlatane.beatpad.model.Instrument
 
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackGenerator

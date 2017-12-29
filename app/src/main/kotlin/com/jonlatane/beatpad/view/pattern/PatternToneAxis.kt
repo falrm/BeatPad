@@ -1,14 +1,12 @@
-package com.jonlatane.beatpad.view.tonesequence
+package com.jonlatane.beatpad.view.pattern
 
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.view.ViewManager
 import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.view.melody.BaseMelodyView
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.warn
 
 class PatternToneAxis @JvmOverloads constructor(

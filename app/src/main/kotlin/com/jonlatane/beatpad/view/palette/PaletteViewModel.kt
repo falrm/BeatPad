@@ -4,7 +4,7 @@ import android.view.View
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Pattern
 import com.jonlatane.beatpad.view.HideableRecyclerView
-import com.jonlatane.beatpad.view.tonesequence.PatternViewModel
+import com.jonlatane.beatpad.view.pattern.PatternViewModel
 import kotlin.properties.Delegates.observable
 
 /**

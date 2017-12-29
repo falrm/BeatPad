@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.output.instrument
 
 import be.tarsos.dsp.io.android.AudioDispatcherFactory
+import com.jonlatane.beatpad.model.Instrument
 
 /**
  * Created by jonlatane on 5/29/17.

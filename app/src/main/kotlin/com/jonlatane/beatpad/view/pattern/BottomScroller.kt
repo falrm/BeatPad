@@ -1,11 +1,9 @@
-package com.jonlatane.beatpad.view.tonesequence
+package com.jonlatane.beatpad.view.pattern
 
 import android.content.Context
 import android.graphics.PointF
 import android.view.MotionEvent
-import android.view.ViewManager
 import com.jonlatane.beatpad.view.NonDelayedHorizontalScrollView
-import org.jetbrains.anko.custom.ankoView
 
 /**
  * A [NonDelayedHorizontalScrollView] that tracks if the user is holding it down.

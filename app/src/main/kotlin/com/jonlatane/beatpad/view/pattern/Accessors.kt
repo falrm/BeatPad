@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.view.tonesequence
+package com.jonlatane.beatpad.view.pattern
 
 import android.view.ViewManager
 import org.jetbrains.anko.custom.ankoView

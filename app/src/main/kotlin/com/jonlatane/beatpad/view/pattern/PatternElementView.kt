@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.view.tonesequence
+package com.jonlatane.beatpad.view.pattern
 
 import android.content.Context
 import android.graphics.Canvas
@@ -25,16 +25,9 @@ class PatternElementView @JvmOverloads constructor(
 	}
 	lateinit var viewModel: PatternViewModel
 
-	// Lazy loaded
-	var seqIndex = 0
-	var subdivision: Subdivision?
-		get() = viewModel.toneSequence.subdivisions[seqIndex]
-		set(value) {
-			if(value != null && isVisible)
-				viewModel.toneSequence.subdivisions[seqIndex] = value
-		}
-	val isVisible: Boolean get() = seqIndex < viewModel.toneSequence.subdivisions.size
-	val isDownbeat: Boolean get() = seqIndex % viewModel.toneSequence.subdivisionsPerBeat == 0
+	var elementPosition = 0
+	val subdivision: Subdivision get() = viewModel.toneSequence.subdivisions[elementPosition]
+	val isDownbeat: Boolean get() = elementPosition % viewModel.toneSequence.subdivisionsPerBeat == 0
 
 	override var initialHeight: Int? = null
 	override val renderVertically = true
@@ -47,10 +40,8 @@ class PatternElementView @JvmOverloads constructor(
 
 	override fun onDraw(canvas: Canvas) {
 		super.onDraw(canvas)
-		if(isVisible) {
-			canvas.drawStepNotes()
-			canvas.drawRhythm()
-		}
+		canvas.drawStepNotes()
+		canvas.drawRhythm()
 	}
 
 	private val p = Paint()

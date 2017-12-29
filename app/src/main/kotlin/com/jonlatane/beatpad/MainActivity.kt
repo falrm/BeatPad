@@ -11,7 +11,7 @@ import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.sensors.Orientation
-import com.jonlatane.beatpad.storage.ToneSequenceStorage
+import com.jonlatane.beatpad.storage.PatternStorage
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.util.show
@@ -58,7 +58,7 @@ class MainActivity : BaseActivity() {
 		val harmonyController = DeviceOrientationInstrument(harmonicInstrument)
 		RhythmAnimations.wireMelodicControl(orbifold, harmonyController)
 		keyboardIOHandler = KeyboardIOHandler(keyboard, pianoBoardInstrument)
-        pattern = ToneSequenceStorage.loadSequence(this)
+        pattern = PatternStorage.loadSequence(this)
 
 		sequencerThread = ToneSequencePlayerThread(
 			sequencerInstrument,
@@ -101,7 +101,7 @@ class MainActivity : BaseActivity() {
 	override fun onResume() {
 		super.onResume()
 		orbifold.onResume()
-		pattern = ToneSequenceStorage.loadSequence(this)
+		pattern = PatternStorage.loadSequence(this)
 	}
 
 	override fun onPause() {

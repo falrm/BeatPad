@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.view.tonesequence
+package com.jonlatane.beatpad.view.pattern
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -10,13 +10,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.view.HideableRelativeLayout
-import com.jonlatane.beatpad.view.nonDelayedHorizontalScrollView
 import com.jonlatane.beatpad.view.nonDelayedRecyclerView
 import com.jonlatane.beatpad.view.nonDelayedScrollView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.ankoView
-import org.jetbrains.anko.recyclerview.v7._RecyclerView
-import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.sdk25.coroutines.onScrollChange
 
 
@@ -37,6 +34,8 @@ inline fun ViewManager.toneSequenceView(
 				onHeldDownChanged = { heldDown ->
 					if (heldDown) holdToEdit?.animate()?.alpha(0f)?.translationY(100f)
 					else holdToEdit?.animate()?.alpha(1f)?.translationY(0f)
+					viewModel.centerHorizontalScroller.scrollingEnabled = !heldDown
+					viewModel.centerVerticalScroller.scrollingEnabled = !heldDown
 				}
 				linearLayout {
 					orientation = LinearLayout.HORIZONTAL

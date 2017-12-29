@@ -1,9 +1,9 @@
-package com.jonlatane.beatpad.view.tonesequence
+package com.jonlatane.beatpad.view.pattern
 
 import android.view.View
 import com.jonlatane.beatpad.model.Pattern
 import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
-import com.jonlatane.beatpad.storage.ToneSequenceStorage
+import com.jonlatane.beatpad.storage.PatternStorage
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.NonDelayedRecyclerView
 import com.jonlatane.beatpad.view.NonDelayedScrollView
@@ -12,8 +12,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.properties.Delegates.observable
 
 open class PatternViewModel {
-	var toneSequence by observable<Pattern>(ToneSequenceStorage.defaultSequence) { _, _, _ ->
-		//patternElementAdapter?.notifyDataSetChanged()
+	var toneSequence by observable<Pattern>(PatternStorage.defaultSequence) { _, _, _ ->
+		patternElementAdapter?.notifyDataSetChanged()
 	}
 	var playbackPosition by observable<Int?>(null) { _, old, new ->
 		if(old != null) patternElementAdapter?.notifyItemChanged(old)
@@ -37,7 +37,7 @@ open class PatternViewModel {
 	val bottoms = mutableListOf<View>()
 
 	internal fun redraw() {
-		//patternElementAdapter?.notifyDataSetChanged()
+		patternElementAdapter?.notifyDataSetChanged()
 		verticalAxis?.invalidate()
 	}
 
