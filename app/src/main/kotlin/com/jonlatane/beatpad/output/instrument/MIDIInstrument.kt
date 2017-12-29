@@ -4,17 +4,23 @@ import com.jonlatane.beatpad.midi.MidiDevices
 import org.apache.commons.lang3.reflect.FieldUtils
 import org.apache.commons.lang3.text.WordUtils
 import org.billthefarmer.mididriver.GeneralMidiConstants
+import org.billthefarmer.mididriver.MidiConstants.NOTE_OFF
 import org.billthefarmer.mididriver.MidiDriver
+import java.util.*
 
 import kotlin.experimental.or
 
-class MIDIInstrument : Instrument {
-
+class MIDIInstrument(
+	var channel: Byte = 0,
+	var instrument: Byte = 0
+) : Instrument {
     @Transient private val tones = mutableListOf<Int>()
     @Transient private val byte2 = ByteArray(2)
     @Transient private val byte3 = ByteArray(3)
-    var channel: Byte = 0
-    var instrument: Byte = 0
+    object GM2Configuration {
+        var msb: Byte? = null
+        var lsb: Byte? = null
+    }
 
     override fun play(tone: Int) {// Construct a note ON message for the middle C at maximum velocity on channel 1:
         play(tone, DEFAULT_VELOCITY)
@@ -50,24 +56,56 @@ class MIDIInstrument : Instrument {
         MidiDevices.send(byte3)
     }
 
-    val instrumentName: String
+    override val instrumentName: String
         get() = MIDI_INSTRUMENT_NAMES[instrument.toInt()]
 
     private fun selectInstrument(instrument: Byte): MIDIInstrument {
         this.instrument = instrument
-        byte2[0] = (SELECT_INSTRUMENT or channel)  // STATUS byte: Change, 0x00 = channel 1
+        // Write Bank MSB Control Change
+        val msb = GM2Configuration.msb
+        if(msb != null) {
+            byte3[0] = (CONTROL_CHANGE or channel)
+            byte3[1] = CONTROL_MSB
+            byte3[2] = msb
+            DRIVER.write(byte3)
+            MidiDevices.send(byte3)
+        }
+
+        // Write Bank MSB Control Change
+        val lsb = GM2Configuration.msb
+        if(lsb != null) {
+            byte3[0] = (CONTROL_CHANGE or channel)
+            byte3[1] = CONTROL_LSB
+            byte3[2] = lsb
+            DRIVER.write(byte3)
+            MidiDevices.send(byte3)
+        }
+
+        // Then write as Program Change
+        byte2[0] = (PROGRAM_CHANGE or channel)  // STATUS byte: Change, 0x00 = channel 1
         byte2[1] = instrument
         DRIVER.write(byte2)
+        MidiDevices.send(byte2)
         return this
     }
 
     companion object {
-        private val TAG = MIDIInstrument::class.simpleName
         val DRIVER = MidiDriver()
-        val NOTE_ON = 0x90.toByte()
-        val NOTE_OFF: Byte = 0x80.toByte()
-        val SELECT_INSTRUMENT = 0xC0.toByte()
-        val DEFAULT_VELOCITY = 64
+        const val NOTE_ON = 0x90.toByte()
+        const val NOTE_OFF: Byte = 0x80.toByte()
+        const val PROGRAM_CHANGE = 0xC0.toByte()
+        const val CONTROL_CHANGE = 0xB0.toByte()
+        const val CONTROL_MSB = 0x00.toByte()
+        const val CONTROL_LSB = 0x20.toByte()
+        const val DEFAULT_VELOCITY = 64
+	      fun randomInstrument(
+		      channel: Byte = 0,
+		      exceptions: Set<Byte> = emptySet()
+	      ): MIDIInstrument {
+		      val options = ((0..127).map {it.toByte()} - exceptions)
+		      val instrument = options[Random().nextInt(options.size - 1)]
+		      return MIDIInstrument(channel, instrument)
+	      }
         val MIDI_INSTRUMENT_NAMES: List<String> by lazy {
             val instrumentNames = arrayOfNulls<String>(128)
             val declaredFields = GeneralMidiConstants::class.java.declaredFields

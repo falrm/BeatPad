@@ -4,8 +4,8 @@ import android.support.v7.widget.RecyclerView
 import android.widget.PopupMenu
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.RationalToneSequence
-import org.jetbrains.anko.appcompat.v7.alertDialogLayout
+import com.jonlatane.beatpad.model.RationalPattern
+import com.jonlatane.beatpad.model.Rest
 import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.toast
 import kotlin.properties.Delegates
@@ -32,7 +32,7 @@ class PatternHolder(
 		newPatternMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
 				R.id.newDrawnPattern ->
-					viewModel.editingSequence = adapter.insert(RationalToneSequence())
+					viewModel.editingSequence = adapter.insert(newPattern())
 				R.id.newMidiPattern -> context.toast("TODO!")
 				R.id.newAudioPattern -> context.toast("TODO!")
 				else -> context.toast("Impossible!")
@@ -50,6 +50,8 @@ class PatternHolder(
 		}
 	}
 
+	private fun newPattern() = RationalPattern((1..16).map{Rest()})
+
 	private fun onPositionChanged() {
 		if(patternPosition < viewModel.palette.parts[partPosition].segments.size) {
 			editMode()
@@ -63,9 +65,10 @@ class PatternHolder(
 			text = ""
 			backgroundResource = R.drawable.orbifold_chord
 			setOnClickListener {
-				editPatternMenu.show()
+				viewModel.editingSequence = pattern
 			}
 			setOnLongClickListener {
+				editPatternMenu.show()
 				true
 			}
 		}
@@ -76,9 +79,10 @@ class PatternHolder(
 			text = "+"
 			backgroundResource = R.drawable.orbifold_chord
 			setOnClickListener {
-				newPatternMenu.show()
+				viewModel.editingSequence = adapter.insert(newPattern())
 			}
 			setOnLongClickListener {
+				newPatternMenu.show()
 				true
 			}
 		}

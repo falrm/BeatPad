@@ -1,27 +1,15 @@
 package com.jonlatane.beatpad.view.palette
 
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.view.Gravity.*
-import android.view.View
-import android.view.ViewGroup
 import android.view.ViewManager
 import android.widget.LinearLayout
-import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.util.show
-import com.jonlatane.beatpad.view.nonDelayedHorizontalScrollView
-import com.jonlatane.beatpad.view.nonDelayedScrollView
-import com.jonlatane.beatpad.view.tonesequence.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.ankoView
-import org.jetbrains.anko.recyclerview.v7._RecyclerView
-import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.sdk25.coroutines.onScrollChange
 
 inline fun ViewManager.paletteToolbar(
 	theme: Int = 0,

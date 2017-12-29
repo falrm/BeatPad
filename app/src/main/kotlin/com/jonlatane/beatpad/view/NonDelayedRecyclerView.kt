@@ -1,18 +1,16 @@
 package com.jonlatane.beatpad.view
 
-import android.content.Context
-import android.util.AttributeSet
 import android.view.MotionEvent
-import android.view.ViewManager
-import android.widget.HorizontalScrollView
-import android.widget.ScrollView
-import org.jetbrains.anko._ScrollView
-import org.jetbrains.anko.custom.ankoView
+import com.jonlatane.beatpad.util.HideableView
+import org.jetbrains.anko._RelativeLayout
+import org.jetbrains.anko.recyclerview.v7._RecyclerView
 
-class NonDelayedScrollView @JvmOverloads constructor(
-	context: Context,
+class NonDelayedRecyclerView @JvmOverloads constructor(
+	ctx: android.content.Context,
 	var scrollingEnabled: Boolean = true
-) : _ScrollView(context) {
+): HideableRecyclerView(ctx) {
+	override var initialHeight: Int? = null
+
 	override fun shouldDelayChildPressedState() = false
 	override fun onTouchEvent(ev: MotionEvent): Boolean {
 		when (ev.action) {

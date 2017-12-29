@@ -8,6 +8,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Palette
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showInstrumentPicker
 import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.backgroundColor
@@ -33,9 +34,9 @@ class PartHolder(
 		editPartMenu.inflate(R.menu.part_edit_menu)
 		editPartMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
-				//R.id.newDrawnPattern -> adapter.newToneSequence()
+			//R.id.newDrawnPattern -> adapter.newToneSequence()
 				R.id.editPartInstrument -> editInstrument()
-				//R.id.removePart -> TODO()
+			//R.id.removePart -> TODO()
 			}
 			true
 		}
@@ -43,14 +44,18 @@ class PartHolder(
 	}
 
 	fun editInstrument() {
-		showInstrumentPicker(part.instrument, layout.context) {
-			adapter.notifyItemChanged(partPosition)
+		val instrument = part.instrument
+		when (instrument) {
+			is MIDIInstrument ->
+				showInstrumentPicker(instrument, layout.context) {
+					adapter.notifyItemChanged(partPosition)
+				}
 		}
 	}
 
 	private fun onPartPositionChanged() {
 		patternAdapter.partPosition = partPosition
-		if(partPosition < viewModel.palette.parts.size) {
+		if (partPosition < viewModel.palette.parts.size) {
 			makeEditablePart(partPosition)
 		} else {
 			makeAddButton()
@@ -84,7 +89,16 @@ class PartHolder(
 			text = "+"
 			backgroundResource = R.drawable.orbifold_chord
 			setOnClickListener {
-				viewModel.palette.parts.add(Palette.Part())
+				viewModel.palette.parts.add(
+					Palette.Part(
+						MIDIInstrument.randomInstrument(
+							channel = viewModel.palette.parts.size.toByte(),
+							exceptions = viewModel.palette.parts.mapNotNull {
+								(it.instrument as? MIDIInstrument)?.instrument
+							}.toSet()
+						)
+					)
+				)
 				adapter.notifyItemInserted(viewModel.palette.parts.size - 1)
 			}
 			setOnLongClickListener {

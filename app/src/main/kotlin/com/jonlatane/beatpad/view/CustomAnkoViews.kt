@@ -21,3 +21,10 @@ fun ViewManager.noDefaultSpinner(theme: Int = 0)
 
 inline fun ViewManager.noDefaultSpinner(theme: Int = 0, init: NoDefaultSpinner.() -> Unit)
 	= ankoView({ NoDefaultSpinner(it) }, theme, init)
+
+
+fun ViewManager.nonDelayedRecyclerView(theme: Int = 0)
+	= nonDelayedRecyclerView(theme) {}
+
+inline fun ViewManager.nonDelayedRecyclerView(theme: Int = 0, init: NonDelayedRecyclerView.() -> Unit)
+	= ankoView({ NonDelayedRecyclerView(it) }, theme, init)

@@ -56,7 +56,7 @@ enum class Orbifold(val title: String, vararg sequences: Orbit)
 	),
 	functional(
 		"Functional (Intermediate)",
-		FunctionalDimMinDomMajAug,
+		DimMinDomMajAug,
 		FunctionalTwoFiveOne,
 		FunctionalAlternatingMajorMinorThirds
 	);

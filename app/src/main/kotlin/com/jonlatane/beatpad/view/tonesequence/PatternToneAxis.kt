@@ -11,7 +11,7 @@ import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.warn
 
-class ToneSequenceAxis @JvmOverloads constructor(
+class PatternToneAxis @JvmOverloads constructor(
 	context: Context,
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
@@ -54,10 +54,3 @@ class ToneSequenceAxis @JvmOverloads constructor(
 		}
 	}
 }
-
-
-fun ViewManager.toneSequenceAxis(theme: Int = 0)
-	= toneSequenceAxis(theme) {}
-
-inline fun ViewManager.toneSequenceAxis(theme: Int = 0, init: ToneSequenceAxis.() -> Unit)
-	= ankoView({ ToneSequenceAxis(it) }, theme, init)

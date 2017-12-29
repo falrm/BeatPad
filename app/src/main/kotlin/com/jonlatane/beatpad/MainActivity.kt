@@ -3,7 +3,7 @@ package com.jonlatane.beatpad
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import com.jonlatane.beatpad.model.ToneSequence
+import com.jonlatane.beatpad.model.Pattern
 import com.jonlatane.beatpad.harmony.Orbifold
 import com.jonlatane.beatpad.harmony.Orbifold.*
 import com.jonlatane.beatpad.harmony.chord.Chord
@@ -37,7 +37,7 @@ class MainActivity : BaseActivity() {
 	private val sequencerInstrument = MIDIInstrument()
 	private lateinit var keyboardIOHandler: KeyboardIOHandler
 	internal lateinit var sequencerThread: ToneSequencePlayerThread
-	internal lateinit var toneSequence: ToneSequence
+	internal lateinit var pattern: Pattern
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -58,11 +58,11 @@ class MainActivity : BaseActivity() {
 		val harmonyController = DeviceOrientationInstrument(harmonicInstrument)
 		RhythmAnimations.wireMelodicControl(orbifold, harmonyController)
 		keyboardIOHandler = KeyboardIOHandler(keyboard, pianoBoardInstrument)
-        toneSequence = ToneSequenceStorage.loadSequence(this)
+        pattern = ToneSequenceStorage.loadSequence(this)
 
 		sequencerThread = ToneSequencePlayerThread(
 			sequencerInstrument,
-			sequence = toneSequence,
+			sequence = pattern,
 			beatsPerMinute = 120,
 			chordResolver = { orbifold.chord }
 		)
@@ -101,7 +101,7 @@ class MainActivity : BaseActivity() {
 	override fun onResume() {
 		super.onResume()
 		orbifold.onResume()
-		toneSequence = ToneSequenceStorage.loadSequence(this)
+		pattern = ToneSequenceStorage.loadSequence(this)
 	}
 
 	override fun onPause() {

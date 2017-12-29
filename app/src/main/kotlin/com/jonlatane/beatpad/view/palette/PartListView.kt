@@ -1,23 +1,13 @@
 package com.jonlatane.beatpad.view.palette
 
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.text.TextUtils
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewManager
-import android.widget.*
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.Palette
-import com.jonlatane.beatpad.model.RationalToneSequence
-import com.jonlatane.beatpad.showInstrumentPicker
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.view.HideableRecyclerView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.ankoView
-import org.jetbrains.anko.recyclerview.v7._RecyclerView
-import org.jetbrains.anko.recyclerview.v7.recyclerView
 
 inline fun ViewManager.partListView(
 	theme: Int = 0,

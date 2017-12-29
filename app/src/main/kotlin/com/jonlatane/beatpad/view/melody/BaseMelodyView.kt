@@ -79,7 +79,7 @@ abstract class BaseMelodyView @JvmOverloads constructor(
 	}
 
 	fun Canvas.renderSteps() {
-		paint.color = R.color.colorPrimaryDark
+		paint.color = context.color(R.color.colorPrimaryDark)
 		if(showSteps) {
 			val halfStepWidth: Float = axisLength / halfStepsOnScreen
 			var linePosition = onScreenNotes.first().top - 12 * halfStepWidth //TODO gross hack

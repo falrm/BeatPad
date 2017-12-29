@@ -49,9 +49,3 @@ class BottomScroller(
 		return super.onInterceptTouchEvent(ev)
 	}
 }
-
-fun ViewManager.bottomScroller(theme: Int = 0)
-	= bottomScroller(theme) {}
-
-inline fun ViewManager.bottomScroller(theme: Int = 0, init: BottomScroller.() -> Unit)
-	= ankoView({ BottomScroller(it) }, theme, init)

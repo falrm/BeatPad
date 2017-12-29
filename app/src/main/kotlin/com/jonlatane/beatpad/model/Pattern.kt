@@ -3,7 +3,7 @@ package com.jonlatane.beatpad.model
 import com.jonlatane.beatpad.util.mod12
 import kotlin.properties.Delegates
 
-interface ToneSequence {
+interface Pattern {
 	val subdivisions: MutableList<Subdivision>
 	val subdivisionsPerBeat: Int
 	val relativeTo: Int
@@ -17,7 +17,7 @@ interface ToneSequence {
 		abstract val duration: Int
 		abstract fun transposed(originalRoot: Int, newRoot: Int): Subdivision
 		/**
-		 * All the notes of any ToneSequence should be given as though the tonic center is at 0.
+		 * All the notes of any Pattern should be given as though the tonic center is at 0.
 		 */
 		data class Note(
 			var tones: MutableSet<Int> = mutableSetOf(),

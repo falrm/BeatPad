@@ -14,7 +14,7 @@ class Chord : Parcelable {
 
 	constructor(root: Int, extension: IntArray) {
 		this.root = root.mod12
-		this.extension = (extension + root).map { it.mod12 }.toSet().let {
+		this.extension = (extension + 0).map { it.mod12 }.toSet().let {
 			if(BuildConfig.DEBUG) it.sorted() else it
 		}.toIntArray()
 		this.heptatonics = Heptatonics(setOf(*this.extension.toTypedArray()))
@@ -36,7 +36,8 @@ class Chord : Parcelable {
 
 	/**
 	 * Gets a derivative chord created by replacing all of the outTones with inTones.
-	 * For instance, replaceOrAdd(2,1) should turn any chord except a #9 chord into that chord with a b9
+	 * For instance, substituteIfPresent(2,1) will convert 9 chords to b9 chords, but
+	 * leave triads, 7 chords, 11#9 and 13#9 chords untouched.
 	 * @param outTone
 	 * *
 	 * @param inTone
@@ -44,6 +45,21 @@ class Chord : Parcelable {
 	 * @return A new chord.  Its extension will have all of this chord's instances of outTone replaced
 	 * *         with inTone.  If none were found, inTone will be added.
 	 */
+	fun substituteIfPresent(outTone: Int, inTone: Int): Chord {
+		var found = false
+		val newExtension = (extension.map {
+			if(it == outTone) {
+				found = true
+				inTone
+			} else it
+		}).toSet().toIntArray()
+		var result = Chord(root, newExtension)
+		if (!found) {
+			result = result.plus(inTone)
+		}
+		return result
+	}
+
 	fun replaceOrAdd(outTone: Int, inTone: Int): Chord {
 		var found = false
 		val newExtension = (extension.map {
@@ -59,7 +75,7 @@ class Chord : Parcelable {
 		return result
 	}
 
-	fun remove(tone: Int) = replaceOrAdd(tone, 0)
+	fun remove(tone: Int) = substituteIfPresent(tone, 0)
 
 	fun changeRoot(interval: Int) = Chord(
 		root = root + interval,

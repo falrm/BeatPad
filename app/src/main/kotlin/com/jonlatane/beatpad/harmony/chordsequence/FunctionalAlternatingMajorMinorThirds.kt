@@ -9,13 +9,13 @@ import com.jonlatane.beatpad.harmony.chord.*
 object FunctionalAlternatingMajorMinorThirds : Orbit {
     override fun forward(c: Chord) = when {
         c.isDominant -> c
-        c.isMinor -> c.changeRoot(m3).replaceOrAdd(m3, M3)
-        else -> c.changeRoot(M3).replaceOrAdd(M3, m3)
+        c.isMinor -> c.changeRoot(m3).substituteIfPresent(m3, M3)
+        else -> c.changeRoot(M3).substituteIfPresent(M3, m3)
     }
 
     override fun back(c: Chord) = when {
         c.isDominant -> c
-        c.isMinor -> c.changeRoot(-M3).replaceOrAdd(m3, M3)
-        else -> c.changeRoot(-m3).replaceOrAdd(M3, m3)
+        c.isMinor -> c.changeRoot(-M3).substituteIfPresent(m3, M3)
+        else -> c.changeRoot(-m3).substituteIfPresent(M3, m3)
     }
 }

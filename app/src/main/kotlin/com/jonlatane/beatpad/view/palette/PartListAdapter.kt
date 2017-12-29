@@ -1,15 +1,11 @@
 package com.jonlatane.beatpad.view.palette
 
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.Gravity
-import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.Palette
-import com.jonlatane.beatpad.showInstrumentPicker
 import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7._RecyclerView

@@ -4,29 +4,24 @@ import android.app.AlertDialog
 import android.view.Gravity
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.LinearLayout.HORIZONTAL
 import android.widget.TextView
-import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.SequenceEditorActivity
 import com.jonlatane.beatpad.model.*
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
-import com.jonlatane.beatpad.view.nonDelayedHorizontalScrollView
-import com.jonlatane.beatpad.view.nonDelayedScrollView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.sdk25.coroutines.onScrollChange
 import java.util.concurrent.Executors
 
-class ToneSequenceUI : AnkoComponent<SequenceEditorActivity> {
-	companion object {
+class PatternUI : AnkoComponent<SequenceEditorActivity> {
+	companion object Companion {
 		val STEPS_TO_ALLOCATE = 16
 	}
 
 	private val executorService = Executors.newScheduledThreadPool(2)
-	val viewModel = ToneSequenceViewModel()
+	val viewModel = PatternViewModel()
 	val previewInstrument = MIDIInstrument().apply {
 		channel = 4
 		instrument = GeneralMidiConstants.SYNTH_BASS_1

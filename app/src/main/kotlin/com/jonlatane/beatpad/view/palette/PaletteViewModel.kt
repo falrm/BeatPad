@@ -1,24 +1,19 @@
 package com.jonlatane.beatpad.view.palette
 
 import android.view.View
-import com.jonlatane.beatpad.harmony.chord.*
 import com.jonlatane.beatpad.model.Palette
-import com.jonlatane.beatpad.model.ToneSequence
-import com.jonlatane.beatpad.util.hide
-import com.jonlatane.beatpad.util.show
+import com.jonlatane.beatpad.model.Pattern
 import com.jonlatane.beatpad.view.HideableRecyclerView
-import com.jonlatane.beatpad.view.HideableRelativeLayout
-import com.jonlatane.beatpad.view.tonesequence.ToneSequenceViewModel
-import kotlin.properties.Delegates
+import com.jonlatane.beatpad.view.tonesequence.PatternViewModel
 import kotlin.properties.Delegates.observable
 
 /**
  * The PaletteViewModel still assumes we'll only be editing
- * one ToneSequence at a time.
+ * one Pattern at a time.
  */
-class PaletteViewModel : ToneSequenceViewModel() {
+class PaletteViewModel : PatternViewModel() {
 	val palette = Palette()
-	var editingSequence by observable<ToneSequence?>(null) { _, _, new ->
+	var editingSequence by observable<Pattern?>(null) { _, _, new ->
 		if(new != null) {
 			toneSequence = new
 			editPatternMode()

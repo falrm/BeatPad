@@ -9,12 +9,12 @@ import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.storage.ToneSequenceStorage
 import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
-import com.jonlatane.beatpad.view.tonesequence.ToneSequenceUI
+import com.jonlatane.beatpad.view.tonesequence.PatternUI
 import org.billthefarmer.mididriver.GeneralMidiConstants.*
 import org.jetbrains.anko.*
 
 class SequenceEditorActivity : Activity(), AnkoLogger {
-	lateinit var ui: ToneSequenceUI
+	lateinit var ui: PatternUI
 	val viewModel get() = ui.viewModel
 	val sequencerInstrument get() = ui.sequencerInstrument
 	val orbifold get() = viewModel.orbifold
@@ -27,22 +27,19 @@ class SequenceEditorActivity : Activity(), AnkoLogger {
 		super.onCreate(savedInstanceState)
 
 		info("hi hi hi hi")
-		ui = ToneSequenceUI().also {
+		ui = PatternUI().also {
 			it.setContentView(this)
 		}
-		val bundle = savedInstanceState ?: intent.extras.getBundle("playgroundState")
-
-		fun Bundle.formatted(): String {
+		val bundle = savedInstanceState ?: intent.extras?.getBundle("playgroundState")
+		println("Got intent with extras: ${bundle?.run {
 			var string = "Bundle{"
 			this.keySet().forEach { key ->
 				string += " " + key + " => " + this.get(key) + ";"
 			}
 			string += " }"
-			return string
-		}
-
-		println("Got intent with extras: ${bundle.formatted()}")
-		onRestoreInstanceState(bundle)
+			string
+		}}")
+		if(bundle != null) onRestoreInstanceState(bundle)
 	}
 
 	override fun onResume() {

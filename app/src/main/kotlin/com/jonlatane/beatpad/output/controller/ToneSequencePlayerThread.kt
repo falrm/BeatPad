@@ -1,15 +1,15 @@
 package com.jonlatane.beatpad.output.controller
 
-import com.jonlatane.beatpad.model.ToneSequence
-import com.jonlatane.beatpad.model.ToneSequence.Subdivision.Note
+import com.jonlatane.beatpad.model.Pattern
+import com.jonlatane.beatpad.model.Pattern.Subdivision.Note
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.Instrument
-import com.jonlatane.beatpad.view.tonesequence.ToneSequenceViewModel
+import com.jonlatane.beatpad.view.tonesequence.PatternViewModel
 
 class ToneSequencePlayerThread(
 	val instrument: Instrument,
-	val viewModel: ToneSequenceViewModel? = null,
-	val sequence:  ToneSequence = viewModel!!.toneSequence,
+	val viewModel: PatternViewModel? = null,
+	val sequence: Pattern = viewModel!!.toneSequence,
 	val chordResolver: () -> Chord = { viewModel!!.orbifold.chord },
 	val onFinish: (ToneSequencePlayerThread) -> Unit = {},
 	@Volatile var beatsPerMinute: Int

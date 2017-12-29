@@ -2,22 +2,20 @@ package com.jonlatane.beatpad.view.palette
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.Gravity.*
+import android.view.Gravity.CENTER_HORIZONTAL
+import android.view.Gravity.CENTER_VERTICAL
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewManager
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.color
-import com.jonlatane.beatpad.view.nonDelayedHorizontalScrollView
-import com.jonlatane.beatpad.view.nonDelayedScrollView
-import com.jonlatane.beatpad.view.tonesequence.*
-import org.jetbrains.anko.*
+import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.custom.ankoView
+import org.jetbrains.anko.dip
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
-import org.jetbrains.anko.recyclerview.v7.recyclerView
-import org.jetbrains.anko.sdk25.coroutines.onScrollChange
+import org.jetbrains.anko.wrapContent
 
 inline fun ViewManager.chordListView(
 	theme: Int = 0,
@@ -94,9 +92,8 @@ inline fun ViewManager.chordListView(
 			override fun getItemCount(): Int = viewModel.palette.chords.size + 1
 		}
 
-		val orientation = LinearLayoutManager.HORIZONTAL
 		backgroundColor = context.color(R.color.colorPrimaryDark)
-		layoutManager = LinearLayoutManager(context, orientation, false)
+		layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 		overScrollMode = View.OVER_SCROLL_NEVER
 		adapter = listAdapter
 		adapter.registerAdapterDataObserver(

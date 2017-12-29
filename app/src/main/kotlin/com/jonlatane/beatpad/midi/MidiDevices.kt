@@ -95,6 +95,7 @@ object MidiDevices {
         it.type == MidiDeviceInfo.PortInfo.TYPE_OUTPUT
       }!!.portNumber
       manager.openDevice(info, { device ->
+        device?.info
         val inputPort = device?.openOutputPort(portNumber)
         if(inputPort != null) {
           MainApplication.instance.toast("Connected to ${info.name}!")

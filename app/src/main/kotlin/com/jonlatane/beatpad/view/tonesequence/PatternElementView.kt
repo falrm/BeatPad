@@ -5,19 +5,17 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.view.ViewManager
-import com.jonlatane.beatpad.model.ToneSequence.Subdivision
-import com.jonlatane.beatpad.model.ToneSequence.Subdivision.Note
-import com.jonlatane.beatpad.model.ToneSequence.Subdivision.Sustain
+import com.jonlatane.beatpad.model.Pattern.Subdivision
+import com.jonlatane.beatpad.model.Pattern.Subdivision.Note
+import com.jonlatane.beatpad.model.Pattern.Subdivision.Sustain
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.view.melody.BaseMelodyView
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.warn
 
 
-class ToneSequenceElement @JvmOverloads constructor(
+class PatternElementView @JvmOverloads constructor(
 	context: Context,
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
@@ -25,12 +23,10 @@ class ToneSequenceElement @JvmOverloads constructor(
 	init {
 		showSteps = true
 	}
-	lateinit var viewModel: ToneSequenceViewModel
+	lateinit var viewModel: PatternViewModel
 
 	// Lazy loaded
-	val seqIndex: Int by lazy {
-		viewModel.elements.indexOf(this)
-	}
+	var seqIndex = 0
 	var subdivision: Subdivision?
 		get() = viewModel.toneSequence.subdivisions[seqIndex]
 		set(value) {
@@ -125,10 +121,3 @@ class ToneSequenceElement @JvmOverloads constructor(
 		return Math.round(-39 + 88 * (height - y) / height)
 	}
 }
-
-
-fun ViewManager.toneSequenceElement(theme: Int = 0)
-	= toneSequenceElement(theme) {}
-
-inline fun ViewManager.toneSequenceElement(theme: Int = 0, init: ToneSequenceElement.() -> Unit)
-	= ankoView({ ToneSequenceElement(it) }, theme, init)

@@ -7,7 +7,7 @@ import com.jonlatane.beatpad.model.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.error
 import java.io.*
-import com.jonlatane.beatpad.model.ToneSequence
+import com.jonlatane.beatpad.model.Pattern
 import org.jetbrains.anko.info
 
 object ToneSequenceStorage : AnkoLogger {
@@ -30,26 +30,26 @@ object ToneSequenceStorage : AnkoLogger {
 	}
 
 
-	fun storeSequence(toneSequence: ToneSequence, context: Context) = try {
+	fun storeSequence(pattern: Pattern, context: Context) = try {
 		val outputStreamWriter = OutputStreamWriter(context.openFileOutput("sequence.json", Context.MODE_PRIVATE))
-		val json = gson.toJson(toneSequence)
-		info("Stored ToneSequence: $json")
+		val json = gson.toJson(pattern)
+		info("Stored Pattern: $json")
 		outputStreamWriter.write(json)
 		outputStreamWriter.close()
 	} catch (e: IOException) {
 		Log.e("Exception", "File write failed: " + e.toString());
 	}
 
-	fun loadSequence(context: Context): ToneSequence = try {
+	fun loadSequence(context: Context): Pattern = try {
 		val json: String = InputStreamReader(context.openFileInput("sequence.json")).use { it.readText() }
-		info("Loaded ToneSequence: $json")
-		gson.fromJson(json, ToneSequence::class.java)!!
+		info("Loaded Pattern: $json")
+		gson.fromJson(json, Pattern::class.java)!!
 	} catch (t: Throwable) {
 		error("Failed to load stored sequence", t)
 		defaultSequence
 	}
 
-	val defaultSequence = RationalToneSequence(
+	val defaultSequence = RationalPattern(
 		listOf(
 			Rest(),
 			Rest(),

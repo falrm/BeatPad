@@ -2,7 +2,6 @@ package com.jonlatane.beatpad
 
 import android.app.Activity
 import android.os.Bundle
-import com.jonlatane.beatpad.R.id.orbifold
 import com.jonlatane.beatpad.harmony.Orbifold
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
@@ -11,11 +10,9 @@ import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.storage.ToneSequenceStorage
 import com.jonlatane.beatpad.util.formatted
 import com.jonlatane.beatpad.view.palette.PaletteUI
-import com.jonlatane.beatpad.view.tonesequence.ToneSequenceUI
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.debug
-import org.jetbrains.anko.info
 import org.jetbrains.anko.setContentView
 
 class PaletteEditorActivity : Activity(), AnkoLogger {

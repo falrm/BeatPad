@@ -4,6 +4,6 @@ import com.jonlatane.beatpad.util.HideableView
 import org.jetbrains.anko._RelativeLayout
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 
-class HideableRecyclerView(ctx: android.content.Context): _RecyclerView(ctx), HideableView {
+open class HideableRecyclerView(ctx: android.content.Context): _RecyclerView(ctx), HideableView {
 	override var initialHeight: Int? = null
 }

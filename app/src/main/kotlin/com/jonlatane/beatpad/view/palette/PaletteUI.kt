@@ -134,6 +134,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 
 			viewModel.keyboardView = keyboardView {
 				elevation = 10f
+				alpha = 0f
 				//translationY = dimen(R.dimen.key_height_white).toFloat()
 			}.lparams {
 				height = dimen(R.dimen.key_height_white)
@@ -149,7 +150,8 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 					.translationX(viewModel.toneSequenceView.width.toFloat())
 					.withEndAction { viewModel.toneSequenceView.alpha = 1f }
 					.start()
-				viewModel.keyboardView.hide()
+				viewModel.keyboardView.hide(false)
+				viewModel.keyboardView.alpha = 1f
 			}
 		}
 	}
