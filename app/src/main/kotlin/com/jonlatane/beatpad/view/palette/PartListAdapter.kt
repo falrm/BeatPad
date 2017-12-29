@@ -30,7 +30,7 @@ class PartListAdapter(
 					marqueeRepeatLimit = -1
 					isSelected = true
 					gravity = Gravity.CENTER_HORIZONTAL
-					backgroundResource = R.drawable.orbifold_chord
+					backgroundResource = R.drawable.part_background
 				}.lparams {
 					width = matchParent
 					height = wrapContent
@@ -42,7 +42,6 @@ class PartListAdapter(
 					height = matchParent
 					width = matchParent
 				}
-				backgroundColor = context.color(R.color.colorPrimaryDark)
 				isClickable = true
 				isLongClickable = true
 				gravity = Gravity.CENTER_HORIZONTAL

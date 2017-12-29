@@ -87,7 +87,6 @@ class PartHolder(
 	private fun makeAddButton() {
 		partName.apply {
 			text = "+"
-			backgroundResource = R.drawable.orbifold_chord
 			setOnClickListener {
 				viewModel.palette.parts.add(
 					Palette.Part(
