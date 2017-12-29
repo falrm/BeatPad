@@ -1,29 +1,28 @@
 package com.jonlatane.beatpad.model
 
 import com.jonlatane.beatpad.util.mod12
-import kotlin.properties.Delegates
 
 interface Pattern {
-	val subdivisions: MutableList<Subdivision>
+	val elements: MutableList<Element>
 	val subdivisionsPerBeat: Int
 	val relativeTo: Int
-	fun transposed(newRoot: Int): List<Subdivision> {
-		return subdivisions.map {
+	fun transposed(newRoot: Int): List<Element> {
+		return elements.map {
 			it.transposed(relativeTo, newRoot)
 		}
 	}
 
-	sealed class Subdivision {
+	sealed class Element {
 		abstract val duration: Int
-		abstract fun transposed(originalRoot: Int, newRoot: Int): Subdivision
+		abstract fun transposed(originalRoot: Int, newRoot: Int): Element
 		/**
 		 * All the notes of any Pattern should be given as though the tonic center is at 0.
 		 */
-		data class Note(
+		class Note(
 			var tones: MutableSet<Int> = mutableSetOf(),
 			var velocity: Float = 1f,
 		  override var duration: Int = 0
-		) : Subdivision() {
+		) : Element() {
 			/**
 			 *
 			 */
@@ -41,11 +40,11 @@ interface Pattern {
 			}
 		}
 
-		data class Sustain(
+		class Sustain(
 			val note: Note,
 			override var duration: Int = 0
-		) : Subdivision() {
-			override fun transposed(originalRoot: Int, newRoot: Int): Subdivision {
+		) : Element() {
+			override fun transposed(originalRoot: Int, newRoot: Int): Element {
 				return Sustain(note.transposed(originalRoot, newRoot), duration)
 			}
 		}

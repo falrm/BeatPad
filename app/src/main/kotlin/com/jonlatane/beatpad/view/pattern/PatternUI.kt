@@ -104,8 +104,8 @@ class PatternUI : AnkoComponent<SequenceEditorActivity> {
 						.setTitle("Clear Sequence Data")
 						.setMessage("Really delete all your hard work?")
 						.setPositiveButton("Yes, it's just art") { _, _ ->
-							for (index in viewModel.toneSequence.subdivisions.indices) {
-								viewModel.toneSequence.subdivisions[index] = Rest()
+							for (index in viewModel.toneSequence.elements.indices) {
+								viewModel.toneSequence.elements[index] = Rest()
 								viewModel.redraw()
 							}
 						}

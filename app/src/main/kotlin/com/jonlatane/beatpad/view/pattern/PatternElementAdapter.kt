@@ -31,5 +31,5 @@ class PatternElementAdapter(
 		holder.element.invalidate()
 	}
 
-	override fun getItemCount(): Int = viewModel.toneSequence.subdivisions.size
+	override fun getItemCount(): Int = viewModel.toneSequence.elements.size
 }

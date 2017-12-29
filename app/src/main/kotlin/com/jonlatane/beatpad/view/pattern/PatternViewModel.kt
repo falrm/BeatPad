@@ -41,9 +41,9 @@ open class PatternViewModel {
 		verticalAxis?.invalidate()
 	}
 
-	internal fun markPlaying(subdivision: Pattern.Subdivision) {
+	internal fun markPlaying(element: Pattern.Element) {
 		try {
-			patternElementAdapter?.notifyItemChanged(toneSequence.subdivisions.indexOf(subdivision))
+			playbackPosition = toneSequence.elements.indexOf(element)
 		} catch (t: Throwable) {
 		}
 	}

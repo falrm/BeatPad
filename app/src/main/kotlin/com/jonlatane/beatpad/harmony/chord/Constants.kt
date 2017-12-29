@@ -1,6 +1,6 @@
 package com.jonlatane.beatpad.harmony.chord
 
-// Constants for actual intervals, in half subdivisions.  dim/minor/Perfect/Major/Aug 2-7
+// Constants for actual intervals, in half elements.  dim/minor/Perfect/Major/Aug 2-7
 val root = 0
 @get:JvmName("minor2")
 val m2 = 1

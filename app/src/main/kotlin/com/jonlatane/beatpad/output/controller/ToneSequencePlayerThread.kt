@@ -1,7 +1,7 @@
 package com.jonlatane.beatpad.output.controller
 
 import com.jonlatane.beatpad.model.Pattern
-import com.jonlatane.beatpad.model.Pattern.Subdivision.Note
+import com.jonlatane.beatpad.model.Pattern.Element.Note
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.model.Instrument
 import com.jonlatane.beatpad.view.pattern.PatternViewModel
@@ -25,7 +25,7 @@ class ToneSequencePlayerThread(
 	private fun playBeat() {
 		try {
 
-			for (step in sequence.subdivisions) {
+			for (step in sequence.elements) {
 				val playDuration = 60000L / (beatsPerMinute * sequence.subdivisionsPerBeat)
 				val pauseDuration = 0L
 

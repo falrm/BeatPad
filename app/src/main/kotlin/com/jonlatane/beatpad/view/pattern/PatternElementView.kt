@@ -5,9 +5,9 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
-import com.jonlatane.beatpad.model.Pattern.Subdivision
-import com.jonlatane.beatpad.model.Pattern.Subdivision.Note
-import com.jonlatane.beatpad.model.Pattern.Subdivision.Sustain
+import com.jonlatane.beatpad.model.Pattern.Element
+import com.jonlatane.beatpad.model.Pattern.Element.Note
+import com.jonlatane.beatpad.model.Pattern.Element.Sustain
 import com.jonlatane.beatpad.harmony.chord.Chord
 import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.view.melody.BaseMelodyView
@@ -26,7 +26,7 @@ class PatternElementView @JvmOverloads constructor(
 	lateinit var viewModel: PatternViewModel
 
 	var elementPosition = 0
-	val subdivision: Subdivision get() = viewModel.toneSequence.subdivisions[elementPosition]
+	val element: Element get() = viewModel.toneSequence.elements[elementPosition]
 	val isDownbeat: Boolean get() = elementPosition % viewModel.toneSequence.subdivisionsPerBeat == 0
 
 	override var initialHeight: Int? = null
@@ -39,6 +39,7 @@ class PatternElementView @JvmOverloads constructor(
 		set(value) { throw UnsupportedOperationException() }
 
 	override fun onDraw(canvas: Canvas) {
+		backgroundAlpha = if(viewModel.playbackPosition == elementPosition) 255 else 187
 		super.onDraw(canvas)
 		canvas.drawStepNotes()
 		canvas.drawRhythm()
@@ -46,15 +47,15 @@ class PatternElementView @JvmOverloads constructor(
 
 	private val p = Paint()
 	private fun Canvas.drawStepNotes() {
-		p.color = when(subdivision) {
+		p.color = when(element) {
 			is Note -> 0xAA212121.toInt()
 			is Sustain -> 0xAA424242.toInt()
 			null -> 0x00FFFFFF
 		}
 		try {
-			val tones = when (subdivision) {
-				is Note -> (subdivision as Note).tones
-				is Sustain -> (subdivision as Sustain).note.tones
+			val tones = when (element) {
+				is Note -> (element as Note).tones
+				is Sustain -> (element as Sustain).note.tones
 				null -> emptySet<Int>()
 			}
 			tones.forEach { tone ->
@@ -96,8 +97,8 @@ class PatternElementView @JvmOverloads constructor(
 
 			MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
 				val tone = getTone(event.getY(pointerIndex))
-				if(subdivision is Note) {
-					val tones = (subdivision as Note).tones
+				if(element is Note) {
+					val tones = (element as Note).tones
 					if(!tones.remove(tone)) tones.add(tone)
 				}
 			}
