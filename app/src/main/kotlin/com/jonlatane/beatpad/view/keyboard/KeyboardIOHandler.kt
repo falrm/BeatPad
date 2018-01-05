@@ -7,7 +7,7 @@ import android.view.View
 import android.view.View.OnTouchListener
 import android.widget.Button
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.harmony.chord.Chord
+import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.mod12
 import org.jetbrains.anko.backgroundResource

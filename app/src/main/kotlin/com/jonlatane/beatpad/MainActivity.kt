@@ -3,15 +3,15 @@ package com.jonlatane.beatpad
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import com.jonlatane.beatpad.model.Pattern
-import com.jonlatane.beatpad.harmony.Orbifold
-import com.jonlatane.beatpad.harmony.Orbifold.*
-import com.jonlatane.beatpad.harmony.chord.Chord
+import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.harmony.Orbifold
+import com.jonlatane.beatpad.model.harmony.Orbifold.*
+import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.sensors.Orientation
-import com.jonlatane.beatpad.storage.PatternStorage
+import com.jonlatane.beatpad.storage.MelodyStorage
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.util.show
@@ -37,20 +37,20 @@ class MainActivity : BaseActivity() {
 	private val sequencerInstrument = MIDIInstrument()
 	private lateinit var keyboardIOHandler: KeyboardIOHandler
 	internal lateinit var sequencerThread: ToneSequencePlayerThread
-	internal lateinit var pattern: Pattern
+	internal lateinit var asdf: Melody
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_main)
 
-		melody.instrument.channel = 0
+		colorboard.instrument.channel = 0
 		harmonicInstrument.channel = 1
 		sequencerInstrument.channel = 2
 		pianoBoardInstrument.channel = 3
 
 		supportActionBar?.elevation = 0f
 
-		melody.instrument.instrument = GeneralMidiConstants.ROCK_ORGAN
+		colorboard.instrument.instrument = GeneralMidiConstants.ROCK_ORGAN
 		harmonicInstrument.instrument = GeneralMidiConstants.SYNTHBRASS_1
 		sequencerInstrument.instrument = GeneralMidiConstants.ACOUSTIC_GRAND_PIANO
 		pianoBoardInstrument.instrument = GeneralMidiConstants.SYNTH_BASS_1
@@ -58,18 +58,18 @@ class MainActivity : BaseActivity() {
 		val harmonyController = DeviceOrientationInstrument(harmonicInstrument)
 		RhythmAnimations.wireMelodicControl(orbifold, harmonyController)
 		keyboardIOHandler = KeyboardIOHandler(keyboard, pianoBoardInstrument)
-        pattern = PatternStorage.loadSequence(this)
+        asdf = MelodyStorage.loadSequence(this)
 
 		sequencerThread = ToneSequencePlayerThread(
 			sequencerInstrument,
-			sequence = pattern,
+			sequence = asdf,
 			beatsPerMinute = 120,
 			chordResolver = { orbifold.chord }
 		)
 
 		orbifold.onChordChangedListener = { c: Chord ->
 			val tones = c.getTones()
-			melody.chord = c
+			colorboard.chord = c
 			harmonyController.tones = tones
 			keyboardIOHandler.highlightChord(c)
 		}
@@ -101,7 +101,7 @@ class MainActivity : BaseActivity() {
 	override fun onResume() {
 		super.onResume()
 		orbifold.onResume()
-		pattern = PatternStorage.loadSequence(this)
+		asdf = MelodyStorage.loadSequence(this)
 	}
 
 	override fun onPause() {
@@ -110,13 +110,14 @@ class MainActivity : BaseActivity() {
 	}
 
 	override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+		super.onRestoreInstanceState(savedInstanceState)
 		val chord = savedInstanceState.getParcelable<Chord>("currentChord")
 		if (chord != null) {
 			orbifold.chord = chord
 		}
 		sequencerThread.beatsPerMinute = savedInstanceState.getInt("tempo")
 		updateTempoButton()
-		melody.instrument.instrument = savedInstanceState.getByte("melodicInstrument")
+		colorboard.instrument.instrument = savedInstanceState.getByte("melodicInstrument")
 		harmonicInstrument.instrument = savedInstanceState.getByte("harmonicInstrument")
 		sequencerInstrument.instrument = savedInstanceState.getByte("sequencerInstrument")
 		pianoBoardInstrument.instrument = savedInstanceState.getByte("pianoInstrument")
@@ -126,27 +127,28 @@ class MainActivity : BaseActivity() {
 			updateOrbifold()
 		}
 		if (savedInstanceState.getBoolean("melodyHidden")) {
-			melody.hide(animated = false)
+			colorboard.hide(animated = false)
 			updateOrbifold()
 		}
 	}
 
 	// invoked when the activity may be temporarily destroyed, save the instance state here
 	override fun onSaveInstanceState(outState: Bundle) {
+		super.onSaveInstanceState(outState)
 		outState.putParcelable("currentChord", orbifold.chord)
 		outState.putInt("tempo", sequencerThread.beatsPerMinute)
-		outState.putByte("melodicInstrument", melody.instrument.instrument)
+		outState.putByte("melodicInstrument", colorboard.instrument.instrument)
 		outState.putByte("harmonicInstrument", harmonicInstrument.instrument)
 		outState.putByte("sequencerInstrument", sequencerInstrument.instrument)
 		outState.putByte("pianoInstrument", pianoBoardInstrument.instrument)
 		outState.putBoolean("pianoHidden", keyboard.isHidden)
-		outState.putBoolean("melodyHidden", melody.isHidden)
+		outState.putBoolean("melodyHidden", colorboard.isHidden)
 		outState.putInt("orbifoldMode", orbifold.orbifold.ordinal)
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
-			R.id.color_board_instrument -> showInstrumentPicker(melody.instrument, this)
+			R.id.color_board_instrument -> showInstrumentPicker(colorboard.instrument, this)
 			R.id.harmony_instrument -> showInstrumentPicker(harmonicInstrument, this)
 			R.id.sequencer_instrument -> showInstrumentPicker(sequencerInstrument, this)
 			R.id.piano_board_instrument -> showInstrumentPicker(pianoBoardInstrument, this)
@@ -161,11 +163,11 @@ class MainActivity : BaseActivity() {
 				}
 			}
 			R.id.color_keyboard_toggle -> {
-				if (melody.isHidden) {
-					melody.show()
+				if (colorboard.isHidden) {
+					colorboard.show()
 					updateOrbifold()
 				} else {
-					melody.hide()
+					colorboard.hide()
 					updateOrbifold()
 				}
 			}
@@ -185,10 +187,10 @@ class MainActivity : BaseActivity() {
 
 	override fun updateMenuOptions() {
 		menu.findItem(R.id.piano_board_instrument).title = "Keyboard: ${pianoBoardInstrument.instrumentName}"
-		menu.findItem(R.id.color_board_instrument).title = "Colorboard: ${melody.instrument.instrumentName}"
+		menu.findItem(R.id.color_board_instrument).title = "Colorboard: ${colorboard.instrument.instrumentName}"
 		menu.findItem(R.id.harmony_instrument).title = "Harmony: ${harmonicInstrument.instrumentName}"
 		menu.findItem(R.id.sequencer_instrument).title = "Sequencer: ${sequencerInstrument.instrumentName}"
-		if (melody.isHidden) {
+		if (colorboard.isHidden) {
 			menu.findItem(R.id.color_keyboard_toggle).title = "Use Colorboard"
 		} else {
 			menu.findItem(R.id.color_keyboard_toggle).title = "Hide Colorboard"

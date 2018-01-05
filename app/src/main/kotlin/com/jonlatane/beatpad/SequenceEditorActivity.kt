@@ -2,19 +2,19 @@ package com.jonlatane.beatpad
 
 import android.app.Activity
 import android.os.Bundle
-import com.jonlatane.beatpad.harmony.Orbifold
-import com.jonlatane.beatpad.harmony.Orbifold.intermediate
-import com.jonlatane.beatpad.harmony.chord.Chord
+import com.jonlatane.beatpad.model.harmony.Orbifold
+import com.jonlatane.beatpad.model.harmony.Orbifold.intermediate
+import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
-import com.jonlatane.beatpad.storage.PatternStorage
+import com.jonlatane.beatpad.storage.MelodyStorage
 import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
-import com.jonlatane.beatpad.view.pattern.PatternUI
+import com.jonlatane.beatpad.view.melody.MelodyUI
 import org.billthefarmer.mididriver.GeneralMidiConstants.*
 import org.jetbrains.anko.*
 
 class SequenceEditorActivity : Activity(), AnkoLogger {
-	lateinit var ui: PatternUI
+	lateinit var ui: MelodyUI
 	val viewModel get() = ui.viewModel
 	val sequencerInstrument get() = ui.sequencerInstrument
 	val orbifold get() = viewModel.orbifold
@@ -27,7 +27,7 @@ class SequenceEditorActivity : Activity(), AnkoLogger {
 		super.onCreate(savedInstanceState)
 
 		info("hi hi hi hi")
-		ui = PatternUI().also {
+		ui = MelodyUI().also {
 			it.setContentView(this)
 		}
 		val bundle = savedInstanceState ?: intent.extras?.getBundle("playgroundState")
@@ -61,17 +61,17 @@ class SequenceEditorActivity : Activity(), AnkoLogger {
 		AudioTrackCache.releaseAll()
 		MIDIInstrument.DRIVER.stop()
 		ui.sequencerThread.stopped = true
-		PatternStorage.storeSequence(toneSequence, this)
+		MelodyStorage.storeSequence(toneSequence, this)
 	}
 
 	override fun onStop() {
 		super.onStop()
-		PatternStorage.storeSequence(toneSequence, this)
+		MelodyStorage.storeSequence(toneSequence, this)
 	}
 
 	override fun onRestoreInstanceState(savedInstanceState: Bundle) {
 		super.onRestoreInstanceState(savedInstanceState)
-		toneSequence = PatternStorage.loadSequence(this)
+		toneSequence = MelodyStorage.loadSequence(this)
 		ui.sequencerInstrument.instrument = savedInstanceState.getByte("sequencerInstrument", SYNTH_BASS_1)
 		orbifold.orbifold = Orbifold.values().find {
 			it.ordinal == (savedInstanceState["orbifoldMode"] as Int? ?: -1)

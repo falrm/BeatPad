@@ -13,7 +13,7 @@ import android.widget.NumberPicker
 import android.widget.TextView
 import com.jonlatane.beatpad.ConductorActivity.Companion.SERVICE_NAME
 import com.jonlatane.beatpad.ConductorActivity.Companion.SERVICE_TYPE
-import com.jonlatane.beatpad.harmony.Orbifold
+import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import org.jetbrains.anko.contentView

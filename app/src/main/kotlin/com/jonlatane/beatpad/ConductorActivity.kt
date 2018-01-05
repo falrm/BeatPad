@@ -5,7 +5,7 @@ import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
 import android.view.MenuItem
-import com.jonlatane.beatpad.harmony.Orbifold.*
+import com.jonlatane.beatpad.model.harmony.Orbifold.*
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.sensors.Orientation

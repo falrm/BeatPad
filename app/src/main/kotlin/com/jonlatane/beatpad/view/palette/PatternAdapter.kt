@@ -5,7 +5,7 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.Pattern
+import com.jonlatane.beatpad.model.Melody
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
@@ -43,7 +43,7 @@ class PatternAdapter(
 		holder.patternPosition = patternPosition
 	}
 
-	fun insert(sequence: Pattern): Pattern {
+	fun insert(sequence: Melody): Melody {
 		part.segments.add(sequence)
 		notifyItemInserted(part.segments.size - 1)
 		return sequence

@@ -7,11 +7,11 @@ import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.harmony.Orbit
-import com.jonlatane.beatpad.harmony.Orbifold
-import com.jonlatane.beatpad.harmony.chord.Chord
-import com.jonlatane.beatpad.harmony.chord.Maj7
-import com.jonlatane.beatpad.harmony.chordsequence.Chromatic
+import com.jonlatane.beatpad.model.harmony.Orbit
+import com.jonlatane.beatpad.model.harmony.Orbifold
+import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.harmony.chord.Maj7
+import com.jonlatane.beatpad.model.harmony.chordsequence.Chromatic
 import com.jonlatane.beatpad.showOrbifoldPicker
 import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.*

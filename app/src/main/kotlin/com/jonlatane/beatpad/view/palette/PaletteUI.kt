@@ -6,7 +6,7 @@ import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.view.keyboard.keyboardView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
-import com.jonlatane.beatpad.view.pattern.toneSequenceView
+import com.jonlatane.beatpad.view.melody.toneSequenceView
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.*
 import java.util.concurrent.Executors

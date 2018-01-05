@@ -1,5 +1,9 @@
 package com.jonlatane.beatpad.model
 
+/**
+ * You should implement Instrument at the platform level,
+ * including serialization/deserialization of your instrument
+ */
 interface Instrument {
     fun play(tone: Int)
     fun stop()

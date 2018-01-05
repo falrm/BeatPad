@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.widget.PopupMenu
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.pattern.RationalPattern
+import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.model.Rest
 import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.toast
@@ -50,7 +50,7 @@ class PatternHolder(
 		}
 	}
 
-	private fun newPattern() = RationalPattern((1..16).map { Rest() }, 4)
+	private fun newPattern() = RationalMelody((1..16).map { Rest() }, 4)
 
 	private fun onPositionChanged() {
 		if(patternPosition < viewModel.palette.parts[partPosition].segments.size) {
