@@ -23,6 +23,7 @@ class PaletteViewModel : PatternViewModel() {
 	lateinit var partListView: HideableRecyclerView
 	lateinit var toolbarView: View
 	lateinit var keyboardView: View
+	lateinit var colorboardView: View
 
 	fun onBackPressed(): Boolean {
 		val result = editingSequence != null

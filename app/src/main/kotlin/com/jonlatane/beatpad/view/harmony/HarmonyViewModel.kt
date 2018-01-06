@@ -43,9 +43,9 @@ open class HarmonyViewModel {
 	}
 
 	internal fun markPlaying(element: Melody.Element) {
-		try {
+		/*try {
 			playbackPosition = harmony.elements.indexOf(element)
 		} catch (t: Throwable) {
-		}
+		}*/
 	}
 }

@@ -3,7 +3,9 @@ package com.jonlatane.beatpad.view.palette
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.hide
+import com.jonlatane.beatpad.view.colorboard.colorboardView
 import com.jonlatane.beatpad.view.keyboard.keyboardView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
 import com.jonlatane.beatpad.view.melody.toneSequenceView
@@ -127,6 +129,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 			}
 
 			viewModel.keyboardView = keyboardView {
+				id = IDSeq++
 				elevation = 10f
 				alpha = 0f
 				//translationY = dimen(R.dimen.key_height_white).toFloat()
@@ -134,6 +137,17 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 				height = dimen(R.dimen.key_height_white)
 				width = matchParent
 				alignParentBottom()
+			}
+
+			viewModel.colorboardView = colorboardView {
+				elevation = 10f
+				alpha = 0f
+				backgroundColor = color(android.R.color.white)
+				//translationY = dimen(R.dimen.key_height_white).toFloat()
+			}.lparams {
+				height = dimen(R.dimen.key_height_white)
+				width = matchParent
+				above(viewModel.keyboardView)
 			}
 
 			post {
@@ -144,8 +158,10 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 					.translationX(viewModel.toneSequenceView.width.toFloat())
 					.withEndAction { viewModel.toneSequenceView.alpha = 1f }
 					.start()
-				viewModel.keyboardView.hide(false)
-				viewModel.keyboardView.alpha = 1f
+				listOf(viewModel.keyboardView, viewModel.colorboardView).forEach {
+					it.hide(false)
+					it.alpha = 1f
+				}
 			}
 		}
 	}

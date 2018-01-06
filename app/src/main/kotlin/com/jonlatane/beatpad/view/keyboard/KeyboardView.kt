@@ -86,12 +86,3 @@ class KeyboardView @JvmOverloads constructor(
     enableScrolling = false
   }
 }
-
-
-
-
-fun ViewManager.keyboardView(theme: Int = 0)
-  = keyboardView(theme) {}
-
-inline fun ViewManager.keyboardView(theme: Int = 0, init: KeyboardView.() -> Unit)
-  = ankoView({ KeyboardView(it) }, theme, init)

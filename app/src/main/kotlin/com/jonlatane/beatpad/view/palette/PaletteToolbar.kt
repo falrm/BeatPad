@@ -23,6 +23,8 @@ inline fun ViewManager.paletteToolbar(
 ) = ankoView({
 	_LinearLayout(it).apply {
 		orientation = LinearLayout.HORIZONTAL
+		backgroundColor = context.color(R.color.colorPrimaryDark)
+
 		button {
 			text = "Play"
 		}.lparams {
@@ -30,6 +32,7 @@ inline fun ViewManager.paletteToolbar(
 			height = wrapContent
 			weight = 1f
 		}
+
 		button {
 			text = "Stop"
 		}.lparams {
@@ -37,8 +40,9 @@ inline fun ViewManager.paletteToolbar(
 			height = wrapContent
 			weight = 1f
 		}
+
 		button {
-			text = "Boards"
+			text = "Keys"
 		}.lparams {
 			width = matchParent
 			height = wrapContent
@@ -49,6 +53,18 @@ inline fun ViewManager.paletteToolbar(
 			else
 				viewModel.keyboardView.hide()
 		}
-		backgroundColor = context.color(R.color.colorPrimaryDark)
+
+		button {
+			text = "Colors"
+		}.lparams {
+			width = matchParent
+			height = wrapContent
+			weight = 1f
+		}.onClick {
+			if(viewModel.colorboardView.isHidden)
+				viewModel.colorboardView.show()
+			else
+				viewModel.colorboardView.hide()
+		}
 	}
 }, theme, init)
