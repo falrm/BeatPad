@@ -20,9 +20,11 @@ class KeyboardView @JvmOverloads constructor(
 ) : HorizontalScrollView(context, attrs, defStyle), HideableView {
   override var initialHeight: Int? = null
   val margin: Int = context.resources.displayMetrics.densityDpi / 5
+  val ioHandler: KeyboardIOHandler
 
   init {
     LayoutInflater.from(context).inflate(R.layout.view_keyboard, this, true)
+    ioHandler = KeyboardIOHandler(this)
   }
 
   override fun onTouchEvent(event: MotionEvent): Boolean {

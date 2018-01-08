@@ -3,7 +3,10 @@ package com.jonlatane.beatpad.view.palette
 import android.view.View
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.view.HideableRecyclerView
+import com.jonlatane.beatpad.view.colorboard.ColorboardView
+import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import com.jonlatane.beatpad.view.melody.PatternViewModel
 import kotlin.properties.Delegates.observable
 
@@ -22,8 +25,14 @@ class PaletteViewModel : PatternViewModel() {
 	lateinit var chordListView: View
 	lateinit var partListView: HideableRecyclerView
 	lateinit var toolbarView: View
-	lateinit var keyboardView: View
-	lateinit var colorboardView: View
+	lateinit var keyboardView: KeyboardView
+	lateinit var colorboardView: ColorboardView
+	var keyboardPart by observable<Part?>(null) { _, _, new ->
+		if(new != null) keyboardView.ioHandler.instrument = new.instrument
+	}
+	var colorboardPart: Part? by observable<Part?>(null) { _, _, new ->
+		if(new != null) colorboardView.instrument = new.instrument
+	}
 
 	fun onBackPressed(): Boolean {
 		val result = editingSequence != null

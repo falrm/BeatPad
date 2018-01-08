@@ -7,9 +7,11 @@ import android.util.AttributeSet
 import android.util.SparseArray
 import android.util.SparseIntArray
 import android.view.MotionEvent
+import com.jonlatane.beatpad.model.Instrument
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.HideableView
 import org.jetbrains.anko.info
+import kotlin.properties.Delegates.observable
 
 class ColorboardView @JvmOverloads constructor(
 	context: Context,
@@ -17,7 +19,7 @@ class ColorboardView @JvmOverloads constructor(
 	defStyle: Int = 0
 ) : BaseColorboardView(context, attrs, defStyle), HideableView {
 	override var initialHeight: Int? = null
-	val instrument = MIDIInstrument()
+	var instrument by observable<Instrument>(MIDIInstrument()) { _, old, _ -> old.stop() }
 	private val density = context.resources.displayMetrics.density
 	private var activePointers: SparseArray<PointF> = SparseArray()
 	private var pointerTones = SparseIntArray()

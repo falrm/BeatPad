@@ -13,6 +13,7 @@ import com.jonlatane.beatpad.showInstrumentPicker
 import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
+import org.jetbrains.anko.toast
 import kotlin.properties.Delegates
 
 class PartHolder(
@@ -35,6 +36,14 @@ class PartHolder(
 			when (item.itemId) {
 			//R.id.newDrawnPattern -> adapter.newToneSequence()
 				R.id.editPartInstrument -> editInstrument()
+				R.id.usePartOnColorboard -> {
+					viewModel.colorboardPart = part
+					patternRecycler.context.toast("Applied ${part.instrument.instrumentName} to Colorboard!")
+				}
+				R.id.usePartOnKeyboard -> {
+					viewModel.keyboardPart = part
+					patternRecycler.context.toast("Applied ${part.instrument.instrumentName} to Keyboard!")
+				}
 			//R.id.removePart -> TODO()
 			}
 			true

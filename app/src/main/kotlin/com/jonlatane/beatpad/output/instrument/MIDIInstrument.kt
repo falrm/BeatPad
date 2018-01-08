@@ -26,7 +26,7 @@ class MIDIInstrument(
         play(tone, DEFAULT_VELOCITY)
     }
 
-    fun play(tone: Int, velocity: Int) {// Construct a note ON message for the middle C at maximum velocity on channel 1:
+    override fun play(tone: Int, velocity: Int) {// Construct a note ON message for the middle C at maximum velocity on channel 1:
         selectInstrument(instrument)
         byte3[0] = NOTE_ON or channel  // STATUS byte: note On, 0x00 = channel 1
         byte3[1] = (tone + 60).toByte() // DATA byte: middle C = 60
@@ -45,7 +45,7 @@ class MIDIInstrument(
         tones.clear()
     }
 
-    fun stop(tone: Int) {
+    override fun stop(tone: Int) {
         // Construct a note OFF message for the middle C at minimum velocity on channel 1:
         byte3[0] = (NOTE_OFF or channel)  // STATUS byte: 0x80 = note Off, 0x00 = channel 1
         byte3[1] = (tone + 60).toByte()  // 0x3C = middle C

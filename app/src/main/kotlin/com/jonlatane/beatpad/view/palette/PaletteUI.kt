@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.view.palette
 
+import android.view.View
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
@@ -7,8 +8,8 @@ import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.view.colorboard.colorboardView
 import com.jonlatane.beatpad.view.keyboard.keyboardView
-import com.jonlatane.beatpad.view.orbifold.orbifoldView
 import com.jonlatane.beatpad.view.melody.toneSequenceView
+import com.jonlatane.beatpad.view.orbifold.orbifoldView
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.*
 import java.util.concurrent.Executors
@@ -158,7 +159,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 					.translationX(viewModel.toneSequenceView.width.toFloat())
 					.withEndAction { viewModel.toneSequenceView.alpha = 1f }
 					.start()
-				listOf(viewModel.keyboardView, viewModel.colorboardView).forEach {
+				listOf<View>(viewModel.keyboardView, viewModel.colorboardView).forEach {
 					it.hide(false)
 					it.alpha = 1f
 				}

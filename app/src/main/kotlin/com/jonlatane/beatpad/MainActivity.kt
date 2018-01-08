@@ -32,7 +32,7 @@ class MainActivity : BaseActivity() {
 	override val menuResource: Int = R.menu.main_menu
 	private val playing = AtomicBoolean(false)
 	private val executorService = Executors.newScheduledThreadPool(2)
-	private val pianoBoardInstrument = MIDIInstrument()
+	private val pianoBoardInstrument get() = keyboardIOHandler.instrument
 	private val harmonicInstrument = MIDIInstrument()
 	private val sequencerInstrument = MIDIInstrument()
 	private lateinit var keyboardIOHandler: KeyboardIOHandler
@@ -42,23 +42,28 @@ class MainActivity : BaseActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_main)
+		keyboardIOHandler = KeyboardIOHandler(keyboard)
 
-		colorboard.instrument.channel = 0
+		(colorboard.instrument as? MIDIInstrument)?.apply {
+			channel = 0
+			instrument = GeneralMidiConstants.ROCK_ORGAN
+		}
 		harmonicInstrument.channel = 1
+		harmonicInstrument.instrument = GeneralMidiConstants.SYNTHBRASS_1
+
 		sequencerInstrument.channel = 2
-		pianoBoardInstrument.channel = 3
+		sequencerInstrument.instrument = GeneralMidiConstants.ACOUSTIC_GRAND_PIANO
+
+		(pianoBoardInstrument as? MIDIInstrument)?.apply {
+			channel = 3
+			instrument = GeneralMidiConstants.SYNTH_BASS_1
+		}
 
 		supportActionBar?.elevation = 0f
 
-		colorboard.instrument.instrument = GeneralMidiConstants.ROCK_ORGAN
-		harmonicInstrument.instrument = GeneralMidiConstants.SYNTHBRASS_1
-		sequencerInstrument.instrument = GeneralMidiConstants.ACOUSTIC_GRAND_PIANO
-		pianoBoardInstrument.instrument = GeneralMidiConstants.SYNTH_BASS_1
-
 		val harmonyController = DeviceOrientationInstrument(harmonicInstrument)
 		RhythmAnimations.wireMelodicControl(orbifold, harmonyController)
-		keyboardIOHandler = KeyboardIOHandler(keyboard, pianoBoardInstrument)
-        asdf = MelodyStorage.loadSequence(this)
+    asdf = MelodyStorage.loadSequence(this)
 
 		sequencerThread = ToneSequencePlayerThread(
 			sequencerInstrument,
@@ -117,10 +122,10 @@ class MainActivity : BaseActivity() {
 		}
 		sequencerThread.beatsPerMinute = savedInstanceState.getInt("tempo")
 		updateTempoButton()
-		colorboard.instrument.instrument = savedInstanceState.getByte("melodicInstrument")
+		(colorboard.instrument as? MIDIInstrument)?.instrument = savedInstanceState.getByte("melodicInstrument")
 		harmonicInstrument.instrument = savedInstanceState.getByte("harmonicInstrument")
 		sequencerInstrument.instrument = savedInstanceState.getByte("sequencerInstrument")
-		pianoBoardInstrument.instrument = savedInstanceState.getByte("pianoInstrument")
+		(pianoBoardInstrument as? MIDIInstrument)?.instrument = savedInstanceState.getByte("pianoInstrument")
 		orbifold.orbifold = Orbifold.values().find { it.ordinal == savedInstanceState.getInt("orbifoldMode") }!!
 		if (savedInstanceState.getBoolean("pianoHidden")) {
 			keyboard.hide(animated = false)
@@ -137,10 +142,10 @@ class MainActivity : BaseActivity() {
 		super.onSaveInstanceState(outState)
 		outState.putParcelable("currentChord", orbifold.chord)
 		outState.putInt("tempo", sequencerThread.beatsPerMinute)
-		outState.putByte("melodicInstrument", colorboard.instrument.instrument)
+		outState.putByte("melodicInstrument", (colorboard.instrument as? MIDIInstrument)?.instrument ?: 0)
 		outState.putByte("harmonicInstrument", harmonicInstrument.instrument)
 		outState.putByte("sequencerInstrument", sequencerInstrument.instrument)
-		outState.putByte("pianoInstrument", pianoBoardInstrument.instrument)
+		outState.putByte("pianoInstrument", (pianoBoardInstrument as? MIDIInstrument)?.instrument ?: 0)
 		outState.putBoolean("pianoHidden", keyboard.isHidden)
 		outState.putBoolean("melodyHidden", colorboard.isHidden)
 		outState.putInt("orbifoldMode", orbifold.orbifold.ordinal)
@@ -148,10 +153,10 @@ class MainActivity : BaseActivity() {
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
-			R.id.color_board_instrument -> showInstrumentPicker(colorboard.instrument, this)
+			R.id.color_board_instrument -> (colorboard.instrument as? MIDIInstrument)?.let {showInstrumentPicker(it, this) }
 			R.id.harmony_instrument -> showInstrumentPicker(harmonicInstrument, this)
 			R.id.sequencer_instrument -> showInstrumentPicker(sequencerInstrument, this)
-			R.id.piano_board_instrument -> showInstrumentPicker(pianoBoardInstrument, this)
+			R.id.piano_board_instrument -> (pianoBoardInstrument as? MIDIInstrument)?.let {showInstrumentPicker(it, this) }
 			R.id.choose_tempo -> showTempoPicker(this)
 			R.id.keyboard_toggle -> {
 				if (keyboard.isHidden) {

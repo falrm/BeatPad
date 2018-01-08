@@ -4,6 +4,7 @@ import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.view.MenuItem
+import com.jonlatane.beatpad.model.Instrument
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.sensors.Orientation
@@ -21,7 +22,7 @@ import java.util.concurrent.Executors
 class InstrumentActivity : BaseActivity(), AnkoLogger {
     override val menuResource: Int = R.menu.instrument_menu
     lateinit var keyboardIOHandler: KeyboardIOHandler
-    val keyboardInstrument = MIDIInstrument()
+    lateinit var keyboardInstrument: Instrument
     var conductor: NsdServiceInfo? = null
     private val executorService = Executors.newScheduledThreadPool(2)
     @Volatile var requestedConductor = false
@@ -29,8 +30,10 @@ class InstrumentActivity : BaseActivity(), AnkoLogger {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_instrument)
-        keyboardInstrument.channel = 1
-        keyboardIOHandler = KeyboardIOHandler(keyboard, keyboardInstrument)
+        keyboardIOHandler = KeyboardIOHandler(keyboard)
+        (keyboardIOHandler.instrument as? MIDIInstrument)?.apply {
+            channel = 1
+        }
         Orientation.initialize(this)
         startChordListener()
     }
@@ -56,7 +59,7 @@ class InstrumentActivity : BaseActivity(), AnkoLogger {
                         val chord = Chord(root, extension.toIntArray())
                         contentView?.post {
                             keyboardIOHandler.highlightChord(chord)
-                            melody.chord = chord
+                            colorboard.chord = chord
                         }
                     } catch(e: Throwable) {
                         Snackbar.make(contentView!!, "Failed to connect to conductor", Snackbar.LENGTH_SHORT).show()
@@ -83,14 +86,18 @@ class InstrumentActivity : BaseActivity(), AnkoLogger {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.color_instrument -> showInstrumentPicker(melody.instrument, this)
-            R.id.keyboard_instrument -> showInstrumentPicker(keyboardInstrument, this)
+            R.id.color_instrument -> (colorboard.instrument as? MIDIInstrument)?.let {
+                showInstrumentPicker(it, this)
+            }
+            R.id.keyboard_instrument -> (keyboardInstrument as? MIDIInstrument)?.let {
+                showInstrumentPicker(it, this)
+            }
             R.id.choose_conductor -> showConductorPicker(this)
         }
         return true
     }
     override fun updateMenuOptions() {
-        menu.findItem(R.id.color_instrument).title = "Color Instrument: ${melody.instrument.instrumentName}"
+        menu.findItem(R.id.color_instrument).title = "Color Instrument: ${colorboard.instrument.instrumentName}"
         menu.findItem(R.id.keyboard_instrument).title = "Keyboard Instrument: ${keyboardInstrument.instrumentName}"
 
     }

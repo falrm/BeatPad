@@ -13,7 +13,7 @@
         android:layout_alignParentBottom="true"/>
 
     <com.jonlatane.beatpad.view.colorboard.ColorboardView
-        android:id="@+id/melody"
+        android:id="@+id/colorboard"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/keyboard"

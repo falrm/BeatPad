@@ -5,6 +5,8 @@ package com.jonlatane.beatpad.model
  * including serialization/deserialization of your instrument
  */
 interface Instrument {
+    fun play(tone: Int, velocity: Int)
+    fun stop(tone: Int)
     fun play(tone: Int)
     fun stop()
     val instrumentName get() = "Base Instrument"
