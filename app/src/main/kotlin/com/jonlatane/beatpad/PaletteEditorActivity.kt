@@ -2,12 +2,14 @@ package com.jonlatane.beatpad
 
 import android.app.Activity
 import android.os.Bundle
+import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.storage.MelodyStorage
+import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.util.formatted
 import com.jonlatane.beatpad.view.palette.PaletteUI
 import org.billthefarmer.mididriver.GeneralMidiConstants
@@ -20,7 +22,8 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 	val viewModel get() = ui.viewModel
 	val sequencerInstrument get() = ui.sequencerInstrument
 	val orbifold get() = viewModel.orbifold
-	var toneSequence get() = viewModel.toneSequence
+	var toneSequence
+		get() = viewModel.toneSequence
 		set(value) {
 			viewModel.toneSequence = value
 		}
@@ -35,24 +38,26 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 
 		val bundle = savedInstanceState ?: try {
 			intent.extras.getBundle("playgroundState")
-		} catch(t: Throwable) { savedInstanceState }
+		} catch (t: Throwable) {
+			savedInstanceState
+		}
 
-		if(bundle != null) {
+		if (bundle != null) {
 			println("Got intent with extras: ${bundle.formatted()}")
 			onRestoreInstanceState(bundle)
 		}
 	}
 
 	override fun onBackPressed() {
-		if(!viewModel.onBackPressed()) super.onBackPressed()
+		if (!viewModel.onBackPressed()) super.onBackPressed()
 	}
 
 	override fun onResume() {
 		super.onResume()
-		MIDIInstrument.DRIVER.start()
+		AndroidMidi.ONBOARD_DRIVER.start()
 
 		// Get the configuration.
-		val config = MIDIInstrument.DRIVER.config()
+		val config = AndroidMidi.ONBOARD_DRIVER.config()
 
 		// Print out the details.
 		debug("maxVoices: " + config[0])
@@ -63,15 +68,15 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 
 	override fun onPause() {
 		super.onPause()
-        AudioTrackCache.releaseAll()
-		MIDIInstrument.DRIVER.stop()
+		AudioTrackCache.releaseAll()
+		AndroidMidi.ONBOARD_DRIVER.stop()
 		ui.sequencerThread.stopped = true
-        MelodyStorage.storeSequence(toneSequence, this)
+		PaletteStorage.storePalette(viewModel.palette, this)
 	}
 
 	override fun onStop() {
 		super.onStop()
-        MelodyStorage.storeSequence(toneSequence, this)
+		PaletteStorage.storePalette(viewModel.palette, this)
 	}
 
 	override fun onRestoreInstanceState(savedInstanceState: Bundle) {

@@ -9,15 +9,15 @@ import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.warn
 
-class PatternToneAxis @JvmOverloads constructor(
+class MelodyToneAxis @JvmOverloads constructor(
 	context: Context,
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
 ) : BaseColorboardView(context, attrs, defStyle), HideableView, AnkoLogger {
 	override var initialHeight: Int? = 1
 	override val renderVertically = true
-	override val halfStepsOnScreen = 88
-	override var backgroundAlpha = 100
+	override val halfStepsOnScreen = 88f
+	override var colorGuideAlpha = 100
 
 	init {
 		showSteps = true
@@ -35,8 +35,8 @@ class PatternToneAxis @JvmOverloads constructor(
 			(-5..5).forEach { octave ->
 				listOf(1, 3, 6, 8, 10).forEach { step ->
 					val tone = 12 * octave + step
-					val top = height - height * (tone - BaseColorboardView.BOTTOM) / 88f
-					val bottom = height - height * (tone - BaseColorboardView.BOTTOM + 1) / 88f
+					val top = height - height * (tone - lowestPitch) / 88f
+					val bottom = height - height * (tone - lowestPitch + 1) / 88f
 					canvas.drawRect(
 						bounds.left.toFloat(),
 						top,

@@ -6,6 +6,7 @@ import com.jonlatane.beatpad.BuildConfig
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.harmony.chord.heptatonics.Heptatonics
 import com.jonlatane.beatpad.util.mod12
+import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 
 class Chord : Parcelable, Transposable<Chord> {
@@ -96,7 +97,7 @@ class Chord : Parcelable, Transposable<Chord> {
 	 * @param bottom lowest allowed note, inclusive
 	 * @param top highest allowed note, inclusive
 	 */
-	fun getTones(bottom: Int = BaseColorboardView.BOTTOM, top: Int = BaseColorboardView.TOP): List<Int> {
+	fun getTones(bottom: Int = AlphaDrawer.BOTTOM, top: Int = AlphaDrawer.TOP): List<Int> {
 		return (bottom..top).filter {
 			it.mod12 in extension.map { (root + it).mod12 }
 		}
@@ -106,7 +107,7 @@ class Chord : Parcelable, Transposable<Chord> {
 	 * Retrieves the closest tone in this chord to the given tone.
 	 * If two tones in the chord are equally close, returns the lower one.
 	 */
-	fun closestTone(tone: Int, bottom: Int = BaseColorboardView.BOTTOM, top: Int = BaseColorboardView.TOP): Int {
+	fun closestTone(tone: Int, bottom: Int = AlphaDrawer.BOTTOM, top: Int = AlphaDrawer.TOP): Int {
 		return getTones(Math.max(bottom, tone - 12), Math.min(top, tone + 12)).minBy {
 			Math.abs(tone - it)
 		}!!

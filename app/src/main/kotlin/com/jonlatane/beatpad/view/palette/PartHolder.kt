@@ -7,6 +7,8 @@ import android.widget.PopupMenu
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.midi.AndroidMidi
+import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showInstrumentPicker
@@ -98,7 +100,7 @@ class PartHolder(
 			setOnClickListener {
 				viewModel.palette.parts.add(
 					Part(
-						MIDIInstrument.randomInstrument(
+						GM1Effects.randomInstrument(
 							channel = viewModel.palette.parts.size.toByte(),
 							exceptions = viewModel.palette.parts.mapNotNull {
 								(it.instrument as? MIDIInstrument)?.instrument

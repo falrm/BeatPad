@@ -17,9 +17,9 @@ import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.sdk25.coroutines.onScrollChange
 
 
-inline fun ViewManager.toneSequenceView(
+inline fun ViewManager.melodyView(
 	theme: Int = 0,
-	viewModel: PatternViewModel,
+	viewModel: MelodyViewModel,
 
 	//ui: AnkoContext<Any>,
 	init: HideableRelativeLayout.() -> Unit
@@ -102,8 +102,8 @@ inline fun ViewManager.toneSequenceView(
 						isItemPrefetchEnabled = false
 					}
 					overScrollMode = View.OVER_SCROLL_NEVER
-					viewModel.patternElementAdapter = PatternElementAdapter(viewModel, this)
-					adapter = viewModel.patternElementAdapter
+					viewModel.melodyElementAdapter = MelodyElementAdapter(viewModel, this)
+					adapter = viewModel.melodyElementAdapter
 					adapter.registerAdapterDataObserver(
 						object : RecyclerView.AdapterDataObserver() {
 							override fun onItemRangeInserted(start: Int, count: Int) {

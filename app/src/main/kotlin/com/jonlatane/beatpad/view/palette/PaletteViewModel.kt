@@ -5,17 +5,20 @@ import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.view.HideableRecyclerView
-import com.jonlatane.beatpad.view.colorboard.ColorboardView
+import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
 import com.jonlatane.beatpad.view.keyboard.KeyboardView
-import com.jonlatane.beatpad.view.melody.PatternViewModel
+import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import kotlin.properties.Delegates.observable
 
 /**
  * The PaletteViewModel still assumes we'll only be editing
  * one Melody at a time.
  */
-class PaletteViewModel : PatternViewModel() {
-	val palette = Palette()
+class PaletteViewModel(
+) : MelodyViewModel() {
+	var palette: Palette by observable<Palette>(Palette()) { _, _, new ->
+
+	}
 	var editingSequence by observable<Melody?>(null) { _, _, new ->
 		if(new != null) {
 			toneSequence = new
@@ -26,7 +29,7 @@ class PaletteViewModel : PatternViewModel() {
 	lateinit var partListView: HideableRecyclerView
 	lateinit var toolbarView: View
 	lateinit var keyboardView: KeyboardView
-	lateinit var colorboardView: ColorboardView
+	lateinit var colorboardView: ColorboardInputView
 	var keyboardPart by observable<Part?>(null) { _, _, new ->
 		if(new != null) keyboardView.ioHandler.instrument = new.instrument
 	}

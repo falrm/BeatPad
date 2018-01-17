@@ -31,7 +31,7 @@
 		android:layout_height="@dimen/key_height_white"
 		android:layout_alignParentBottom="true"/>
 
-	<com.jonlatane.beatpad.view.colorboard.ColorboardView
+	<com.jonlatane.beatpad.view.colorboard.ColorboardInputView
 		android:id="@+id/colorboard"
 		android:layout_width="match_parent"
 		android:layout_height="@dimen/key_height_white"

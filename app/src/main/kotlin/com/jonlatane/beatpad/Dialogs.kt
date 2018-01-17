@@ -13,6 +13,7 @@ import android.widget.NumberPicker
 import android.widget.TextView
 import com.jonlatane.beatpad.ConductorActivity.Companion.SERVICE_NAME
 import com.jonlatane.beatpad.ConductorActivity.Companion.SERVICE_TYPE
+import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
@@ -31,7 +32,7 @@ fun showOrbifoldPicker(orbifold: OrbifoldView) {
 fun showInstrumentPicker(instrument: MIDIInstrument, context: Context, onChosen: () -> Unit = {}) {
     val builder = AlertDialog.Builder(context)
     builder.setTitle("Choose an instrument")
-    builder.setItems(MIDIInstrument.MIDI_INSTRUMENT_NAMES.toTypedArray()) { _, which ->
+    builder.setItems(GM1Effects.MIDI_INSTRUMENT_NAMES.toTypedArray()) { _, which ->
         instrument.instrument = which.toByte()
         (context as? BaseActivity)?.updateMenuOptions()
         onChosen()

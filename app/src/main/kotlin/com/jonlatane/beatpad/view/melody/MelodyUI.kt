@@ -21,7 +21,7 @@ class MelodyUI : AnkoComponent<SequenceEditorActivity> {
 	}
 
 	private val executorService = Executors.newScheduledThreadPool(2)
-	val viewModel = PatternViewModel()
+	val viewModel = MelodyViewModel()
 	val previewInstrument = MIDIInstrument().apply {
 		channel = 4
 		instrument = GeneralMidiConstants.SYNTH_BASS_1
@@ -54,7 +54,7 @@ class MelodyUI : AnkoComponent<SequenceEditorActivity> {
 				}
 			}
 
-			toneSequenceView(viewModel = viewModel) {
+			melodyView(viewModel = viewModel) {
 				id = IDSeq++
 			}.lparams {
 				width = MATCH_PARENT

@@ -2,6 +2,7 @@ package com.jonlatane.beatpad
 
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
+import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import org.jetbrains.anko.AnkoLogger
@@ -21,10 +22,10 @@ abstract class BaseActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onResume() {
         super.onResume()
-        MIDIInstrument.DRIVER.start()
+        AndroidMidi.ONBOARD_DRIVER.start()
 
         // Get the configuration.
-        val config = MIDIInstrument.DRIVER.config()
+        val config = AndroidMidi.ONBOARD_DRIVER.config()
 
         // Print out the details.
         debug("maxVoices: " + config[0])
@@ -36,6 +37,6 @@ abstract class BaseActivity : AppCompatActivity(), AnkoLogger {
     override fun onPause() {
         super.onPause()
         AudioTrackCache.releaseAll()
-        MIDIInstrument.DRIVER.stop()
+        AndroidMidi.ONBOARD_DRIVER.stop()
     }
 }

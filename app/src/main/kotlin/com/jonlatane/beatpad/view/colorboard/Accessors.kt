@@ -7,5 +7,5 @@ import org.jetbrains.anko.custom.ankoView
 fun ViewManager.colorboardView(theme: Int = 0)
 	= colorboardView(theme) {}
 
-inline fun ViewManager.colorboardView(theme: Int = 0, init: ColorboardView.() -> Unit)
-	= ankoView({ ColorboardView(it) }, theme, init)
+inline fun ViewManager.colorboardView(theme: Int = 0, init: ColorboardInputView.() -> Unit)
+	= ankoView({ ColorboardInputView(it) }, theme, init)

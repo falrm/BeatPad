@@ -4,11 +4,11 @@ import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Melody.Element.Note
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.Instrument
-import com.jonlatane.beatpad.view.melody.PatternViewModel
+import com.jonlatane.beatpad.view.melody.MelodyViewModel
 
 class ToneSequencePlayerThread(
 	val instrument: Instrument,
-	val viewModel: PatternViewModel? = null,
+	val viewModel: MelodyViewModel? = null,
 	val sequence: Melody = viewModel!!.toneSequence,
 	val chordResolver: () -> Chord = { viewModel!!.orbifold.chord },
 	val onFinish: (ToneSequencePlayerThread) -> Unit = {},

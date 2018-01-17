@@ -10,12 +10,13 @@ import com.jonlatane.beatpad.model.Melody.Element.Note
 import com.jonlatane.beatpad.model.Melody.Element.Sustain
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.util.HideableView
+import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.warn
 
 
-class PatternElementView @JvmOverloads constructor(
+class MelodyElementView @JvmOverloads constructor(
 	context: Context,
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
@@ -23,7 +24,7 @@ class PatternElementView @JvmOverloads constructor(
 	init {
 		showSteps = true
 	}
-	lateinit var viewModel: PatternViewModel
+	lateinit var viewModel: MelodyViewModel
 
 	var elementPosition = 0
 	val element: Element get() = viewModel.toneSequence.elements[elementPosition]
@@ -31,7 +32,7 @@ class PatternElementView @JvmOverloads constructor(
 
 	override var initialHeight: Int? = null
 	override val renderVertically = true
-	override val halfStepsOnScreen = 88
+	override val halfStepsOnScreen = 88f
 	override val drawPadding = 30
 	override val nonRootPadding = 20
 	override var chord: Chord
@@ -39,7 +40,7 @@ class PatternElementView @JvmOverloads constructor(
 		set(value) { throw UnsupportedOperationException() }
 
 	override fun onDraw(canvas: Canvas) {
-		backgroundAlpha = if(viewModel.playbackPosition == elementPosition) 255 else 187
+		colorGuideAlpha = if(viewModel.playbackPosition == elementPosition) 255 else 187
 		super.onDraw(canvas)
 		canvas.drawStepNotes()
 		canvas.drawRhythm()
@@ -56,11 +57,10 @@ class PatternElementView @JvmOverloads constructor(
 			val tones = when (element) {
 				is Note -> (element as Note).tones
 				is Sustain -> (element as Sustain).note.tones
-				null -> emptySet<Int>()
 			}
 			tones.forEach { tone ->
-				val top = height - height * (tone - BaseColorboardView.BOTTOM) / 88f
-				val bottom = height - height * (tone - BaseColorboardView.BOTTOM + 1) / 88f
+				val top = height - height * (tone - AlphaDrawer.BOTTOM) / 88f
+				val bottom = height - height * (tone - AlphaDrawer.BOTTOM + 1) / 88f
 				drawRect(
 					bounds.left.toFloat(),
 					top,

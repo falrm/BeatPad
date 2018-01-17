@@ -7,14 +7,14 @@ import org.jetbrains.anko.custom.ankoView
 fun ViewManager.toneSequenceElement(theme: Int = 0)
 	= toneSequenceElement(theme) {}
 
-inline fun ViewManager.toneSequenceElement(theme: Int = 0, init: PatternElementView.() -> Unit)
-	= ankoView({ PatternElementView(it) }, theme, init)
+inline fun ViewManager.toneSequenceElement(theme: Int = 0, init: MelodyElementView.() -> Unit)
+	= ankoView({ MelodyElementView(it) }, theme, init)
 
 fun ViewManager.toneSequenceAxis(theme: Int = 0)
 	= toneSequenceAxis(theme) {}
 
-inline fun ViewManager.toneSequenceAxis(theme: Int = 0, init: PatternToneAxis.() -> Unit)
-	= ankoView({ PatternToneAxis(it) }, theme, init)
+inline fun ViewManager.toneSequenceAxis(theme: Int = 0, init: MelodyToneAxis.() -> Unit)
+	= ankoView({ MelodyToneAxis(it) }, theme, init)
 
 
 fun ViewManager.bottomScroller(theme: Int = 0)

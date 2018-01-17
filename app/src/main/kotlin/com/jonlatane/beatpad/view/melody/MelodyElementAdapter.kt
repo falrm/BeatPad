@@ -7,26 +7,26 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 
 
-class PatternElementAdapter(
-	val viewModel: PatternViewModel,
+class MelodyElementAdapter(
+	val viewModel: MelodyViewModel,
 	val recyclerView: _RecyclerView
-) : RecyclerView.Adapter<PatternElementHolder>() {
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatternElementHolder? {
+) : RecyclerView.Adapter<MelodyElementHolder>() {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyElementHolder? {
 		return with(recyclerView) {
-			PatternElementHolder(
+			MelodyElementHolder(
 				viewModel = viewModel,
 				element = toneSequenceElement {
-					this@toneSequenceElement.viewModel = this@PatternElementAdapter.viewModel
+					this@toneSequenceElement.viewModel = this@MelodyElementAdapter.viewModel
 				}.lparams {
 					width = dimen(R.dimen.subdivision_controller_size)
 					height = dip(1000f)
 				},
-				adapter = this@PatternElementAdapter
+				adapter = this@MelodyElementAdapter
 			)
 		}
 	}
 
-	override fun onBindViewHolder(holder: PatternElementHolder, elementPosition: Int) {
+	override fun onBindViewHolder(holder: MelodyElementHolder, elementPosition: Int) {
 		holder.element.elementPosition = elementPosition
 		holder.element.invalidate()
 	}

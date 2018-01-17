@@ -13,7 +13,7 @@ import com.jonlatane.beatpad.util.HideableView
 import org.jetbrains.anko.info
 import kotlin.properties.Delegates.observable
 
-class ColorboardView @JvmOverloads constructor(
+class ColorboardInputView @JvmOverloads constructor(
 	context: Context,
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
@@ -25,12 +25,12 @@ class ColorboardView @JvmOverloads constructor(
 	private var pointerTones = SparseIntArray()
 	private var pointerVelocities = SparseIntArray()
 	override val renderVertically = false
-	override val halfStepsOnScreen = 15
+	override val halfStepsOnScreen = 15f
 
 	override fun onDraw(canvas: Canvas) {
 		super.onDraw(canvas)
 		paint.color = 0xCC000000.toInt()
-		for (i in 0..activePointers.size() - 1) {
+		for (i in 0 until activePointers.size()) {
 			val key = activePointers.keyAt(i)
 			// get the object by the key.
 			val pointer = activePointers[key]

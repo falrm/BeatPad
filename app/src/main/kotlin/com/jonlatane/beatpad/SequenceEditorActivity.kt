@@ -2,6 +2,7 @@ package com.jonlatane.beatpad
 
 import android.app.Activity
 import android.os.Bundle
+import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.Orbifold.intermediate
 import com.jonlatane.beatpad.model.harmony.chord.Chord
@@ -44,10 +45,10 @@ class SequenceEditorActivity : Activity(), AnkoLogger {
 
 	override fun onResume() {
 		super.onResume()
-		MIDIInstrument.DRIVER.start()
+		AndroidMidi.ONBOARD_DRIVER.start()
 
 		// Get the configuration.
-		val config = MIDIInstrument.DRIVER.config()
+		val config = AndroidMidi.ONBOARD_DRIVER.config()
 
 		// Print out the details.
 		debug("maxVoices: " + config[0])
@@ -59,7 +60,7 @@ class SequenceEditorActivity : Activity(), AnkoLogger {
 	override fun onPause() {
 		super.onPause()
 		AudioTrackCache.releaseAll()
-		MIDIInstrument.DRIVER.stop()
+		AndroidMidi.ONBOARD_DRIVER.stop()
 		ui.sequencerThread.stopped = true
 		MelodyStorage.storeSequence(toneSequence, this)
 	}

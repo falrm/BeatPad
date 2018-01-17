@@ -4,13 +4,10 @@ import android.view.View
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
-import com.jonlatane.beatpad.storage.MelodyStorage
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.NonDelayedRecyclerView
-import com.jonlatane.beatpad.view.NonDelayedScrollView
-import com.jonlatane.beatpad.view.melody.BottomScroller
-import com.jonlatane.beatpad.view.melody.PatternElementAdapter
-import com.jonlatane.beatpad.view.melody.PatternToneAxis
+import com.jonlatane.beatpad.view.melody.MelodyElementAdapter
+import com.jonlatane.beatpad.view.melody.MelodyToneAxis
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.properties.Delegates.observable
@@ -25,7 +22,7 @@ open class HarmonyViewModel {
 	}
 	val playing = AtomicBoolean(false)
 	lateinit var orbifold: OrbifoldView
-	var verticalAxis: PatternToneAxis? = null
+	var verticalAxis: MelodyToneAxis? = null
 	var chord
 		get() = orbifold.chord
 		set(value) {
@@ -33,7 +30,7 @@ open class HarmonyViewModel {
 		}
 	lateinit var harmonyView: HideableRelativeLayout
 	lateinit var centerHorizontalScroller: NonDelayedRecyclerView
-	var chordAdapter: PatternElementAdapter? = null
+	var chordAdapter: MelodyElementAdapter? = null
 	lateinit var sequencerThread: ToneSequencePlayerThread
 	val bottoms = mutableListOf<View>()
 
