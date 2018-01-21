@@ -8,4 +8,5 @@ abstract class RecordedMIDIMelody(
 	override var tonic: Int = 0
 ) : Melody {
 	override var shouldConformWithHarmony = false
+	override val type get() = "midi"
 }

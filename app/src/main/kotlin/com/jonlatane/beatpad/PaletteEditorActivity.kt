@@ -20,13 +20,6 @@ import org.jetbrains.anko.setContentView
 class PaletteEditorActivity : Activity(), AnkoLogger {
 	lateinit var ui: PaletteUI
 	val viewModel get() = ui.viewModel
-	val sequencerInstrument get() = ui.sequencerInstrument
-	val orbifold get() = viewModel.orbifold
-	var toneSequence
-		get() = viewModel.toneSequence
-		set(value) {
-			viewModel.toneSequence = value
-		}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -34,7 +27,7 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 		ui = PaletteUI().also {
 			it.setContentView(this)
 		}
-		viewModel.sequencerThread = ToneSequencePlayerThread(sequencerInstrument, viewModel, beatsPerMinute = 104)
+		viewModel.palette = PaletteStorage.loadPalette(this)
 
 		val bundle = savedInstanceState ?: try {
 			intent.extras.getBundle("playgroundState")
@@ -70,7 +63,7 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 		super.onPause()
 		AudioTrackCache.releaseAll()
 		AndroidMidi.ONBOARD_DRIVER.stop()
-		ui.sequencerThread.stopped = true
+		//ui.sequencerThread.stopped = true
 		PaletteStorage.storePalette(viewModel.palette, this)
 	}
 
@@ -81,24 +74,22 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 
 	override fun onRestoreInstanceState(savedInstanceState: Bundle) {
 		super.onRestoreInstanceState(savedInstanceState)
-		toneSequence = MelodyStorage.loadSequence(this)
 		ui.sequencerInstrument.instrument = savedInstanceState.getByte("sequencerInstrument", GeneralMidiConstants.SYNTH_BASS_1)
-		orbifold.orbifold = Orbifold.values().find {
+		viewModel.orbifold.orbifold = Orbifold.values().find {
 			it.ordinal == (savedInstanceState["orbifoldMode"] as Int? ?: -1)
 		} ?: Orbifold.intermediate
 		val chord = savedInstanceState.getParcelable<Chord>("currentChord")
 		if (chord != null) {
-			orbifold.chord = chord
+			viewModel.orbifold.chord = chord
 		}
-		viewModel.sequencerThread = ToneSequencePlayerThread(sequencerInstrument, viewModel, beatsPerMinute = 104)
-		ui.sequencerThread.beatsPerMinute = savedInstanceState.getInt("tempo", 147)
 	}
 
 	override fun onSaveInstanceState(outState: Bundle) {
 		super.onSaveInstanceState(outState)
-		outState.putParcelable("currentChord", orbifold.chord)
-		outState.putInt("tempo", ui.sequencerThread.beatsPerMinute)
-		outState.putByte("sequencerInstrument", ui.sequencerInstrument.instrument)
-		outState.putInt("orbifoldMode", orbifold.orbifold.ordinal)
+		PaletteStorage.storePalette(viewModel.palette, this)
+		outState.putParcelable("currentChord", viewModel.orbifold.chord)
+		//outState.putInt("tempo", ui.sequencerThread.beatsPerMinute)
+		//outState.putByte("sequencerInstrument", ui.sequencerInstrument.instrument)
+		outState.putInt("orbifoldMode", viewModel.orbifold.orbifold.ordinal)
 	}
 }

@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.model.harmony
 
 import com.jonlatane.beatpad.model.harmony.chord.*
+import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 import io.damo.aspen.*
 import org.assertj.core.api.Assertions.*
@@ -28,7 +29,7 @@ class ChordTest : Test({
 		}
 		test("spans") {
 			val chord = Chord(0, intArrayOf(0)) // Just middle C
-			assertThat(chord.getTones(BaseColorboardView.BOTTOM, BaseColorboardView.TOP).size).isEqualTo(8)
+			assertThat(chord.getTones(AlphaDrawer.BOTTOM, AlphaDrawer.TOP).size).isEqualTo(8)
 		}
 	}
 

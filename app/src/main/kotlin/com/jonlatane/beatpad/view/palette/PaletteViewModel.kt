@@ -16,8 +16,8 @@ import kotlin.properties.Delegates.observable
  */
 class PaletteViewModel(
 ) : MelodyViewModel() {
-	var palette: Palette by observable<Palette>(Palette()) { _, _, new ->
-
+	var palette by observable(Palette()) { _, _, _ ->
+		editingSequence = null
 	}
 	var editingSequence by observable<Melody?>(null) { _, _, new ->
 		if(new != null) {

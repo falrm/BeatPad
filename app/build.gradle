@@ -3,6 +3,7 @@ buildscript {
 	ext.anko_version = '0.10.1'
 	ext.support_version = '27.0.2'
 	ext.serialization_version = '0.4'
+	ext.jackson_version = '2.9.3'
 	repositories {
 		jcenter()
 		google()
@@ -28,6 +29,7 @@ android {
 		targetSdkVersion 27
 		versionCode 4
 		versionName "Alpha 10"
+		multiDexEnabled true
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 	}
 	buildTypes {
@@ -73,7 +75,7 @@ dependencies {
 		exclude group: 'com.android.support', module: 'support-annotations'
 	})
 	compile 'com.google.code.gson:gson:2.8.1'
-  compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
+	compile "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
 
 	compile 'com.github.billthefarmer:mididriver:v1.13'
 	compile 'org.apache.commons:commons-lang3:3.5'

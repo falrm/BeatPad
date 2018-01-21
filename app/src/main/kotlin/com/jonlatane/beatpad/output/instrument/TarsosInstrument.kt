@@ -4,6 +4,7 @@ import be.tarsos.dsp.io.android.AudioDispatcherFactory
 import com.jonlatane.beatpad.model.Instrument
 
 class TarsosInstrument(val adp: AudioDispatcherFactory): Instrument {
+  override val type: String get() = "tarsos"
   override fun play(tone: Int) {
     TODO("not implemented")
   }

@@ -9,4 +9,5 @@ abstract class RecordedAudioMelody(
 	var data: ByteArray = byteArrayOf()
 ) : Melody {
 	override var shouldConformWithHarmony = false
+	override val type get() = "audio"
 }

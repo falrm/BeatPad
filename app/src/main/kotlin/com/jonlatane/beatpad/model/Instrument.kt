@@ -9,5 +9,6 @@ interface Instrument {
     fun stop(tone: Int)
     fun play(tone: Int)
     fun stop()
+    val type: String get() = "To be used during deserialization"
     val instrumentName get() = "Base Instrument"
 }

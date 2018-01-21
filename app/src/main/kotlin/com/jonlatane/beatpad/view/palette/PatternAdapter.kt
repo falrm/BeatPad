@@ -44,10 +44,10 @@ class PatternAdapter(
 	}
 
 	fun insert(sequence: Melody): Melody {
-		part.segments.add(sequence)
-		notifyItemInserted(part.segments.size - 1)
+		part.melodies.add(sequence)
+		notifyItemInserted(part.melodies.size - 1)
 		return sequence
 	}
 
-	override fun getItemCount(): Int = viewModel.palette.parts[partPosition].segments.size + 1
+	override fun getItemCount(): Int = viewModel.palette.parts[partPosition].melodies.size + 1
 }

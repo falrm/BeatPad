@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.output.instrument
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.midi.AndroidMidi.CONTROL_CHANGE
 import com.jonlatane.beatpad.midi.AndroidMidi.CONTROL_LSB
@@ -22,6 +23,7 @@ class MIDIInstrument(
 	@Transient private val tones = mutableListOf<Int>()
 	@Transient private val byte2 = ByteArray(2)
 	@Transient private val byte3 = ByteArray(3)
+	override val type get() = "midi"
 
 	object GM2Configuration {
 		var msb: Byte? = null
@@ -63,7 +65,7 @@ class MIDIInstrument(
 	}
 
 	override val instrumentName: String
-		get() = if(GM2Configuration.msb != null) GM2Effects.all.find {
+		@JsonIgnore get() = if(GM2Configuration.msb != null) GM2Effects.all.find {
 			it.patchNumber == instrument.toInt()
 		}?.patchName ?: ""
 		else MIDI_INSTRUMENT_NAMES[instrument.toInt()]

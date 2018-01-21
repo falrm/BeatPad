@@ -21,7 +21,7 @@ class PatternHolder(
 	var patternPosition by Delegates.observable(initialPattern) {
 		_, _, _ -> onPositionChanged()
 	}
-	val pattern get() = part.segments[patternPosition]
+	val pattern get() = part.melodies[patternPosition]
 	private val context get() = textView.context
 
 	private val newPatternMenu = PopupMenu(textView.context, textView)
@@ -50,10 +50,10 @@ class PatternHolder(
 		}
 	}
 
-	private fun newPattern() = RationalMelody((1..16).map { Rest() }, 4)
+	private fun newPattern() = RationalMelody((1..16).map { Rest() }.toMutableList(), 4)
 
 	private fun onPositionChanged() {
-		if(patternPosition < viewModel.palette.parts[partPosition].segments.size) {
+		if(patternPosition < viewModel.palette.parts[partPosition].melodies.size) {
 			editMode()
 		} else {
 			addMode()

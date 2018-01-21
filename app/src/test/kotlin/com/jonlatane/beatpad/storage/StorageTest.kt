@@ -5,23 +5,13 @@ import com.jonlatane.beatpad.model.harmony.chord.*
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 import io.damo.aspen.*
 import org.assertj.core.api.Assertions.*
-import kotlinx.serialization.*
-import kotlinx.serialization.cbor.CBOR
-import kotlinx.serialization.json.JSON
 
 class StorageTest : Test({
-	val palette = Palette()
+	val palette = PaletteStorage.basePalette
 	test("Storage") {
-		val data = JSON.stringify(palette)
+		val data = PaletteStorage.stringify(palette)
 		println(data)
+		val newPalette = PaletteStorage.parse(data)
+		println(PaletteStorage.stringify(newPalette))
 	}
 })
-
-object PaletteStorageYay {
-  val json = JSON(
-	  indent = "  "
-  )
-	fun store(file: String, palette: Palette) {
-
-	}
-}

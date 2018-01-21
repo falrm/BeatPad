@@ -12,4 +12,5 @@ class RationalMelody(
 	override val elements: MutableList<Element>
 		= elements.toMutableList()
 	override var tonic: Int = 0
+	override val type get() = "rational"
 }
