@@ -3,12 +3,14 @@ package com.jonlatane.beatpad.view.palette
 import android.view.View
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.view.colorboard.colorboardView
 import com.jonlatane.beatpad.view.keyboard.keyboardView
 import com.jonlatane.beatpad.view.melody.melodyView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
+import kotlinx.android.synthetic.main.activity_main.*
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.*
 import java.util.concurrent.Executors
@@ -161,6 +163,13 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 				listOf<View>(viewModel.keyboardView, viewModel.colorboardView).forEach {
 					it.hide(false)
 					it.alpha = 1f
+				}
+
+				viewModel.orbifold.onChordChangedListener = { c: Chord ->
+					val tones = c.getTones()
+					viewModel.colorboardView.chord = c
+					//viewModel.harmonyController.tones = tones
+					viewModel.keyboardView.ioHandler.highlightChord(c)
 				}
 			}
 		}

@@ -39,11 +39,14 @@
         </activity>
         <activity
           android:name=".PaletteEditorActivity"
-          android:label="Palette Editor">
+          android:label="Palette Editor"
+          android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+        <service android:name=".output.service.PlaybackService" >
+        </service>
     </application>
 
 </manifest>

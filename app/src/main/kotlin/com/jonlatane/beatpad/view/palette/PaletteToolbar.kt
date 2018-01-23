@@ -10,6 +10,10 @@ import com.jonlatane.beatpad.util.show
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import android.content.Intent
+import com.jonlatane.beatpad.MainApplication
+import com.jonlatane.beatpad.output.service.PlaybackService
+
 
 inline fun ViewManager.paletteToolbar(
 	theme: Int = 0,
@@ -27,6 +31,11 @@ inline fun ViewManager.paletteToolbar(
 
 		button {
 			text = "Play"
+			onClick {
+				val startIntent = Intent(MainApplication.instance, PlaybackService::class.java)
+				startIntent.action = PlaybackService.Companion.Action.STARTFOREGROUND_ACTION
+				MainApplication.instance.startService(startIntent)
+			}
 		}.lparams {
 			width = matchParent
 			height = wrapContent

@@ -1,7 +1,5 @@
 package com.jonlatane.beatpad.view.keyboard
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import android.util.SparseIntArray
 import android.view.MotionEvent
 import android.view.View
@@ -13,6 +11,7 @@ import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.mod12
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.backgroundResource
+import org.jetbrains.anko.verbose
 import java.util.*
 import kotlin.properties.Delegates.observable
 
@@ -59,7 +58,7 @@ class KeyboardIOHandler(
 	 */
 	fun highlightChord(harmonicChord: Chord?) {
 		if (harmonicChord != null) {
-			Log.i(TAG, "Highlighting chord " + harmonicChord.name)
+			verbose("Highlighting chord ${harmonicChord.name}")
 			for (id in KEY_IDS) {
 				val b = keyboardView.findViewById<Button>(id)
 				val tone = KEY_IDS_INVERSE.get(id)
@@ -90,7 +89,7 @@ class KeyboardIOHandler(
 				}
 			}
 		} else {
-			Log.i(TAG, "Clearing highlights")
+			verbose("Clearing highlights")
 			for (id in KEY_IDS) {
 				val n = KEY_IDS_INVERSE.get(id)
 				if (isBlack(n)) {
