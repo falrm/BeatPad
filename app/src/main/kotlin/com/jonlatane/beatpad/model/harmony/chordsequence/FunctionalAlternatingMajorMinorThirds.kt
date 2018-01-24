@@ -11,11 +11,11 @@ object FunctionalAlternatingMajorMinorThirds : Orbit {
         c.isDominant -> c
         c.isMinor -> c.changeRoot(m3).substituteIfPresent(m3, M3)
         else -> c.changeRoot(M3).substituteIfPresent(M3, m3)
-    }
+    }.autoP5
 
     override fun back(c: Chord) = when {
         c.isDominant -> c
         c.isMinor -> c.changeRoot(-M3).substituteIfPresent(m3, M3)
         else -> c.changeRoot(-m3).substituteIfPresent(M3, m3)
-    }
+    }.autoP5
 }

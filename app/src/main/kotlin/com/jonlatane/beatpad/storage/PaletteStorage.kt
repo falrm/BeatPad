@@ -30,77 +30,20 @@ import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 
 
 object PaletteStorage : AnkoLogger {
-	private val mapper = ObjectMapper().apply {
+	internal val mapper = ObjectMapper().apply {
 		val module = SimpleModule().apply {
-			addDeserializer(Melody::class.java, object: StdDeserializer<Melody>(Melody::class.java) {
-				override fun deserialize(jp: JsonParser, context: DeserializationContext): Melody {
-					val mapper = jp.codec as ObjectMapper
-					val root = mapper.readTree<ObjectNode>(jp)
-					/*write you own condition*/
-					val type = root.get("type").asText()
-					root.remove("type")
-					return when(type) {
-						"rational" -> mapper.readValue(root.toString(), RationalMelody::class.java)
-						else -> TODO()
-					}
-				}
-			})
-			addDeserializer(Instrument::class.java, object: StdDeserializer<Instrument>(Instrument::class.java) {
-				override fun deserialize(jp: JsonParser, context: DeserializationContext): Instrument {
-					val mapper = jp.codec as ObjectMapper
-					val root = mapper.readTree<ObjectNode>(jp)
-					/*write you own condition*/
-					val type = root.get("type").asText()
-					root.remove("type")
-					return when(type) {
-						"midi" -> mapper.readValue(root.toString(), MIDIInstrument::class.java)
-						else -> TODO()
-					}
-				}
-			})
-			addSerializer(Melody::class.java, object: StdSerializer<Melody>(Melody::class.java) {
-				override fun serialize(value: Melody, jgen: JsonGenerator, provider: SerializerProvider) {
-					jgen.writeStartObject()
-					val javaType = provider.constructType(Melody::class.java)
-					val beanDesc: BeanDescription = provider.config.introspect(javaType)
-					val serializer = BeanSerializerFactory.instance.findBeanSerializer(provider,
-						javaType,
-						beanDesc)
-					serializer.unwrappingSerializer(null).serialize(value, jgen, provider)
-					jgen.writeObjectField("type", value.type)
-					jgen.writeEndObject()
-				}
-
-			})
-			addDeserializer(Melement::class.java, object: StdDeserializer<Melement>(Melement::class.java) {
-				override fun deserialize(jp: JsonParser, context: DeserializationContext): Melement {
-					val mapper = jp.codec as ObjectMapper
-					val root = mapper.readTree<ObjectNode>(jp)
-					/*write you own condition*/
-					val klass = if(root.has("tones")) Note::class.java else Sustain::class.java
-					return mapper.readValue(root.toString(), klass)
-				}
-
-			})
-
-			addDeserializer(Chord::class.java, object: StdDeserializer<Chord>(Chord::class.java) {
-				override fun deserialize(jp: JsonParser, context: DeserializationContext): Chord {
-					val mapper = jp.codec as ObjectMapper
-					val root = mapper.readTree<ObjectNode>(jp)
-					/*write you own condition*/
-					return Chord(
-						root = root["root"].asInt(),
-						extension =  root["extension"].asIterable().map { it.asInt() }.toIntArray()
-					)
-				}
-
-			})
+			addSerializer(Melody::class.java, MelodyStorage.Serializer)
+			addDeserializer(Melement::class.java, MelodyStorage.ElementSerializer)
+			addDeserializer(Melody::class.java, MelodyStorage.Deserializer)
+			addDeserializer(Instrument::class.java, InstrumentStorage.Deserializer)
+			addSerializer(Chord::class.java, ChordStorage.Serializer)
+			addDeserializer(Chord::class.java, ChordStorage.Deserializer)
 		}
 		registerModule(module)
 	}
 
-	private val writer get() = mapper.writerWithDefaultPrettyPrinter()
-	private val reader get() = mapper.reader()
+	internal val writer get() = mapper.writerWithDefaultPrettyPrinter()
+	internal val reader get() = mapper.reader()
 
 
 	fun storePalette(palette: Palette, context: Context) = try {
@@ -125,26 +68,14 @@ object PaletteStorage : AnkoLogger {
 	}
 
 	fun stringify(palette: Palette) = writer.writeValueAsString(palette)
-	fun parse(data: String) = mapper.readValue(data, Palette::class.java)
-
-	private fun Palette.normalizeDeserializedData() {
-		parts.forEach {  part ->
-			part.melodies.forEach { melody ->
-				melody.normalizeDeserializedData()
-			}
-		}
+	fun parse(data: String): Palette = mapper.readValue(data, Palette::class.java).also {
+		it.normalizeDeserializedData()
 	}
 
-	private fun Melody.normalizeDeserializedData() {
-		var lastNote: Note? = null
-		elements.indices.forEach { index ->
-			val melement = elements[index]
-			when (melement) {
-				is Note -> lastNote = melement
-				is Sustain -> {
-					if (lastNote == null) elements[index] = Rest() // Invalid Sustain location
-					else melement.note = lastNote ?: melement.note
-				}
+	private fun Palette.normalizeDeserializedData() {
+		parts.forEach { part ->
+			part.melodies.forEach { melody ->
+				//melody.normalizeDeserializedData()
 			}
 		}
 	}

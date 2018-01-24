@@ -77,6 +77,15 @@ class Chord : Parcelable, Transposable<Chord> {
 		return result
 	}
 
+	fun with(extra: Int) = Chord(root, extension + extra)
+
+	fun with(vararg extras: Int) = Chord(root, extension + extras)
+
+	fun conditionallyWith(vararg tone: Int, condition: Chord.() -> Boolean)
+		= if(condition.invoke(this)) with(*tone) else this
+
+	val autoP5 get() = conditionallyWith(P5) { heptatonics.fifth == NONEXISTENT }
+
 	fun remove(tone: Int) = substituteIfPresent(tone, 0)
 
 	fun changeRoot(interval: Int) = Chord(
@@ -88,10 +97,6 @@ class Chord : Parcelable, Transposable<Chord> {
 		root = root + interval,
 		extension = extension
 	)
-
-	fun with(extra: Int) = Chord(root, extension + extra)
-
-	fun with(vararg extras: Int) = Chord(root, extension + extras)
 
 	/**
 	 * @param bottom lowest allowed note, inclusive

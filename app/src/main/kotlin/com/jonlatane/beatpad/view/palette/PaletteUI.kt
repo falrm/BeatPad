@@ -81,10 +81,6 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 
 				viewModel.orbifold = orbifoldView {
 					id = IDSeq++
-					onChordChangedListener = {
-						viewModel.verticalAxis?.chord = it
-						viewModel.redraw()
-					}
 				}.lparams {
 					alignParentLeft()
 					above(viewModel.chordListView)

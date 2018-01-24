@@ -41,6 +41,7 @@ class MelodyUI : AnkoComponent<SequenceEditorActivity> {
 				id = IDSeq++
 				onChordChangedListener = {
 					viewModel.verticalAxis?.chord = it
+					viewModel.redraw()
 				}
 			}.lparams {
 				if (configuration.portrait) {

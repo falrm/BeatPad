@@ -12,9 +12,12 @@ object FunctionalTwoFiveOne : Orbit {
 			c.hasMajor7 -> c.changeRoot(M2).with(m3).replaceOrAdd(P5, d5) // imM7 -> iib5
 			c.hasMinor2 -> c.changeRoot(-P5) // iii -> vi
 			c.hasMinor6 -> c.changeRoot(-P5) // vi -> ii (irreversible)
-			else -> c.changeRoot(-P5).with(M3).remove(P4) // ii -> V
+			else -> c.changeRoot(-P5).with(M3, P5).remove(P4) // ii -> V
 		}
-		c.isDominant -> c.changeRoot(-P5).remove(P4)
+		c.isDominant -> when {
+			c.hasMinor2 -> c.changeRoot(-P5).with(m3) // V7b9 -> i
+			else -> c.changeRoot(-P5).remove(P4).with(M3) // V7 -> I
+		} // V -> I //knowing to go to
 		c.isSus -> when {
 			else -> c
 		}
@@ -23,7 +26,7 @@ object FunctionalTwoFiveOne : Orbit {
 			c.hasMajor3 -> c.changeRoot(M2).substituteIfPresent(M3, m3) // I -> ii
 			else -> c.changeRoot(M2).with(m3) // I -> ii
 		}
-	}
+	}.autoP5
 
 	override fun back(c: Chord) = when {
 		c.isMinor -> when {
@@ -38,12 +41,12 @@ object FunctionalTwoFiveOne : Orbit {
 			else -> c
 		}
 		else -> when { // Assumed to be major at this
-			c.hasAugmented4 -> c.changeRoot(P5) // VI -> V
+			c.hasAugmented4 -> c.changeRoot(P5).with(P5) // VI -> V
 			c.hasMajor3 -> when {
 
 				else -> c.changeRoot(P5).remove(P4).replaceOrAdd(M7, m7) // I -> ii
 			}
 			else -> c.changeRoot(M2).with(m3) // I -> ii
 		}
-	}
+	}.autoP5
 }

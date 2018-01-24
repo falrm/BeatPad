@@ -66,11 +66,11 @@ class OrbifoldView @JvmOverloads constructor(
 	internal var sequences: MutableList<SequenceViews> = ArrayList()
 
 	internal inner class SequenceViews(val sequence: Orbit) {
-		val axis = inflateAxisView()
-		val connectForward = inflateConnectorView()
-		val connectBack = inflateConnectorView()
-		val forward = inflateChordView()
-		val back = inflateChordView()
+		val axis = inflateAxisView().apply { alpha = 0f }
+		val connectForward = inflateConnectorView().apply { alpha = 0f }
+		val connectBack = inflateConnectorView().apply { alpha = 0f }
+		val forward = inflateChordView().apply { alpha = 0f }
+		val back = inflateChordView().apply { alpha = 0f }
 
 		init {
 			forward.setOnClickListener { v: View ->
@@ -94,8 +94,8 @@ class OrbifoldView @JvmOverloads constructor(
 		clipToPadding = false
 		clipChildren = false
 		centralChord = inflateChordView(centralChordElevation)
-		halfStepUp = inflateChordView(halfStepChordElevation)
-		halfStepDown = inflateChordView(halfStepChordElevation)
+		halfStepUp = inflateChordView(halfStepChordElevation).apply { alpha = 0f }
+		halfStepDown = inflateChordView(halfStepChordElevation).apply { alpha = 0f }
 		halfStepUp.setOnClickListener { v: View ->
 			selectedChord = v as TextView
 			chord = Chromatic.forward(chord)
