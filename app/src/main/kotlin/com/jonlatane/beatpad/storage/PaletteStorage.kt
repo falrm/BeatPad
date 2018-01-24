@@ -25,6 +25,7 @@ import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import com.fasterxml.jackson.databind.ser.BeanSerializerFactory
 import com.fasterxml.jackson.databind.BeanDescription
+import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 
 
@@ -78,6 +79,19 @@ object PaletteStorage : AnkoLogger {
 					/*write you own condition*/
 					val klass = if(root.has("tones")) Note::class.java else Sustain::class.java
 					return mapper.readValue(root.toString(), klass)
+				}
+
+			})
+
+			addDeserializer(Chord::class.java, object: StdDeserializer<Chord>(Chord::class.java) {
+				override fun deserialize(jp: JsonParser, context: DeserializationContext): Chord {
+					val mapper = jp.codec as ObjectMapper
+					val root = mapper.readTree<ObjectNode>(jp)
+					/*write you own condition*/
+					return Chord(
+						root = root["root"].asInt(),
+						extension =  root["extension"].asIterable().map { it.asInt() }.toIntArray()
+					)
 				}
 
 			})

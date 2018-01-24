@@ -52,7 +52,6 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_conductor)
-        Orientation.initialize(this)
         val harmonyController = DeviceOrientationInstrument(conductorInstrument)
         RhythmAnimations.wireMelodicControl(orbifold, harmonyController)
         orbifold.onChordChangedListener = { chord ->

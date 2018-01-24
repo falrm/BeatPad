@@ -44,6 +44,11 @@ inline fun ViewManager.paletteToolbar(
 
 		button {
 			text = "Stop"
+			onClick {
+				val startIntent = Intent(MainApplication.instance, PlaybackService::class.java)
+				startIntent.action = PlaybackService.Companion.Action.STOPFOREGROUND_ACTION
+				MainApplication.instance.startService(startIntent)
+			}
 		}.lparams {
 			width = matchParent
 			height = wrapContent

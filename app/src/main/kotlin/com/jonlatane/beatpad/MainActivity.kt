@@ -100,7 +100,6 @@ class MainActivity : BaseActivity() {
 			}
 		}
 		updateTempoButton()
-		Orientation.initialize(this)
 	}
 
 	override fun onResume() {

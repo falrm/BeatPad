@@ -5,10 +5,7 @@ import android.os.Bundle
 import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
-import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
-import com.jonlatane.beatpad.storage.MelodyStorage
 import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.util.formatted
 import com.jonlatane.beatpad.view.palette.PaletteUI
@@ -47,7 +44,9 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 
 	override fun onResume() {
 		super.onResume()
-		AndroidMidi.ONBOARD_DRIVER.start()
+		//try {
+			AndroidMidi.ONBOARD_DRIVER.start()
+		//} catch( t: Throwable) { error(t) }
 
 		// Get the configuration.
 		val config = AndroidMidi.ONBOARD_DRIVER.config()

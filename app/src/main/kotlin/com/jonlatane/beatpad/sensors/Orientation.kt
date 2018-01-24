@@ -9,15 +9,11 @@ import com.jonlatane.beatpad.sensors.Orientation.pitch
 import com.jonlatane.beatpad.sensors.Orientation.roll
 import org.jetbrains.anko.AnkoLogger
 
-/**
- * Created by jonlatane on 5/5/17.
- */
-
 object Orientation: AnkoLogger {
-    @Volatile var azimuth = 0f
-    @Volatile var pitch = 0f
-    @Volatile var roll = 0f
-    @Volatile var inclination = 0f
+    var azimuth = 0f
+    var pitch = 0f
+    var roll = 0f
+    var inclination = 0f
 
     fun initialize(c: Context) {
         val sensorManager = c.getSystemService(Context.SENSOR_SERVICE) as SensorManager

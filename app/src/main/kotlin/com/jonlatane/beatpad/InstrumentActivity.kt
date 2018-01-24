@@ -34,7 +34,6 @@ class InstrumentActivity : BaseActivity(), AnkoLogger {
         (keyboardIOHandler.instrument as? MIDIInstrument)?.apply {
             channel = 1
         }
-        Orientation.initialize(this)
         startChordListener()
     }
 

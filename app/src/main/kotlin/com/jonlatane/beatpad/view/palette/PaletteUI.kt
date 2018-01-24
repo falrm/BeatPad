@@ -35,10 +35,6 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 			if (configuration.portrait) {
 				viewModel.orbifold = orbifoldView {
 					id = IDSeq++
-					onChordChangedListener = {
-						viewModel.verticalAxis?.chord = it
-						viewModel.redraw()
-					}
 				}.lparams {
 					width = matchParent
 					height = dip(210f)
@@ -170,6 +166,8 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 					viewModel.colorboardView.chord = c
 					//viewModel.harmonyController.tones = tones
 					viewModel.keyboardView.ioHandler.highlightChord(c)
+					viewModel.verticalAxis?.chord = c
+					viewModel.redraw()
 				}
 			}
 		}
