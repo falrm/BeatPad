@@ -1,17 +1,16 @@
 package com.jonlatane.beatpad.view
 
 import android.content.Context
-import android.util.AttributeSet
+import android.os.Parcelable
 import android.view.MotionEvent
-import android.view.ViewManager
-import android.widget.HorizontalScrollView
+import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko._HorizontalScrollView
-import org.jetbrains.anko.custom.ankoView
+import org.jetbrains.anko.error
 
 open class NonDelayedHorizontalScrollView(
 	context: Context,
 	var scrollingEnabled: Boolean = true
-): _HorizontalScrollView(context) {
+): _HorizontalScrollView(context), AnkoLogger {
 	override fun shouldDelayChildPressedState() = false
 	override fun onTouchEvent(ev: MotionEvent): Boolean {
 		when (ev.action) {
@@ -23,5 +22,13 @@ open class NonDelayedHorizontalScrollView(
 	}
 	override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
 		return scrollingEnabled && super.onInterceptTouchEvent(ev)
+	}
+
+	override fun onRestoreInstanceState(state: Parcelable?) {
+		try {
+			super.onRestoreInstanceState(state)
+		} catch(t: Throwable) {
+			error("Failed to restore instance state:", t)
+		}
 	}
 }

@@ -24,7 +24,6 @@ class OrbifoldView @JvmOverloads constructor(
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
 ) : RelativeLayout(context, attrs, defStyle) {
-
 	inline fun <T: View> T.lparams(
 		width: Int = android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
 		height: Int = android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -57,6 +56,7 @@ class OrbifoldView @JvmOverloads constructor(
 		}
 	}
 	internal var centralChord: TextView
+	internal lateinit var centralChordBackground: View
 	internal lateinit var centralChordThrobber: View
 	internal lateinit var centralChordTouchPoint: View
 	internal var halfStepUp: TextView
@@ -200,6 +200,16 @@ class OrbifoldView @JvmOverloads constructor(
 			alpha = 0f
 		}
 
+		centralChordBackground = view {
+			id = R.id.orbifold_background
+			//outlineProvider = null
+			//tag = null
+			background = context.getDrawable(R.drawable.orbifold_bg_highlight)
+			elevation = centralBackgroundElevation
+		}.lparams(dip(180), height = dip(108))  {
+			centerInParent()
+		}
+
 		LayoutInflater.from(context).inflate(R.layout.orbifold_bg_highlight, this, true)
 		centralChordTouchPoint = findViewWithTag<View>("newBG").apply {
 			elevation = Float.MAX_VALUE
@@ -208,8 +218,13 @@ class OrbifoldView @JvmOverloads constructor(
 		}
 	}
 
+	override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+		super.onSizeChanged(w, h, oldw, oldh)
+		post { animateTo(SelectionState) }
+	}
+
 	fun onResume() {
-		animateTo(SelectionState)
+		//animateTo(SelectionState)
 	}
 
 	private fun addSequence(index: Int, sequence: Orbit) {
@@ -221,7 +236,7 @@ class OrbifoldView @JvmOverloads constructor(
 	}
 
 	private fun removeSequence(sequence: Orbit) {
-		for (index in 0..sequences.size - 1) {
+		for (index in 0 until sequences.size) {
 			val views = sequences[index]
 			if (views.sequence === sequence) {
 				animateViewOut(views.axis)

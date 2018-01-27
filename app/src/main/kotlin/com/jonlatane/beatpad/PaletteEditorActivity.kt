@@ -2,12 +2,15 @@ package com.jonlatane.beatpad
 
 import android.app.Activity
 import android.os.Bundle
+import android.view.WindowManager
 import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.util.formatted
+import com.jonlatane.beatpad.util.hide
+import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.view.palette.PaletteUI
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.AnkoLogger
@@ -24,6 +27,8 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 		ui = PaletteUI().also {
 			it.setContentView(this)
 		}
+
+		window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 		viewModel.palette = PaletteStorage.loadPalette(this)
 
 		val bundle = savedInstanceState ?: try {
@@ -81,6 +86,12 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 		if (chord != null) {
 			viewModel.orbifold.chord = chord
 		}
+		if (savedInstanceState.getBoolean("pianoHidden")) {
+			viewModel.keyboardView.hide(animated = false)
+		}
+		if (savedInstanceState.getBoolean("melodyHidden")) {
+			viewModel.colorboardView.hide(animated = false)
+		}
 	}
 
 	override fun onSaveInstanceState(outState: Bundle) {
@@ -90,5 +101,7 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 		//outState.putInt("tempo", ui.sequencerThread.beatsPerMinute)
 		//outState.putByte("sequencerInstrument", ui.sequencerInstrument.instrument)
 		outState.putInt("orbifoldMode", viewModel.orbifold.orbifold.ordinal)
+		outState.putBoolean("pianoHidden", viewModel.keyboardView.isHidden)
+		outState.putBoolean("melodyHidden", viewModel.colorboardView.isHidden)
 	}
 }

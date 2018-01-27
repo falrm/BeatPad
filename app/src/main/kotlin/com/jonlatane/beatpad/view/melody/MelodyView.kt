@@ -28,9 +28,8 @@ inline fun ViewManager.melodyView(
 	ankoView({
 		viewModel.toneSequenceView = HideableRelativeLayout(it).apply {
 			var holdToEdit: TextView? = null
-			var IDSeq = 1
 			viewModel.bottomScroller = bottomScroller {
-				id = IDSeq++
+				id = R.id.bottom_scroller
 				onHeldDownChanged = { heldDown ->
 					if (heldDown) holdToEdit?.animate()?.alpha(0f)?.translationY(100f)
 					else holdToEdit?.animate()?.alpha(1f)?.translationY(0f)
@@ -70,7 +69,7 @@ inline fun ViewManager.melodyView(
 				leftMargin = dip(30)
 			}
 			viewModel.leftScroller = nonDelayedScrollView {
-				id = IDSeq++
+				id = R.id.left_scroller
 				linearLayout {
 					viewModel.verticalAxis = toneSequenceAxis().lparams {
 						width = dip(30)
@@ -86,13 +85,13 @@ inline fun ViewManager.melodyView(
 				alignParentLeft()
 			}
 			viewModel.centerVerticalScroller = nonDelayedScrollView {
-				id = IDSeq++
+				id = R.id.center_v_scroller
 				onScrollChange { _, _, scrollY, _, _ ->
 					viewModel.leftScroller.scrollY = scrollY
 				}
 
 				viewModel.centerHorizontalScroller = nonDelayedRecyclerView {
-					id = IDSeq++
+					id = R.id.center_h_scroller
 					isFocusableInTouchMode = true
 				}.lparams {
 					height = wrapContent

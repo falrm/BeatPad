@@ -4,9 +4,9 @@ import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.recyclerview.v7.recyclerView
@@ -20,10 +20,9 @@ class PartListAdapter(
 		return recyclerView.run {
 			var partName: TextView? = null
 			var partPatternRecycler: _RecyclerView? = null
-			var idSeq = 1
-			val layout = _RelativeLayout(parent.context).apply {
+			val layout = linearLayout() {
+				orientation = LinearLayout.VERTICAL
 				partName = textView {
-					id = idSeq++
 					textSize = 20f
 					singleLine = true
 					ellipsize = TextUtils.TruncateAt.MARQUEE
@@ -34,17 +33,19 @@ class PartListAdapter(
 				}.lparams {
 					width = matchParent
 					height = wrapContent
-					alignParentTop()
+					//alignParentTop()
 				}
 
-				partPatternRecycler = (recyclerView{ id = idSeq++ } as _RecyclerView).lparams {
-					below(partName!!)
+				partPatternRecycler = recyclerView().lparams {
+					//below(partName!!)
 					height = matchParent
 					width = matchParent
-				}
+					weight = 1f
+				} as _RecyclerView
 				isClickable = true
 				isLongClickable = true
 				gravity = Gravity.CENTER_HORIZONTAL
+				layoutParams
 			}.lparams {
 				width = dip(120)
 				height = matchParent

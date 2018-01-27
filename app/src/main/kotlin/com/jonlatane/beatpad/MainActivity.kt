@@ -3,6 +3,7 @@ package com.jonlatane.beatpad
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.WindowManager
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.Orbifold.*
@@ -42,6 +43,7 @@ class MainActivity : BaseActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_main)
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		keyboardIOHandler = KeyboardIOHandler(keyboard)
 
 		(colorboard.instrument as? MIDIInstrument)?.apply {
@@ -183,8 +185,8 @@ class MainActivity : BaseActivity() {
 			R.id.pop_mode -> orbifold.orbifold = pop
 			R.id.conduct -> startActivity<ConductorActivity>()
 			R.id.play -> startActivity<InstrumentActivity>()
-			R.id.sequence_editor -> startActivity<SequenceEditorActivity>("playgroundState" to Bundle().also { onSaveInstanceState(it) })
-			R.id.palette_editor -> startActivity<PaletteEditorActivity>("playgroundState" to Bundle().also { onSaveInstanceState(it) })
+			R.id.sequence_editor -> startActivity<SequenceEditorActivity>()
+			R.id.palette_editor -> startActivity<PaletteEditorActivity>()
 		}
 		return true
 	}

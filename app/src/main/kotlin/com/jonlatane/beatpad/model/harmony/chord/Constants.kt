@@ -1,28 +1,28 @@
 package com.jonlatane.beatpad.model.harmony.chord
 
 // Constants for actual intervals, in half elements.  dim/minor/Perfect/Major/Aug 2-7
-val root = 0
+const val root = 0
 @get:JvmName("minor2")
-val m2 = 1
-val M2 = 2
-val A2 = 3
+const val m2 = 1
+const val M2 = 2
+const val A2 = 3
 @get:JvmName("minor3")
-val m3 = 3
-val M3 = 4
-val d4 = 4
-val P4 = 5
-val A4 = 6
-val d5 = 6
-val P5 = 7
-val A5 = 8
+const val m3 = 3
+const val M3 = 4
+const val d4 = 4
+const val P4 = 5
+const val A4 = 6
+const val d5 = 6
+const val P5 = 7
+const val A5 = 8
 @get:JvmName("minor6")
-val m6 = 8
-val M6 = 9
-val A6 = 10
-val d7 = 9
+const val m6 = 8
+const val M6 = 9
+const val A6 = 10
+const val d7 = 9
 @get:JvmName("minor7")
-val m7 = 10
-val M7 = 11
+const val m7 = 10
+const val M7 = 11
 
 // Traditional chord extensions
 val Maj = intArrayOf(root, M3, P5)
@@ -32,7 +32,8 @@ val MajAdd9 = Maj + M2
 val Maj7 = Maj + M7
 val Maj9 = Maj7 + M2
 val Maj11 = Maj9 + P4
-val Maj13 = Maj11 + M6
+val Maj13 = Maj9 + M6 // The "practical" definition, avoiding P4
+val Maj13add11 = Maj11 + M6
 val Maj13Sharp11 = Maj9 + M6 + A4
 val min = intArrayOf(root, m3, P5)
 val min7 = intArrayOf(root, m3, P5, m7)
@@ -40,6 +41,7 @@ val min7flat5 = intArrayOf(root, m3, d5, m7)
 val min7Add11 = min7 + P4
 val min9 = min7 + M2
 val min11 = min9 + P4
+val min11Flat9 = min7 + m2 + P4
 val min13 = min11 + M6
 val min11Flat13 = min11 + m6
 val minMaj7 = intArrayOf(root, m3, P5, M7)
@@ -58,12 +60,12 @@ val Aug = intArrayOf(root, M3, A5)
 val sus = intArrayOf(root, P4, P5)
 
 // Modern harmonic modes
-val Ionian = Maj7 + M2 + P4 + M6
-val Dorian = min7 + M2 + P4 + M6
-val Phrygian = min7 + m2 + P4 + m6
+val Ionian = Maj13add11
+val Dorian = min13
+val Phrygian = min11Flat9 + m6
 val Lydian = Maj13Sharp11
-val Mixolydian = Dom7 + M2 + P4 + M6
-val Aeolian = min7 + M2 + P4 + m6
+val Mixolydian = Dom13
+val Aeolian = min11Flat13
 val Locrian = dim + m2 + P4 + M6 + m7
 
 
@@ -74,3 +76,5 @@ val PERFECT = 3
 val MAJOR = 4
 val AUGMENTED = 5
 val NONEXISTENT = 0
+
+

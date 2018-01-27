@@ -86,6 +86,26 @@ class Chord : Parcelable, Transposable<Chord> {
 
 	val autoP5 get() = conditionallyWith(P5) { heptatonics.fifth == NONEXISTENT }
 
+	fun withThird(type: Int): Chord = when(type) {
+		heptatonics.third -> this
+		NONEXISTENT -> when(heptatonics.third) {
+			MAJOR -> remove(M3)
+			MINOR -> remove(m3)
+			else -> this
+		}
+		MAJOR -> when(heptatonics.third) {
+			MAJOR -> this
+			MINOR -> remove(m3).with(M3)
+			else -> with(M3)
+		}
+		MINOR -> when(heptatonics.third) {
+			MAJOR -> remove(M3).with(m3)
+			MINOR -> this
+			else -> with(m3)
+		}
+		else -> TODO()
+	}
+
 	fun remove(tone: Int) = substituteIfPresent(tone, 0)
 
 	fun changeRoot(interval: Int) = Chord(

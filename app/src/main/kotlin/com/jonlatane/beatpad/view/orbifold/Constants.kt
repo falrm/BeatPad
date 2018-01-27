@@ -12,4 +12,5 @@ internal val View.connectorElevation get() = 4f * density
 internal val View.defaultChordElevation get() = 5f * density
 internal val View.halfStepBackgroundElevation get() = 7f * density
 internal val View.halfStepChordElevation get() = 8f * density
+internal val View.centralBackgroundElevation get() = 11f * density
 internal val View.centralChordElevation get() = 12f * density

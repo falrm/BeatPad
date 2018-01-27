@@ -12,15 +12,15 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.ser.BeanSerializerFactory
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
-import com.google.gson.*
 import com.jonlatane.beatpad.model.*
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.error
-import java.io.*
-import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.model.melody.RecordedAudioMelody
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.error
 import org.jetbrains.anko.info
+import java.io.IOException
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 
 object MelodyStorage : AnkoLogger {
 	object Serializer: StdSerializer<Melody>(Melody::class.java) {

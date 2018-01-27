@@ -22,6 +22,10 @@ interface HideableView {
 	var initialHeight: Int?
 }
 
+var nextViewId: Int = 10001
+	get() = if(field == Int.MAX_VALUE) 101 else field++
+  private set
+
 fun afterAll(
 	animators: Collection<ViewPropertyAnimator>,
 	duration: Long = defaultDuration,

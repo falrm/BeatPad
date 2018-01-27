@@ -2,6 +2,7 @@ package com.jonlatane.beatpad
 
 import android.app.Activity
 import android.os.Bundle
+import android.view.WindowManager
 import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.Orbifold.intermediate
@@ -26,11 +27,10 @@ class SequenceEditorActivity : Activity(), AnkoLogger {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-
-		info("hi hi hi hi")
 		ui = MelodyUI().also {
 			it.setContentView(this)
 		}
+		window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		val bundle = savedInstanceState ?: intent.extras?.getBundle("playgroundState")
 		println("Got intent with extras: ${bundle?.run {
 			var string = "Bundle{"

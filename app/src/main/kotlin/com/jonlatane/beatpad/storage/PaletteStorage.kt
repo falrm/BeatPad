@@ -1,21 +1,10 @@
 package com.jonlatane.beatpad.storage
 
 import android.content.Context
-import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializerProvider
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase
-import com.fasterxml.jackson.databind.ser.std.StdSerializer
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonSerializer
 import com.jonlatane.beatpad.model.*
+import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.error
@@ -23,10 +12,6 @@ import org.jetbrains.anko.info
 import java.io.IOException
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
-import com.fasterxml.jackson.databind.ser.BeanSerializerFactory
-import com.fasterxml.jackson.databind.BeanDescription
-import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 
 
 object PaletteStorage : AnkoLogger {
@@ -63,7 +48,7 @@ object PaletteStorage : AnkoLogger {
 		palette.normalizeDeserializedData()
 		palette
 	} catch (t: Throwable) {
-		error("Failed to load stored palette", t)
+		//error("Failed to load stored palette", t)
 		basePalette
 	}
 

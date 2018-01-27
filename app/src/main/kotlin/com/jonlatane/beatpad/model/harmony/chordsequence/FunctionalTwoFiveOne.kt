@@ -15,9 +15,9 @@ object FunctionalTwoFiveOne : Orbit {
 			else -> c.changeRoot(-P5).with(M3, P5).remove(P4) // ii -> V
 		}
 		c.isDominant -> when {
-			c.hasMinor2 -> c.changeRoot(-P5).with(m3) // V7b9 -> i
-			else -> c.changeRoot(-P5).remove(P4).with(M3) // V7 -> I
-		} // V -> I //knowing to go to
+			c.hasMinor2 -> c.changeRoot(-P5).withThird(MINOR) // V7b9 -> i
+			else -> c.changeRoot(-P5).remove(P4).withThird(MAJOR) // V7 -> I
+		}
 		c.isSus -> when {
 			else -> c
 		}

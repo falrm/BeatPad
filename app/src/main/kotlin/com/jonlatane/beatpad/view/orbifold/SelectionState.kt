@@ -39,6 +39,10 @@ object SelectionState : NavigationState, AnkoLogger {
       width = v.centralChord.scaledWidth,
       duration = ANIMATION_DURATION
     )
+    v.centralChordBackground.animateWidth(
+      width = v.centralChord.scaledWidth,
+      duration = ANIMATION_DURATION
+    )
     for (i in 0..v.sequences.size - 1) {
       val sv = v.sequences[i]
       val forwardAngle = i * theta - (Math.PI - theta) / 2

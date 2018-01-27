@@ -3,6 +3,7 @@ package com.jonlatane.beatpad.view.palette
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -20,7 +21,7 @@ import kotlin.properties.Delegates
 
 class PartHolder(
 	val viewModel: PaletteViewModel,
-	val layout: RelativeLayout,
+	val layout: ViewGroup,
 	private val patternRecycler: _RecyclerView,
 	private val partName: TextView,
 	private val adapter: PartListAdapter,
@@ -76,10 +77,11 @@ class PartHolder(
 		partName.apply {
 			text = part.instrument.instrumentName
 			setOnClickListener {
-				editInstrument()
+				editPartMenu.show()
+
 			}
 			setOnLongClickListener {
-				editPartMenu.show()
+				editInstrument()
 				true
 			}
 		}

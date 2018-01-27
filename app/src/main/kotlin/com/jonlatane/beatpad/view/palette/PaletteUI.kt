@@ -30,11 +30,10 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 
 
 	override fun createView(ui: AnkoContext<PaletteEditorActivity>) = with(ui) {
-		var IDSeq = 1 // Literally just a source of View IDs to make Android happy.
 		relativeLayout {
 			if (configuration.portrait) {
 				viewModel.orbifold = orbifoldView {
-					id = IDSeq++
+					id = R.id.orbifold
 				}.lparams {
 					width = matchParent
 					height = dip(210f)
@@ -42,7 +41,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 				}
 
 				viewModel.chordListView = chordListView(viewModel = viewModel) {
-					id = IDSeq++
+					id = R.id.chord_list
 				}.lparams {
 					below(viewModel.orbifold)
 					elevation=5f
@@ -51,7 +50,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 				}
 
 				viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
-					id = IDSeq++
+					id = R.id.toolbar
 				}.lparams {
 					below(viewModel.chordListView)
 					width = matchParent
@@ -61,7 +60,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 				val leftSideWidth = dip(350f)
 
 				viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
-					id = IDSeq++
+					id = R.id.toolbar
 				}.lparams {
 					width = leftSideWidth
 					height = wrapContent
@@ -71,7 +70,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 				}
 
 				viewModel.chordListView = chordListView(viewModel = viewModel) {
-					id = IDSeq++
+					id = R.id.chord_list
 				}.lparams {
 					width = leftSideWidth
 					height = wrapContent
@@ -80,7 +79,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 				}
 
 				viewModel.orbifold = orbifoldView {
-					id = IDSeq++
+					id = R.id.orbifold
 				}.lparams {
 					alignParentLeft()
 					above(viewModel.chordListView)
@@ -92,7 +91,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 			}
 
 			viewModel.partListView = partListView(viewModel = viewModel) {
-				id = IDSeq++
+				id = R.id.part_list
 			}.lparams {
 				width = matchParent
 				height = wrapContent
@@ -107,7 +106,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 			}
 
 			viewModel.toneSequenceView = melodyView(viewModel = viewModel) {
-				id = IDSeq++
+				id = R.id.melody
 				alpha = 0f
 			}.lparams {
 				width = matchParent
@@ -123,9 +122,9 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 			}
 
 			viewModel.keyboardView = keyboardView {
-				id = IDSeq++
+				id = R.id.keyboard
 				elevation = 10f
-				alpha = 0f
+				//alpha = 0f
 				//translationY = dimen(R.dimen.key_height_white).toFloat()
 			}.lparams {
 				height = dimen(R.dimen.key_height_white)
@@ -134,14 +133,24 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 			}
 
 			viewModel.colorboardView = colorboardView {
+				id = R.id.colorboard
 				elevation = 10f
-				alpha = 0f
+				//alpha = 0f
 				backgroundColor = color(android.R.color.white)
 				//translationY = dimen(R.dimen.key_height_white).toFloat()
 			}.lparams {
 				height = dimen(R.dimen.key_height_white)
 				width = matchParent
 				above(viewModel.keyboardView)
+			}
+
+			viewModel.orbifold.onChordChangedListener = { c: Chord ->
+				val tones = c.getTones()
+				viewModel.colorboardView.chord = c
+				//viewModel.harmonyController.tones = tones
+				viewModel.keyboardView.ioHandler.highlightChord(c)
+				viewModel.verticalAxis?.chord = c
+				viewModel.redraw()
 			}
 
 			post {
@@ -152,19 +161,10 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 					.translationX(viewModel.toneSequenceView.width.toFloat())
 					.withEndAction { viewModel.toneSequenceView.alpha = 1f }
 					.start()
-				listOf<View>(viewModel.keyboardView, viewModel.colorboardView).forEach {
+				/*listOf<View>(viewModel.keyboardView, viewModel.colorboardView).forEach {
 					it.hide(false)
 					it.alpha = 1f
-				}
-
-				viewModel.orbifold.onChordChangedListener = { c: Chord ->
-					val tones = c.getTones()
-					viewModel.colorboardView.chord = c
-					//viewModel.harmonyController.tones = tones
-					viewModel.keyboardView.ioHandler.highlightChord(c)
-					viewModel.verticalAxis?.chord = c
-					viewModel.redraw()
-				}
+				}*/
 			}
 		}
 	}

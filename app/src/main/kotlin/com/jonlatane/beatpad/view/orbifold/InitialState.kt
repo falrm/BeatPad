@@ -27,10 +27,11 @@ object InitialState : NavigationState {
       .scaleX(target.scaleX).scaleY(target.scaleY))
     for (halfStep in arrayOf(v.halfStepDown, v.halfStepUp)) {
       if (halfStep === v.selectedChord) {
+        halfStep.translationZ = v.centralChord.z - halfStep.z
         toTargetChord.add(
           halfStep.animate()
             .scaleX(CENTRAL_CHORD_SCALE).scaleY(CENTRAL_CHORD_SCALE)
-            .translationY(0f).translationZBy(10f)
+            .translationY(0f)
         )
       } else {
         toTargetChord.add(
@@ -79,11 +80,11 @@ object InitialState : NavigationState {
     }
     if (v.selectedChord === v.halfStepDown) {
       v.halfStepUp.translationY = -(v.halfStepUp.scaledHeight + v.centralChord.scaledHeight) / 2f
-      v.halfStepUp.translationZ = 0f
     } else if (v.selectedChord === v.halfStepUp) {
       v.halfStepDown.translationY = (v.halfStepDown.scaledHeight + v.centralChord.scaledHeight) / 2f
-      v.halfStepDown.translationZ = 0f
     }
+    v.halfStepUp.translationZ = 0f
+    v.halfStepDown.translationZ = 0f
     for (sv in v.sequences) {
       if (sv.forward === v.selectedChord || sv.back === v.selectedChord) {
         skipToSelectionPhase(v, sv)

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewManager
 import android.widget.TextView
+import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.melody.MelodyElementAdapter
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
@@ -25,10 +26,8 @@ inline fun ViewManager.harmonyView(
 	ankoView({
 		viewModel.toneSequenceView = HideableRelativeLayout(it).apply {
 			var holdToEdit: TextView? = null
-			var IDSeq = 1
-
 				viewModel.centerHorizontalScroller = nonDelayedRecyclerView {
-					id = IDSeq++
+					id = R.id.center_h_scroller
 					isFocusableInTouchMode = true
 				}.lparams {
 				width = ViewGroup.LayoutParams.MATCH_PARENT

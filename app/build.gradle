@@ -1,8 +1,7 @@
 buildscript {
-	ext.kotlin_version = '1.2.10'
-	ext.anko_version = '0.10.1'
+	ext.kotlin_version = '1.2.20'
+	ext.anko_version = '0.10.4'
 	ext.support_version = '27.0.2'
-	ext.serialization_version = '0.4'
 	ext.jackson_version = '2.9.3'
 	repositories {
 		jcenter()
@@ -11,14 +10,12 @@ buildscript {
 	}
 	dependencies {
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-		classpath "org.jetbrains.kotlinx:kotlinx-gradle-serialization-plugin:$serialization_version"
 	}
 }
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlinx-serialization'
 
 android {
 	compileSdkVersion 27
@@ -74,7 +71,6 @@ dependencies {
 	androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
 		exclude group: 'com.android.support', module: 'support-annotations'
 	})
-	compile 'com.google.code.gson:gson:2.8.1'
 	compile "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
 
 	compile 'com.github.billthefarmer:mididriver:v1.13'

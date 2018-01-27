@@ -5,8 +5,10 @@ import android.view.Gravity
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.TextView
+import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.SequenceEditorActivity
-import com.jonlatane.beatpad.model.*
+import com.jonlatane.beatpad.model.Rest
+import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
@@ -34,11 +36,11 @@ class MelodyUI : AnkoComponent<SequenceEditorActivity> {
 
 
 	override fun createView(ui: AnkoContext<SequenceEditorActivity>) = with(ui) {
-		var IDSeq = 1 // Literally just a source of View IDs to make Android happy.
+		viewModel.sequencerThread = ToneSequencePlayerThread(sequencerInstrument, viewModel, beatsPerMinute = 120)
 		var holdToEdit: TextView? = null
 		relativeLayout {
 			viewModel.orbifold = orbifoldView {
-				id = IDSeq++
+				id = R.id.orbifold
 				onChordChangedListener = {
 					viewModel.verticalAxis?.chord = it
 					viewModel.redraw()
@@ -56,7 +58,7 @@ class MelodyUI : AnkoComponent<SequenceEditorActivity> {
 			}
 
 			melodyView(viewModel = viewModel) {
-				id = IDSeq++
+				id = R.id.melody
 			}.lparams {
 				width = MATCH_PARENT
 				height = MATCH_PARENT
