@@ -78,10 +78,11 @@ class ColorboardInputView @JvmOverloads constructor(
 
 	private fun getVelocity(y: Float): Int {
 		var velocity01: Float = (height - y) / height
-		velocity01 = Math.sqrt(Math.sqrt(Math.max(0.1f, velocity01).toDouble())).toFloat()
-		val velocity: Int = Math.min(127, Math.max(10, Math.round(
+		velocity01 = Math.pow(Math.max(0.1f, velocity01).toDouble(), 0.75).toFloat() // Min ~23
+		val velocity: Int = Math.min(127, Math.max(1, Math.round(
 			velocity01 * 127
 		)))
+		info("Colorboard velocity: $velocity $velocity01 $y $height")
 		return velocity
 	}
 

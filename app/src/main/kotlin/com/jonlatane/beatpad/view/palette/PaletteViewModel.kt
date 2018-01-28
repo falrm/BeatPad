@@ -16,13 +16,13 @@ import kotlin.properties.Delegates.observable
  */
 class PaletteViewModel(
 ) : MelodyViewModel() {
-	var palette by observable(Palette()) { _, _, new ->
+	var palette: Palette by observable(Palette()) { _, _, new ->
 		editingSequence = null
 		if(new.parts.isEmpty()) {
 			new.parts.add(Part())
 		}
-		keyboardPart = new.parts[0]
-		colorboardPart = new.parts[0]
+		keyboardPart = new.keyboardPart ?: new.parts[0]
+		colorboardPart = new.colorboardPart ?: new.parts[0]
 	}
 	var editingSequence by observable<Melody?>(null) { _, _, new ->
 		if(new != null) {
@@ -37,9 +37,11 @@ class PaletteViewModel(
 	lateinit var colorboardView: ColorboardInputView
 	var keyboardPart by observable<Part?>(null) { _, _, new ->
 		if(new != null) keyboardView.ioHandler.instrument = new.instrument
+		palette.keyboardPart = new
 	}
 	var colorboardPart: Part? by observable<Part?>(null) { _, _, new ->
 		if(new != null) colorboardView.instrument = new.instrument
+		palette.colorboardPart = new
 	}
 
 	fun onBackPressed(): Boolean {

@@ -9,5 +9,7 @@ import com.jonlatane.beatpad.model.harmony.chord.Chord
 class Palette (
   val chords: MutableList<Chord> = mutableListOf(),
   val parts: MutableList<Part> = mutableListOf(),
-  val harmonies: MutableList<Harmony> = mutableListOf()
+  val harmonies: MutableList<Harmony> = mutableListOf(),
+  var keyboardPart: Part? = null,
+  var colorboardPart: Part? = null
 )

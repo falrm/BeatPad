@@ -50,12 +50,16 @@ object MelodyStorage : AnkoLogger {
 			}.apply {
 				var lastNote: Note? = null
 				elements.indices.forEach { index ->
-					val melement = elements[index]
-					when (melement) {
-						is Note -> lastNote = melement
-						is Sustain -> {
-							if (lastNote == null) elements[index] = Rest() // Invalid Sustain location
-							else melement.note = lastNote ?: melement.note
+					elements[index] = elements[index].let {
+						when(it) {
+							is Note -> {
+								lastNote = it
+								it
+							}
+							is Sustain -> {
+								if (lastNote == null) Rest() // Invalid Sustain location
+								else Sustain(lastNote!!)
+							}
 						}
 					}
 				}
@@ -82,7 +86,7 @@ object MelodyStorage : AnkoLogger {
 		outputStreamWriter.write(json)
 		outputStreamWriter.close()
 	} catch (e: IOException) {
-		Log.e("Exception", "File write failed: " + e.toString());
+		Log.e("Exception", "File write failed: " + e.toString())
 	}
 
 	fun loadSequence(context: Context): Melody = try {
