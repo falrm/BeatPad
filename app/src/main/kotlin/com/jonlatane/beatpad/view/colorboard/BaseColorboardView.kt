@@ -28,7 +28,6 @@ abstract class BaseColorboardView @JvmOverloads constructor(
 	override val drawnColorGuideAlpha get() = (colorGuideAlpha * alpha).toInt()
 	var showSteps = true
 	override val drawPadding = 0
-	override val nonRootPadding = dip(13f)
 	override val axisLength get() = (if(renderVertically) height else width).toFloat()
 	override var paint = Paint()
 	override var bounds = Rect()

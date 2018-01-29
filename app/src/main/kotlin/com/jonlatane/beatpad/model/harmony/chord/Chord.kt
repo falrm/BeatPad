@@ -132,11 +132,14 @@ class Chord : Parcelable, Transposable<Chord> {
 	 * Retrieves the closest tone in this chord to the given tone.
 	 * If two tones in the chord are equally close, returns the lower one.
 	 */
-	fun closestTone(tone: Int, bottom: Int = AlphaDrawer.BOTTOM, top: Int = AlphaDrawer.TOP): Int {
-		val tonesInNeighborhood = getTones(Math.max(bottom, tone - 12), Math.min(top, tone + 12))
-		return tonesInNeighborhood.minBy {
-			Math.abs(tone - it)
-		}!!
+	fun closestTone(tone: Int): Int {
+		for(i in 0..11) {
+			when {
+				containsTone(tone + i) -> return tone + i
+				containsTone(tone  - i) -> return tone - i
+			}
+		}
+		return root
 	}
 
 	val name: String

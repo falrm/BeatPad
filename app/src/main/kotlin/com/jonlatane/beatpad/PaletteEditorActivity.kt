@@ -1,12 +1,14 @@
 package com.jonlatane.beatpad
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
+import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.util.formatted
 import com.jonlatane.beatpad.util.hide
@@ -16,10 +18,12 @@ import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.debug
 import org.jetbrains.anko.setContentView
+import org.jetbrains.anko.toast
 
 class PaletteEditorActivity : Activity(), AnkoLogger {
 	lateinit var ui: PaletteUI
 	val viewModel get() = ui.viewModel
+	var lastBackPress: Long? = null
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -44,29 +48,44 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 	}
 
 	override fun onBackPressed() {
-		if (!viewModel.onBackPressed()) super.onBackPressed()
+		when {
+			viewModel.onBackPressed() -> {}
+			lastBackPress?.let { System.currentTimeMillis() - it <  3000 } ?: false -> {
+				val startIntent = Intent(this, PlaybackService::class.java)
+				startIntent.action = PlaybackService.Companion.Action.STOPFOREGROUND_ACTION
+				startService(startIntent)
+				super.onBackPressed()
+			}
+			else -> {
+				lastBackPress = System.currentTimeMillis()
+				toast("Press again to confirm exit")
+			}
+		}
 	}
 
 	override fun onResume() {
 		super.onResume()
+		val startIntent = Intent(MainApplication.instance, PlaybackService::class.java).let {
+			it.action = PlaybackService.Companion.Action.STARTFOREGROUND_ACTION
+			MainApplication.instance.startService(it)
+		}
 		//try {
-			AndroidMidi.ONBOARD_DRIVER.start()
+			//AndroidMidi.ONBOARD_DRIVER.start()
 		//} catch( t: Throwable) { error(t) }
 
 		// Get the configuration.
-		val config = AndroidMidi.ONBOARD_DRIVER.config()
+		/*val config = AndroidMidi.ONBOARD_DRIVER.config()
 
 		// Print out the details.
 		debug("maxVoices: " + config[0])
 		debug("numChannels: " + config[1])
 		debug("sampleRate: " + config[2])
-		debug("mixBufferSize: " + config[3])
+		debug("mixBufferSize: " + config[3])*/
 	}
 
 	override fun onPause() {
 		super.onPause()
 		AudioTrackCache.releaseAll()
-		AndroidMidi.ONBOARD_DRIVER.stop()
 		//ui.sequencerThread.stopped = true
 		PaletteStorage.storePalette(viewModel.palette, this)
 	}

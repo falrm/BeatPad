@@ -13,9 +13,11 @@ import android.support.v4.app.NotificationCompat
 import com.jonlatane.beatpad.MainActivity
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
+import java.util.concurrent.Executors
 
 
 class PlaybackService : Service(), AnkoLogger {
@@ -37,6 +39,7 @@ class PlaybackService : Service(), AnkoLogger {
 	override fun onCreate() {
 		super.onCreate()
 		instance = this
+		AndroidMidi.ONBOARD_DRIVER.start()
 	}
 
 	override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -45,6 +48,10 @@ class PlaybackService : Service(), AnkoLogger {
 			showNotification()
 		} else if (intent.action == Action.PLAY_ACTION) {
 			info("Clicked Play")
+			BeatClockProducerThread.startProducing()
+		} else if (intent.action == Action.PAUSE_ACTION) {
+			info("Clicked Pause")
+			BeatClockProducerThread.stopProducing()
 		} else if (intent.action == Action.STOPFOREGROUND_ACTION) {
 			info("Received Stop Foreground Intent")
 			stopForeground(true)
@@ -57,7 +64,7 @@ class PlaybackService : Service(), AnkoLogger {
 		super.onDestroy()
 		info("In onDestroy")
 		AudioTrackCache.releaseAll()
-		//AndroidMidi.ONBOARD_DRIVER.stop()
+		AndroidMidi.ONBOARD_DRIVER.stop()
 	}
 
 	override fun onBind(intent: Intent): IBinder? {
@@ -89,15 +96,15 @@ class PlaybackService : Service(), AnkoLogger {
 				""
 			}
 		val notification = NotificationCompat.Builder(this, channelId)
-			.setContentTitle("Playing Audio")
-			.setTicker("Playing Audio")
-			.setContentText("My Palette")
+			.setContentTitle("Playback Service")
+			.setTicker("Playback Service")
+			.setContentText("Background audio playback enabled.")
 			.setSmallIcon(R.mipmap.ic_launcher_round)
 			//.setPriority()
 			.setLargeIcon(Bitmap.createScaledBitmap(icon, 128, 128, false))
 			.setContentIntent(pendingIntent)
 			.setOngoing(true)
-			.addAction(android.R.drawable.ic_media_play, "Play/Pause", pendingIntent(Action.PLAY_ACTION))
+			//.addAction(android.R.drawable.ic_media_play, "Play/Pause", pendingIntent(Action.PLAY_ACTION))
 			.addAction(android.R.drawable.ic_media_next, "Exit", pendingIntent(Action.STOPFOREGROUND_ACTION))
 			.build()
 		startForeground(SERVICE_ID, notification)
@@ -108,7 +115,7 @@ class PlaybackService : Service(), AnkoLogger {
 	private fun createNotificationChannel(): String{
 		val channelId = "audio_playback"
 		val channelName = "MIDI and Hardware Audio"
-		val chan = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
+		val chan = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_NONE)
 		//chan.lightColor = Color.BLUE
 		//chan.importance = NotificationManager.IMPORTANCE_NONE
 		//chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE

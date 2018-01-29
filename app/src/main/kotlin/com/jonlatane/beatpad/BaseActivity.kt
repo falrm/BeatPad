@@ -19,24 +19,4 @@ abstract class BaseActivity : AppCompatActivity(), AnkoLogger {
         updateMenuOptions()
         return true
     }
-
-    override fun onResume() {
-        super.onResume()
-        AndroidMidi.ONBOARD_DRIVER.start()
-
-        // Get the configuration.
-        val config = AndroidMidi.ONBOARD_DRIVER.config()
-
-        // Print out the details.
-        debug("maxVoices: " + config[0])
-        debug("numChannels: " + config[1])
-        debug("sampleRate: " + config[2])
-        debug("mixBufferSize: " + config[3])
-    }
-
-    override fun onPause() {
-        super.onPause()
-        AudioTrackCache.releaseAll()
-        AndroidMidi.ONBOARD_DRIVER.stop()
-    }
 }

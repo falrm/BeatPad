@@ -13,6 +13,7 @@ import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.dip
 import org.jetbrains.anko.warn
 
 
@@ -33,8 +34,8 @@ class MelodyElementView @JvmOverloads constructor(
 	override var initialHeight: Int? = null
 	override val renderVertically = true
 	override val halfStepsOnScreen = 88f
-	override val drawPadding = 30
-	override val nonRootPadding = 20
+	override val drawPadding = dip(10)
+	override val nonRootPadding = dip(5)
 	override var chord: Chord
 		get() = viewModel.orbifold.chord
 		set(value) { throw UnsupportedOperationException() }

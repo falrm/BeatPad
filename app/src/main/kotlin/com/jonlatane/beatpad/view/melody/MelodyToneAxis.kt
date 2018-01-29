@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.dip
 import org.jetbrains.anko.warn
 
 class MelodyToneAxis @JvmOverloads constructor(
@@ -18,6 +19,8 @@ class MelodyToneAxis @JvmOverloads constructor(
 	override val renderVertically = true
 	override val halfStepsOnScreen = 88f
 	override var colorGuideAlpha = 100
+	override val drawPadding = dip(10)
+	override val nonRootPadding = dip(5)
 
 	init {
 		showSteps = true
