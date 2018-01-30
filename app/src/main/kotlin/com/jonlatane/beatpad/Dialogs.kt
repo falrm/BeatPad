@@ -34,7 +34,7 @@ fun showInstrumentPicker(instrument: MIDIInstrument, context: Context, onChosen:
     builder.setTitle("Choose an instrument")
     builder.setItems(GM1Effects.MIDI_INSTRUMENT_NAMES.toTypedArray()) { _, which ->
         instrument.instrument = which.toByte()
-        (context as? BaseActivity)?.updateMenuOptions()
+        (context as? OldBaseActivity)?.updateMenuOptions()
         onChosen()
     }
     builder.show()

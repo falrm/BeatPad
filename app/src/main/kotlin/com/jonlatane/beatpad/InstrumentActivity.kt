@@ -7,7 +7,6 @@ import android.view.MenuItem
 import com.jonlatane.beatpad.model.Instrument
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.sensors.Orientation
 import com.jonlatane.beatpad.view.keyboard.KeyboardIOHandler
 import kotlinx.android.synthetic.main.activity_instrument.*
 import org.jetbrains.anko.AnkoLogger
@@ -19,7 +18,7 @@ import java.net.Socket
 import java.util.concurrent.Executors
 
 
-class InstrumentActivity : BaseActivity(), AnkoLogger {
+class InstrumentActivity : OldBaseActivity(), AnkoLogger {
     override val menuResource: Int = R.menu.instrument_menu
     lateinit var keyboardIOHandler: KeyboardIOHandler
     lateinit var keyboardInstrument: Instrument

@@ -8,7 +8,6 @@ import android.view.MenuItem
 import com.jonlatane.beatpad.model.harmony.Orbifold.*
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.sensors.Orientation
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import kotlinx.android.synthetic.main.activity_conductor.*
 import org.jetbrains.anko.AnkoLogger
@@ -21,7 +20,7 @@ import java.io.PrintWriter
 import java.net.ServerSocket
 import java.util.concurrent.Executors
 
-class ConductorActivity : BaseActivity(), AnkoLogger {
+class ConductorActivity : OldBaseActivity(), AnkoLogger {
     override val menuResource: Int = R.menu.conduct_menu
     private val conductorInstrument = MIDIInstrument()
     private var serviceName = SERVICE_NAME

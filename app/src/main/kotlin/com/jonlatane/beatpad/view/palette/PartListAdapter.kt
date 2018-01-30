@@ -16,6 +16,9 @@ class PartListAdapter(
 	val viewModel: PaletteViewModel,
 	private val recyclerView: _RecyclerView
 ) : RecyclerView.Adapter<PartHolder>() {
+	companion object {
+		val MAX_PARTS = 5
+	}
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PartHolder? {
 		return recyclerView.run {
 			var partName: TextView? = null
@@ -59,5 +62,8 @@ class PartListAdapter(
 		holder.partPosition = partPosition
 	}
 
-	override fun getItemCount(): Int = viewModel.palette.parts.size + 1
+	override fun getItemCount(): Int = when {
+		viewModel.palette.parts.size < MAX_PARTS -> viewModel.palette.parts.size + 1
+		else -> viewModel.palette.parts.size
+	}
 }

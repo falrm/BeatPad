@@ -5,19 +5,16 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
-import com.jonlatane.beatpad.MainActivity
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
-import java.util.concurrent.Executors
 
 
 class PlaybackService : Service(), AnkoLogger {
@@ -48,10 +45,10 @@ class PlaybackService : Service(), AnkoLogger {
 			showNotification()
 		} else if (intent.action == Action.PLAY_ACTION) {
 			info("Clicked Play")
-			BeatClockProducerThread.startProducing()
+			BeatClockProducer.startProducing()
 		} else if (intent.action == Action.PAUSE_ACTION) {
 			info("Clicked Pause")
-			BeatClockProducerThread.stopProducing()
+			BeatClockProducer.stopProducing()
 		} else if (intent.action == Action.STOPFOREGROUND_ACTION) {
 			info("Received Stop Foreground Intent")
 			stopForeground(true)

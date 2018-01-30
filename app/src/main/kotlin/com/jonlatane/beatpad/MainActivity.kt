@@ -11,7 +11,6 @@ import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
-import com.jonlatane.beatpad.sensors.Orientation
 import com.jonlatane.beatpad.storage.MelodyStorage
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.util.isHidden
@@ -29,7 +28,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
-class MainActivity : BaseActivity() {
+class MainActivity : OldBaseActivity() {
 	override val menuResource: Int = R.menu.main_menu
 	private val playing = AtomicBoolean(false)
 	private val executorService = Executors.newScheduledThreadPool(2)

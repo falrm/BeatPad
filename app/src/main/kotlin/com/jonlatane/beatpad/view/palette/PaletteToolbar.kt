@@ -12,7 +12,6 @@ import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import android.content.Intent
 import com.jonlatane.beatpad.MainApplication
-import com.jonlatane.beatpad.output.service.BeatClockProducerThread
 import com.jonlatane.beatpad.output.service.PlaybackService
 
 
