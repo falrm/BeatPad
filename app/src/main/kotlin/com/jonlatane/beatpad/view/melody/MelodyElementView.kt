@@ -88,7 +88,7 @@ class MelodyElementView @JvmOverloads constructor(
 	}
 
 	override fun onTouchEvent(event: MotionEvent): Boolean {
-		if(!viewModel.bottomScroller.isHeldDown) return false
+		if(!viewModel.melodyBottomScroller.isHeldDown) return false
 		// get pointer index from the event object
 		val pointerIndex = event.actionIndex
 		// get pointer ID

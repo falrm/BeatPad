@@ -27,11 +27,11 @@ open class MelodyViewModel {
 		set(value) {
 			orbifold.chord = value; redraw()
 		}
-	lateinit var toneSequenceView: HideableRelativeLayout
-	lateinit var leftScroller: NonDelayedScrollView
-	lateinit var bottomScroller: BottomScroller
-	lateinit var centerVerticalScroller: NonDelayedScrollView
-	lateinit var centerHorizontalScroller: NonDelayedRecyclerView
+	lateinit var melodyView: HideableRelativeLayout
+	lateinit var melodyLeftScroller: NonDelayedScrollView
+	lateinit var melodyBottomScroller: BottomScroller
+	lateinit var melodyCenterVerticalScroller: NonDelayedScrollView
+	lateinit var melodyCenterHorizontalScroller: NonDelayedRecyclerView
 	var melodyElementAdapter: MelodyElementAdapter? = null
 	lateinit var sequencerThread: ToneSequencePlayerThread
 	val bottoms = mutableListOf<View>()

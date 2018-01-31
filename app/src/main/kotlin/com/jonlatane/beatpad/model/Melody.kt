@@ -4,6 +4,7 @@ import com.jonlatane.beatpad.model.melody.RationalMelody
 
 interface Melody: Pattern<Melody.Element> {
 	var shouldConformWithHarmony: Boolean
+	var enabled: Boolean
 	val type get() = "base"
 
 	override fun transpose(interval: Int): Melody {

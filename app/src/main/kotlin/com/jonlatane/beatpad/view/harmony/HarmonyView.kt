@@ -24,17 +24,17 @@ inline fun ViewManager.harmonyView(
 )
 	= //with(ui) {
 	ankoView({
-		viewModel.toneSequenceView = HideableRelativeLayout(it).apply {
+		viewModel.melodyView = HideableRelativeLayout(it).apply {
 			var holdToEdit: TextView? = null
-				viewModel.centerHorizontalScroller = nonDelayedRecyclerView {
+				viewModel.melodyCenterHorizontalScroller = nonDelayedRecyclerView {
 					id = R.id.center_h_scroller
 					isFocusableInTouchMode = true
 				}.lparams {
 				width = ViewGroup.LayoutParams.MATCH_PARENT
 				height = ViewGroup.LayoutParams.MATCH_PARENT
 				alignParentRight()
-				above(viewModel.bottomScroller)
-				rightOf(viewModel.leftScroller)
+				above(viewModel.melodyBottomScroller)
+				rightOf(viewModel.melodyLeftScroller)
 				alignParentTop()
 				}.apply {
 					layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
@@ -56,7 +56,7 @@ inline fun ViewManager.harmonyView(
 				}
 
 		}
-		viewModel.toneSequenceView
+		viewModel.melodyView
 	}, theme, init)
 //}
 

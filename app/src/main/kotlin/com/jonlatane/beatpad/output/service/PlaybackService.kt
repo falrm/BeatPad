@@ -60,6 +60,7 @@ class PlaybackService : Service(), AnkoLogger {
 	override fun onDestroy() {
 		super.onDestroy()
 		info("In onDestroy")
+		BeatClockProducer.stopProducing()
 		AudioTrackCache.releaseAll()
 		AndroidMidi.ONBOARD_DRIVER.stop()
 	}

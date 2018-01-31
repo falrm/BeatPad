@@ -14,33 +14,37 @@ import kotlin.properties.Delegates.observable
  * The PaletteViewModel still assumes we'll only be editing
  * one Melody at a time.
  */
-class PaletteViewModel(
-) : MelodyViewModel() {
-	var palette: Palette by observable(Palette()) { _, _, new ->
+class PaletteViewModel : MelodyViewModel() {
+	var palette: Palette by observable(
+		initialValue = BeatClockPaletteConsumer.palette ?: Palette()
+	) { _, _, new ->
 		editingSequence = null
-		if(new.parts.isEmpty()) {
+		if (new.parts.isEmpty()) {
 			new.parts.add(Part())
 		}
 		keyboardPart = new.keyboardPart ?: new.parts[0]
 		colorboardPart = new.colorboardPart ?: new.parts[0]
+		BeatClockPaletteConsumer.palette = new
 	}
+
 	var editingSequence by observable<Melody?>(null) { _, _, new ->
-		if(new != null) {
+		if (new != null) {
 			toneSequence = new
 			editPatternMode()
 		} else patternListMode()
 	}
+
 	lateinit var chordListView: View
 	lateinit var partListView: HideableRecyclerView
 	lateinit var toolbarView: View
 	lateinit var keyboardView: KeyboardView
 	lateinit var colorboardView: ColorboardInputView
 	var keyboardPart by observable<Part?>(null) { _, _, new ->
-		if(new != null) keyboardView.ioHandler.instrument = new.instrument
+		if (new != null) keyboardView.ioHandler.instrument = new.instrument
 		palette.keyboardPart = new
 	}
 	var colorboardPart: Part? by observable<Part?>(null) { _, _, new ->
-		if(new != null) colorboardView.instrument = new.instrument
+		if (new != null) colorboardView.instrument = new.instrument
 		palette.colorboardPart = new
 	}
 
@@ -51,15 +55,15 @@ class PaletteViewModel(
 	}
 
 	private fun editPatternMode() {
-		toneSequenceView.animate()
+		melodyView.animate()
 			.translationX(0f)
 			.start()
 		partListView.animate().alpha(0f)
 	}
 
 	private fun patternListMode() {
-		toneSequenceView.animate()
-			.translationX(toneSequenceView.width.toFloat())
+		melodyView.animate()
+			.translationX(melodyView.width.toFloat())
 			.start()
 		partListView.animate().alpha(1f)
 	}

@@ -7,6 +7,7 @@ abstract class RecordedMIDIMelody(
 	override var subdivisionsPerBeat: Int = 1,
 	override var tonic: Int = 0
 ) : Melody {
+	override var enabled = true
 	override var shouldConformWithHarmony = false
 	override val type get() = "midi"
 }

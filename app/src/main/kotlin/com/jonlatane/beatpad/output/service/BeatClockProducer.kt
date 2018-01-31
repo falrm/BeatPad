@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.output.service
 
+import BeatClockPaletteConsumer
 import android.util.Log
 import org.jetbrains.anko.AnkoLogger
 import java.util.concurrent.Executors
@@ -23,7 +24,7 @@ object BeatClockProducer : AnkoLogger {
 					Log.i(BeatClockProducer::class.simpleName, "Quarter $superCount")
 				}
 				//debug("Tick")
-				//BeatClockPaletteConsumer.tick()
+				BeatClockPaletteConsumer.tick()
 				Thread.sleep(tickTime)
 			}
 		}

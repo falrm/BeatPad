@@ -8,6 +8,7 @@ abstract class RecordedAudioMelody(
 	override var tonic: Int = 0,
 	var data: ByteArray = byteArrayOf()
 ) : Melody {
+	override var enabled = true
 	override var shouldConformWithHarmony = false
 	override val type get() = "audio"
 }

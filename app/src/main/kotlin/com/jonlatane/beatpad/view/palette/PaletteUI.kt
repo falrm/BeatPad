@@ -1,16 +1,13 @@
 package com.jonlatane.beatpad.view.palette
 
-import android.view.View
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.view.colorboard.colorboardView
 import com.jonlatane.beatpad.view.keyboard.keyboardView
 import com.jonlatane.beatpad.view.melody.melodyView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
-import kotlinx.android.synthetic.main.activity_main.*
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.*
 import java.util.concurrent.Executors
@@ -105,7 +102,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 				}
 			}
 
-			viewModel.toneSequenceView = melodyView(viewModel = viewModel) {
+			viewModel.melodyView = melodyView(viewModel = viewModel) {
 				id = R.id.melody
 				alpha = 0f
 			}.lparams {
@@ -157,9 +154,9 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 				viewModel.partListView.animate()
 					.alpha(1f)
 					.start()
-				viewModel.toneSequenceView.animate()
-					.translationX(viewModel.toneSequenceView.width.toFloat())
-					.withEndAction { viewModel.toneSequenceView.alpha = 1f }
+				viewModel.melodyView.animate()
+					.translationX(viewModel.melodyView.width.toFloat())
+					.withEndAction { viewModel.melodyView.alpha = 1f }
 					.start()
 				/*listOf<View>(viewModel.keyboardView, viewModel.colorboardView).forEach {
 					it.hide(false)

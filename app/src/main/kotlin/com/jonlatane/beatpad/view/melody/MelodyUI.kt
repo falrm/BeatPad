@@ -90,7 +90,7 @@ class MelodyUI : AnkoComponent<SequenceEditorActivity> {
 			}.lparams {
 				width = WRAP_CONTENT
 				height = WRAP_CONTENT
-				below(viewModel.centerVerticalScroller)
+				below(viewModel.melodyCenterVerticalScroller)
 				alignParentBottom()
 				gravity = Gravity.CENTER_VERTICAL
 				if (configuration.portrait) {
@@ -119,7 +119,7 @@ class MelodyUI : AnkoComponent<SequenceEditorActivity> {
 				width = WRAP_CONTENT
 				height = WRAP_CONTENT
 				alignParentRight()
-				below(viewModel.centerVerticalScroller)
+				below(viewModel.melodyCenterVerticalScroller)
 				alignParentBottom()
 				gravity = Gravity.CENTER_VERTICAL
 			}

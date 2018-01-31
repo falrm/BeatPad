@@ -26,15 +26,15 @@ inline fun ViewManager.melodyView(
 )
 	= //with(ui) {
 	ankoView({
-		viewModel.toneSequenceView = HideableRelativeLayout(it).apply {
+		viewModel.melodyView = HideableRelativeLayout(it).apply {
 			var holdToEdit: TextView? = null
-			viewModel.bottomScroller = bottomScroller {
+			viewModel.melodyBottomScroller = bottomScroller {
 				id = R.id.bottom_scroller
 				onHeldDownChanged = { heldDown ->
 					if (heldDown) holdToEdit?.animate()?.alpha(0f)?.translationY(100f)
 					else holdToEdit?.animate()?.alpha(1f)?.translationY(0f)
-					viewModel.centerHorizontalScroller.scrollingEnabled = !heldDown
-					viewModel.centerVerticalScroller.scrollingEnabled = !heldDown
+					viewModel.melodyCenterHorizontalScroller.scrollingEnabled = !heldDown
+					viewModel.melodyCenterVerticalScroller.scrollingEnabled = !heldDown
 				}
 				linearLayout {
 					orientation = LinearLayout.HORIZONTAL
@@ -68,7 +68,7 @@ inline fun ViewManager.melodyView(
 				height = dimen(R.dimen.subdivision_controller_size)
 				leftMargin = dip(30)
 			}
-			viewModel.leftScroller = nonDelayedScrollView {
+			viewModel.melodyLeftScroller = nonDelayedScrollView {
 				id = R.id.left_scroller
 				linearLayout {
 					viewModel.verticalAxis = toneSequenceAxis().lparams {
@@ -81,16 +81,16 @@ inline fun ViewManager.melodyView(
 			}.lparams {
 				width = dip(30)
 				height = ViewGroup.LayoutParams.MATCH_PARENT
-				above(viewModel.bottomScroller)
+				above(viewModel.melodyBottomScroller)
 				alignParentLeft()
 			}
-			viewModel.centerVerticalScroller = nonDelayedScrollView {
+			viewModel.melodyCenterVerticalScroller = nonDelayedScrollView {
 				id = R.id.center_v_scroller
 				onScrollChange { _, _, scrollY, _, _ ->
-					viewModel.leftScroller.scrollY = scrollY
+					viewModel.melodyLeftScroller.scrollY = scrollY
 				}
 
-				viewModel.centerHorizontalScroller = nonDelayedRecyclerView {
+				viewModel.melodyCenterHorizontalScroller = nonDelayedRecyclerView {
 					id = R.id.center_h_scroller
 					isFocusableInTouchMode = true
 				}.lparams {
@@ -114,9 +114,9 @@ inline fun ViewManager.melodyView(
 							}
 						})
 				}
-				/*viewModel.centerHorizontalScroller = nonDelayedHorizontalScrollView {
+				/*viewModel.melodyCenterHorizontalScroller = nonDelayedHorizontalScrollView {
 					onScrollChange { _, scrollX, _, _, _ ->
-						viewModel.bottomScroller.scrollX = scrollX
+						viewModel.melodyBottomScroller.scrollX = scrollX
 					}
 					linearLayout {
 						orientation = LinearLayout.HORIZONTAL
@@ -135,13 +135,13 @@ inline fun ViewManager.melodyView(
 				width = ViewGroup.LayoutParams.MATCH_PARENT
 				height = ViewGroup.LayoutParams.MATCH_PARENT
 				alignParentRight()
-				above(viewModel.bottomScroller)
-				rightOf(viewModel.leftScroller)
+				above(viewModel.melodyBottomScroller)
+				rightOf(viewModel.melodyLeftScroller)
 				alignParentTop()
 			}
 
 		}
-		viewModel.toneSequenceView
+		viewModel.melodyView
 	}, theme, init)
 //}
 
