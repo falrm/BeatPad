@@ -81,7 +81,7 @@ object MelodyStorage : AnkoLogger {
 
 	fun storeSequence(melody: Melody, context: Context) = try {
 		val outputStreamWriter = OutputStreamWriter(context.openFileOutput("sequence.json", Context.MODE_PRIVATE))
-		val json = PaletteStorage.mapper.writeValueAsString(melody)
+		val json = AppObjectMapper.writeValueAsString(melody)
 		info("Stored Melody: $json")
 		outputStreamWriter.write(json)
 		outputStreamWriter.close()
@@ -92,7 +92,7 @@ object MelodyStorage : AnkoLogger {
 	fun loadSequence(context: Context): Melody = try {
 		val json: String = InputStreamReader(context.openFileInput("sequence.json")).use { it.readText() }
 		info("Loaded Melody: $json")
-		PaletteStorage.mapper.readValue(json, Melody::class.java)
+		AppObjectMapper.readValue(json, Melody::class.java)
 	} catch (t: Throwable) {
 		error("Failed to load stored sequence", t)
 		PaletteStorage.baseMelody

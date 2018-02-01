@@ -15,6 +15,9 @@ import kotlin.properties.Delegates.observable
  * one Melody at a time.
  */
 class PaletteViewModel : MelodyViewModel() {
+	init {
+		BeatClockPaletteConsumer.viewModel = this
+	}
 	var palette: Palette by observable(
 		initialValue = BeatClockPaletteConsumer.palette ?: Palette()
 	) { _, _, new ->
@@ -25,6 +28,7 @@ class PaletteViewModel : MelodyViewModel() {
 		keyboardPart = new.keyboardPart ?: new.parts[0]
 		colorboardPart = new.colorboardPart ?: new.parts[0]
 		BeatClockPaletteConsumer.palette = new
+		partListAdapter?.notifyDataSetChanged()
 	}
 
 	var editingSequence by observable<Melody?>(null) { _, _, new ->
@@ -35,6 +39,7 @@ class PaletteViewModel : MelodyViewModel() {
 	}
 
 	lateinit var chordListView: View
+	var partListAdapter: PartListAdapter? = null
 	lateinit var partListView: HideableRecyclerView
 	lateinit var toolbarView: View
 	lateinit var keyboardView: KeyboardView

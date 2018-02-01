@@ -6,7 +6,7 @@ import org.jetbrains.anko.AnkoLogger
 import java.util.concurrent.Executors
 
 object BeatClockProducer : AnkoLogger {
-	var bpm: Int = 60
+	var bpm: Int = 120
 	private const val subdivisionsPerBeat = 24 // This is the MIDI beat clock standard
 	private val executorService = Executors.newScheduledThreadPool(1)
 	private var playbackHandler: PlaybackHandler? = null

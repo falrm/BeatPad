@@ -5,20 +5,25 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import com.jonlatane.beatpad.midi.AndroidMidi
+import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.output.service.PlaybackService
+import com.jonlatane.beatpad.sensors.ShakeDetector
 import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.util.formatted
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.view.palette.PaletteUI
 import org.billthefarmer.mididriver.GeneralMidiConstants
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.debug
-import org.jetbrains.anko.setContentView
-import org.jetbrains.anko.toast
+import org.jetbrains.anko.*
+import android.content.Context.VIBRATOR_SERVICE
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+
+
 
 class PaletteEditorActivity : Activity(), AnkoLogger {
 	lateinit var ui: PaletteUI
@@ -65,22 +70,27 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 
 	override fun onResume() {
 		super.onResume()
-		val startIntent = Intent(MainApplication.instance, PlaybackService::class.java).let {
+		Intent(MainApplication.instance, PlaybackService::class.java).let {
 			it.action = PlaybackService.Companion.Action.STARTFOREGROUND_ACTION
 			MainApplication.instance.startService(it)
 		}
-		//try {
-			//AndroidMidi.ONBOARD_DRIVER.start()
-		//} catch( t: Throwable) { error(t) }
-
-		// Get the configuration.
-		/*val config = AndroidMidi.ONBOARD_DRIVER.config()
-
-		// Print out the details.
-		debug("maxVoices: " + config[0])
-		debug("numChannels: " + config[1])
-		debug("sampleRate: " + config[2])
-		debug("mixBufferSize: " + config[3])*/
+		ShakeDetector.onShakeListener = object: ShakeDetector.OnShakeListener {
+			override fun onShake() {
+				val v = getSystemService(VIBRATOR_SERVICE) as Vibrator
+				// Vibrate for 500 milliseconds
+				if (Build.VERSION.SDK_INT >= 26) {
+					v.vibrate(VibrationEffect.createOneShot(150,255))
+				} else {
+					v.vibrate(150)
+				}
+				showConfirmDialog(
+					this@PaletteEditorActivity,
+					"Erase everything to start from scratch?"
+				) {
+					viewModel.palette = Palette()
+				}
+			}
+		}
 	}
 
 	override fun onPause() {
@@ -88,11 +98,17 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 		AudioTrackCache.releaseAll()
 		//ui.sequencerThread.stopped = true
 		PaletteStorage.storePalette(viewModel.palette, this)
+		ShakeDetector.onShakeListener = null
 	}
 
 	override fun onStop() {
 		super.onStop()
 		PaletteStorage.storePalette(viewModel.palette, this)
+	}
+
+	override fun onDestroy() {
+		super.onDestroy()
+		BeatClockPaletteConsumer.viewModel = null
 	}
 
 	override fun onRestoreInstanceState(savedInstanceState: Bundle) {

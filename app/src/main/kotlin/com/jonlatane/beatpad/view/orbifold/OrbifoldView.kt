@@ -10,6 +10,7 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.harmony.Orbit
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.harmony.chord.Maj13
 import com.jonlatane.beatpad.model.harmony.chord.Maj7
 import com.jonlatane.beatpad.model.harmony.chordsequence.Chromatic
 import com.jonlatane.beatpad.showOrbifoldPicker
@@ -38,7 +39,7 @@ class OrbifoldView @JvmOverloads constructor(
 		_, _, listener ->
 		listener?.invoke(chord)
 	}
-	var chord: Chord by observable(Chord(0, Maj7)) { _, _, chord ->
+	var chord: Chord by observable(Chord(0, Maj13)) { _, _, chord ->
 		if (selectedChord != null) {
 			animateTo(InitialState)
 		} else {
@@ -46,7 +47,7 @@ class OrbifoldView @JvmOverloads constructor(
 		}
 		onChordChangedListener?.invoke(chord)
 	}
-	var orbifold: Orbifold by observable(Orbifold.intermediate) {
+	var orbifold: Orbifold by observable(Orbifold.functional) {
 		_, _, new ->
 		(Orbifold.ALL_ORBITS - new).forEach {
 			removeSequence(it)

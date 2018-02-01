@@ -4,17 +4,16 @@ import android.support.v7.widget.RecyclerView
 import android.widget.PopupMenu
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.melody.RationalMelody
-import com.jonlatane.beatpad.model.Rest
+import com.jonlatane.beatpad.storage.PaletteStorage
 import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.toast
 import kotlin.properties.Delegates
 
-class PatternHolder(
+class MelodyHolder(
 	val viewModel: PaletteViewModel,
 	val textView: TextView,
-	val adapter: PatternAdapter,
-  initialPattern: Int = 0
+	val adapter: MelodyAdapter,
+	initialPattern: Int = 0
 ) : RecyclerView.ViewHolder(textView) {
 	val partPosition get() = adapter.partPosition
 	val part get() = adapter.part
@@ -50,7 +49,7 @@ class PatternHolder(
 		}
 	}
 
-	private fun newPattern() = RationalMelody((1..16).map { Rest() }.toMutableList(), 4)
+	private fun newPattern() = PaletteStorage.baseMelody
 
 	private fun onPositionChanged() {
 		if(patternPosition < viewModel.palette.parts[partPosition].melodies.size) {

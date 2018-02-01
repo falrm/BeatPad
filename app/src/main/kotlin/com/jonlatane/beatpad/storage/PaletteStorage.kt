@@ -1,11 +1,11 @@
 package com.jonlatane.beatpad.storage
 
 import android.content.Context
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.jonlatane.beatpad.model.*
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.Palette
+import com.jonlatane.beatpad.model.Part
+import com.jonlatane.beatpad.model.Rest
 import com.jonlatane.beatpad.model.melody.RationalMelody
+import com.jonlatane.beatpad.storage.AppObjectMapper.writer
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.error
 import org.jetbrains.anko.info
@@ -15,20 +15,6 @@ import java.io.OutputStreamWriter
 
 
 object PaletteStorage : AnkoLogger {
-	internal val mapper = ObjectMapper().apply {
-		val module = SimpleModule().apply {
-			addSerializer(Melody::class.java, MelodyStorage.Serializer)
-			addDeserializer(Melement::class.java, MelodyStorage.ElementSerializer)
-			addDeserializer(Melody::class.java, MelodyStorage.Deserializer)
-			addDeserializer(Instrument::class.java, InstrumentStorage.Deserializer)
-			addSerializer(Chord::class.java, ChordStorage.Serializer)
-			addDeserializer(Chord::class.java, ChordStorage.Deserializer)
-		}
-		registerModule(module)
-	}
-
-	internal val writer get() = mapper.writerWithDefaultPrettyPrinter()
-	internal val reader get() = mapper.reader()
 
 
 	fun storePalette(palette: Palette, context: Context) = try {
@@ -45,7 +31,6 @@ object PaletteStorage : AnkoLogger {
 		val json: String = InputStreamReader(context.openFileInput("palette.json")).use { it.readText() }
 		info("Loaded palette: $json")
 		val palette = parse(json)
-		palette.normalizeDeserializedData()
 		palette
 	} catch (t: Throwable) {
 		//error("Failed to load stored palette", t)
@@ -53,17 +38,7 @@ object PaletteStorage : AnkoLogger {
 	}
 
 	fun stringify(palette: Palette) = writer.writeValueAsString(palette)
-	fun parse(data: String): Palette = mapper.readValue(data, Palette::class.java).also {
-		it.normalizeDeserializedData()
-	}
-
-	private fun Palette.normalizeDeserializedData() {
-		parts.forEach { part ->
-			part.melodies.forEach { melody ->
-				//melody.normalizeDeserializedData()
-			}
-		}
-	}
+	fun parse(data: String): Palette = AppObjectMapper.readValue(data, Palette::class.java)
 
 	val basePalette
 		get() = Palette().apply {

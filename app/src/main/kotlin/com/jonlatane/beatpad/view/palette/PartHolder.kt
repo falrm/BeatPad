@@ -5,10 +5,8 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
@@ -29,7 +27,7 @@ class PartHolder(
 ) : RecyclerView.ViewHolder(layout) {
 	var partPosition by Delegates.observable(initialPart) { _, _, _ -> onPartPositionChanged() }
 	val part get() = viewModel.palette.parts[partPosition]
-	private val patternAdapter = PatternAdapter(viewModel, patternRecycler, 0)
+	private val patternAdapter = MelodyAdapter(viewModel, patternRecycler, 0)
 
 	private val editPartMenu = PopupMenu(partName.context, partName)
 
@@ -87,7 +85,7 @@ class PartHolder(
 		}
 		patternRecycler.apply {
 			visibility = View.VISIBLE
-			val sequenceListAdapter = PatternAdapter(viewModel, this, partPosition)
+			val sequenceListAdapter = MelodyAdapter(viewModel, this, partPosition)
 			val orientation = LinearLayoutManager.VERTICAL
 			backgroundColor = context.color(R.color.colorPrimaryDark)
 			layoutManager = LinearLayoutManager(context, orientation, false)

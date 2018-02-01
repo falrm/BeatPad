@@ -13,19 +13,19 @@ import org.jetbrains.anko.wrapContent
 import kotlin.properties.Delegates
 
 
-class PatternAdapter(
+class MelodyAdapter(
 	val viewModel: PaletteViewModel,
 	val recyclerView: _RecyclerView,
 	initialPart: Int = 0
-) : RecyclerView.Adapter<PatternHolder>() {
+) : RecyclerView.Adapter<MelodyHolder>() {
 	var partPosition by Delegates.observable(initialPart) {
 		_, _, _ -> notifyDataSetChanged()
 	}
 	val part get() = viewModel.palette.parts[partPosition]
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatternHolder? {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyHolder? {
 		return recyclerView.run {
-			PatternHolder(viewModel, TextView(parent.context).apply {
+			MelodyHolder(viewModel, TextView(parent.context).apply {
 				textSize = 25f
 				background = context.getDrawable(R.drawable.orbifold_chord)
 				layoutParams = ViewGroup.LayoutParams(wrapContent, wrapContent)
@@ -35,11 +35,11 @@ class PatternAdapter(
 				gravity = Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL
 			}.lparams {
 				width = matchParent
-			}, this@PatternAdapter)
+			}, this@MelodyAdapter)
 		}
 	}
 
-	override fun onBindViewHolder(holder: PatternHolder, patternPosition: Int) {
+	override fun onBindViewHolder(holder: MelodyHolder, patternPosition: Int) {
 		holder.patternPosition = patternPosition
 	}
 

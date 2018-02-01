@@ -1,9 +1,9 @@
 package com.jonlatane.beatpad
 
 import android.app.Application
-import android.graphics.drawable.GradientDrawable
 import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.sensors.Orientation
+import com.jonlatane.beatpad.sensors.ShakeDetector
 
 class MainApplication : Application() {
     override fun onCreate() {
@@ -11,6 +11,7 @@ class MainApplication : Application() {
         instance = this
         MidiDevices.initialize(this)
         Orientation.initialize(this)
+        ShakeDetector.initialize(this)
     }
 
     companion object {

@@ -19,7 +19,9 @@ object BeatClockPaletteConsumer : AnkoLogger {
 	private data class Attack(
 		val instrument: Instrument,
 	  val note: Note
-	)
+	) {
+		val chosenTones = mutableSetOf<Int>()
+	}
 	private val activeAttacks = mutableMapOf<Part, MutableMap<Melody, Attack>>()
 	fun tick() {
 		palette?.let { palette ->
@@ -32,13 +34,15 @@ object BeatClockPaletteConsumer : AnkoLogger {
 				val activePartAttacks = activeAttacks.getOrPut(part) { mutableMapOf() }
 				for((melody, attack) in melodies) {
 					activePartAttacks.remove(melody)?.let { lastAttack ->
-						lastAttack.note.tones.forEach {
+						lastAttack.chosenTones.forEach {
 							part.instrument.stop(it)
 						}
 					}
 					info("Attack: $attack")
-					attack.note.tones.forEach {
-						part.instrument.play(it, attack.note.velocity.to127Int)
+					attack.note.tones.forEach { tone ->
+						val chosenTone = viewModel?.orbifold?.chord?.closestTone(tone) ?: tone
+						attack.chosenTones.add(chosenTone)
+						part.instrument.play(chosenTone, attack.note.velocity.to127Int)
 					}
 					activePartAttacks[melody] = attack
 				}

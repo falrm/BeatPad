@@ -43,70 +43,49 @@ class Heptatonics(private val colors: Set<Int>) {
 	val hasMinor2 get() = second == MINOR
 	val has2 get() = second != NONEXISTENT
 
-	/**  @return [.MINOR], [.MAJOR] or [.NONEXISTENT] */
-	val seventh: Int by lazy {
-		if (colors.contains(11))
-			MAJOR
-		else if (colors.contains(10))
-			MINOR
-		else
-			NONEXISTENT
-	}
-
-	/**  @return [.MINOR], [.MAJOR] or [.NONEXISTENT] */
-	val sixth: Int by lazy {
-		if (colors.contains(9))
-			MAJOR
-		else if (colors.contains(8) && fifth != AUGMENTED)
-			MINOR
-		else
-			NONEXISTENT
-	}
-
-	/**  @return [.PERFECT], [.AUGMENTED], [.DIMINISHED] or [.NONEXISTENT] */
-	val fifth: Int by lazy {
-		if (colors.contains(7))
-			PERFECT
-		else if (colors.contains(6))
-			DIMINISHED
-		else if (colors.contains(8))
-			AUGMENTED
-		else
-			NONEXISTENT
-	}
-
-	/**  @return [.PERFECT], [.AUGMENTED], [.DIMINISHED] or [.NONEXISTENT] */
-	val fourth: Int by lazy {
-		if (colors.contains(5))
-			PERFECT
-		else if (colors.contains(6) && fifth != DIMINISHED)
-			AUGMENTED
-		else if (colors.contains(8) && sixth == MAJOR)
-			AUGMENTED
-		else
-			NONEXISTENT
-	}
 
 	/**  @return [.MINOR], [.MAJOR], or [.NONEXISTENT] */
-	val third: Int by lazy {
-		if (colors.contains(4))
-			MAJOR
-		else if (colors.contains(3))
-			MINOR
-		else
-			NONEXISTENT
+	val third: Int = when {
+		colors.contains(4) -> MAJOR
+		colors.contains(3) -> MINOR
+		else -> NONEXISTENT
+	}
+
+	/**  @return [.PERFECT], [.AUGMENTED], [.DIMINISHED] or [.NONEXISTENT] */
+	val fifth: Int = when {
+		colors.contains(7) -> PERFECT
+		colors.contains(6) -> DIMINISHED
+		colors.contains(8) -> AUGMENTED
+		else -> NONEXISTENT
+	}
+
+	/**  @return [.MINOR], [.MAJOR] or [.NONEXISTENT] */
+	val seventh: Int = when {
+		colors.contains(11) -> MAJOR
+		colors.contains(10) -> MINOR
+		else -> NONEXISTENT
 	}
 
 	/**  @return [.MINOR], [.MAJOR], [.AUGMENTED] or [.NONEXISTENT] */
-	val second: Int by lazy {
-		if (colors.contains(1))
-			MINOR
-		else if (colors.contains(2))
-			MAJOR
-		else if (colors.contains(3) && third == MAJOR)
-			AUGMENTED
-		else
-			NONEXISTENT
+	val second: Int = when {
+		colors.contains(1) -> MINOR
+		colors.contains(2) -> MAJOR
+		colors.contains(3) && third == MAJOR -> AUGMENTED
+		else -> NONEXISTENT
+	}
+
+	/**  @return [.PERFECT], [.AUGMENTED], [.DIMINISHED] or [.NONEXISTENT] */
+	val fourth: Int = when {
+		colors.contains(5) -> PERFECT
+		colors.contains(6) && fifth != DIMINISHED -> AUGMENTED
+		else -> NONEXISTENT
+	}
+
+	/**  @return [.MINOR], [.MAJOR] or [.NONEXISTENT] */
+	val sixth: Int = when {
+		colors.contains(9) -> MAJOR
+		colors.contains(8) && fifth != AUGMENTED -> MINOR
+		else -> NONEXISTENT
 	}
 
 	val colorString: String by lazy {
@@ -206,7 +185,6 @@ class Heptatonics(private val colors: Set<Int>) {
 				colorString = "5" + colorString
 			}
 		}
-
 		colorString
 	}
 }

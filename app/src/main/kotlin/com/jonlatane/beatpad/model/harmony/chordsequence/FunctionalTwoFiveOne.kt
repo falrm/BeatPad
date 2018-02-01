@@ -34,7 +34,9 @@ object FunctionalTwoFiveOne : Orbit {
 				.substituteIfPresent(M2, m2) // imM7 -> V7b9
 			c.hasMinor2 -> c.changeRoot(P5) // iii -> ?
 			c.hasMinor6 -> c.changeRoot(P5) // vi -> iii
-			else -> c.changeRoot(-M2).with(M3).remove(P4).substituteIfPresent(m7, M7) // ii -> I
+			else -> c.changeRoot(-M2) // ii -> I
+				.with(M3).remove(P4).substituteIfPresent(m7, M7)
+				.autoP5.autoM6
 		}
 		c.isDominant -> c.changeRoot(P5).remove(P4)
 		c.isSus -> when {

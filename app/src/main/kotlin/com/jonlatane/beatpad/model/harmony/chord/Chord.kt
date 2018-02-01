@@ -85,6 +85,7 @@ class Chord : Parcelable, Transposable<Chord> {
 		= if(condition.invoke(this)) with(*tone) else this
 
 	val autoP5 get() = conditionallyWith(P5) { heptatonics.fifth == NONEXISTENT }
+	val autoM6 get() = substituteIfPresent(m6, M6)
 
 	fun withThird(type: Int): Chord = when(type) {
 		heptatonics.third -> this

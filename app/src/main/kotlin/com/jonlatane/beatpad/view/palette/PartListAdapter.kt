@@ -19,6 +19,9 @@ class PartListAdapter(
 	companion object {
 		val MAX_PARTS = 5
 	}
+	init {
+		viewModel.partListAdapter = this
+	}
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PartHolder? {
 		return recyclerView.run {
 			var partName: TextView? = null

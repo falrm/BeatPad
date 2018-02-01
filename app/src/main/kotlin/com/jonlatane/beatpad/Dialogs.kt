@@ -19,143 +19,199 @@ import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import org.jetbrains.anko.contentView
 import org.jetbrains.anko.nsdManager
+import android.content.DialogInterface
+import com.jonlatane.beatpad.storage.Storage
+
 
 fun showOrbifoldPicker(orbifold: OrbifoldView) {
-    val builder = AlertDialog.Builder(orbifold.context)
-    builder.setTitle("Choose an Orbifold")
-    builder.setItems(Orbifold.values().map { it.title }.toTypedArray()) { _, which ->
-        orbifold.orbifold = Orbifold.values()[which]
-    }
-    builder.show()
+	val builder = AlertDialog.Builder(orbifold.context)
+	builder.setTitle("Choose an Orbifold")
+	builder.setItems(Orbifold.values().map { it.title }.toTypedArray()) { _, which ->
+		orbifold.orbifold = Orbifold.values()[which]
+	}
+	builder.show()
 }
 
-fun showInstrumentPicker(instrument: MIDIInstrument, context: Context, onChosen: () -> Unit = {}) {
-    val builder = AlertDialog.Builder(context)
-    builder.setTitle("Choose an instrument")
-    builder.setItems(GM1Effects.MIDI_INSTRUMENT_NAMES.toTypedArray()) { _, which ->
-        instrument.instrument = which.toByte()
-        (context as? OldBaseActivity)?.updateMenuOptions()
-        onChosen()
-    }
-    builder.show()
+fun showInstrumentPicker(
+	instrument: MIDIInstrument,
+	context: Context,
+	sortRecents: Boolean = true,
+	onChosen: () -> Unit = {}
+) {
+	val recents = Storage.loadGM1InstrumentRecents(context)
+	val builder = AlertDialog.Builder(context)
+	builder.setTitle("Choose an instrument")
+	val items = if (sortRecents) {
+		recents.map { GM1Effects.MIDI_INSTRUMENT_NAMES[it] }.toTypedArray()
+	} else {
+		GM1Effects.MIDI_INSTRUMENT_NAMES.toTypedArray()
+	}
+	builder.setItems(items) { _, which ->
+		val selection = if (sortRecents) recents[which] else which
+		Storage.storeGM1InstrumentSelection(selection, context)
+		instrument.instrument = selection.toByte()
+		(context as? OldBaseActivity)?.updateMenuOptions()
+		onChosen()
+	}
+	val toggleText = if (sortRecents) {
+		"Sort by MIDI GM1"
+	} else {
+		"Sort by Recently Used"
+	}
+	builder.setNeutralButton(toggleText) { dialog: DialogInterface?, which: Int ->
+		dialog?.cancel()
+		showInstrumentPicker(
+			instrument,
+			context,
+			!sortRecents,
+			onChosen
+		)
+	}
+	builder.show()
 }
 
 fun showTempoPicker(activity: MainActivity) {
-    val dialog = Dialog(activity)
-    dialog.setTitle("Select Tempo")
-    dialog.setContentView(R.layout.dialog_choose_tempo)
-    val picker = dialog.findViewById<NumberPicker>(R.id.numberPicker1)
-    picker.maxValue = 960
-    picker.minValue = 15
-    picker.value = activity.sequencerThread.beatsPerMinute
-    picker.wrapSelectorWheel = false
-    picker.setOnValueChangedListener { _, _, _ ->
-        val bpm = picker.value
-        activity.sequencerThread.beatsPerMinute = bpm
-        activity.updateTempoButton()
-    }
-    dialog.show()
+	val dialog = Dialog(activity)
+	dialog.setTitle("Select Tempo")
+	dialog.setContentView(R.layout.dialog_choose_tempo)
+	val picker = dialog.findViewById<NumberPicker>(R.id.numberPicker1)
+	picker.maxValue = 960
+	picker.minValue = 15
+	picker.value = activity.sequencerThread.beatsPerMinute
+	picker.wrapSelectorWheel = false
+	picker.setOnValueChangedListener { _, _, _ ->
+		val bpm = picker.value
+		activity.sequencerThread.beatsPerMinute = bpm
+		activity.updateTempoButton()
+	}
+	dialog.show()
+}
+
+fun showConfirmDialog(
+	context: Context,
+	promptText: String = "Are you sure?",
+	yesText: String = "Yes",
+	noText: String = "No",
+	noAction: () -> Unit = {},
+	yesAction: () -> Unit
+) {
+	val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+		when (which) {
+			DialogInterface.BUTTON_POSITIVE -> {
+				yesAction.invoke()
+			}
+
+			DialogInterface.BUTTON_NEGATIVE -> {
+				noAction.invoke()
+			}
+		}
+	}
+
+	val builder = AlertDialog.Builder(context)
+	builder.setMessage(promptText).setPositiveButton(yesText, dialogClickListener)
+		.setNegativeButton(noText, dialogClickListener).show()
 }
 
 fun showConductorPicker(activity: InstrumentActivity, onClose: () -> Unit = {}) {
-    val nsdManager = activity.nsdManager
-    val conductorList = mutableListOf<NsdServiceInfo>()
-    val adapter = object : BaseAdapter() {
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            val result = convertView ?: activity.layoutInflater.inflate(R.layout.list_item_conductor, null)
-            val txt = result.findViewById<TextView>(R.id.conductor)
-            txt.text = conductorList[position].serviceName
-            return result
-        }
+	val nsdManager = activity.nsdManager
+	val conductorList = mutableListOf<NsdServiceInfo>()
+	val adapter = object : BaseAdapter() {
+		override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+			val result = convertView
+				?: activity.layoutInflater.inflate(R.layout.list_item_conductor, null)
+			val txt = result.findViewById<TextView>(R.id.conductor)
+			txt.text = conductorList[position].serviceName
+			return result
+		}
 
-        override fun getItem(position: Int): Any {
-            return conductorList[position]
-        }
+		override fun getItem(position: Int): Any {
+			return conductorList[position]
+		}
 
-        override fun getItemId(position: Int): Long {
-            return conductorList[position].hashCode().toLong()
-        }
+		override fun getItemId(position: Int): Long {
+			return conductorList[position].hashCode().toLong()
+		}
 
-        override fun getCount(): Int {
-            return conductorList.size
-        }
+		override fun getCount(): Int {
+			return conductorList.size
+		}
 
-    }
-    val discoveryListener = object : NsdManager.DiscoveryListener {
+	}
+	val discoveryListener = object : NsdManager.DiscoveryListener {
 
-        //  Called as soon as service discovery begins.
-        override fun onDiscoveryStarted(regType: String) {
-            Log.d("showConductorPicker", "Service discovery started")
-        }
+		//  Called as soon as service discovery begins.
+		override fun onDiscoveryStarted(regType: String) {
+			Log.d("showConductorPicker", "Service discovery started")
+		}
 
-        override fun onServiceFound(service: NsdServiceInfo) {
-            // A service was found!  Do something with it.
-            Log.d("showConductorPicker", "Service discovery success" + service)
-            if (service.serviceType != SERVICE_TYPE) {
-                // Service type is the string containing the protocol and
-                // transport layer for this service.
-                Log.d("showConductorPicker", "Unknown Service Type: " + service.serviceType)
-            } else if(service.serviceName.contains(SERVICE_NAME)){
-                conductorList.add(service)
-                activity.contentView?.post {
-                    adapter.notifyDataSetChanged()
-                }
-            }
-        }
+		override fun onServiceFound(service: NsdServiceInfo) {
+			// A service was found!  Do something with it.
+			Log.d("showConductorPicker", "Service discovery success" + service)
+			if (service.serviceType != SERVICE_TYPE) {
+				// Service type is the string containing the protocol and
+				// transport layer for this service.
+				Log.d("showConductorPicker", "Unknown Service Type: " + service.serviceType)
+			} else if (service.serviceName.contains(SERVICE_NAME)) {
+				conductorList.add(service)
+				activity.contentView?.post {
+					adapter.notifyDataSetChanged()
+				}
+			}
+		}
 
-        override fun onServiceLost(service: NsdServiceInfo) {
-            // When the network service is no longer available.
-            // Internal bookkeeping code goes here.
-            Log.e("showConductorPicker", "service lost" + service)
-            conductorList.remove(service)
-            activity.contentView?.post {
-                adapter.notifyDataSetChanged()
-            }
-        }
+		override fun onServiceLost(service: NsdServiceInfo) {
+			// When the network service is no longer available.
+			// Internal bookkeeping code goes here.
+			Log.e("showConductorPicker", "service lost" + service)
+			conductorList.remove(service)
+			activity.contentView?.post {
+				adapter.notifyDataSetChanged()
+			}
+		}
 
-        override fun onDiscoveryStopped(serviceType: String) {
-            Log.i("showConductorPicker", "Discovery stopped: " + serviceType)
-            conductorList.clear()
-        }
+		override fun onDiscoveryStopped(serviceType: String) {
+			Log.i("showConductorPicker", "Discovery stopped: " + serviceType)
+			conductorList.clear()
+		}
 
-        override fun onStartDiscoveryFailed(serviceType: String, errorCode: Int) {
-            Log.e("onStartDiscoveryFailed", "Discovery failed: Error code:" + errorCode)
-            //nsdManager.stopServiceDiscovery(this)
-        }
+		override fun onStartDiscoveryFailed(serviceType: String, errorCode: Int) {
+			Log.e("onStartDiscoveryFailed", "Discovery failed: Error code:" + errorCode)
+			//nsdManager.stopServiceDiscovery(this)
+		}
 
-        override fun onStopDiscoveryFailed(serviceType: String, errorCode: Int) {
-            Log.e("onStopDiscoveryFailed", "Discovery failed: Error code:" + errorCode)
-            nsdManager.stopServiceDiscovery(this)
-        }
-    }
+		override fun onStopDiscoveryFailed(serviceType: String, errorCode: Int) {
+			Log.e("onStopDiscoveryFailed", "Discovery failed: Error code:" + errorCode)
+			nsdManager.stopServiceDiscovery(this)
+		}
+	}
 
-    nsdManager.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, discoveryListener)
+	nsdManager.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, discoveryListener)
 
-    activity.contentView?.post {
-        val builder = AlertDialog.Builder(activity)
-        builder.setTitle("Choose Conductor")
-        builder.setAdapter(adapter) { _, which: Int ->
-            val conductor = conductorList[which]
-            nsdManager.resolveService(conductor, object : NsdManager.ResolveListener {
-                override fun onResolveFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {}
+	activity.contentView?.post {
+		val builder = AlertDialog.Builder(activity)
+		builder.setTitle("Choose Conductor")
+		builder.setAdapter(adapter) { _, which: Int ->
+			val conductor = conductorList[which]
+			nsdManager.resolveService(conductor, object : NsdManager.ResolveListener {
+				override fun onResolveFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {}
 
-                override fun onServiceResolved(serviceInfo: NsdServiceInfo?) {
-                    activity.conductor = serviceInfo
-                }
+				override fun onServiceResolved(serviceInfo: NsdServiceInfo?) {
+					activity.conductor = serviceInfo
+				}
 
-            })
-            println(which)
-        }
-        builder.setOnDismissListener {
-            onClose()
-        }
-        builder.setOnCancelListener {
-            try {
-                nsdManager.stopServiceDiscovery(discoveryListener)
-                onClose()
-            } catch(ignored: Throwable) {
-            }
-        }
-        builder.show()
-    }
+			})
+			println(which)
+		}
+		builder.setOnDismissListener {
+			onClose()
+		}
+		builder.setOnCancelListener {
+			try {
+				nsdManager.stopServiceDiscovery(discoveryListener)
+				onClose()
+			} catch (ignored: Throwable) {
+			}
+		}
+		builder.show()
+	}
 }
