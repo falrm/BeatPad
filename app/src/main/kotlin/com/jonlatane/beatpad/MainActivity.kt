@@ -18,6 +18,7 @@ import com.jonlatane.beatpad.util.show
 import com.jonlatane.beatpad.view.keyboard.KeyboardIOHandler
 import com.jonlatane.beatpad.view.tempo.TempoTracking
 import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
+import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.view.orbifold.ANIMATION_DURATION
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import kotlinx.android.synthetic.main.activity_main.*
@@ -64,7 +65,7 @@ class MainActivity : OldBaseActivity() {
 
 		val harmonyController = DeviceOrientationInstrument(harmonicInstrument)
 		RhythmAnimations.wireMelodicControl(orbifold, harmonyController)
-    asdf = MelodyStorage.loadSequence(this)
+    asdf = Storage.loadSequence(this)
 
 		sequencerThread = ToneSequencePlayerThread(
 			sequencerInstrument,
@@ -106,7 +107,7 @@ class MainActivity : OldBaseActivity() {
 	override fun onResume() {
 		super.onResume()
 		orbifold.onResume()
-		asdf = MelodyStorage.loadSequence(this)
+		asdf = Storage.loadSequence(this)
 	}
 
 	override fun onPause() {

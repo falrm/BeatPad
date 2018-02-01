@@ -55,6 +55,17 @@ object BeatClockPaletteConsumer : AnkoLogger {
 		} ?: info("Tick called with no Palette available")
 	}
 
+	internal fun clearActiveAttacks() {
+		for((part, melodyAttacks) in activeAttacks) {
+			for((_, attack) in melodyAttacks) {
+				attack.chosenTones.forEach {
+					part.instrument.stop(it)
+				}
+			}
+		}
+		activeAttacks.clear()
+	}
+
 	private val Palette.currentAttacks : Map<Part, Map<Melody, Attack>> get() {
 		// [currentBeat] is beat 0, 0.04167 (1/24), ..., 0.25, ... 0.75, ..., 1, etc.
 		// assuming we're using a MIDI 24-per-quarter clock.

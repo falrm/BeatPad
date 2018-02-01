@@ -9,7 +9,7 @@ import com.jonlatane.beatpad.model.harmony.Orbifold.intermediate
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
-import com.jonlatane.beatpad.storage.MelodyStorage
+import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
 import com.jonlatane.beatpad.view.melody.MelodyUI
 import org.billthefarmer.mididriver.GeneralMidiConstants.*
@@ -62,17 +62,17 @@ class SequenceEditorActivity : Activity(), AnkoLogger {
 		AudioTrackCache.releaseAll()
 		AndroidMidi.ONBOARD_DRIVER.stop()
 		ui.sequencerThread.stopped = true
-		MelodyStorage.storeSequence(toneSequence, this)
+		Storage.storeSequence(toneSequence, this)
 	}
 
 	override fun onStop() {
 		super.onStop()
-		MelodyStorage.storeSequence(toneSequence, this)
+		Storage.storeSequence(toneSequence, this)
 	}
 
 	override fun onRestoreInstanceState(savedInstanceState: Bundle) {
 		super.onRestoreInstanceState(savedInstanceState)
-		toneSequence = MelodyStorage.loadSequence(this)
+		toneSequence = Storage.loadSequence(this)
 		ui.sequencerInstrument.instrument = savedInstanceState.getByte("sequencerInstrument", SYNTH_BASS_1)
 		orbifold.orbifold = Orbifold.values().find {
 			it.ordinal == (savedInstanceState["orbifoldMode"] as Int? ?: -1)

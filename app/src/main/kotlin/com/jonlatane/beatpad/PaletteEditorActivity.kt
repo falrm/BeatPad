@@ -1,34 +1,34 @@
 package com.jonlatane.beatpad
 
+import BeatClockPaletteConsumer
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.WindowManager
-import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.sensors.ShakeDetector
-import com.jonlatane.beatpad.storage.PaletteStorage
+import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.formatted
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.view.palette.PaletteUI
 import org.billthefarmer.mididriver.GeneralMidiConstants
-import org.jetbrains.anko.*
-import android.content.Context.VIBRATOR_SERVICE
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
-
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.setContentView
+import org.jetbrains.anko.toast
 
 
 class PaletteEditorActivity : Activity(), AnkoLogger {
-	lateinit var ui: PaletteUI
-	val viewModel get() = ui.viewModel
-	var lastBackPress: Long? = null
+	private lateinit var ui: PaletteUI
+	private val viewModel get() = ui.viewModel
+	private var lastBackPress: Long? = null
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -38,7 +38,7 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 		}
 
 		window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-		viewModel.palette = PaletteStorage.loadPalette(this)
+		viewModel.palette = Storage.loadPalette(this)
 
 		val bundle = savedInstanceState ?: try {
 			intent.extras.getBundle("playgroundState")
@@ -97,13 +97,13 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 		super.onPause()
 		AudioTrackCache.releaseAll()
 		//ui.sequencerThread.stopped = true
-		PaletteStorage.storePalette(viewModel.palette, this)
+		Storage.storePalette(viewModel.palette, this)
 		ShakeDetector.onShakeListener = null
 	}
 
 	override fun onStop() {
 		super.onStop()
-		PaletteStorage.storePalette(viewModel.palette, this)
+		Storage.storePalette(viewModel.palette, this)
 	}
 
 	override fun onDestroy() {
@@ -131,7 +131,7 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 
 	override fun onSaveInstanceState(outState: Bundle) {
 		super.onSaveInstanceState(outState)
-		PaletteStorage.storePalette(viewModel.palette, this)
+		Storage.storePalette(viewModel.palette, this)
 		outState.putParcelable("currentChord", viewModel.orbifold.chord)
 		//outState.putInt("tempo", ui.sequencerThread.beatsPerMinute)
 		//outState.putByte("sequencerInstrument", ui.sequencerInstrument.instrument)

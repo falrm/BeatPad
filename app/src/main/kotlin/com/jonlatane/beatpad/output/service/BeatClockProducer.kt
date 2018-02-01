@@ -16,7 +16,8 @@ object BeatClockProducer : AnkoLogger {
 			var superCount = 0 // Stupid Android logging
 			var count = 0
 			while (!stopped) {
-				val tickTime = 60000L / (bpm * subdivisionsPerBeat)
+				val start = System.currentTimeMillis()
+				val tickTime: Long = 60000L / (bpm * subdivisionsPerBeat)
 				if (count++ == subdivisionsPerBeat) {
 					count = 0
 					if(superCount == Int.MAX_VALUE) superCount = 0
@@ -25,8 +26,9 @@ object BeatClockProducer : AnkoLogger {
 				}
 				//debug("Tick")
 				BeatClockPaletteConsumer.tick()
-				Thread.sleep(tickTime)
+				Thread.sleep(Math.max(0, tickTime - (System.currentTimeMillis() - start)))
 			}
+			BeatClockPaletteConsumer.clearActiveAttacks()
 		}
 	}
 

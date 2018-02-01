@@ -15,7 +15,7 @@ import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.output.service.PlaybackService
 
 
-inline fun ViewManager.paletteToolbar(
+fun ViewManager.paletteToolbar(
 	theme: Int = 0,
 	viewModel: PaletteViewModel
 ) = paletteToolbar(theme, viewModel, {})

@@ -17,7 +17,7 @@ import org.jetbrains.anko.dip
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.wrapContent
 
-inline fun ViewManager.chordListView(
+fun ViewManager.chordListView(
 	theme: Int = 0,
 	viewModel: PaletteViewModel
 ) = chordListView(theme, viewModel, {})
