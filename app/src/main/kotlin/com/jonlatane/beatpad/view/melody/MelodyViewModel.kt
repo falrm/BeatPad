@@ -27,6 +27,7 @@ open class MelodyViewModel {
 		set(value) {
 			orbifold.chord = value; redraw()
 		}
+	lateinit var melodyToolbar: MelodyToolbar
 	lateinit var melodyView: HideableRelativeLayout
 	lateinit var melodyLeftScroller: NonDelayedScrollView
 	lateinit var melodyBottomScroller: BottomScroller

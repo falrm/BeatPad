@@ -28,6 +28,14 @@ inline fun ViewManager.melodyView(
 	ankoView({
 		viewModel.melodyView = HideableRelativeLayout(it).apply {
 			var holdToEdit: TextView? = null
+
+			viewModel.melodyToolbar = melodyToolbar(viewModel) {
+				id = R.id.melody_toolbar
+			}.lparams {
+				width = matchParent
+				height = wrapContent
+				alignParentTop()
+			}
 			viewModel.melodyBottomScroller = bottomScroller {
 				id = R.id.bottom_scroller
 				onHeldDownChanged = { heldDown ->
@@ -81,6 +89,7 @@ inline fun ViewManager.melodyView(
 			}.lparams {
 				width = dip(30)
 				height = ViewGroup.LayoutParams.MATCH_PARENT
+				below(viewModel.melodyToolbar)
 				above(viewModel.melodyBottomScroller)
 				alignParentLeft()
 			}
@@ -114,30 +123,13 @@ inline fun ViewManager.melodyView(
 							}
 						})
 				}
-				/*viewModel.melodyCenterHorizontalScroller = nonDelayedHorizontalScrollView {
-					onScrollChange { _, scrollX, _, _, _ ->
-						viewModel.melodyBottomScroller.scrollX = scrollX
-					}
-					linearLayout {
-						orientation = LinearLayout.HORIZONTAL
-						repeat(MelodyUI.STEPS_TO_ALLOCATE) {
-							viewModel.elements.add(toneSequenceElement {
-								this.viewModel = viewModel
-							}.lparams {
-								width = dimen(R.dimen.subdivision_controller_size)
-								height = dip(1000f)
-							})
-						}
-					}
-					isHorizontalScrollBarEnabled = false
-				}*/
 			}.lparams {
 				width = ViewGroup.LayoutParams.MATCH_PARENT
 				height = ViewGroup.LayoutParams.MATCH_PARENT
 				alignParentRight()
 				above(viewModel.melodyBottomScroller)
 				rightOf(viewModel.melodyLeftScroller)
-				alignParentTop()
+				below(viewModel.melodyToolbar)
 			}
 
 		}

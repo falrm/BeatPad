@@ -36,6 +36,7 @@ class PaletteViewModel : MelodyViewModel() {
 			toneSequence = new
 			editPatternMode()
 		} else patternListMode()
+		melodyToolbar.updateButtonText()
 	}
 
 	lateinit var chordListView: View

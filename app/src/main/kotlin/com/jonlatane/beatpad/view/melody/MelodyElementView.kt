@@ -12,6 +12,7 @@ import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
+import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.warn
@@ -39,6 +40,7 @@ class MelodyElementView @JvmOverloads constructor(
 	override var chord: Chord
 		get() = viewModel.orbifold.chord
 		set(value) { throw UnsupportedOperationException() }
+	val melodyOffset get() = viewModel.toneSequence.offsetUnder(viewModel.orbifold.chord)
 
 	override fun onDraw(canvas: Canvas) {
 		colorGuideAlpha = if(viewModel.playbackPosition == elementPosition) 255 else 187
@@ -52,7 +54,6 @@ class MelodyElementView @JvmOverloads constructor(
 		p.color = when(element) {
 			is Note -> 0xAA212121.toInt()
 			is Sustain -> 0xAA424242.toInt()
-			null -> 0x00FFFFFF
 		}
 		try {
 			val tones = when (element) {
@@ -60,8 +61,9 @@ class MelodyElementView @JvmOverloads constructor(
 				is Sustain -> (element as Sustain).note.tones
 			}
 			tones.forEach { tone ->
-				val top = height - height * (tone - AlphaDrawer.BOTTOM) / 88f
-				val bottom = height - height * (tone - AlphaDrawer.BOTTOM + 1) / 88f
+				val realTone = tone + melodyOffset
+				val top = height - height * (realTone - AlphaDrawer.BOTTOM) / 88f
+				val bottom = height - height * (realTone - AlphaDrawer.BOTTOM + 1) / 88f
 				drawRect(
 					bounds.left.toFloat(),
 					top,
@@ -100,7 +102,7 @@ class MelodyElementView @JvmOverloads constructor(
 				val tone = getTone(event.getY(pointerIndex))
 				if(element is Note) {
 					val tones = (element as Note).tones
-					if(!tones.remove(tone)) tones.add(tone)
+					if(!tones.remove(tone)) tones.add(tone - melodyOffset)
 				}
 			}
 			MotionEvent.ACTION_MOVE -> {}

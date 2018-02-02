@@ -22,3 +22,6 @@ fun ViewManager.bottomScroller(theme: Int = 0)
 
 inline fun ViewManager.bottomScroller(theme: Int = 0, init: BottomScroller.() -> Unit)
 	= ankoView({ BottomScroller(it) }, theme, init)
+
+inline fun ViewManager.melodyToolbar(viewModel: MelodyViewModel, theme: Int = 0, init: MelodyToolbar.() -> Unit = {})
+	= ankoView({ MelodyToolbar(it, viewModel) }, theme, init)

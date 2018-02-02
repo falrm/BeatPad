@@ -171,8 +171,8 @@ class Chord : Parcelable, Transposable<Chord> {
 	val isDominant: Boolean get() = heptatonics.isDominant
 
 	companion object {
-		private val mod12Names = arrayOf("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
-		private val mod7Names = arrayOf("C", "D", "E", "F", "G", "A", "B")
+		val mod12Names = arrayOf("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
+		val mod7Names = arrayOf("C", "D", "E", "F", "G", "A", "B")
 
 		@JvmField
 		val CREATOR: Parcelable.Creator<Chord> = object : Parcelable.Creator<Chord> {

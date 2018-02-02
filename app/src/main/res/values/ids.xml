@@ -20,6 +20,7 @@
 			Generate an id which can be used when the location menu item is added in MainActivity
 	-->
 	<item name="bottom_scroller" type="id"/>
+	<item name="melody_toolbar" type="id"/>
 	<item name="left_scroller" type="id"/>
 	<item name="center_v_scroller" type="id"/>
 	<item name="center_h_scroller" type="id"/>

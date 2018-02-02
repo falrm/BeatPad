@@ -1,4 +1,5 @@
 import com.jonlatane.beatpad.model.*
+import com.jonlatane.beatpad.util.mod12
 import com.jonlatane.beatpad.util.to127Int
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
@@ -39,8 +40,12 @@ object BeatClockPaletteConsumer : AnkoLogger {
 						}
 					}
 					info("Attack: $attack")
+					val melodyOffset = viewModel?.orbifold?.chord?.let { chord ->
+						melody.offsetUnder(chord)
+					} ?: 0
 					attack.note.tones.forEach { tone ->
-						val chosenTone = viewModel?.orbifold?.chord?.closestTone(tone) ?: tone
+						val transposedTone = tone + melodyOffset
+						val chosenTone = viewModel?.orbifold?.chord?.closestTone(transposedTone) ?: transposedTone
 						attack.chosenTones.add(chosenTone)
 						part.instrument.play(chosenTone, attack.note.velocity.to127Int)
 					}

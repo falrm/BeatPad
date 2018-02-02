@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Fixed Position"
+        android:id="@+id/fixedPositionMelody"/>
+    <item android:title="Relative to Current Chord"
+        android:id="@+id/relativeToCurrentChord"/>
+    <item android:id="@+id/relativeTo"
+          android:title="Relative to...">
+        <menu>
+            <item android:id="@+id/c" android:title="C"/>
+            <item android:id="@+id/cSharp" android:title="C#"/>
+            <item android:id="@+id/d" android:title="D"/>
+            <item android:id="@+id/dSharp" android:title="D#"/>
+            <item android:id="@+id/e" android:title="E"/>
+            <item android:id="@+id/f" android:title="F"/>
+            <item android:id="@+id/fSharp" android:title="F#"/>
+            <item android:id="@+id/g" android:title="G"/>
+            <item android:id="@+id/gSharp" android:title="G#"/>
+            <item android:id="@+id/a" android:title="A"/>
+            <item android:id="@+id/aSharp" android:title="A#"/>
+            <item android:id="@+id/b" android:title="B"/>
+        </menu>
+    </item>
+</menu>
