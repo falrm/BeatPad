@@ -31,5 +31,5 @@ class MelodyElementAdapter(
 		holder.element.invalidate()
 	}
 
-	override fun getItemCount(): Int = viewModel.toneSequence.elements.size
+	override fun getItemCount(): Int = viewModel.openedMelody.elements.size
 }

@@ -29,11 +29,12 @@ class PaletteViewModel : MelodyViewModel() {
 		colorboardPart = new.colorboardPart ?: new.parts[0]
 		BeatClockPaletteConsumer.palette = new
 		partListAdapter?.notifyDataSetChanged()
+		chordListAdapter?.notifyDataSetChanged()
 	}
 
 	var editingSequence by observable<Melody?>(null) { _, _, new ->
 		if (new != null) {
-			toneSequence = new
+			openedMelody = new
 			editPatternMode()
 		} else patternListMode()
 		melodyToolbar.updateButtonText()
@@ -41,6 +42,7 @@ class PaletteViewModel : MelodyViewModel() {
 
 	lateinit var chordListView: View
 	var partListAdapter: PartListAdapter? = null
+	var chordListAdapter: ChordListAdapter? = null
 	lateinit var partListView: HideableRecyclerView
 	lateinit var toolbarView: View
 	lateinit var keyboardView: KeyboardView

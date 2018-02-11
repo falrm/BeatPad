@@ -64,7 +64,7 @@ class PartHolder(
 
 	private fun onPartPositionChanged() {
 		patternAdapter.partPosition = partPosition
-		if (partPosition < viewModel.palette.parts.size) {
+		if (partPosition < viewModel.palette.parts.size || !adapter.canAddParts()) {
 			makeEditablePart(partPosition)
 		} else {
 			makeAddButton()
@@ -98,17 +98,7 @@ class PartHolder(
 		partName.apply {
 			text = "+"
 			setOnClickListener {
-				viewModel.palette.parts.add(
-					Part(
-						GM1Effects.randomInstrument(
-							channel = viewModel.palette.parts.size.toByte(),
-							exceptions = viewModel.palette.parts.mapNotNull {
-								(it.instrument as? MIDIInstrument)?.instrument
-							}.toSet()
-						)
-					)
-				)
-				adapter.notifyItemInserted(viewModel.palette.parts.size - 1)
+				adapter.addPart()
 			}
 			setOnLongClickListener {
 				//						viewModel.palette.chords.add(viewModel.orbifold.chord)

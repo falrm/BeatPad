@@ -28,74 +28,12 @@ inline fun ViewManager.chordListView(
 	init: _RecyclerView.() -> Unit
 ) = ankoView({
 	_RecyclerView(it).apply {
-		val listAdapter = object : RecyclerView.Adapter<ChordHolder>() {
-			override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChordHolder? {
-				return ChordHolder(TextView(parent.context).apply {
-					textSize = 25f
-					background = context.getDrawable(R.drawable.orbifold_chord)
-					layoutParams = ViewGroup.LayoutParams(wrapContent, wrapContent)
-					minimumWidth = context.dip(90)
-					isClickable = true
-					isLongClickable = true
-					gravity = CENTER_VERTICAL or CENTER_HORIZONTAL
-				})
-			}
-
-			override fun onBindViewHolder(holder: ChordHolder, position: Int) {
-				if(position < viewModel.palette.chords.size) {
-					val c = viewModel.palette.chords[position]
-					holder.textView.apply {
-						text = c.name
-						backgroundResource = when {
-							c.isDominant -> R.drawable.orbifold_chord_dominant
-							c.isDiminished -> R.drawable.orbifold_chord_diminished
-							c.isMinor -> R.drawable.orbifold_chord_minor
-							c.isAugmented -> R.drawable.orbifold_chord_augmented
-							c.isMajor -> R.drawable.orbifold_chord_major
-							else -> R.drawable.orbifold_chord
-						}
-						setOnClickListener {
-							viewModel.orbifold.disableNextTransitionAnimation()
-							viewModel.orbifold.chord = c
-						}
-						setOnLongClickListener {
-							viewModel.palette.chords.removeAt(position)
-							notifyItemRemoved(position)
-							notifyItemRangeChanged(
-								position,
-								viewModel.palette.chords.size - position
-							)
-							true
-						}
-					}
-				} else {
-					makeAddButton(holder)
-				}
-			}
-
-			fun makeAddButton(holder: ChordHolder) {
-				holder.textView.apply {
-					text = "+"
-					backgroundResource = R.drawable.orbifold_chord
-					setOnClickListener {
-						viewModel.palette.chords.add(viewModel.orbifold.chord)
-						notifyItemInserted(viewModel.palette.chords.size - 1)
-					}
-					setOnLongClickListener {
-						viewModel.palette.chords.add(viewModel.orbifold.chord)
-						notifyItemInserted(viewModel.palette.chords.size)
-						true
-					}
-				}
-			}
-
-			override fun getItemCount(): Int = viewModel.palette.chords.size + 1
-		}
+		viewModel.chordListAdapter = ChordListAdapter(viewModel)
 
 		backgroundColor = context.color(R.color.colorPrimaryDark)
 		layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 		overScrollMode = View.OVER_SCROLL_NEVER
-		adapter = listAdapter
+		adapter = viewModel.chordListAdapter
 		adapter.registerAdapterDataObserver(
 			object : RecyclerView.AdapterDataObserver() {
 				override fun onItemRangeInserted(start: Int, count: Int) {

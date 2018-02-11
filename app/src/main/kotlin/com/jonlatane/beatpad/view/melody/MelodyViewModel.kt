@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.properties.Delegates.observable
 
 open class MelodyViewModel {
-	var toneSequence by observable<Melody>(PaletteStorage.baseMelody) { _, _, _ ->
+	var openedMelody by observable<Melody>(PaletteStorage.baseMelody) { _, _, _ ->
 		melodyElementAdapter?.notifyDataSetChanged()
 	}
 	var playbackPosition by observable<Int?>(null) { _, old, new ->
@@ -44,7 +44,7 @@ open class MelodyViewModel {
 
 	internal fun markPlaying(element: Melody.Element) {
 		try {
-			playbackPosition = toneSequence.elements.indexOf(element)
+			playbackPosition = openedMelody.elements.indexOf(element)
 		} catch (t: Throwable) {
 		}
 	}

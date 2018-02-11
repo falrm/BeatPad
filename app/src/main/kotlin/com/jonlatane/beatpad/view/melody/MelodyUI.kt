@@ -107,8 +107,8 @@ class MelodyUI : AnkoComponent<SequenceEditorActivity> {
 						.setTitle("Clear Sequence Data")
 						.setMessage("Really delete all your hard work?")
 						.setPositiveButton("Yes, it's just art") { _, _ ->
-							for (index in viewModel.toneSequence.elements.indices) {
-								viewModel.toneSequence.elements[index] = Rest()
+							for (index in viewModel.openedMelody.elements.indices) {
+								viewModel.openedMelody.elements[index] = Rest()
 								viewModel.redraw()
 							}
 						}

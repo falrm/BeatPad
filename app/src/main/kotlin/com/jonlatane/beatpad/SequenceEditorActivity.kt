@@ -7,7 +7,6 @@ import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.Orbifold.intermediate
 import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
@@ -20,9 +19,9 @@ class SequenceEditorActivity : Activity(), AnkoLogger {
 	val viewModel get() = ui.viewModel
 	val sequencerInstrument get() = ui.sequencerInstrument
 	val orbifold get() = viewModel.orbifold
-	var toneSequence get() = viewModel.toneSequence
+	var toneSequence get() = viewModel.openedMelody
 		set(value) {
-			viewModel.toneSequence = value
+			viewModel.openedMelody = value
 		}
 
 	override fun onCreate(savedInstanceState: Bundle?) {

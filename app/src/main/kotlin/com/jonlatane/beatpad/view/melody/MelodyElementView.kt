@@ -12,7 +12,6 @@ import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
-import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.warn
@@ -29,8 +28,8 @@ class MelodyElementView @JvmOverloads constructor(
 	lateinit var viewModel: MelodyViewModel
 
 	var elementPosition = 0
-	val element: Element get() = viewModel.toneSequence.elements[elementPosition]
-	val isDownbeat: Boolean get() = elementPosition % viewModel.toneSequence.subdivisionsPerBeat == 0
+	val element: Element get() = viewModel.openedMelody.elements[elementPosition]
+	val isDownbeat: Boolean get() = elementPosition % viewModel.openedMelody.subdivisionsPerBeat == 0
 
 	override var initialHeight: Int? = null
 	override val renderVertically = true
@@ -40,7 +39,7 @@ class MelodyElementView @JvmOverloads constructor(
 	override var chord: Chord
 		get() = viewModel.orbifold.chord
 		set(value) { throw UnsupportedOperationException() }
-	val melodyOffset get() = viewModel.toneSequence.offsetUnder(viewModel.orbifold.chord)
+	val melodyOffset get() = viewModel.openedMelody.offsetUnder(viewModel.orbifold.chord)
 
 	override fun onDraw(canvas: Canvas) {
 		colorGuideAlpha = if(viewModel.playbackPosition == elementPosition) 255 else 187

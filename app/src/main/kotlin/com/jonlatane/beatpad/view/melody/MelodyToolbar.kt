@@ -9,9 +9,9 @@ import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.mod12
-import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk25.coroutines.onLongClick
 
 
 class MelodyToolbar(
@@ -37,56 +37,60 @@ class MelodyToolbar(
 		it.inflate(R.menu.melody_relative_menu)
 		it.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
-				R.id.fixedPositionMelody -> viewModel.toneSequence.shouldConformWithHarmony = false
-				R.id.relativeToCurrentChord -> viewModel.toneSequence.apply {
+				R.id.fixedPositionMelody -> viewModel.openedMelody.shouldConformWithHarmony = false
+				R.id.relativeToCurrentChord -> viewModel.openedMelody.apply {
+					val newRoot = viewModel.orbifold.chord.root.mod12
+					if(!shouldConformWithHarmony) {
+						transposeInPlace((tonic - newRoot).mod12)
+					}
 					shouldConformWithHarmony = true
-					tonic = viewModel.orbifold.chord.root.mod12
+					tonic = newRoot
 				}
-				R.id.c -> viewModel.toneSequence.apply {
+				R.id.c -> viewModel.openedMelody.apply {
 					shouldConformWithHarmony = true
 					tonic = 0
 				}
-				R.id.cSharp -> viewModel.toneSequence.apply {
+				R.id.cSharp -> viewModel.openedMelody.apply {
 					shouldConformWithHarmony = true
 					tonic = 1
 				}
-				R.id.d -> viewModel.toneSequence.apply {
+				R.id.d -> viewModel.openedMelody.apply {
 					shouldConformWithHarmony = true
 					tonic = 2
 				}
-				R.id.dSharp -> viewModel.toneSequence.apply {
+				R.id.dSharp -> viewModel.openedMelody.apply {
 					shouldConformWithHarmony = true
 					tonic = 3
 				}
-				R.id.e -> viewModel.toneSequence.apply {
+				R.id.e -> viewModel.openedMelody.apply {
 					shouldConformWithHarmony = true
 					tonic = 4
 				}
-				R.id.f -> viewModel.toneSequence.apply {
+				R.id.f -> viewModel.openedMelody.apply {
 					shouldConformWithHarmony = true
 					tonic = 5
 				}
-				R.id.fSharp -> viewModel.toneSequence.apply {
+				R.id.fSharp -> viewModel.openedMelody.apply {
 					shouldConformWithHarmony = true
 					tonic = 6
 				}
-				R.id.g -> viewModel.toneSequence.apply {
+				R.id.g -> viewModel.openedMelody.apply {
 					shouldConformWithHarmony = true
 					tonic = 7
 				}
-				R.id.gSharp -> viewModel.toneSequence.apply {
+				R.id.gSharp -> viewModel.openedMelody.apply {
 					shouldConformWithHarmony = true
 					tonic = 8
 				}
-				R.id.a -> viewModel.toneSequence.apply {
+				R.id.a -> viewModel.openedMelody.apply {
 					shouldConformWithHarmony = true
 					tonic = 9
 				}
-				R.id.aSharp -> viewModel.toneSequence.apply {
+				R.id.aSharp -> viewModel.openedMelody.apply {
 					shouldConformWithHarmony = true
 					tonic = 10
 				}
-				R.id.b -> viewModel.toneSequence.apply {
+				R.id.b -> viewModel.openedMelody.apply {
 					shouldConformWithHarmony = true
 					tonic = 11
 				}
@@ -99,8 +103,8 @@ class MelodyToolbar(
 
 	fun updateButtonText() {
 		relativeToButton.text = when {
-			!viewModel.toneSequence.shouldConformWithHarmony -> "Fixed Position"
-			else -> "Relative to ${Chord.mod12Names[viewModel.toneSequence.tonic.mod12]}"
+			!viewModel.openedMelody.shouldConformWithHarmony -> "Fixed Position"
+			else -> "Relative to ${Chord.mod12Names[viewModel.openedMelody.tonic.mod12]}"
 		}
 	}
 	private fun updateMelody() = viewModel.melodyElementAdapter?.notifyDataSetChanged()
@@ -115,7 +119,12 @@ class MelodyToolbar(
 	private val upButton = button {
 		text = "Up"
 		onClick {
-			viewModel.toneSequence.transposeInPlace(1)
+			viewModel.openedMelody.transposeInPlace(1)
+			updateMelody()
+		}
+		onLongClick {
+			viewModel.openedMelody.transposeInPlace(12)
+			context.toast("Octave Up")
 			updateMelody()
 		}
 	}.lparams {
@@ -127,7 +136,12 @@ class MelodyToolbar(
 	private val downButton = button {
 		text = "Down"
 		onClick {
-			viewModel.toneSequence.transposeInPlace(-1)
+			viewModel.openedMelody.transposeInPlace(-1)
+			updateMelody()
+		}
+		onLongClick {
+			viewModel.openedMelody.transposeInPlace(-12)
+			context.toast("Octave Down")
 			updateMelody()
 		}
 	}.lparams {

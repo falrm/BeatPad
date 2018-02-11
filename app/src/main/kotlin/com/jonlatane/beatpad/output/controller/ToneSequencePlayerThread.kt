@@ -9,7 +9,7 @@ import com.jonlatane.beatpad.view.melody.MelodyViewModel
 class ToneSequencePlayerThread(
 	val instrument: Instrument,
 	val viewModel: MelodyViewModel? = null,
-	val sequence: Melody = viewModel!!.toneSequence,
+	val sequence: Melody = viewModel!!.openedMelody,
 	val chordResolver: () -> Chord = { viewModel!!.orbifold.chord },
 	val onFinish: (ToneSequencePlayerThread) -> Unit = {},
 	@Volatile var beatsPerMinute: Int

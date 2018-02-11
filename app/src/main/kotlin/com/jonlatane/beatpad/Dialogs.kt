@@ -20,6 +20,7 @@ import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import org.jetbrains.anko.contentView
 import org.jetbrains.anko.nsdManager
 import android.content.DialogInterface
+import com.jonlatane.beatpad.output.service.BeatClockProducer
 import com.jonlatane.beatpad.storage.Storage
 
 
@@ -86,6 +87,7 @@ fun showTempoPicker(activity: MainActivity) {
 	}
 	dialog.show()
 }
+
 
 fun showConfirmDialog(
 	context: Context,

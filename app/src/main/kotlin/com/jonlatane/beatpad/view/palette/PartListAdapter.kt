@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.midi.GM1Effects
+import com.jonlatane.beatpad.model.Part
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.recyclerview.v7.recyclerView
@@ -69,4 +72,23 @@ class PartListAdapter(
 		viewModel.palette.parts.size < MAX_PARTS -> viewModel.palette.parts.size + 1
 		else -> viewModel.palette.parts.size
 	}
+
+	fun addPart() {
+		viewModel.palette.parts.add(
+			Part(
+				GM1Effects.randomInstrument(
+					channel = viewModel.palette.parts.size.toByte(),
+					exceptions = viewModel.palette.parts.mapNotNull {
+						(it.instrument as? MIDIInstrument)?.instrument
+					}.toSet()
+				)
+			)
+		)
+		if(canAddParts())
+			notifyItemInserted(viewModel.palette.parts.size - 1)
+		else
+			notifyItemChanged(viewModel.palette.parts.size - 1)
+	}
+
+	fun canAddParts() = viewModel.palette.parts.size < PartListAdapter.MAX_PARTS
 }
