@@ -10,6 +10,7 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showInstrumentPicker
 import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.backgroundColor
@@ -27,6 +28,7 @@ class PartHolder(
 ) : RecyclerView.ViewHolder(layout) {
 	var partPosition by Delegates.observable(initialPart) { _, _, _ -> onPartPositionChanged() }
 	val part get() = viewModel.palette.parts[partPosition]
+	val context get() = patternRecycler.context
 	private val patternAdapter = MelodyAdapter(viewModel, patternRecycler, 0)
 
 	private val editPartMenu = PopupMenu(partName.context, partName)
@@ -39,17 +41,25 @@ class PartHolder(
 				R.id.editPartInstrument -> editInstrument()
 				R.id.usePartOnColorboard -> {
 					viewModel.colorboardPart = part
-					patternRecycler.context.toast("Applied ${part.instrument.instrumentName} to Colorboard!")
+					context.toast("Applied ${part.instrument.instrumentName} to Colorboard!")
 				}
 				R.id.usePartOnKeyboard -> {
 					viewModel.keyboardPart = part
-					patternRecycler.context.toast("Applied ${part.instrument.instrumentName} to Keyboard!")
+					context.toast("Applied ${part.instrument.instrumentName} to Keyboard!")
 				}
 				R.id.usePartOnSplat -> {
 					viewModel.splatPart = part
-					patternRecycler.context.toast("Applied ${part.instrument.instrumentName} to Splat!")
+					context.toast("Applied ${part.instrument.instrumentName} to Splat!")
 				}
-			R.id.removePart -> patternRecycler.context.toast("TODO!")
+				R.id.removePart -> showConfirmDialog(
+						context,
+						promptText = "Really delete the ${part.instrument.instrumentName} part?",
+						yesText = "Yes, delete part"
+					) {
+						viewModel.palette.parts.removeAt(partPosition)
+						adapter.notifyItemRemoved(partPosition)
+					}
+				else -> context.toast("TODO!")
 			}
 			true
 		}

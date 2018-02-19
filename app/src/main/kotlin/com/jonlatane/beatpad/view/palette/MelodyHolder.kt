@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.widget.PopupMenu
 import android.widget.TextView
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.storage.PaletteStorage
 import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.toast
@@ -42,7 +43,14 @@ class MelodyHolder(
 		editPatternMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
 				R.id.editPattern -> viewModel.editingSequence = pattern
-				R.id.removePattern -> context.toast("TODO!")
+				R.id.removePattern -> showConfirmDialog(
+					context,
+					promptText = "Really delete this melody?",
+					yesText = "Yes, delete melody"
+				) {
+					part.melodies.removeAt(patternPosition)
+					adapter.notifyItemRemoved(patternPosition)
+				}
 				else -> context.toast("TODO!")
 			}
 			true
