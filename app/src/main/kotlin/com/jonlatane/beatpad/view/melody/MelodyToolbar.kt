@@ -39,9 +39,8 @@ class MelodyToolbar(
 		it.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
 				R.id.fixedPositionMelody -> { viewModel.openedMelody.apply {
-						val newRoot = 0//viewModel.orbifold.chord.root.mod12
 						if(shouldConformWithHarmony) {
-							transposeInPlace((tonic - newRoot - (tonic - viewModel.orbifold.chord.root.mod12)).mod12Nearest)
+							transposeInPlace(viewModel.orbifold.chord.root.mod12Nearest)
 						}
 						shouldConformWithHarmony = false
 						tonic = 0
