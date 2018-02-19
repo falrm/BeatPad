@@ -11,5 +11,6 @@ class Palette (
   val parts: MutableList<Part> = mutableListOf(),
   val harmonies: MutableList<Harmony> = mutableListOf(),
   var keyboardPart: Part? = null,
-  var colorboardPart: Part? = null
+  var colorboardPart: Part? = null,
+  var splatPart: Part? = null
 )

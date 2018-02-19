@@ -4,6 +4,8 @@
         android:id="@+id/editPartInstrument"/>
     <item android:title="Use on Colorboard"
           android:id="@+id/usePartOnColorboard"/>
+    <item android:title="Use on Splat"
+          android:id="@+id/usePartOnSplat"/>
     <item android:title="Use on Keyboard"
           android:id="@+id/usePartOnKeyboard"/>
     <item android:title="Remove Part"

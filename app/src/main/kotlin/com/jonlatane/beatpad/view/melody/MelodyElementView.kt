@@ -101,7 +101,8 @@ class MelodyElementView @JvmOverloads constructor(
 				val tone = getTone(event.getY(pointerIndex))
 				if(element is Note) {
 					val tones = (element as Note).tones
-					if(!tones.remove(tone)) tones.add(tone - melodyOffset)
+					val targetTone = tone - melodyOffset
+					if(!tones.remove(targetTone)) tones.add(targetTone)
 				}
 			}
 			MotionEvent.ACTION_MOVE -> {}

@@ -147,6 +147,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 				//viewModel.harmonyController.tones = tones
 				viewModel.keyboardView.ioHandler.highlightChord(c)
 				viewModel.verticalAxis?.chord = c
+				viewModel.splatController?.tones = c.getTones()
 				viewModel.redraw()
 			}
 

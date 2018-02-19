@@ -14,9 +14,11 @@ open class DeviceOrientationInstrument(val instrument: Instrument) {
 		//Log.i(TAG, String.format("Relative pitch: %.2f", relativePitch));
 		val highestPossibleBottomToneIndex: Float = tones.size - (toneSpread * numSimultaneousTones)
 		val toneIndex = (highestPossibleBottomToneIndex * relativePitch).toInt()
-		(0..numSimultaneousTones - 1)
-			.map { tones[(toneIndex + it * toneSpread).toInt()] }
-			.forEach { instrument.play(it) }
+		(0 until numSimultaneousTones)
+			.mapNotNull {
+				val index = (toneIndex + it * toneSpread).toInt()
+				tones.getOrNull(index)
+			}.forEach { instrument.play(it) }
 	}
 
 	fun stop() {

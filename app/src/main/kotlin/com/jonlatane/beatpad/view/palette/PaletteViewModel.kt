@@ -4,10 +4,14 @@ import android.view.View
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Part
+import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
+import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.view.HideableRecyclerView
 import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
 import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
+import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlin.properties.Delegates.observable
 
 /**
@@ -27,6 +31,7 @@ class PaletteViewModel : MelodyViewModel() {
 		}
 		keyboardPart = new.keyboardPart ?: new.parts[0]
 		colorboardPart = new.colorboardPart ?: new.parts[0]
+		splatPart = new.splatPart ?: new.parts[0]
 		BeatClockPaletteConsumer.palette = new
 		partListAdapter?.notifyDataSetChanged()
 		chordListAdapter?.notifyDataSetChanged()
@@ -36,6 +41,8 @@ class PaletteViewModel : MelodyViewModel() {
 		if (new != null) {
 			openedMelody = new
 			editPatternMode()
+			colorboardView.hide()
+			keyboardView.hide()
 		} else patternListMode()
 		melodyToolbar.updateButtonText()
 	}
@@ -54,6 +61,17 @@ class PaletteViewModel : MelodyViewModel() {
 	var colorboardPart: Part? by observable<Part?>(null) { _, _, new ->
 		if (new != null) colorboardView.instrument = new.instrument
 		palette.colorboardPart = new
+	}
+
+	var splatController: DeviceOrientationInstrument? = null
+	var splatPart: Part? by observable<Part?>(null) { _, _, new ->
+		if (new != null) {
+			splatController = DeviceOrientationInstrument(new.instrument).also {
+				it.tones = orbifold.chord.getTones()
+				RhythmAnimations.wireMelodicControl(orbifold, it)
+			}
+		}
+		palette.splatPart = new
 	}
 
 	fun onBackPressed(): Boolean {

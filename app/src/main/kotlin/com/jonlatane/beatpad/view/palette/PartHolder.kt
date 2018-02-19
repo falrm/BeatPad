@@ -45,6 +45,10 @@ class PartHolder(
 					viewModel.keyboardPart = part
 					patternRecycler.context.toast("Applied ${part.instrument.instrumentName} to Keyboard!")
 				}
+				R.id.usePartOnSplat -> {
+					viewModel.splatPart = part
+					patternRecycler.context.toast("Applied ${part.instrument.instrumentName} to Splat!")
+				}
 			R.id.removePart -> patternRecycler.context.toast("TODO!")
 			}
 			true
