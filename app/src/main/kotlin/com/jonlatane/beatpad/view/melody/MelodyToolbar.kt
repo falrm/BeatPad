@@ -9,6 +9,7 @@ import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.mod12
+import com.jonlatane.beatpad.util.mod12Nearest
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
@@ -37,11 +38,19 @@ class MelodyToolbar(
 		it.inflate(R.menu.melody_relative_menu)
 		it.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
-				R.id.fixedPositionMelody -> viewModel.openedMelody.shouldConformWithHarmony = false
+				R.id.fixedPositionMelody -> { viewModel.openedMelody.apply {
+						val newRoot = 0//viewModel.orbifold.chord.root.mod12
+						if(shouldConformWithHarmony) {
+							transposeInPlace((tonic - newRoot - (tonic - viewModel.orbifold.chord.root.mod12)).mod12Nearest)
+						}
+						shouldConformWithHarmony = false
+						tonic = 0
+					}
+				}
 				R.id.relativeToCurrentChord -> viewModel.openedMelody.apply {
 					val newRoot = viewModel.orbifold.chord.root.mod12
 					if(!shouldConformWithHarmony) {
-						transposeInPlace((tonic - newRoot).mod12)
+						transposeInPlace((tonic - newRoot).mod12Nearest)
 					}
 					shouldConformWithHarmony = true
 					tonic = newRoot

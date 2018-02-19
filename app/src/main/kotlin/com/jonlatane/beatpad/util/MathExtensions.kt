@@ -1,6 +1,12 @@
 package com.jonlatane.beatpad.util
 
 val Int.mod12 get() = ((this % 12) + 12) % 12
+val Int.mod12Nearest get(): Int = mod12.let {
+	when {
+		it <= 6 -> it
+		else -> it - 12
+	}
+}
 val Int.mod7 get() = ((this % 12) + 12) % 12
 val Int.fromOctaveToOffset get() = (this - 4) * 12
 val Float.to255Int

@@ -28,7 +28,7 @@ class MelodyHolder(
 	private val editPatternMenu = PopupMenu(textView.context, textView)
 
 	init {
-		newPatternMenu.inflate(R.menu.pattern_new_menu)
+		newPatternMenu.inflate(R.menu.part_melody_new_menu)
 		newPatternMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
 				R.id.newDrawnPattern ->
@@ -39,7 +39,7 @@ class MelodyHolder(
 			}
 			true
 		}
-		editPatternMenu.inflate(R.menu.pattern_edit_menu)
+		editPatternMenu.inflate(R.menu.part_melody_edit_menu)
 		editPatternMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
 				R.id.editPattern -> viewModel.editingSequence = pattern
