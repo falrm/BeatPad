@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.view.palette
 
+import android.view.ViewManager
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.harmony.chord.Chord
@@ -29,93 +30,9 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 	override fun createView(ui: AnkoContext<PaletteEditorActivity>) = with(ui) {
 		relativeLayout {
 			if (configuration.portrait) {
-				viewModel.orbifold = orbifoldView {
-					id = R.id.orbifold
-				}.lparams {
-					width = matchParent
-					height = dip(210f)
-					alignParentTop()
-				}
-
-				viewModel.chordListView = chordListView(viewModel = viewModel) {
-					id = R.id.chord_list
-				}.lparams {
-					below(viewModel.orbifold)
-					elevation=5f
-					width = matchParent
-					height = wrapContent
-				}
-
-				viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
-					id = R.id.toolbar
-				}.lparams {
-					below(viewModel.chordListView)
-					width = matchParent
-					height = wrapContent
-				}
+				portraitLayout(this@relativeLayout)
 			} else {
-				val leftSideWidth = dip(350f)
-
-				viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
-					id = R.id.toolbar
-				}.lparams {
-					width = leftSideWidth
-					height = wrapContent
-					alignParentLeft()
-					alignParentTop()
-
-				}
-
-				viewModel.chordListView = chordListView(viewModel = viewModel) {
-					id = R.id.chord_list
-				}.lparams {
-					width = leftSideWidth
-					height = wrapContent
-					alignParentLeft()
-					alignParentBottom()
-				}
-
-				viewModel.orbifold = orbifoldView {
-					id = R.id.orbifold
-				}.lparams {
-					alignParentLeft()
-					above(viewModel.chordListView)
-					below(viewModel.toolbarView)
-					width = leftSideWidth
-					height = matchParent
-					elevation = 5f
-				}
-			}
-
-			viewModel.partListView = partListView(viewModel = viewModel) {
-				id = R.id.part_list
-			}.lparams {
-				width = matchParent
-				height = wrapContent
-				alignParentBottom()
-				if (configuration.portrait) {
-					below(viewModel.toolbarView)
-				} else {
-					rightOf(viewModel.orbifold)
-					alignParentTop()
-					alignParentRight()
-				}
-			}
-
-			viewModel.melodyView = melodyView(viewModel = viewModel) {
-				id = R.id.melody
-				alpha = 0f
-			}.lparams {
-				width = matchParent
-				height = wrapContent
-				alignParentBottom()
-				if (configuration.portrait) {
-					below(viewModel.toolbarView)
-				} else {
-					rightOf(viewModel.orbifold)
-					alignParentTop()
-					alignParentRight()
-				}
+				landscapeLayout(this@relativeLayout)
 			}
 
 			viewModel.keyboardView = keyboardView {
@@ -164,6 +81,109 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 					it.alpha = 1f
 				}*/
 			}
+		}
+	}
+
+	private fun ViewManager.portraitLayout(layout: _RelativeLayout) = with(layout) {
+		viewModel.orbifold = orbifoldView {
+			id = R.id.orbifold
+		}.lparams {
+			width = matchParent
+			height = dip(210f)
+			alignParentTop()
+		}
+
+		viewModel.chordListView = chordListView(viewModel = viewModel) {
+			id = R.id.chord_list
+		}.lparams {
+			below(viewModel.orbifold)
+			elevation = 5f
+			width = matchParent
+			height = wrapContent
+		}
+
+		viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
+			id = R.id.toolbar
+		}.lparams {
+			below(viewModel.chordListView)
+			width = matchParent
+			height = wrapContent
+		}
+
+		viewModel.partListView = partListView(viewModel = viewModel) {
+			id = R.id.part_list
+		}.lparams {
+			width = matchParent
+			height = wrapContent
+			alignParentBottom()
+			below(viewModel.toolbarView)
+		}
+
+		viewModel.melodyView = melodyView(viewModel = viewModel) {
+			id = R.id.melody
+			alpha = 0f
+		}.lparams {
+			width = matchParent
+			height = wrapContent
+			alignParentBottom()
+			below(viewModel.toolbarView)
+		}
+	}
+
+	private fun ViewManager.landscapeLayout(layout: _RelativeLayout) = with(layout) {
+		val leftSideWidth = dip(350f)
+
+		viewModel.chordListView = chordListView(viewModel = viewModel) {
+			id = R.id.chord_list
+		}.lparams {
+			width = leftSideWidth
+			height = wrapContent
+			alignParentLeft()
+			alignParentTop()
+		}
+
+		viewModel.orbifold = orbifoldView {
+			id = R.id.orbifold
+		}.lparams {
+			alignParentLeft()
+			below(viewModel.chordListView)
+			width = leftSideWidth
+			height = matchParent
+			elevation = 5f
+		}
+
+		viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
+			id = R.id.toolbar
+		}.lparams {
+			width = matchParent
+			height = wrapContent
+			rightOf(viewModel.orbifold)
+			alignParentTop()
+			alignParentRight()
+
+		}
+
+		viewModel.partListView = partListView(viewModel = viewModel) {
+			id = R.id.part_list
+		}.lparams {
+			width = matchParent
+			height = wrapContent
+			alignParentBottom()
+			rightOf(viewModel.orbifold)
+			below(viewModel.toolbarView)
+			alignParentRight()
+		}
+
+		viewModel.melodyView = melodyView(viewModel = viewModel) {
+			id = R.id.melody
+			alpha = 0f
+		}.lparams {
+			width = matchParent
+			height = wrapContent
+			alignParentBottom()
+			rightOf(viewModel.orbifold)
+			below(viewModel.toolbarView)
+			alignParentRight()
 		}
 	}
 }
