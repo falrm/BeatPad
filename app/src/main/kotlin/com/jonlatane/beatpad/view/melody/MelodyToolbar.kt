@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.view.melody
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.Button
 import android.widget.LinearLayout
@@ -10,6 +11,7 @@ import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.mod12
 import com.jonlatane.beatpad.util.mod12Nearest
+import com.jonlatane.beatpad.util.toolbarStyle
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
@@ -24,17 +26,29 @@ class MelodyToolbar(
 		backgroundColor = context.color(R.color.colorPrimaryDark)
 	}
 
-	val relativeToButton: Button = button {
-		text = "Relative To"
+	private val lengthButton: Button = button {
+		text = ""
 		onClick {
-			relativeToMenu.show()
+			context.toast("TODO")
 		}
 	}.lparams {
 		width = matchParent
 		height = wrapContent
 		weight = 1f
 	}
-	val relativeToMenu = PopupMenu(context, relativeToButton).also {
+
+	private val relativeToButton: Button = button {
+		text = ""
+		onClick {
+			relativeToMenu.show()
+		}
+		toolbarStyle()
+	}.lparams {
+		width = matchParent
+		height = wrapContent
+		weight = 1f
+	}
+	private val relativeToMenu = PopupMenu(context, relativeToButton).also {
 		it.inflate(R.menu.melody_relative_menu)
 		it.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
@@ -109,11 +123,15 @@ class MelodyToolbar(
 		}
 	}
 
+	@SuppressLint("SetTextI18n")
 	fun updateButtonText() {
 		relativeToButton.text = when {
 			!viewModel.openedMelody.shouldConformWithHarmony -> "Fixed Position"
 			else -> "Relative to ${Chord.mod12Names[viewModel.openedMelody.tonic.mod12]}"
 		}
+
+		lengthButton.text =
+			"${viewModel.openedMelody.elements.size}/${viewModel.openedMelody.subdivisionsPerBeat}"
 	}
 	private fun updateMelody() = viewModel.melodyElementAdapter?.notifyDataSetChanged()
 

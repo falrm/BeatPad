@@ -23,7 +23,7 @@ object ChordStorage {
 		override fun deserialize(jp: JsonParser, context: DeserializationContext): Chord {
 			val mapper = jp.codec as ObjectMapper
 			val root = mapper.readTree<ObjectNode>(jp)
-			/*write you own condition*/
+			/*send you own condition*/
 			return Chord(
 				root = root["root"].asInt(),
 				extension =  root["extension"].asIterable().map { it.asInt() }.toIntArray()

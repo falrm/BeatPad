@@ -7,12 +7,14 @@ import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.Orbifold.intermediate
 import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.storage.Storage
-import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
 import com.jonlatane.beatpad.view.melody.MelodyUI
-import org.billthefarmer.mididriver.GeneralMidiConstants.*
-import org.jetbrains.anko.*
+import org.billthefarmer.mididriver.GeneralMidiConstants.SYNTH_BASS_1
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.debug
+import org.jetbrains.anko.setContentView
 
 class SequenceEditorActivity : Activity(), AnkoLogger {
 	lateinit var ui: MelodyUI

@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.SeekBar
 import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.midi.GM1Effects
@@ -13,23 +14,52 @@ import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showInstrumentPicker
 import com.jonlatane.beatpad.util.color
+import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.info
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
+import org.jetbrains.anko.sdk25.coroutines.onSeekBarChangeListener
 import org.jetbrains.anko.toast
 import kotlin.properties.Delegates
+import kotlin.properties.Delegates.observable
+import kotlin.reflect.KProperty
 
 class PartHolder(
 	val viewModel: PaletteViewModel,
 	val layout: ViewGroup,
 	private val patternRecycler: _RecyclerView,
 	private val partName: TextView,
+	private val volumeSeekBar: SeekBar,
 	private val adapter: PartListAdapter,
 	initialPart: Int = 0
-) : RecyclerView.ViewHolder(layout) {
+) : RecyclerView.ViewHolder(layout), AnkoLogger {
 	var partPosition by Delegates.observable(initialPart) { _, _, _ -> onPartPositionChanged() }
 	val part get() = viewModel.palette.parts[partPosition]
 	val context get() = patternRecycler.context
 	private val patternAdapter = MelodyAdapter(viewModel, patternRecycler, 0)
+	var editingVolume: Boolean by observable(false) { _, _, editingVolume: Boolean ->
+		if(editingVolume && isEditablePart) {
+			volumeSeekBar.animate().alpha(1f)
+			volumeSeekBar.isEnabled = true
+			volumeSeekBar.apply {
+				onSeekBarChangeListener {
+					onProgressChanged { _, progress, _ ->
+						info("Setting part volume to ${progress.toFloat() / 127f}")
+						part.volume = progress.toFloat() / 127f
+					}
+				}
+			}
+			partName.isClickable = false
+			partName.isLongClickable = false
+			partName.animate().alpha(0.5f)
+		} else {
+			volumeSeekBar.animate().alpha(0f)
+			volumeSeekBar.isEnabled = false
+			partName.isClickable = true
+			partName.isLongClickable = true
+			partName.animate().alpha(1f)
+		}
+	}
 
 	private val editPartMenu = PopupMenu(partName.context, partName)
 
@@ -76,9 +106,12 @@ class PartHolder(
 		}
 	}
 
+	private val isEditablePart: Boolean
+		get() = partPosition < viewModel.palette.parts.size || !adapter.canAddParts()
+
 	private fun onPartPositionChanged() {
 		patternAdapter.partPosition = partPosition
-		if (partPosition < viewModel.palette.parts.size || !adapter.canAddParts()) {
+		if(isEditablePart) {
 			makeEditablePart(partPosition)
 		} else {
 			makeAddButton()
@@ -87,10 +120,9 @@ class PartHolder(
 
 	private fun makeEditablePart(partPosition: Int) {
 		partName.apply {
-			text = part.instrument.instrumentName
+			if(text != part.instrument.instrumentName) text = part.instrument.instrumentName
 			setOnClickListener {
 				editPartMenu.show()
-
 			}
 			setOnLongClickListener {
 				editInstrument()
@@ -106,6 +138,16 @@ class PartHolder(
 			overScrollMode = View.OVER_SCROLL_NEVER
 			adapter = sequenceListAdapter
 		}
+		volumeSeekBar.apply {
+			isIndeterminate = false
+			progress = (part.volume * 127).toInt()
+			onSeekBarChangeListener {
+				onProgressChanged { _, progress, _ ->
+					info("Setting part volume to ${progress.toFloat() / 127f}")
+					part.volume = progress.toFloat() / 127f
+				}
+			}
+		}
 	}
 
 	private fun makeAddButton() {
@@ -114,14 +156,14 @@ class PartHolder(
 			setOnClickListener {
 				adapter.addPart()
 			}
-			setOnLongClickListener {
-				//						viewModel.palette.chords.add(viewModel.orbifold.chord)
-//						notifyItemInserted(viewModel.palette.parts.size)
-				true
-			}
+			setOnLongClickListener { true }
 		}
 		patternRecycler.apply {
 			visibility = View.GONE
+		}
+		volumeSeekBar.apply {
+			isIndeterminate = true
+			onSeekBarChangeListener {}
 		}
 	}
 }

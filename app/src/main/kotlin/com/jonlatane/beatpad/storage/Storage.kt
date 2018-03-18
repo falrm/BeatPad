@@ -23,7 +23,7 @@ object Storage: AnkoLogger {
 		outputStreamWriter.write(json)
 		outputStreamWriter.close()
 	} catch (e: IOException) {
-		error("File write failed: " + e.toString())
+		error("File send failed: " + e.toString())
 	}
 
 	fun loadPalette(context: Context): Palette = try {
@@ -47,7 +47,7 @@ object Storage: AnkoLogger {
 		outputStreamWriter.write(json)
 		outputStreamWriter.close()
 	} catch (e: IOException) {
-		error("File write failed: " + e.toString())
+		error("File send failed: " + e.toString())
 	}
 
 	fun loadGM1InstrumentRecents(context: Context): List<Int> = try {
@@ -68,7 +68,7 @@ object Storage: AnkoLogger {
 		outputStreamWriter.write(json)
 		outputStreamWriter.close()
 	} catch (e: IOException) {
-		Log.e("Exception", "File write failed: " + e.toString())
+		Log.e("Exception", "File send failed: " + e.toString())
 	}
 
 	fun loadSequence(context: Context): Melody = try {

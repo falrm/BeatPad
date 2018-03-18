@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="Edit Pattern"
+    <item android:title="Edit Melody"
         android:id="@+id/editPattern"/>
-    <item android:title="Remove Pattern"
+    <item android:title="Remove Melody"
         android:id="@+id/removePattern"/>
 </menu>

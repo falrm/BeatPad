@@ -1,5 +1,4 @@
 import com.jonlatane.beatpad.model.*
-import com.jonlatane.beatpad.util.mod12
 import com.jonlatane.beatpad.util.to127Int
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
@@ -8,7 +7,7 @@ import java.lang.Math.max
 import kotlin.math.floor
 import kotlin.properties.Delegates.observable
 
-object BeatClockPaletteConsumer : AnkoLogger {
+object BeatClockPaletteConsumer: AnkoLogger {
 	var palette: Palette? = null
 	var viewModel: PaletteViewModel? by observable(null) { _, _, _ ->
 
@@ -39,7 +38,6 @@ object BeatClockPaletteConsumer : AnkoLogger {
 							part.instrument.stop(it)
 						}
 					}
-					info("Attack: $attack")
 					val melodyOffset = viewModel?.orbifold?.chord?.let { chord ->
 						melody.offsetUnder(chord)
 					} ?: 0

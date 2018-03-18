@@ -2,6 +2,7 @@ package com.jonlatane.beatpad.util
 
 import android.animation.ValueAnimator
 import android.os.Build
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -13,13 +14,23 @@ import org.jetbrains.anko.info
 import java.util.concurrent.atomic.AtomicInteger
 import android.view.animation.Transformation
 import android.view.animation.Animation
-
+import android.widget.TextView
+import org.jetbrains.anko.allCaps
+import org.jetbrains.anko.singleLine
 
 
 private val defaultDuration get() = 300L
 
 interface HideableView {
 	var initialHeight: Int?
+}
+
+fun TextView.toolbarStyle() {
+	singleLine = true
+	ellipsize = TextUtils.TruncateAt.MARQUEE
+	marqueeRepeatLimit = -1
+	isSelected = true
+	allCaps = true
 }
 
 var nextViewId: Int = 10001

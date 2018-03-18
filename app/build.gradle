@@ -17,6 +17,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
+kotlin {
+  experimental {
+    coroutines 'enable'
+  }
+}
+
 android {
 	compileSdkVersion 27
 	buildToolsVersion "26.0.2"
@@ -67,6 +73,8 @@ dependencies {
 	compile "org.jetbrains.anko:anko-recyclerview-v7:$anko_version"
 	compile "org.jetbrains.anko:anko-sdk25-coroutines:$anko_version"
 	compile "org.jetbrains.anko:anko-appcompat-v7-coroutines:$anko_version"
+	compile "org.jetbrains.anko:anko-constraint-layout:$anko_version"
+	compile "com.android.support.constraint:constraint-layout:1.1.0-beta5"
 
 	androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
 		exclude group: 'com.android.support', module: 'support-annotations'

@@ -13,6 +13,12 @@ val Float.to255Int
 	get() = Math.min(255, Math.max(0, Math.round(this * 255)))
 val Float.to127Int
 	get() = Math.min(127, Math.max(0, Math.round(this * 127)))
+inline val Float.between01
+	get() = when {
+		this < 0f -> 0f
+		this > 1f -> 1f
+		else -> this
+	}
 
 fun gcd(a: Int, b: Int): Int {
 	if (b == 0) return a

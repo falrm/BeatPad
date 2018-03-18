@@ -4,7 +4,6 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
-import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.debug
 

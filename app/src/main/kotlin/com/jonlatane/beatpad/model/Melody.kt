@@ -7,6 +7,7 @@ import com.jonlatane.beatpad.util.mod12
 interface Melody: Pattern<Melody.Element> {
 	var shouldConformWithHarmony: Boolean
 	var enabled: Boolean
+	var velocityFactor: Float
 	val type get() = "base"
 
 	override fun transpose(interval: Int): Melody {

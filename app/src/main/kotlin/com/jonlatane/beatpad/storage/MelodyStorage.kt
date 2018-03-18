@@ -40,7 +40,7 @@ object MelodyStorage : AnkoLogger {
 		override fun deserialize(jp: JsonParser, context: DeserializationContext): Melody {
 			val mapper = jp.codec as ObjectMapper
 			val root = mapper.readTree<ObjectNode>(jp)
-			/*write you own condition*/
+			/*send you own condition*/
 			val type = root.get("type").asText()
 			root.remove("type")
 			return when(type) {
@@ -71,7 +71,7 @@ object MelodyStorage : AnkoLogger {
 		override fun deserialize(jp: JsonParser, context: DeserializationContext): Melement {
 			val mapper = jp.codec as ObjectMapper
 			val root = mapper.readTree<ObjectNode>(jp)
-			/*write you own condition*/
+			/*send you own condition*/
 			val klass = if(root.has("tones")) Note::class.java else Sustain::class.java
 			return mapper.readValue(root.toString(), klass)
 		}

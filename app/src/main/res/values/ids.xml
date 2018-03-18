@@ -34,5 +34,6 @@
 	<item name="colorboard" type="id"/>
 	<item name="part_name" type="id"/>
 	<item name="part_patterns" type="id"/>
+	<item name="part_volume" type="id"/>
 
 </resources>

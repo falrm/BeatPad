@@ -13,7 +13,7 @@ object InstrumentStorage {
 		override fun deserialize(jp: JsonParser, context: DeserializationContext): Instrument {
 			val mapper = jp.codec as ObjectMapper
 			val root = mapper.readTree<ObjectNode>(jp)
-			/*write you own condition*/
+			/*send you own condition*/
 			val type = root.get("type").asText()
 			root.remove("type")
 			return when(type) {

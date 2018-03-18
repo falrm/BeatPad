@@ -13,6 +13,14 @@ import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackGenerator
 class AudioTrackInstrument(private val generator: AudioTrackGenerator) : Instrument {
     private val tracks = mutableMapOf<Int, AudioTrack>()
     override val type get() = "audio"
+    override var volume: Float = 1f
+        set(value) {
+            field = when {
+                value < 0f -> 0f
+                value > 1f -> 1f
+                else -> value
+            }
+        }
     override fun play(tone: Int) {
         val track = AudioTrackCache.getAudioTrackForNote(tone, generator)
         track.play()

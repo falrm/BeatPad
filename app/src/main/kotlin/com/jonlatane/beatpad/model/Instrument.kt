@@ -15,4 +15,5 @@ interface Instrument {
     fun stop()
     val type: String get() = "To be used during deserialization"
     val instrumentName get() = "Base Instrument"
+    var volume: Float
 }
