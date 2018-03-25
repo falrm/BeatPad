@@ -4,16 +4,16 @@ import android.view.ViewManager
 import org.jetbrains.anko.custom.ankoView
 
 
-fun ViewManager.toneSequenceElement(theme: Int = 0)
-	= toneSequenceElement(theme) {}
+fun ViewManager.melodyElementView(theme: Int = 0)
+	= melodyElementView(theme) {}
 
-inline fun ViewManager.toneSequenceElement(theme: Int = 0, init: MelodyElementView.() -> Unit)
+inline fun ViewManager.melodyElementView(theme: Int = 0, init: MelodyElementView.() -> Unit)
 	= ankoView({ MelodyElementView(it) }, theme, init)
 
-fun ViewManager.toneSequenceAxis(theme: Int = 0)
-	= toneSequenceAxis(theme) {}
+fun ViewManager.melodyToneAxis(theme: Int = 0)
+	= melodyToneAxis(theme) {}
 
-inline fun ViewManager.toneSequenceAxis(theme: Int = 0, init: MelodyToneAxis.() -> Unit)
+inline fun ViewManager.melodyToneAxis(theme: Int = 0, init: MelodyToneAxis.() -> Unit)
 	= ankoView({ MelodyToneAxis(it) }, theme, init)
 
 

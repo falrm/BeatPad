@@ -79,7 +79,7 @@ inline fun ViewManager.melodyView(
 			viewModel.melodyLeftScroller = nonDelayedScrollView {
 				id = R.id.left_scroller
 				linearLayout {
-					viewModel.verticalAxis = toneSequenceAxis().lparams {
+					viewModel.verticalAxis = melodyToneAxis().lparams {
 						width = dip(30)
 						height = dip(1000f)
 					}

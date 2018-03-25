@@ -18,7 +18,7 @@ class ChordAdapter(
 			ChordHolder(
 				viewModel = viewModel,
 				element = textView {
-					//this@toneSequenceElement.viewModel = this@ChordAdapter.viewModel
+					//this@melodyElementView.viewModel = this@ChordAdapter.viewModel
 				}.lparams {
 					width = dimen(R.dimen.subdivision_controller_size)
 					height = dip(1000f)

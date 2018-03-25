@@ -11,12 +11,18 @@ class MelodyElementAdapter(
 	val viewModel: MelodyViewModel,
 	val recyclerView: _RecyclerView
 ) : RecyclerView.Adapter<MelodyElementHolder>() {
+	fun invalidate(position: Int) {
+		recyclerView.findViewHolderForAdapterPosition(position)?.let {
+			(it as MelodyElementHolder).element.invalidate()
+		}
+	}
+
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyElementHolder? {
 		return with(recyclerView) {
 			MelodyElementHolder(
 				viewModel = viewModel,
-				element = toneSequenceElement {
-					this@toneSequenceElement.viewModel = this@MelodyElementAdapter.viewModel
+				element = melodyElementView {
+					this@melodyElementView.viewModel = this@MelodyElementAdapter.viewModel
 				}.lparams {
 					width = dimen(R.dimen.subdivision_controller_size)
 					height = dip(1000f)
