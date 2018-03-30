@@ -8,8 +8,6 @@ import android.widget.PopupMenu
 import android.widget.SeekBar
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.midi.GM1Effects
-import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showInstrumentPicker
@@ -22,7 +20,6 @@ import org.jetbrains.anko.sdk25.coroutines.onSeekBarChangeListener
 import org.jetbrains.anko.toast
 import kotlin.properties.Delegates
 import kotlin.properties.Delegates.observable
-import kotlin.reflect.KProperty
 
 class PartHolder(
 	val viewModel: PaletteViewModel,

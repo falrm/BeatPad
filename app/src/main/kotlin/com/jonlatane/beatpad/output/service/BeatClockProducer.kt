@@ -26,7 +26,14 @@ object BeatClockProducer : AnkoLogger {
 				}
 				//debug("Tick")
 				BeatClockPaletteConsumer.tick()
-				Thread.sleep(Math.max(0, tickTime - (System.currentTimeMillis() - start)))
+				val sleepTime = (tickTime - (System.currentTimeMillis() - start)).let {
+					when {
+						it < 0 -> 0L
+						it > 800 -> 800L
+						else -> it
+					}
+				}
+				Thread.sleep(sleepTime)
 			}
 			BeatClockPaletteConsumer.clearActiveAttacks()
 		}

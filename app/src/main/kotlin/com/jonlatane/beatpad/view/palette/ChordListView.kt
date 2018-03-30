@@ -31,7 +31,9 @@ inline fun ViewManager.chordListView(
 		viewModel.chordListAdapter = ChordListAdapter(viewModel)
 
 		backgroundColor = context.color(R.color.colorPrimaryDark)
-		layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+		layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
+			isItemPrefetchEnabled = false
+		}
 		overScrollMode = View.OVER_SCROLL_NEVER
 		adapter = viewModel.chordListAdapter
 		adapter.registerAdapterDataObserver(

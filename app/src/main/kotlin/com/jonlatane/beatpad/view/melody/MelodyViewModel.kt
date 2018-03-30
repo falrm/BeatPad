@@ -16,8 +16,8 @@ open class MelodyViewModel {
 		melodyElementAdapter?.notifyDataSetChanged()
 	}
 	var playbackPosition by observable<Int?>(null) { _, old, new ->
-		old?.let { melodyElementAdapter?.invalidate(it) }
-		new?.let { melodyElementAdapter?.invalidate(it) }
+		old?.let { melodyView.post { melodyElementAdapter?.invalidate(it) } }
+		new?.let { melodyView.post { melodyElementAdapter?.invalidate(it) } }
 	}
 	val playing = AtomicBoolean(false)
 	lateinit var orbifold: OrbifoldView

@@ -17,7 +17,9 @@ inline fun ViewManager.partListView(
 	HideableRecyclerView(it).apply {
 		val orientation = LinearLayoutManager.HORIZONTAL
 		backgroundColor = context.color(R.color.colorPrimaryDark)
-		layoutManager = LinearLayoutManager(context, orientation, false)
+		layoutManager = LinearLayoutManager(context, orientation, false).apply {
+			isItemPrefetchEnabled = false
+		}
 		overScrollMode = View.OVER_SCROLL_NEVER
 		adapter = PartListAdapter(viewModel, this)
 //		adapter.registerAdapterDataObserver(

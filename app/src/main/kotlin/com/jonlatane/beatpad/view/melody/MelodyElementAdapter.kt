@@ -12,9 +12,7 @@ class MelodyElementAdapter(
 	val recyclerView: _RecyclerView
 ) : RecyclerView.Adapter<MelodyElementHolder>() {
 	fun invalidate(position: Int) {
-		recyclerView.findViewHolderForAdapterPosition(position)?.let {
-			(it as MelodyElementHolder).element.invalidate()
-		}
+		recyclerView.layoutManager.findViewByPosition(position)?.invalidate()
 	}
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyElementHolder? {
