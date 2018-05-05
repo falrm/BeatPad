@@ -7,12 +7,14 @@ import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.harmony.Orbit
-import com.jonlatane.beatpad.harmony.Orbifold
-import com.jonlatane.beatpad.harmony.chord.Chord
-import com.jonlatane.beatpad.harmony.chord.Maj7
-import com.jonlatane.beatpad.harmony.chordsequence.Chromatic
+import com.jonlatane.beatpad.model.harmony.Orbit
+import com.jonlatane.beatpad.model.harmony.Orbifold
+import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.harmony.chord.Maj13
+import com.jonlatane.beatpad.model.harmony.chord.Maj7
+import com.jonlatane.beatpad.model.harmony.chordsequence.Chromatic
 import com.jonlatane.beatpad.showOrbifoldPicker
+import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.util.*
@@ -23,7 +25,6 @@ class OrbifoldView @JvmOverloads constructor(
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
 ) : RelativeLayout(context, attrs, defStyle) {
-
 	inline fun <T: View> T.lparams(
 		width: Int = android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
 		height: Int = android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -38,7 +39,7 @@ class OrbifoldView @JvmOverloads constructor(
 		_, _, listener ->
 		listener?.invoke(chord)
 	}
-	var chord: Chord by observable(Chord(0, Maj7)) { _, _, chord ->
+	var chord: Chord by observable(Chord(0, Maj13)) { _, _, chord ->
 		if (selectedChord != null) {
 			animateTo(InitialState)
 		} else {
@@ -46,9 +47,9 @@ class OrbifoldView @JvmOverloads constructor(
 		}
 		onChordChangedListener?.invoke(chord)
 	}
-	var orbifold: Orbifold by observable(Orbifold.intermediate) {
+	var orbifold: Orbifold by observable(Orbifold.functional) {
 		_, _, new ->
-		(Orbifold.ALL_SEQUENCEs - new).forEach {
+		(Orbifold.ALL_ORBITS - new).forEach {
 			removeSequence(it)
 		}
 		new.indices.forEach {
@@ -56,6 +57,7 @@ class OrbifoldView @JvmOverloads constructor(
 		}
 	}
 	internal var centralChord: TextView
+	internal lateinit var centralChordBackground: View
 	internal lateinit var centralChordThrobber: View
 	internal lateinit var centralChordTouchPoint: View
 	internal var halfStepUp: TextView
@@ -65,11 +67,11 @@ class OrbifoldView @JvmOverloads constructor(
 	internal var sequences: MutableList<SequenceViews> = ArrayList()
 
 	internal inner class SequenceViews(val sequence: Orbit) {
-		val axis = inflateAxisView()
-		val connectForward = inflateConnectorView()
-		val connectBack = inflateConnectorView()
-		val forward = inflateChordView()
-		val back = inflateChordView()
+		val axis = inflateAxisView().apply { alpha = 0f }
+		val connectForward = inflateConnectorView().apply { alpha = 0f }
+		val connectBack = inflateConnectorView().apply { alpha = 0f }
+		val forward = inflateChordView().apply { alpha = 0f }
+		val back = inflateChordView().apply { alpha = 0f }
 
 		init {
 			forward.setOnClickListener { v: View ->
@@ -93,8 +95,8 @@ class OrbifoldView @JvmOverloads constructor(
 		clipToPadding = false
 		clipChildren = false
 		centralChord = inflateChordView(centralChordElevation)
-		halfStepUp = inflateChordView(halfStepChordElevation)
-		halfStepDown = inflateChordView(halfStepChordElevation)
+		halfStepUp = inflateChordView(halfStepChordElevation).apply { alpha = 0f }
+		halfStepDown = inflateChordView(halfStepChordElevation).apply { alpha = 0f }
 		halfStepUp.setOnClickListener { v: View ->
 			selectedChord = v as TextView
 			chord = Chromatic.forward(chord)
@@ -122,20 +124,28 @@ class OrbifoldView @JvmOverloads constructor(
 			elevation = 1f
 		}
 
-		backgroundColor = resources.getColor(R.color.colorPrimaryDark)
+		backgroundColor = context.color(R.color.colorPrimaryDark)
 	}
 
 	internal fun updateChordText() {
 		fun TextView.chordify(c: Chord) {
 			text = c.name
 			val p = arrayOf(paddingLeft, paddingTop, paddingRight, paddingBottom)
-			backgroundResource = when {
+			/*backgroundResource = when {
 				c.isDominant -> R.drawable.orbifold_chord_dominant
 				c.isDiminished -> R.drawable.orbifold_chord_diminished
 				c.isMinor -> R.drawable.orbifold_chord_minor
 				c.isAugmented -> R.drawable.orbifold_chord_augmented
 				c.isMajor -> R.drawable.orbifold_chord_major
 				else -> R.drawable.orbifold_chord
+			}*/
+			textColor = when {
+				c.isDominant -> color(R.color.dominant)
+				c.isDiminished -> color(R.color.diminished)
+				c.isMinor -> color(R.color.minor)
+				c.isAugmented -> color(R.color.augmented)
+				c.isMajor -> color(R.color.major)
+				else -> color(android.R.color.white)
 			}
 			setPadding(p[0], p[1], p[2], p[3])
 		}
@@ -151,7 +161,7 @@ class OrbifoldView @JvmOverloads constructor(
 
 	private fun inflateChordView(defaultElevation: Float = defaultChordElevation): TextView {
 		LayoutInflater.from(context).inflate(R.layout.orbifold_chord, this, true)
-		val result = findViewWithTag("newChord").apply {
+		val result = findViewWithTag<TextView>("newChord").apply {
 			elevation = defaultElevation
 			tag = null
 		} as TextView
@@ -160,7 +170,7 @@ class OrbifoldView @JvmOverloads constructor(
 
 	private fun inflateAxisView(): View {
 		LayoutInflater.from(context).inflate(R.layout.orbifold_axis, this, true)
-		val result = findViewWithTag("newConnector").apply {
+		val result = findViewWithTag<View>("newConnector").apply {
 			elevation = axisElevation
 			tag = null
 		}
@@ -169,7 +179,7 @@ class OrbifoldView @JvmOverloads constructor(
 
 	private fun inflateConnectorView(): View {
 		LayoutInflater.from(context).inflate(R.layout.orbifold_connector, this, true)
-		val result = findViewWithTag("newConnector").apply {
+		val result = findViewWithTag<View>("newConnector").apply {
 			elevation = connectorElevation
 			tag = null
 		}
@@ -178,29 +188,44 @@ class OrbifoldView @JvmOverloads constructor(
 
 	private fun inflateBG() {
 		LayoutInflater.from(context).inflate(R.layout.orbifold_bg_half_steps, this, true)
-		halfStepBackground = findViewWithTag("newBG").apply {
+		halfStepBackground = findViewWithTag<View>("newBG").apply {
 			elevation = halfStepBackgroundElevation
 			tag = null
 		}
 
 		LayoutInflater.from(context).inflate(R.layout.orbifold_bg_highlight, this, true)
-		centralChordThrobber = findViewWithTag("newBG").apply {
+		centralChordThrobber = findViewWithTag<View>("newBG").apply {
 			outlineProvider = null
 			elevation = Float.MAX_VALUE - 1f
 			tag = null
 			alpha = 0f
 		}
 
+		centralChordBackground = view {
+			id = R.id.orbifold_background
+			//outlineProvider = null
+			//tag = null
+			background = context.getDrawable(R.drawable.orbifold_bg_highlight)
+			elevation = centralBackgroundElevation
+		}.lparams(dip(180), height = dip(108))  {
+			centerInParent()
+		}
+
 		LayoutInflater.from(context).inflate(R.layout.orbifold_bg_highlight, this, true)
-		centralChordTouchPoint = findViewWithTag("newBG").apply {
+		centralChordTouchPoint = findViewWithTag<View>("newBG").apply {
 			elevation = Float.MAX_VALUE
 			alpha = 0f
 			tag = null
 		}
 	}
 
+	override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+		super.onSizeChanged(w, h, oldw, oldh)
+		post { animateTo(SelectionState) }
+	}
+
 	fun onResume() {
-		animateTo(SelectionState)
+		//animateTo(SelectionState)
 	}
 
 	private fun addSequence(index: Int, sequence: Orbit) {
@@ -212,7 +237,7 @@ class OrbifoldView @JvmOverloads constructor(
 	}
 
 	private fun removeSequence(sequence: Orbit) {
-		for (index in 0..sequences.size - 1) {
+		for (index in 0 until sequences.size) {
 			val views = sequences[index]
 			if (views.sequence === sequence) {
 				animateViewOut(views.axis)
@@ -239,4 +264,7 @@ class OrbifoldView @JvmOverloads constructor(
 
 	fun skipTo(state: NavigationState) = state.skipTo(this)
 	fun animateTo(state: NavigationState) = state.animateTo(this)
+    fun disableNextTransitionAnimation() {
+        selectedChord = null
+    }
 }

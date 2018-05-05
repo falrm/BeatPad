@@ -5,6 +5,7 @@ import android.widget.TextView
 import com.jonlatane.beatpad.util.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
+import org.jetbrains.anko.verbose
 
 object SelectionState : NavigationState, AnkoLogger {
   override fun animateTo(v: OrbifoldView) {
@@ -35,6 +36,10 @@ object SelectionState : NavigationState, AnkoLogger {
       duration = ANIMATION_DURATION
     )
     v.centralChordThrobber.animateWidth(
+      width = v.centralChord.scaledWidth,
+      duration = ANIMATION_DURATION
+    )
+    v.centralChordBackground.animateWidth(
       width = v.centralChord.scaledWidth,
       duration = ANIMATION_DURATION
     )
@@ -76,7 +81,7 @@ object SelectionState : NavigationState, AnkoLogger {
 
   private fun skipAxisToSelectionPhase(sv: OrbifoldView.SequenceViews, tX: Float, tY: Float) {
     val width = Math.round(2f * tX + Math.max(sv.forward.width, sv.back.width))
-    info("Setting to axis width $width")
+    verbose("Setting to axis width $width")
     sv.axis.apply {
       alpha = 0.4f
       translationX = 0f
@@ -161,7 +166,7 @@ object SelectionState : NavigationState, AnkoLogger {
 
   private fun animateAxisToSelectionPhase(sv: OrbifoldView.SequenceViews, tX: Float, tY: Float) {
     val width = Math.round(2f * tX + Math.max(sv.forward.width, sv.back.width))
-    info("Animating to axis width $width")
+    verbose("Animating to axis width $width")
     val propertyAnimator = sv.axis.animate().translationY(tY).translationX(0f).alpha(0.4f)
     sv.axis.animateWidth(width)
     propertyAnimator.setDuration(ANIMATION_DURATION).start()

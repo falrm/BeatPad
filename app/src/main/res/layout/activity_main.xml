@@ -31,8 +31,8 @@
 		android:layout_height="@dimen/key_height_white"
 		android:layout_alignParentBottom="true"/>
 
-	<com.jonlatane.beatpad.view.melody.MelodyView
-		android:id="@+id/melody"
+	<com.jonlatane.beatpad.view.colorboard.ColorboardInputView
+		android:id="@+id/colorboard"
 		android:layout_width="match_parent"
 		android:layout_height="@dimen/key_height_white"
 		android:layout_above="@id/keyboard"/>
@@ -41,7 +41,7 @@
 		android:id="@+id/orbifold"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_above="@id/melody"
+		android:layout_above="@id/colorboard"
 		android:layout_alignParentTop="true"/>
 
 </RelativeLayout>

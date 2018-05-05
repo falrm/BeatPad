@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Change Instrument"
+        android:id="@+id/editPartInstrument"/>
+    <item android:title="Use on Colorboard"
+          android:id="@+id/usePartOnColorboard"/>
+    <item android:title="Use on Splat"
+          android:id="@+id/usePartOnSplat"/>
+    <item android:title="Use on Keyboard"
+          android:id="@+id/usePartOnKeyboard"/>
+    <item android:title="Remove Part"
+        android:id="@+id/removePart"/>
+</menu>

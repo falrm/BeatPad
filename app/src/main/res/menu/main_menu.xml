@@ -24,4 +24,6 @@
     </item>
     <item android:title="Sequence Editor"
           android:id="@+id/sequence_editor"/>
+    <item android:title="Palette Editor"
+          android:id="@+id/palette_editor"/>
 </menu>

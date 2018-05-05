@@ -2,6 +2,7 @@ package com.jonlatane.beatpad.util
 
 import android.animation.ValueAnimator
 import android.os.Build
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +14,9 @@ import org.jetbrains.anko.info
 import java.util.concurrent.atomic.AtomicInteger
 import android.view.animation.Transformation
 import android.view.animation.Animation
-
+import android.widget.TextView
+import org.jetbrains.anko.allCaps
+import org.jetbrains.anko.singleLine
 
 
 private val defaultDuration get() = 300L
@@ -21,6 +24,18 @@ private val defaultDuration get() = 300L
 interface HideableView {
 	var initialHeight: Int?
 }
+
+fun TextView.toolbarStyle() {
+	singleLine = true
+	ellipsize = TextUtils.TruncateAt.MARQUEE
+	marqueeRepeatLimit = -1
+	isSelected = true
+	allCaps = true
+}
+
+var nextViewId: Int = 10001
+	get() = if(field == Int.MAX_VALUE) 101 else field++
+  private set
 
 fun afterAll(
 	animators: Collection<ViewPropertyAnimator>,
@@ -98,7 +113,6 @@ fun View.animateHeight(height: Int, duration: Long = defaultDuration) {
 	anim.addUpdateListener { valueAnimator ->
 		val value = valueAnimator.animatedValue as Int
 		this.layoutHeight = value
-		AnkoLogger(View::class.java).info("Animated height: $value")
 	}
 	anim.setDuration(duration).start()
 }
@@ -114,7 +128,8 @@ fun View.show(animated: Boolean = true) {
 
 fun View.hide(animated: Boolean = true) {
 	if ((this as HideableView).initialHeight == null) {
-		initialHeight = if (height > 0) height else layoutHeight
+		measure(width, height)
+		initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
 	}
 	if (animated) {
 		animateHeight(0)
@@ -123,8 +138,4 @@ fun View.hide(animated: Boolean = true) {
 	}
 }
 
-fun View.color(resId: Int) =
-	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-		resources.getColor(resId, context.theme)
-	else @Suppress("Deprecated")
-		resources.getColor(resId)
+fun View.color(resId: Int) = context.color(resId)

@@ -5,10 +5,9 @@ import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
 import android.view.MenuItem
-import com.jonlatane.beatpad.harmony.Orbifold.*
+import com.jonlatane.beatpad.model.harmony.Orbifold.*
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.sensors.Orientation
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import kotlinx.android.synthetic.main.activity_conductor.*
 import org.jetbrains.anko.AnkoLogger
@@ -21,7 +20,7 @@ import java.io.PrintWriter
 import java.net.ServerSocket
 import java.util.concurrent.Executors
 
-class ConductorActivity : BaseActivity(), AnkoLogger {
+class ConductorActivity : OldBaseActivity(), AnkoLogger {
     override val menuResource: Int = R.menu.conduct_menu
     private val conductorInstrument = MIDIInstrument()
     private var serviceName = SERVICE_NAME
@@ -29,9 +28,9 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
     private val executorService = Executors.newScheduledThreadPool(2)
     private val registrationListener = object: NsdManager.RegistrationListener {
         override fun onServiceRegistered(serviceInfo: NsdServiceInfo) {
-            // Save the service name.  Android may have changed it in order to
-            // resolve a conflict, so update the name you initially requested
-            // with the name Android actually used.
+            // Save the service partName.  Android may have changed it in order to
+            // resolve a conflict, so update the partName you initially requested
+            // with the partName Android actually used.
             serviceName = serviceInfo.serviceName
             contentView?.post {
                 title = serviceName
@@ -52,7 +51,6 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_conductor)
-        Orientation.initialize(this)
         val harmonyController = DeviceOrientationInstrument(conductorInstrument)
         RhythmAnimations.wireMelodicControl(orbifold, harmonyController)
         orbifold.onChordChangedListener = { chord ->
@@ -65,7 +63,7 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
         // Create the NsdServiceInfo object, and populate it.
         val serviceInfo = NsdServiceInfo()
 
-        // The name is subject to change based on conflicts
+        // The partName is subject to change based on conflicts
         // with other services advertised on the same network.
         serviceInfo.serviceName = SERVICE_NAME
         serviceInfo.serviceType = SERVICE_TYPE
@@ -94,7 +92,7 @@ class ConductorActivity : BaseActivity(), AnkoLogger {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.conductorInstrument -> showInstrumentPicker(this, conductorInstrument)
+            R.id.conductorInstrument -> showInstrumentPicker(conductorInstrument, this)
             R.id.basic_mode -> orbifold.orbifold = basic
             R.id.intermediate_mode -> orbifold.orbifold = intermediate
             R.id.advanced_mode -> orbifold.orbifold = advanced

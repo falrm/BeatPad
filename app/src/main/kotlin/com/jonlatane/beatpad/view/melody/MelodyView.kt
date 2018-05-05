@@ -1,99 +1,139 @@
 package com.jonlatane.beatpad.view.melody
 
-import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.PointF
-import android.graphics.Rect
-import android.os.Build
-import android.util.AttributeSet
-import android.util.SparseArray
-import android.util.SparseIntArray
-import android.view.MotionEvent
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewManager
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.harmony.chord.Chord
-import com.jonlatane.beatpad.harmony.chord.Maj7
-import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.util.HideableView
-import com.jonlatane.beatpad.util.density
-import com.jonlatane.beatpad.util.mod12
-import org.jetbrains.anko.info
-import java.lang.Thread.sleep
-import java.util.concurrent.ConcurrentHashMap
+import com.jonlatane.beatpad.view.HideableRelativeLayout
+import com.jonlatane.beatpad.view.nonDelayedRecyclerView
+import com.jonlatane.beatpad.view.nonDelayedScrollView
+import org.jetbrains.anko.*
+import org.jetbrains.anko.custom.ankoView
+import org.jetbrains.anko.sdk25.coroutines.onScrollChange
 
-class MelodyView @JvmOverloads constructor(
-	context: Context,
-	attrs: AttributeSet? = null,
-	defStyle: Int = 0
-) : BaseMelodyView(context, attrs, defStyle), HideableView {
-	override var initialHeight: Int? = null
-	val instrument = MIDIInstrument()
-	private val density = context.resources.displayMetrics.density
-	private var activePointers: SparseArray<PointF> = SparseArray()
-	private var pointerTones = SparseIntArray()
-	private var pointerVelocities = SparseIntArray()
-	override val renderVertically = false
-	override val halfStepsOnScreen = 15
 
-	override fun onDraw(canvas: Canvas) {
-		super.onDraw(canvas)
-		paint.color = 0xCC000000.toInt()
-		for (i in 0..activePointers.size() - 1) {
-			val key = activePointers.keyAt(i)
-			// get the object by the key.
-			val pointer = activePointers[key]
-			paint.alpha = pointerVelocities[key] * 2
-			canvas.drawCircle(pointer.x, pointer.y, 25f * density, paint)
-		}
-		post {
-			Thread.sleep(10L)
-			invalidate()
-		}
-	}
+inline fun ViewManager.melodyView(
+	theme: Int = 0,
+	viewModel: MelodyViewModel,
 
-	override fun onTouchEvent(event: MotionEvent): Boolean {
-		// get pointer index from the event object
-		val pointerIndex = event.actionIndex
-		// get pointer ID
-		val pointerId = event.getPointerId(pointerIndex)
-		val maskedAction = event.actionMasked
-		when (maskedAction) {
+	//ui: AnkoContext<Any>,
+	init: HideableRelativeLayout.() -> Unit
+)
+	= //with(ui) {
+	ankoView({
+		viewModel.melodyView = HideableRelativeLayout(it).apply {
+			var holdToEdit: TextView? = null
 
-			MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
-				// We have a new pointer. Lets add it to the list of pointers
-				val f = PointF()
-				f.x = event.getX(pointerIndex)
-				f.y = event.getY(pointerIndex)
-				activePointers.put(pointerId, f)
-
-				val tone = getTone(f.x)
-				info("tone: $tone")
-				val velocity = getVelocity(f.y)
-				pointerTones.put(pointerId, tone)
-				pointerVelocities.put(pointerId, velocity)
-				info("playing $tone with velocity $velocity")
-				instrument.play(tone, velocity)
+			viewModel.melodyToolbar = melodyToolbar(viewModel) {
+				id = R.id.melody_toolbar
+			}.lparams {
+				width = matchParent
+				height = wrapContent
+				alignParentTop()
 			}
-			MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> {
-				instrument.stop(pointerTones.get(pointerId))
-				activePointers.remove(pointerId)
+			viewModel.melodyBottomScroller = bottomScroller {
+				id = R.id.bottom_scroller
+				onHeldDownChanged = { heldDown ->
+					if (heldDown) holdToEdit?.animate()?.alpha(0f)?.translationY(100f)
+					else holdToEdit?.animate()?.alpha(1f)?.translationY(0f)
+					viewModel.melodyCenterHorizontalScroller.scrollingEnabled = !heldDown
+					viewModel.melodyCenterVerticalScroller.scrollingEnabled = !heldDown
+				}
+				linearLayout {
+					orientation = LinearLayout.HORIZONTAL
+					repeat(MelodyUI.STEPS_TO_ALLOCATE) {
+						viewModel.bottoms.add(
+							view {
+								background = context.getDrawable(R.drawable.tone_footer)
+							}.lparams {
+								width = dimen(R.dimen.subdivision_controller_size)
+								height = dimen(R.dimen.subdivision_controller_size)
+							}
+						)
+					}
+				}
+				scrollingEnabled = false
+			}.lparams {
+				alignParentBottom()
+				alignParentRight()
+				width = ViewGroup.LayoutParams.MATCH_PARENT
+				height = dimen(R.dimen.subdivision_controller_size)
+				leftMargin = dip(30)
 			}
+			holdToEdit = textView {
+				text = "Hold To Edit"
+				textSize = 15f
+				gravity = Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL
+			}.lparams {
+				alignParentBottom()
+				alignParentRight()
+				width = ViewGroup.LayoutParams.MATCH_PARENT
+				height = dimen(R.dimen.subdivision_controller_size)
+				leftMargin = dip(30)
+			}
+			viewModel.melodyLeftScroller = nonDelayedScrollView {
+				id = R.id.left_scroller
+				linearLayout {
+					viewModel.verticalAxis = melodyToneAxis().lparams {
+						width = dip(30)
+						height = dip(1000f)
+					}
+				}
+				scrollingEnabled = false
+				isVerticalScrollBarEnabled = false
+			}.lparams {
+				width = dip(30)
+				height = ViewGroup.LayoutParams.MATCH_PARENT
+				below(viewModel.melodyToolbar)
+				above(viewModel.melodyBottomScroller)
+				alignParentLeft()
+			}
+			viewModel.melodyCenterVerticalScroller = nonDelayedScrollView {
+				id = R.id.center_v_scroller
+				onScrollChange { _, _, scrollY, _, _ ->
+					viewModel.melodyLeftScroller.scrollY = scrollY
+				}
+
+				viewModel.melodyCenterHorizontalScroller = nonDelayedRecyclerView {
+					id = R.id.center_h_scroller
+					isFocusableInTouchMode = true
+				}.lparams {
+					height = wrapContent
+					width = matchParent
+				}.apply {
+					layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
+						isItemPrefetchEnabled = false
+					}
+					overScrollMode = View.OVER_SCROLL_NEVER
+					viewModel.melodyElementAdapter = MelodyElementAdapter(viewModel, this)
+					adapter = viewModel.melodyElementAdapter
+					adapter.registerAdapterDataObserver(
+						object : RecyclerView.AdapterDataObserver() {
+							override fun onItemRangeInserted(start: Int, count: Int) {
+								//updateEmptyViewVisibility(this@recyclerView)
+							}
+
+							override fun onItemRangeRemoved(start: Int, count: Int) {
+								//updateEmptyViewVisibility(this@recyclerView)
+							}
+						})
+				}
+			}.lparams {
+				width = ViewGroup.LayoutParams.MATCH_PARENT
+				height = ViewGroup.LayoutParams.MATCH_PARENT
+				alignParentRight()
+				above(viewModel.melodyBottomScroller)
+				rightOf(viewModel.melodyLeftScroller)
+				below(viewModel.melodyToolbar)
+			}
+
 		}
-		invalidate()
-		return true
-	}
+		viewModel.melodyView
+	}, theme, init)
+//}
 
-
-	private fun getVelocity(y: Float): Int {
-		var velocity01: Float = (height - y) / height
-		velocity01 = Math.sqrt(Math.sqrt(Math.max(0.1f, velocity01).toDouble())).toFloat()
-		val velocity: Int = Math.min(127, Math.max(10, Math.round(
-			velocity01 * 127
-		)))
-		return velocity
-	}
-
-	private fun getTone(x: Float): Int {
-		return onScreenNotes.find { x in (it.bottom..it.top) }!!.tone
-	}
-}

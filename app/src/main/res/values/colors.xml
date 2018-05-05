@@ -2,6 +2,7 @@
 <resources>
 	<color name="colorPrimary">#424242</color>
 	<color name="colorPrimaryDark">#424242</color>
+	<color name="colorPrimaryLight">#E0E0E0</color>
 	<color name="colorAccent">#F652F9</color>
 
 	<!-- A Background color for the Orbifold view -->

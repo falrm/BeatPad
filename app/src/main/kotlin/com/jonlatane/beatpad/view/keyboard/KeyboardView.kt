@@ -11,8 +11,6 @@ import android.view.ViewManager
 import android.widget.HorizontalScrollView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.HideableView
-import com.jonlatane.beatpad.view.tonesequence.ToneSequenceElement
-import com.jonlatane.beatpad.view.tonesequence.toneSequenceElement
 import org.jetbrains.anko.custom.ankoView
 
 class KeyboardView @JvmOverloads constructor(
@@ -22,9 +20,11 @@ class KeyboardView @JvmOverloads constructor(
 ) : HorizontalScrollView(context, attrs, defStyle), HideableView {
   override var initialHeight: Int? = null
   val margin: Int = context.resources.displayMetrics.densityDpi / 5
+  val ioHandler: KeyboardIOHandler
 
   init {
     LayoutInflater.from(context).inflate(R.layout.view_keyboard, this, true)
+    ioHandler = KeyboardIOHandler(this)
   }
 
   override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -88,12 +88,3 @@ class KeyboardView @JvmOverloads constructor(
     enableScrolling = false
   }
 }
-
-
-
-
-fun ViewManager.keyboardView(theme: Int = 0)
-  = toneSequenceElement(theme) {}
-
-inline fun ViewManager.keyboardView(theme: Int = 0, init: KeyboardView.() -> Unit)
-  = ankoView({ KeyboardView(it) }, theme, init)

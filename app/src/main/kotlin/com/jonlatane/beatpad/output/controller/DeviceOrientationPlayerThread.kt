@@ -1,11 +1,11 @@
 package com.jonlatane.beatpad.output.controller
 
-import com.jonlatane.beatpad.output.instrument.Instrument
+import com.jonlatane.beatpad.model.Instrument
 import com.jonlatane.beatpad.sensors.Orientation
 
 class DeviceOrientationPlayerThread(
-  instrument: Instrument,
-  beatsPerMinute: Int
+	instrument: Instrument,
+	beatsPerMinute: Int
 ) : DeviceOrientationInstrument(instrument), Runnable {
 
     @Volatile var beatsPerMinute: Int = 0

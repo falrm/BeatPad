@@ -9,7 +9,7 @@ import android.widget.ScrollView
 import org.jetbrains.anko._ScrollView
 import org.jetbrains.anko.custom.ankoView
 
-class NonDelayedScrollView(
+class NonDelayedScrollView @JvmOverloads constructor(
 	context: Context,
 	var scrollingEnabled: Boolean = true
 ) : _ScrollView(context) {
