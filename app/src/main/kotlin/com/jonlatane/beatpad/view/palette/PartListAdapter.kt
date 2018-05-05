@@ -51,10 +51,12 @@ class PartListAdapter(
 				)
 			)
 		)
-		if (canAddParts())
+		if (canAddParts()) {
 			notifyItemInserted(viewModel.palette.parts.size - 1)
-		else
+			notifyItemChanged(viewModel.palette.parts.size)
+		} else {
 			notifyItemChanged(viewModel.palette.parts.size - 1)
+		}
 	}
 
 	fun canAddParts() = viewModel.palette.parts.size < PartListAdapter.MAX_PARTS

@@ -31,6 +31,7 @@ class PaletteToolbar(ctx: Context,
 		onClick {
 			val startIntent = Intent(MainApplication.instance, PlaybackService::class.java)
 			startIntent.action = PlaybackService.Companion.Action.PLAY_ACTION
+			BeatClockPaletteConsumer.tickPosition = 0
 			MainApplication.instance.startService(startIntent)
 		}
 	}.lparams {
@@ -85,11 +86,11 @@ class PaletteToolbar(ctx: Context,
 		height = wrapContent
 		weight = 1f
 	}.onClick {
-			if (viewModel.keyboardView.isHidden)
-				viewModel.keyboardView.show()
-			else
-				viewModel.keyboardView.hide()
-		}
+		if (viewModel.keyboardView.isHidden)
+			viewModel.keyboardView.show()
+		else
+			viewModel.keyboardView.hide()
+	}
 
 	val colorsButton = button {
 		text = "Colors"
@@ -99,11 +100,11 @@ class PaletteToolbar(ctx: Context,
 		height = wrapContent
 		weight = 1f
 	}.onClick {
-			if (viewModel.colorboardView.isHidden)
-				viewModel.colorboardView.show()
-			else
-				viewModel.colorboardView.hide()
-		}
+		if (viewModel.colorboardView.isHidden)
+			viewModel.colorboardView.show()
+		else
+			viewModel.colorboardView.hide()
+	}
 
 	val volumeButton = button {
 		text = "Vol"
@@ -113,10 +114,10 @@ class PaletteToolbar(ctx: Context,
 		height = wrapContent
 		weight = 1f
 	}.onClick {
-			viewModel.partListAdapter?.let {
-				it.editingVolume = !it.editingVolume
-			}
+		viewModel.partListAdapter?.let {
+			it.editingVolume = !it.editingVolume
 		}
+	}
 
 
 	private fun showTempoPicker() {
