@@ -1,8 +1,11 @@
 package com.jonlatane.beatpad.output.service
 
 import BeatClockPaletteConsumer
+import BeatClockPaletteConsumer.tickPosition
 import android.util.Log
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.debug
+import org.jetbrains.anko.info
 import java.util.concurrent.Executors
 
 object BeatClockProducer : AnkoLogger {
@@ -13,18 +16,16 @@ object BeatClockProducer : AnkoLogger {
 	private class PlaybackHandler : Runnable {
 		var stopped = false
 		override fun run() {
-			var superCount = 0 // Stupid Android logging
-			var count = 0
 			while (!stopped) {
 				val start = System.currentTimeMillis()
 				val tickTime: Long = 60000L / (bpm * subdivisionsPerBeat)
-				if (count++ == subdivisionsPerBeat) {
-					count = 0
-					if(superCount == Int.MAX_VALUE) superCount = 0
-					else superCount++
-					Log.i(BeatClockProducer::class.simpleName, "Quarter $superCount")
+				when {
+					tickPosition % subdivisionsPerBeat == 0 -> { tickPosition / subdivisionsPerBeat }
+					else -> null
+				}?.let {
+					info("Quarter #$it")
 				}
-				//debug("Tick")
+				info("Tick @${BeatClockPaletteConsumer.tickPosition}")
 				BeatClockPaletteConsumer.tick()
 				val sleepTime = (tickTime - (System.currentTimeMillis() - start)).let {
 					when {

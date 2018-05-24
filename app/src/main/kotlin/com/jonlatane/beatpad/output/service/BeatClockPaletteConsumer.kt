@@ -74,7 +74,6 @@ object BeatClockPaletteConsumer : AnkoLogger {
 	}
 
 	fun tick() {
-		info("ticking at $tickPosition")
 		palette?.let { palette ->
 			val enabledMelodies = palette.parts.flatMap { it.melodies }.filter { it.enabled }
 			val totalBeats = enabledMelodies
@@ -82,7 +81,6 @@ object BeatClockPaletteConsumer : AnkoLogger {
 				.reduce(::max)
 			loadUpcomingAttacks()
 			for (attack in upcomingAttacks) {
-				//val attack = upcomingAttacks[attackIndex]
 				val melody = attack.melody!!
 				val instrument = attack.instrument!!
 				val note = attack.note!!
@@ -109,7 +107,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
 				}
 				activeAttacks += attack
 			}
-			if (tickPosition / ticksPerBeat >= totalBeats) {
+			if ((tickPosition + 1) / ticksPerBeat >= totalBeats) {
 				tickPosition = 0
 			} else {
 				tickPosition += 1
