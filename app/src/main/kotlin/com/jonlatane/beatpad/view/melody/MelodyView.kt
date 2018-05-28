@@ -12,6 +12,7 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.nonDelayedRecyclerView
 import com.jonlatane.beatpad.view.nonDelayedScrollView
+import com.jonlatane.beatpad.view.zoomableScrollView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.sdk25.coroutines.onScrollChange
@@ -93,10 +94,25 @@ inline fun ViewManager.melodyView(
 				above(viewModel.melodyBottomScroller)
 				alignParentLeft()
 			}
-			viewModel.melodyCenterVerticalScroller = nonDelayedScrollView {
+			viewModel.melodyCenterVerticalScroller = zoomableScrollView {
 				id = R.id.center_v_scroller
 				onScrollChange { _, _, scrollY, _, _ ->
 					viewModel.melodyLeftScroller.scrollY = scrollY
+				}
+
+				zoomHandler = { xDelta, yDelta ->
+					AnkoLogger<MelodyUI>().info("Zooming: xDelta=$xDelta, yDelta=$yDelta")
+					when {
+						(xDelta.toInt() != 0 || yDelta.toInt() != 0) -> {
+							viewModel.melodyElementAdapter?.apply {
+								elementWidth += xDelta.toInt()
+								elementHeight += (10f * yDelta).toInt()
+								notifyDataSetChanged()
+							}
+							true
+						}
+						else -> false
+					}
 				}
 
 				viewModel.melodyCenterHorizontalScroller = nonDelayedRecyclerView {

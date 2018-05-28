@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.util.applyToHolders
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import kotlin.properties.Delegates.observable
 
@@ -17,9 +18,7 @@ class PartListAdapter(
 		const val MAX_PARTS = 5
 	}
 	var editingVolume by observable(false) { _, _, editingVolume ->
-		(0 until recyclerView.childCount)
-			.map { recyclerView.getChildViewHolder(recyclerView.getChildAt(it)) as PartHolder }
-			.forEach { it.editingVolume = editingVolume }
+		recyclerView.applyToHolders<PartHolder> { it.editingVolume = editingVolume }
 	}
 
 	init {

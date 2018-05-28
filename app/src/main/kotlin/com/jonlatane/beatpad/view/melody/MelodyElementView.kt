@@ -34,7 +34,7 @@ class MelodyElementView @JvmOverloads constructor(
 	override var initialHeight: Int? = null
 	override val renderVertically = true
 	override val halfStepsOnScreen = 88f
-	override val drawPadding = dip(10)
+	override val drawPadding = dip(5)
 	override val nonRootPadding = dip(5)
 	override var chord: Chord
 		get() = viewModel.orbifold.chord
