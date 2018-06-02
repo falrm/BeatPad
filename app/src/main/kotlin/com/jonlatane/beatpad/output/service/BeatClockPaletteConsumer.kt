@@ -1,4 +1,5 @@
 import com.jonlatane.beatpad.model.*
+import com.jonlatane.beatpad.output.service.ObjectPool
 import com.jonlatane.beatpad.util.to127Int
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
@@ -23,27 +24,11 @@ object BeatClockPaletteConsumer : AnkoLogger {
 		var melody: Melody? = null,
 		var note: Note? = null,
 		var chosenTones: MutableList<Int> = Vector(16)
-	) {
-		fun clear() {
-			part = null
-			instrument = null
-			melody = null
-			note = null
-			chosenTones.clear()
-		}
+	)
 
-		val isUsed get() = part != null
-	}
-
-	private val attackPool = Vector<Attack>(16)
+	private val attackPool = ObjectPool of { Attack() } //Vector<Attack>(16)
 	private val activeAttacks = Vector<Attack>(16)
 	private val upcomingAttacks = Vector<Attack>(16)
-
-	init {
-		for (i in 1..16) {
-			attackPool += Attack()
-		}
-	}
 
 	private fun loadUpcomingAttacks() {
 		val currentBeat: Double = tickPosition.toDouble() / ticksPerBeat
@@ -51,23 +36,17 @@ object BeatClockPaletteConsumer : AnkoLogger {
 		palette?.parts?.map { part ->
 			part.melodies.forEach { melody ->
 				if (melody.enabled) {
-					var currentAttack = attackPool[currentAttackIndex]
-					while (currentAttack.isUsed) {
-						if (currentAttackIndex >= attackPool.size) {
-							attackPool.add(Attack())
-						}
-						currentAttack = attackPool[++currentAttackIndex]
-					}
-
+					val attack = attackPool.reserve()
 					val melodyOffset = viewModel?.orbifold?.chord?.let { chord ->
 						melody.offsetUnder(chord)
 					} ?: 0
-					melody.populateAttack(currentBeat, part, part.instrument, currentAttack, melodyOffset)
-					if (currentAttack.isUsed) {
-						currentAttackIndex++
-						upcomingAttacks += currentAttack
-					}
 
+					if (melody.populateAttack(currentBeat, part, part.instrument, attack, melodyOffset)) {
+						currentAttackIndex++
+						upcomingAttacks += attack
+					} else {
+						attackPool.release(attack)
+					}
 				}
 			}
 		}
@@ -88,7 +67,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
 				for (activeAttack in activeAttacks) {
 					if (activeAttack.melody == attack.melody) {
 						info("Ending attack $activeAttack")
-						destroyActiveAttack(activeAttack)
+						attackPool.release(activeAttack)
 						activeAttacks.remove(activeAttack)
 						break
 					}
@@ -117,23 +96,14 @@ object BeatClockPaletteConsumer : AnkoLogger {
 		upcomingAttacks.clear()
 	}
 
-	private fun destroyActiveAttack(activeAttack: Attack) {
-		if (activeAttack.isUsed) {
-			activeAttack.chosenTones.forEach {
-				activeAttack.part!!.instrument.stop(it)
-			}
-			activeAttack.clear()
-		}
-	}
-
 	internal fun clearActiveAttacks() {
 		for (activeAttack in activeAttacks) {
-			destroyActiveAttack(activeAttack)
+			attackPool.release(activeAttack)
 		}
 		activeAttacks.clear()
 	}
 
-	private fun Melody.populateAttack(currentBeat: Double, part: Part, partInstrument: Instrument, attack: Attack, melodyOffset: Int) {
+	private fun Melody.populateAttack(currentBeat: Double, part: Part, partInstrument: Instrument, attack: Attack, melodyOffset: Int): Boolean {
 		val melodyLength: Double = elements.size.toDouble() / subdivisionsPerBeat
 		val positionInMelody: Double = currentBeat % melodyLength
 
@@ -149,7 +119,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
 		val thisTickDistance = distance(0.0)
 		val nextTickDistance = distance(1.0)
 		val previousTickDistance = distance(-1.0)
-		when {
+		return when {
 			thisTickDistance < nextTickDistance && thisTickDistance < previousTickDistance -> {
 				val step = elements[indexCandidate]
 				when (step) {
@@ -165,11 +135,13 @@ object BeatClockPaletteConsumer : AnkoLogger {
 								?: transposedTone
 							attack.chosenTones.add(chosenTone)
 						}
+
+						true
 					}
-					else -> attack.clear()
+					else -> false
 				}
 			}
-			else -> attack.clear()
+			else -> false
 		}
 	}
 }

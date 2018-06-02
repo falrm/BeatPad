@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.TextView
+import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.dip
@@ -21,6 +22,13 @@ class ChordListAdapter(
 			isClickable = true
 			isLongClickable = true
 			gravity = Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL
+			typeface = MainApplication.chordTypeface
+			setPadding(
+				dip(50),
+				dip(5),
+				dip(50),
+				dip(5)
+			)
 		})
 	}
 
@@ -54,6 +62,7 @@ class ChordListAdapter(
 		} else {
 			makeAddButton(holder)
 		}
+		holder.textView.requestLayout()
 	}
 
 	fun makeAddButton(holder: ChordHolder) {

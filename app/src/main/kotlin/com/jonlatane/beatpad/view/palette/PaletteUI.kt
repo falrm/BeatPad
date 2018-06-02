@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.view.palette
 
+import android.graphics.Typeface
 import android.view.ViewManager
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
