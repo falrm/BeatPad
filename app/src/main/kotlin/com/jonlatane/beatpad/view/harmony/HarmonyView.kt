@@ -10,7 +10,6 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.melody.MelodyElementAdapter
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
-import com.jonlatane.beatpad.view.melody.melodyToneAxis
 import com.jonlatane.beatpad.view.nonDelayedRecyclerView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.ankoView
@@ -34,7 +33,7 @@ inline fun ViewManager.harmonyView(
 				width = ViewGroup.LayoutParams.MATCH_PARENT
 				height = ViewGroup.LayoutParams.MATCH_PARENT
 				alignParentRight()
-				above(viewModel.melodyBottomScroller)
+				above(viewModel.melodyEditingModifiers)
 				rightOf(viewModel.melodyLeftScroller)
 				alignParentTop()
 				}.apply {

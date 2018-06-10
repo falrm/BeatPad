@@ -89,7 +89,17 @@ class MelodyElementView @JvmOverloads constructor(
 	}
 
 	override fun onTouchEvent(event: MotionEvent): Boolean {
-		if(!viewModel.melodyBottomScroller.isHeldDown) return false
+		return when (viewModel.melodyEditingModifiers.modifier) {
+
+			MelodyEditingModifiers.Modifier.None -> false
+			MelodyEditingModifiers.Modifier.Editing -> onTouchEditEvent(event)
+			MelodyEditingModifiers.Modifier.Articulating -> true
+			MelodyEditingModifiers.Modifier.Transposing -> true
+		}
+
+	}
+
+	private fun onTouchEditEvent(event: MotionEvent): Boolean {
 		// get pointer index from the event object
 		val pointerIndex = event.actionIndex
 		// get pointer ID
@@ -110,6 +120,7 @@ class MelodyElementView @JvmOverloads constructor(
 		}
 		invalidate()
 		return true
+
 	}
 
 	private fun getTone(y: Float): Int {

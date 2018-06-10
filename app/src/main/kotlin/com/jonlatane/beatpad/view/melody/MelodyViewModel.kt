@@ -30,7 +30,7 @@ open class MelodyViewModel {
 	lateinit var melodyToolbar: MelodyToolbar
 	lateinit var melodyView: HideableRelativeLayout
 	lateinit var melodyLeftScroller: NonDelayedScrollView
-	lateinit var melodyBottomScroller: BottomScroller
+	lateinit var melodyEditingModifiers: MelodyEditingModifiers
 	lateinit var melodyCenterVerticalScroller: NonDelayedScrollView
 	lateinit var melodyCenterHorizontalScroller: NonDelayedRecyclerView
 	var melodyElementAdapter: MelodyElementAdapter? = null

@@ -6,7 +6,6 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewManager
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.view.HideableRelativeLayout
@@ -28,8 +27,6 @@ inline fun ViewManager.melodyView(
 	= //with(ui) {
 	ankoView({
 		viewModel.melodyView = HideableRelativeLayout(it).apply {
-			var holdToEdit: TextView? = null
-
 			viewModel.melodyToolbar = melodyToolbar(viewModel) {
 				id = R.id.melody_toolbar
 			}.lparams {
@@ -37,39 +34,14 @@ inline fun ViewManager.melodyView(
 				height = wrapContent
 				alignParentTop()
 			}
-			viewModel.melodyBottomScroller = bottomScroller {
+			viewModel.melodyEditingModifiers = melodyEditingModifiers {
 				id = R.id.bottom_scroller
 				onHeldDownChanged = { heldDown ->
-					if (heldDown) holdToEdit?.animate()?.alpha(0f)?.translationY(100f)
-					else holdToEdit?.animate()?.alpha(1f)?.translationY(0f)
+					//if (heldDown) holdToEdit?.animate()?.alpha(0f)?.translationY(100f)
+					//else holdToEdit?.animate()?.alpha(1f)?.translationY(0f)
 					viewModel.melodyCenterHorizontalScroller.scrollingEnabled = !heldDown
 					viewModel.melodyCenterVerticalScroller.scrollingEnabled = !heldDown
 				}
-				linearLayout {
-					orientation = LinearLayout.HORIZONTAL
-					repeat(MelodyUI.STEPS_TO_ALLOCATE) {
-						viewModel.bottoms.add(
-							view {
-								background = context.getDrawable(R.drawable.tone_footer)
-							}.lparams {
-								width = dimen(R.dimen.subdivision_controller_size)
-								height = dimen(R.dimen.subdivision_controller_size)
-							}
-						)
-					}
-				}
-				scrollingEnabled = false
-			}.lparams {
-				alignParentBottom()
-				alignParentRight()
-				width = ViewGroup.LayoutParams.MATCH_PARENT
-				height = dimen(R.dimen.subdivision_controller_size)
-				leftMargin = dip(30)
-			}
-			holdToEdit = textView {
-				text = "Hold To Edit"
-				textSize = 15f
-				gravity = Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL
 			}.lparams {
 				alignParentBottom()
 				alignParentRight()
@@ -91,7 +63,7 @@ inline fun ViewManager.melodyView(
 				width = dip(30)
 				height = ViewGroup.LayoutParams.MATCH_PARENT
 				below(viewModel.melodyToolbar)
-				above(viewModel.melodyBottomScroller)
+				above(viewModel.melodyEditingModifiers)
 				alignParentLeft()
 			}
 			viewModel.melodyCenterVerticalScroller = zoomableScrollView {
@@ -143,7 +115,7 @@ inline fun ViewManager.melodyView(
 				width = ViewGroup.LayoutParams.MATCH_PARENT
 				height = ViewGroup.LayoutParams.MATCH_PARENT
 				alignParentRight()
-				above(viewModel.melodyBottomScroller)
+				above(viewModel.melodyEditingModifiers)
 				rightOf(viewModel.melodyLeftScroller)
 				below(viewModel.melodyToolbar)
 			}
