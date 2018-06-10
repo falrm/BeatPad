@@ -8,6 +8,7 @@ import android.widget.TextView
 import com.jonlatane.beatpad.R
 import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder
+import org.jetbrains.anko.constraint.layout._ConstraintLayout
 import org.jetbrains.anko.constraint.layout.applyConstraintSet
 import org.jetbrains.anko.constraint.layout.constraintLayout
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
@@ -18,7 +19,7 @@ interface PartHolderLayout {
 		var partName: TextView? = null
 		var partPatternRecycler: _RecyclerView? = null
 		var seekBar: SeekBar? = null
-		val layout = constraintLayout {
+		val layout = _ConstraintLayout(context).apply {
 			partName = textView {
 				id = R.id.part_name
 				textSize = 20f

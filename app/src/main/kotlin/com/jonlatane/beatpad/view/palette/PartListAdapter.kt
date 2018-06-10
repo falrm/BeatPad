@@ -25,7 +25,7 @@ class PartListAdapter(
 		viewModel.partListAdapter = this
 	}
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PartHolder? {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PartHolder {
 		return recyclerView.partHolder(viewModel, this)
 	}
 

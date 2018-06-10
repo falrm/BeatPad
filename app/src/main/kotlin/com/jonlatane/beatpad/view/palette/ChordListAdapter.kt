@@ -13,7 +13,7 @@ import org.jetbrains.anko.wrapContent
 class ChordListAdapter(
 	val viewModel: PaletteViewModel
 ) : RecyclerView.Adapter<ChordHolder>() {
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChordHolder? {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChordHolder {
 		return ChordHolder(TextView(parent.context).apply {
 			textSize = 25f
 			background = context.getDrawable(R.drawable.orbifold_chord)

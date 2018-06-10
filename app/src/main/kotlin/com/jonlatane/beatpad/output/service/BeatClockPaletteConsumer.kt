@@ -1,7 +1,7 @@
 import com.jonlatane.beatpad.model.*
-import com.jonlatane.beatpad.output.service.ObjectPool
 import com.jonlatane.beatpad.util.to127Int
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
+import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import java.lang.Math.max
@@ -26,7 +26,10 @@ object BeatClockPaletteConsumer : AnkoLogger {
 		var chosenTones: MutableList<Int> = Vector(16)
 	)
 
-	private val attackPool = ObjectPool of { Attack() } //Vector<Attack>(16)
+	private val attackPool = object: DefaultPool<Attack>(16) {
+		override fun produceInstance() = Attack()
+		override fun clearInstance(instance: Attack): Attack = instance.apply { chosenTones.clear() }
+	}
 	private val activeAttacks = Vector<Attack>(16)
 	private val upcomingAttacks = Vector<Attack>(16)
 
@@ -36,7 +39,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
 		palette?.parts?.map { part ->
 			part.melodies.forEach { melody ->
 				if (melody.enabled) {
-					val attack = attackPool.reserve()
+					val attack = attackPool.borrow()
 					val melodyOffset = viewModel?.orbifold?.chord?.let { chord ->
 						melody.offsetUnder(chord)
 					} ?: 0
@@ -45,7 +48,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
 						currentAttackIndex++
 						upcomingAttacks += attack
 					} else {
-						attackPool.release(attack)
+						attackPool.recycle(attack)
 					}
 				}
 			}
@@ -67,8 +70,11 @@ object BeatClockPaletteConsumer : AnkoLogger {
 				for (activeAttack in activeAttacks) {
 					if (activeAttack.melody == attack.melody) {
 						info("Ending attack $activeAttack")
-						attackPool.release(activeAttack)
+						activeAttack.chosenTones.forEach { tone ->
+							instrument.stop(tone)
+						}
 						activeAttacks.remove(activeAttack)
+						attackPool.recycle(activeAttack)
 						break
 					}
 				}
@@ -98,7 +104,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
 
 	internal fun clearActiveAttacks() {
 		for (activeAttack in activeAttacks) {
-			attackPool.release(activeAttack)
+			attackPool.recycle(activeAttack)
 		}
 		activeAttacks.clear()
 	}

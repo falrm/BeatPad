@@ -13,7 +13,7 @@ class ChordAdapter(
 	val viewModel: HarmonyViewModel,
 	val recyclerView: _RecyclerView
 ) : RecyclerView.Adapter<ChordHolder>() {
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChordHolder? {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChordHolder {
 		return with(recyclerView) {
 			ChordHolder(
 				viewModel = viewModel,

@@ -23,7 +23,7 @@ class MelodyAdapter(
 	}
 	val part get() = viewModel.palette.parts[partPosition]
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyHolder? {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyHolder {
 		return recyclerView.run {
 			MelodyHolder(viewModel, TextView(parent.context).apply {
 				textSize = 25f

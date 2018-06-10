@@ -57,12 +57,12 @@ class MelodyElementAdapter(
 		recyclerView.layoutManager.findViewByPosition(position)?.invalidate()
 	}
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyElementHolder? {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyElementHolder {
 		return with(recyclerView) {
 			MelodyElementHolder(
 				viewModel = viewModel,
-				element = melodyElementView {
-					this@melodyElementView.viewModel = this@MelodyElementAdapter.viewModel
+				element = MelodyElementView(context).apply {
+					viewModel = this@MelodyElementAdapter.viewModel
 				}.lparams {
 					width = elementWidth
 					height = elementHeight
