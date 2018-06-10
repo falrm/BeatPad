@@ -104,6 +104,9 @@ object BeatClockPaletteConsumer : AnkoLogger {
 
 	internal fun clearActiveAttacks() {
 		for (activeAttack in activeAttacks) {
+			activeAttack.chosenTones.forEach { tone ->
+				activeAttack.instrument!!.stop(tone)
+			}
 			attackPool.recycle(activeAttack)
 		}
 		activeAttacks.clear()
