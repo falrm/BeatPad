@@ -70,11 +70,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
 				for (activeAttack in activeAttacks) {
 					if (activeAttack.melody == attack.melody) {
 						info("Ending attack $activeAttack")
-						activeAttack.chosenTones.forEach { tone ->
-							instrument.stop(tone)
-						}
-						activeAttacks.remove(activeAttack)
-						attackPool.recycle(activeAttack)
+						destroyAttack(activeAttack)
 						break
 					}
 				}
@@ -100,16 +96,31 @@ object BeatClockPaletteConsumer : AnkoLogger {
 		}
 		?: info("Tick called with no Palette available")
 		upcomingAttacks.clear()
+		// Clean up expired attacks
+		activeAttacks.forEach { attack ->
+			val attackCameFromRunningMelody = viewModel?.palette?.parts
+				?.flatMap { it.melodies }
+				?.filter { it.enabled }
+				?.contains(attack.melody) ?: false
+			if(!attackCameFromRunningMelody) {
+				destroyAttack(attack)
+			}
+		}
 	}
 
 	internal fun clearActiveAttacks() {
-		for (activeAttack in activeAttacks) {
-			activeAttack.chosenTones.forEach { tone ->
-				activeAttack.instrument!!.stop(tone)
-			}
-			attackPool.recycle(activeAttack)
+		for (activeAttack in listOf(*activeAttacks.toArray(arrayOf<Attack>()))) {
+			destroyAttack(activeAttack)
 		}
-		activeAttacks.clear()
+	}
+
+	@Synchronized
+	private fun destroyAttack(attack: Attack) {
+		attack.chosenTones.forEach { tone ->
+			attack.instrument!!.stop(tone)
+		}
+		attackPool.recycle(attack)
+		activeAttacks.remove(attack)
 	}
 
 	private fun Melody.populateAttack(currentBeat: Double, part: Part, partInstrument: Instrument, attack: Attack, melodyOffset: Int): Boolean {

@@ -12,8 +12,7 @@ object BeatClockProducer : AnkoLogger {
 	var bpm: Int = 120
 	private const val subdivisionsPerBeat = 24 // This is the MIDI beat clock standard
 	private val executorService = Executors.newScheduledThreadPool(1)
-	private var playbackHandler: PlaybackHandler? = null
-	private class PlaybackHandler : Runnable {
+	private object PlaybackHandler : Runnable {
 		var stopped = false
 		override fun run() {
 			while (!stopped) {
@@ -42,13 +41,11 @@ object BeatClockProducer : AnkoLogger {
 
 	fun startProducing() {
 		stopProducing()
-		playbackHandler = PlaybackHandler()
-		executorService.execute(Thread(playbackHandler))
+		PlaybackHandler.stopped = false
+		executorService.execute(Thread(PlaybackHandler))
 	}
 
 	fun stopProducing() {
-		playbackHandler?.let {
-			it.stopped = true
-		}
+		PlaybackHandler.stopped = true
 	}
 }
