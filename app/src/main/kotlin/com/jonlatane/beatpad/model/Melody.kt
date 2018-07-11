@@ -55,6 +55,7 @@ interface Melody: Pattern<Melody.Element> {
 				}
 				else -> 0
 			}
+			val isRest get() = tones.isEmpty()
 		}
 
 		class Sustain(

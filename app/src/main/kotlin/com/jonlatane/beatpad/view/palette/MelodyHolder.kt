@@ -50,6 +50,10 @@ class MelodyHolder(
 				) {
 					part.melodies.removeAt(patternPosition)
 					adapter.notifyItemRemoved(patternPosition)
+					adapter.notifyItemRangeChanged(
+						patternPosition,
+						viewModel.palette.chords.size - position
+					)
 				}
 				else -> context.toast("TODO!")
 			}

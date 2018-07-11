@@ -23,7 +23,7 @@ class MainApplication : Application() {
 			private set
 
 		val chordTypeface by lazy {
-			Typeface.createFromAsset(instance.assets, "font/source_sans_pro_regular.otf")
+			Typeface.createFromAsset(instance.assets, "font/open_sans_regular.ttf")
 		}
 	}
 }

@@ -7,10 +7,9 @@ import android.widget.SeekBar
 import android.widget.TextView
 import com.jonlatane.beatpad.R
 import org.jetbrains.anko.*
-import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder
+import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
 import org.jetbrains.anko.constraint.layout._ConstraintLayout
 import org.jetbrains.anko.constraint.layout.applyConstraintSet
-import org.jetbrains.anko.constraint.layout.constraintLayout
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.recyclerview.v7.recyclerView
 
@@ -47,25 +46,25 @@ interface PartHolderLayout {
 			applyConstraintSet {
 				partName!! {
 					connect(
-						ConstraintSetBuilder.Side.TOP to ConstraintSetBuilder.Side.TOP of ConstraintSet.PARENT_ID,
-						ConstraintSetBuilder.Side.START to ConstraintSetBuilder.Side.START of ConstraintSet.PARENT_ID,
-						ConstraintSetBuilder.Side.END to ConstraintSetBuilder.Side.END of ConstraintSet.PARENT_ID
+						TOP to TOP of ConstraintSet.PARENT_ID,
+						START to START of ConstraintSet.PARENT_ID,
+						END to END of ConstraintSet.PARENT_ID
 					)
 				}
 				partPatternRecycler!! {
 					connect(
-						ConstraintSetBuilder.Side.TOP to ConstraintSetBuilder.Side.BOTTOM of R.id.part_name,
-						ConstraintSetBuilder.Side.BOTTOM to ConstraintSetBuilder.Side.BOTTOM of ConstraintSet.PARENT_ID,
-						ConstraintSetBuilder.Side.START to ConstraintSetBuilder.Side.START of ConstraintSet.PARENT_ID,
-						ConstraintSetBuilder.Side.END to ConstraintSetBuilder.Side.END of ConstraintSet.PARENT_ID
+						TOP to BOTTOM of R.id.part_name,
+						BOTTOM to BOTTOM of ConstraintSet.PARENT_ID,
+						START to START of ConstraintSet.PARENT_ID,
+						END to END of ConstraintSet.PARENT_ID
 					)
 				}
 				seekBar!! {
 					connect(
-						ConstraintSetBuilder.Side.TOP to ConstraintSetBuilder.Side.TOP of R.id.part_name,
-						ConstraintSetBuilder.Side.BOTTOM to ConstraintSetBuilder.Side.BOTTOM of R.id.part_name,
-						ConstraintSetBuilder.Side.START to ConstraintSetBuilder.Side.START of R.id.part_name,
-						ConstraintSetBuilder.Side.END to ConstraintSetBuilder.Side.END of R.id.part_name
+						TOP to TOP of R.id.part_name,
+						BOTTOM to BOTTOM of R.id.part_name,
+						START to START of R.id.part_name,
+						END to END of R.id.part_name
 					)
 				}
 			}
