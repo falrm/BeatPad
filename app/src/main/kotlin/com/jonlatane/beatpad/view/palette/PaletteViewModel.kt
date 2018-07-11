@@ -84,6 +84,7 @@ class PaletteViewModel : MelodyViewModel() {
 	private fun editMelodyMode() {
 		melodyView.animate()
 			.translationX(0f)
+      .alpha(1f)
 			.start()
 		partListView.animate().alpha(0f)
 	}
@@ -91,6 +92,7 @@ class PaletteViewModel : MelodyViewModel() {
 	private fun partListMode() {
 		melodyView.animate()
 			.translationX(melodyView.width.toFloat())
+      .alpha(0f)
 			.start()
 		partListView.animate().alpha(1f)
 	}

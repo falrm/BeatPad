@@ -59,10 +59,10 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
         viewModel.partListView.animate()
           .alpha(1f)
           .start()
-        viewModel.melodyView.apply {
-          translationX = width.toFloat()
-          alpha = 1f
-        }
+        viewModel.melodyView.animate()
+          .translationX(viewModel.melodyView.width.toFloat())
+          .withEndAction { viewModel.melodyView.alpha = 1f }
+          .start()
         /*listOf<View>(viewModel.keyboardView, viewModel.colorboardView).forEach {
         it.hide(false)
         it.alpha = 1f

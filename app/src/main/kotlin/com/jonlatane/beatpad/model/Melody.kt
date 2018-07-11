@@ -3,8 +3,10 @@ package com.jonlatane.beatpad.model
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.util.mod12
+import java.util.*
 
 interface Melody: Pattern<Melody.Element> {
+	var id: UUID
 	var shouldConformWithHarmony: Boolean
 	var enabled: Boolean
 	var velocityFactor: Float
@@ -55,7 +57,6 @@ interface Melody: Pattern<Melody.Element> {
 				}
 				else -> 0
 			}
-			val isRest get() = tones.isEmpty()
 		}
 
 		class Sustain(
