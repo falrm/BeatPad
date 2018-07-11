@@ -25,6 +25,7 @@
 	<item name="center_v_scroller" type="id"/>
 	<item name="center_h_scroller" type="id"/>
 	<item name="orbifold" type="id"/>
+	<item name="spacer" type="id"/>
 	<item name="melody" type="id"/>
 	<item name="orbifold_background" type="id"/>
 	<item name="chord_list" type="id"/>

@@ -11,7 +11,6 @@ import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
 import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlin.properties.Delegates.observable
 
 /**
@@ -40,10 +39,12 @@ class PaletteViewModel : MelodyViewModel() {
 	var editingSequence by observable<Melody?>(null) { _, _, new ->
 		if (new != null) {
 			openedMelody = new
-			editPatternMode()
 			colorboardView.hide()
 			keyboardView.hide()
-		} else patternListMode()
+      editMelodyMode()
+		} else {
+			partListMode()
+		}
 		melodyToolbar.updateButtonText()
 	}
 
@@ -80,14 +81,14 @@ class PaletteViewModel : MelodyViewModel() {
 		return result
 	}
 
-	private fun editPatternMode() {
+	private fun editMelodyMode() {
 		melodyView.animate()
 			.translationX(0f)
 			.start()
 		partListView.animate().alpha(0f)
 	}
 
-	private fun patternListMode() {
+	private fun partListMode() {
 		melodyView.animate()
 			.translationX(melodyView.width.toFloat())
 			.start()
