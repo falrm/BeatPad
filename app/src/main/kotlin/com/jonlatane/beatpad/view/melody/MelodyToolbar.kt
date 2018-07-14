@@ -1,10 +1,15 @@
 package com.jonlatane.beatpad.view.melody
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
-import android.widget.LinearLayout
+import android.widget.NumberPicker
 import android.widget.PopupMenu
+import android.widget.RelativeLayout
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.harmony.chord.Chord
@@ -16,20 +21,67 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
 
-
 class MelodyToolbar(
 	context: Context,
 	val viewModel: MelodyViewModel
-): _LinearLayout(context) {
+): _LinearLayout(context), AnkoLogger {
 	init {
-		orientation = LinearLayout.HORIZONTAL
+		orientation = HORIZONTAL
 		backgroundColor = context.color(R.color.colorPrimaryDark)
 	}
 
+  private lateinit var lengthPicker: NumberPicker
+  private lateinit var subdivisionsPerBeatPicker: NumberPicker
+  private lateinit var lengthLayout: RelativeLayout
+  private val lengthDialog = context.alert {
+    customView {
+      lengthLayout = relativeLayout {
+        val numberPickers = linearLayout {
+          orientation = HORIZONTAL
+          id = View.generateViewId()
+
+          lengthPicker = numberPicker {
+            value = 1
+            minValue = 1
+            maxValue = 20000
+            wrapSelectorWheel = false
+          }.lparams(wrapContent, wrapContent)
+
+          textView {
+            text = "/"
+            gravity = Gravity.CENTER
+          }.lparams(wrapContent, matchParent)
+
+          subdivisionsPerBeatPicker = numberPicker {
+            value = 1
+            minValue = 1
+            maxValue = 24
+            wrapSelectorWheel = false
+          }.lparams(wrapContent, wrapContent)
+        }.lparams(wrapContent, wrapContent) {
+          centerHorizontally()
+        }
+        button {
+          text = "OK"
+          id = View.generateViewId()
+        }.lparams(wrapContent, wrapContent) {
+          below(numberPickers)
+          centerHorizontally()
+        }
+      }.lparams(wrapContent, wrapContent)
+    }
+  }
+
 	private val lengthButton: Button = button {
-		text = ""
+		text = "0/0"
 		onClick {
-			context.toast("TODO")
+			//context.toast("TODO")
+      try {
+        (lengthLayout.parent as? ViewGroup)?.removeView(lengthLayout)
+        lengthDialog.show()
+      } catch(t: Throwable) {
+        error("Error showing length dialog", t)
+      }
 		}
 	}.lparams {
 		width = matchParent
@@ -132,6 +184,8 @@ class MelodyToolbar(
 
 		lengthButton.text =
 			"${viewModel.openedMelody.elements.size}/${viewModel.openedMelody.subdivisionsPerBeat}"
+    lengthPicker.value = viewModel.openedMelody.elements.size
+    subdivisionsPerBeatPicker.value = viewModel.openedMelody.subdivisionsPerBeat
 	}
 	private fun updateMelody() = viewModel.melodyElementAdapter?.notifyDataSetChanged()
 

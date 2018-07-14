@@ -12,6 +12,7 @@ import com.fasterxml.jackson.module.kotlin.treeToValue
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Rest
+import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import org.jetbrains.anko.AnkoLogger
 import java.util.*
@@ -65,7 +66,9 @@ object PaletteStorage : AnkoLogger {
 
 			return Palette(
 				id = mapper.treeToValue(root["id"]),
-				chords = mapper.treeToValue(root["chords"]),
+				chords = root["chords"].asIterable()
+					.map { mapper.treeToValue<Chord>(it) }
+					.toMutableList(),
         parts = parts,
         keyboardPart = keyboardPart,
         colorboardPart = colorboardPart,

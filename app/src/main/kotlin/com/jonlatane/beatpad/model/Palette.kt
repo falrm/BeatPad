@@ -5,7 +5,8 @@ import java.util.*
 
 /**
  * A [Palette] is simply a collection of unrelated [Chord]s
- * and [Part]s.
+ * and [Part]s. It's, conveniently, basically a full encapsulation of the
+ * state of the app's UI
  */
 class Palette (
   var id: UUID = UUID.randomUUID(),
