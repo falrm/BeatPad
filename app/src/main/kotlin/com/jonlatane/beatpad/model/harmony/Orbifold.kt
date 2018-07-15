@@ -8,60 +8,67 @@ import com.jonlatane.beatpad.model.harmony.chordsequence.*
  * Created by jonlatane on 5/26/17.
  */
 enum class Orbifold(val title: String, vararg sequences: Orbit)
-	: List<Orbit> by listOf(*sequences) {
-	super_basic("Super Basic", DimMinDomMajAug),
-	basic("Basic", TwoFiveOne),
-	intermediate(
-		"Intermediate",
-		DimMinDomMajAug,
-		TwoFiveOne,
-		AlternatingMajorMinorThirds
-	),
-	advanced(
-		"Advanced",
-		DimMinDomMajAug,
-		FourFiveOne,
-		TwoFiveOne,
-		AlternatingMajorMinorThirds,
-		AlternatingMajorMinorSeconds
-	),
-	master(
-		"Master",
-		DimMinDomMajAug,
-		SubdominantOptions,
-		FourFiveOne,
-		TwoFiveOne,
-		TwoFiveOneMinor,
-		AlternatingMajorMinorThirds,
-		WholeSteps,
-		AlternatingMajorMinorSeconds
-	),
-	chainsmokers(
-		"Chainsmokers",
-		CircleOfFifths,
-		Chainsmokers,
-		AlternatingMajorMinorThirds
-	),
-	pop(
-		"Pop",
-		SubdominantOptions,
-		WholeSteps,
-		AlternatingMajorMinorSeconds
-	),
-	funk(
-		"Funk",
-		FunkDominantStepUp,
-		MinorFunk,
-		FunkDominantSevens
-	),
-	functional(
-		"Functional (Intermediate)",
-		DimMinDomMajAug,
-		FunctionalTwoFiveOne,
-		FunctionalAlternatingMajorMinorThirds
-	);
+  : List<Orbit> by listOf(*sequences) {
+  super_basic("Super Basic", DimMinDomMajAug),
+  basic("Basic", TwoFiveOne),
+  intermediate(
+    "Intermediate",
+    DimMinDomMajAug,
+    TwoFiveOne,
+    AlternatingMajorMinorThirds
+  ),
+  advanced(
+    "Advanced",
+    DimMinDomMajAug,
+    FourFiveOne,
+    TwoFiveOne,
+    AlternatingMajorMinorThirds,
+    AlternatingMajorMinorSeconds
+  ),
+  master(
+    "Master",
+    DimMinDomMajAug,
+    SubdominantOptions,
+    FourFiveOne,
+    TwoFiveOne,
+    TwoFiveOneMinor,
+    AlternatingMajorMinorThirds,
+    WholeSteps,
+    AlternatingMajorMinorSeconds
+  ),
+  chainsmokers(
+    "Chainsmokers",
+    CircleOfFifths,
+    Chainsmokers,
+    AlternatingMajorMinorThirds
+  ),
+  pop(
+    "Pop",
+    SubdominantOptions,
+    WholeSteps,
+    AlternatingMajorMinorSeconds
+  ),
+  funk(
+    "Funk",
+    FunkDominantStepUp,
+    MinorFunk,
+    FunkDominantSevens
+  ),
+  funkyChainsmoking(
+    "Funky Chainsmoking Animals",
+    CircleOfFifths,
+    Chainsmokers,
+    AnimalSpirits,
+    SubdominantOptions
+  ),
+  functional(
+    "Big Chords (Intermediate)",
+    DimMinDomMajAug,
+    FunctionalTwoFiveOne,
+    FunctionalAlternatingMajorMinorThirds
+  );
 
-	companion object {
-		internal val ALL_ORBITS: List<Orbit> = Orbifold.values().flatMap { it }
-	}
+  companion object {
+    internal val ALL_ORBITS: List<Orbit> = Orbifold.values().flatMap { it }
+  }
 }
