@@ -32,7 +32,7 @@ android {
 		applicationId "com.jonlatane.beatpad"
 		minSdkVersion 21
 		targetSdkVersion 27
-		versionCode 11
+		versionCode 12
 		versionName "Polyphonica 0.5.1"
 		multiDexEnabled true
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

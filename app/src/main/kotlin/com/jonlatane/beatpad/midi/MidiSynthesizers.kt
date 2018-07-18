@@ -36,30 +36,6 @@ object MidiSynthesizers: AnkoLogger {
 		outputDevices.remove(info)
 	}
 
-	@RequiresApi(Build.VERSION_CODES.M)
-	private fun sendWithRetry(data: ByteArray, deviceInfo: MidiDeviceInfo) {
-		var port =  outputDevices[deviceInfo]!!
-		var retries = 0
-		var success = false
-		var error: Throwable? = null
-		do {
-			retries++
-			try {
-				port.send(data, 0, data.size)
-				success = true
-			} catch (t: Throwable) {
-				port.close()
-				setupSynthesizer(deviceInfo)
-				port = outputDevices[deviceInfo]!!
-				error = t
-				warn("Failed to send midi data, retrying...", error)
-			}
-		} while( !success && retries < maxSendRetries)
-		if(!success) {
-			error("Failed to send midi data", error)
-		}
-	}
-
 	/**
 	 * Basically, skip everything in the Google guide required to reach the
 	 * "Sending Play ON" section. Send away! Your signals will go to all
