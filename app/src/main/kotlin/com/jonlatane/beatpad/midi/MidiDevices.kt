@@ -71,6 +71,6 @@ object MidiDevices : AnkoLogger {
 	@get:RequiresApi(Build.VERSION_CODES.M)
 	internal val MidiDeviceInfo.name: String
 		get() {
-			return properties[MidiDeviceInfo.PROPERTY_NAME].toString()
+			return properties[MidiDeviceInfo.PROPERTY_NAME]?.toString() ?: "Unnamed MIDI Device"
 		}
 }

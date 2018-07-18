@@ -19,6 +19,7 @@ import java.util.*
 
 
 object PaletteStorage : AnkoLogger {
+	const val paletteModelVersion = 5
 
 	val basePalette
 		get() = Palette().apply {
@@ -41,6 +42,7 @@ object PaletteStorage : AnkoLogger {
       jgen.writeObjectField("keyboardPart", value.keyboardPart?.id)
       jgen.writeObjectField("colorboardPart", value.colorboardPart?.id)
       jgen.writeObjectField("splatPart", value.splatPart?.id)
+			jgen.writeObjectField("modelVersion", paletteModelVersion)
 			jgen.writeEndObject()
 		}
 	}
