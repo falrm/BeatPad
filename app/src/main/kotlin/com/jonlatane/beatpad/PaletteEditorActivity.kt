@@ -56,9 +56,9 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 		when {
 			viewModel.onBackPressed() -> {}
 			lastBackPress?.let { System.currentTimeMillis() - it <  3000 } ?: false -> {
-				val startIntent = Intent(this, PlaybackService::class.java)
-				startIntent.action = PlaybackService.Companion.Action.STOPFOREGROUND_ACTION
-				startService(startIntent)
+				val intent = Intent(this, PlaybackService::class.java)
+				intent.action = PlaybackService.Companion.Action.STOPFOREGROUND_ACTION
+				startService(intent)
 				super.onBackPressed()
 			}
 			else -> {
@@ -114,13 +114,6 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 	override fun onRestoreInstanceState(savedInstanceState: Bundle) {
 		super.onRestoreInstanceState(savedInstanceState)
 		ui.sequencerInstrument.instrument = savedInstanceState.getByte("sequencerInstrument", GeneralMidiConstants.SYNTH_BASS_1)
-		viewModel.orbifold.orbifold = Orbifold.values().find {
-			it.ordinal == (savedInstanceState["orbifoldMode"] as Int? ?: -1)
-		} ?: Orbifold.intermediate
-		val chord = savedInstanceState.getParcelable<Chord>("currentChord")
-		if (chord != null) {
-			viewModel.orbifold.chord = chord
-		}
 		if (savedInstanceState.getBoolean("pianoHidden")) {
 			viewModel.keyboardView.hide(animated = false)
 		}
@@ -132,10 +125,6 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 	override fun onSaveInstanceState(outState: Bundle) {
 		super.onSaveInstanceState(outState)
 		Storage.storePalette(viewModel.palette, this)
-		outState.putParcelable("currentChord", viewModel.orbifold.chord)
-		//outState.putInt("tempo", ui.sequencerThread.beatsPerMinute)
-		//outState.putByte("sequencerInstrument", ui.sequencerInstrument.instrument)
-		outState.putInt("orbifoldMode", viewModel.orbifold.orbifold.ordinal)
 		outState.putBoolean("pianoHidden", viewModel.keyboardView.isHidden)
 		outState.putBoolean("melodyHidden", viewModel.colorboardView.isHidden)
 	}

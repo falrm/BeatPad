@@ -46,6 +46,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
         viewModel.keyboardView.ioHandler.highlightChord(c)
         viewModel.verticalAxis?.chord = c
         viewModel.splatController?.tones = c.getTones()
+        viewModel.palette.chord = c
         viewModel.redraw()
       }
 

@@ -36,12 +36,6 @@ enum class Orbifold(val title: String, vararg sequences: Orbit)
     WholeSteps,
     AlternatingMajorMinorSeconds
   ),
-  chainsmokers(
-    "Chainsmokers",
-    CircleOfFifths,
-    Chainsmokers,
-    AlternatingMajorMinorThirds
-  ),
   pop(
     "Pop",
     SubdominantOptions,
@@ -54,12 +48,18 @@ enum class Orbifold(val title: String, vararg sequences: Orbit)
     MinorFunk,
     FunkDominantSevens
   ),
-  funkyChainsmoking(
-    "Funky Chainsmoking Animals",
+  funkyChainsmokingAnimals(
+    "Something Just Like Animal Spirits",
     CircleOfFifths,
     Chainsmokers,
     AnimalSpirits,
     SubdominantOptions
+  ),
+  chainsmokers(
+    "Something Just Like This",
+    CircleOfFifths,
+    Chainsmokers,
+    AlternatingMajorMinorThirds
   ),
   functional(
     "Big Chords (Intermediate)",

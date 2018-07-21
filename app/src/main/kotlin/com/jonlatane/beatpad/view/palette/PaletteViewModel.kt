@@ -1,8 +1,9 @@
 package com.jonlatane.beatpad.view.palette
 
+import BeatClockPaletteConsumer
 import android.view.View
-import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 import com.jonlatane.beatpad.util.hide
@@ -32,6 +33,9 @@ class PaletteViewModel : MelodyViewModel() {
 		colorboardPart = new.colorboardPart ?: new.parts[0]
 		splatPart = new.splatPart ?: new.parts[0]
 		BeatClockPaletteConsumer.palette = new
+    orbifold.orbifold = new.orbifold
+    orbifold.chord = new.chord
+    toolbarView.updateTempoButton()
 		partListAdapter?.notifyDataSetChanged()
 		chordListAdapter?.notifyDataSetChanged()
 	}
@@ -52,7 +56,7 @@ class PaletteViewModel : MelodyViewModel() {
 	var partListAdapter: PartListAdapter? = null
 	var chordListAdapter: ChordListAdapter? = null
 	lateinit var partListView: HideableRecyclerView
-	lateinit var toolbarView: View
+	lateinit var toolbarView: PaletteToolbar
 	lateinit var keyboardView: KeyboardView
 	lateinit var colorboardView: ColorboardInputView
 	var keyboardPart by observable<Part?>(null) { _, _, new ->

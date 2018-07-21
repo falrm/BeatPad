@@ -12,6 +12,7 @@ import com.fasterxml.jackson.module.kotlin.treeToValue
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Rest
+import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import org.jetbrains.anko.AnkoLogger
@@ -42,6 +43,9 @@ object PaletteStorage : AnkoLogger {
       jgen.writeObjectField("keyboardPart", value.keyboardPart?.id)
       jgen.writeObjectField("colorboardPart", value.colorboardPart?.id)
       jgen.writeObjectField("splatPart", value.splatPart?.id)
+      jgen.writeObjectField("bpm", value.bpm)
+      jgen.writeObjectField("orbifold", value.orbifold.name)
+      jgen.writeObjectField("chord", value.chord)
 			jgen.writeObjectField("modelVersion", paletteModelVersion)
 			jgen.writeEndObject()
 		}
@@ -72,9 +76,15 @@ object PaletteStorage : AnkoLogger {
 					.map { mapper.treeToValue<Chord>(it) }
 					.toMutableList(),
         parts = parts,
+
         keyboardPart = keyboardPart,
         colorboardPart = colorboardPart,
-        splatPart = splatPart
+        splatPart = splatPart,
+
+        bpm = mapper.treeToValue(root["bpm"]),
+        orbifold = Orbifold.valueOf(mapper.treeToValue(root["orbifold"])),
+        chord = mapper.treeToValue(root["chord"])
+
 			)
 		}
 	}

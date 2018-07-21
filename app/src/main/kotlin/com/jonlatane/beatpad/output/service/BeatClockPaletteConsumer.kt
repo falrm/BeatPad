@@ -10,7 +10,7 @@ import kotlin.math.floor
 import kotlin.properties.Delegates.observable
 
 object BeatClockPaletteConsumer : AnkoLogger {
-	var palette: Palette? = null
+	var palette: Palette = Palette()
 	var viewModel: PaletteViewModel? by observable(null) { _, _, _ ->
 
 	}

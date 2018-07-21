@@ -2,6 +2,7 @@ package com.jonlatane.beatpad
 
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.support.v7.app.AlertDialog
@@ -16,12 +17,10 @@ import com.jonlatane.beatpad.ConductorActivity.Companion.SERVICE_TYPE
 import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import org.jetbrains.anko.contentView
 import org.jetbrains.anko.nsdManager
-import android.content.DialogInterface
-import com.jonlatane.beatpad.output.service.BeatClockProducer
-import com.jonlatane.beatpad.storage.Storage
 
 
 fun showOrbifoldPicker(orbifold: OrbifoldView) {

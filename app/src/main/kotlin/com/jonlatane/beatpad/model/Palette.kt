@@ -1,6 +1,8 @@
 package com.jonlatane.beatpad.model
 
+import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.harmony.chord.Maj7
 import java.util.*
 
 /**
@@ -15,5 +17,9 @@ class Palette (
 
   var keyboardPart: Part? = null,
   var colorboardPart: Part? = null,
-  var splatPart: Part? = null
+  var splatPart: Part? = null,
+
+  var bpm: Float = 120f,
+  var orbifold: Orbifold = Orbifold.funkyChainsmokingAnimals,
+  var chord: Chord = Chord(0, Maj7)
 )
