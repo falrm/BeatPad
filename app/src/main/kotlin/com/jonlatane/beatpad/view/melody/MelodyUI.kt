@@ -18,10 +18,6 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.util.concurrent.Executors
 
 class MelodyUI : AnkoComponent<SequenceEditorActivity> {
-	companion object Companion {
-		val STEPS_TO_ALLOCATE = 16
-	}
-
 	private val executorService = Executors.newScheduledThreadPool(2)
 	val viewModel = MelodyViewModel()
 	val previewInstrument = MIDIInstrument().apply {

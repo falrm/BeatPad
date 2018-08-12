@@ -6,7 +6,7 @@ import java.util.*
 
 abstract class RecordedMIDIMelody(
 	override val elements: MutableList<Melody.Element>,
-	override var subdivisionsPerBeat: Int = 1,
+	override var subdivisionsPerBeat: Int = 24,
 	override var tonic: Int = 0
 ) : Melody {
 	override var id: UUID = UUID.randomUUID()

@@ -3,10 +3,12 @@ package com.jonlatane.beatpad.view.palette
 import android.view.View
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.view.colorboard.colorboardView
+import com.jonlatane.beatpad.view.harmony.harmonyView
 import com.jonlatane.beatpad.view.keyboard.keyboardView
 import com.jonlatane.beatpad.view.melody.melodyView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
@@ -15,7 +17,7 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
 import java.util.concurrent.Executors
 
-class PaletteUI : AnkoComponent<PaletteEditorActivity> {
+class PaletteUI() : AnkoComponent<PaletteEditorActivity> {
   private val executorService = Executors.newScheduledThreadPool(2)
   val viewModel = PaletteViewModel()
   val previewInstrument = MIDIInstrument().apply {
@@ -98,13 +100,21 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
       height = wrapContent
     }
 
+    viewModel.harmonyView = harmonyView(viewModel = viewModel.harmonyViewModel) {
+      id = R.id.harmony
+    }.lparams {
+      below(viewModel.toolbarView)
+      width = matchParent
+      height = wrapContent
+    }
+
     viewModel.partListView = partListView(viewModel = viewModel) {
       id = R.id.part_list
     }.lparams {
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      below(viewModel.toolbarView)
+      below(viewModel.harmonyView)
     }
 
     viewModel.melodyView = melodyView(viewModel = viewModel) {
@@ -114,7 +124,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      below(viewModel.toolbarView)
+      below(viewModel.harmonyView)
     }
   }
 
@@ -170,6 +180,16 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
 
     }
 
+    viewModel.harmonyView = harmonyView(viewModel = viewModel.harmonyViewModel) {
+      id = R.id.harmony
+    }.lparams {
+      width = matchParent
+      height = wrapContent
+      rightOf(viewModel.orbifold)
+      below(viewModel.toolbarView)
+      alignParentRight()
+    }
+
     viewModel.partListView = partListView(viewModel = viewModel) {
       id = R.id.part_list
     }.lparams {
@@ -177,7 +197,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
       height = wrapContent
       alignParentBottom()
       rightOf(viewModel.orbifold)
-      below(viewModel.toolbarView)
+      below(viewModel.harmonyView)
       alignParentRight()
     }
 
@@ -189,7 +209,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity> {
       height = wrapContent
       alignParentBottom()
       rightOf(viewModel.orbifold)
-      below(viewModel.toolbarView)
+      below(viewModel.harmonyView)
       alignParentRight()
     }
   }

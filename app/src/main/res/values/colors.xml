@@ -34,7 +34,7 @@
 		and in the Sequence Editor
 	-->
 	<color name="flatTwo">#A32E6C</color>
-	<color name="two">#CFFAAA</color>
+	<color name="two">#80E340</color>
 	<color name="flatThree">@color/minor</color>
 	<color name="three">@color/major</color>
 	<color name="four">@color/subDominant</color>
@@ -46,7 +46,7 @@
 	<color name="seven">#2EBBB5</color>
 
 	<color name="flatTwoDark">#7F2455</color>
-	<color name="twoDark">#BBE39B</color>
+	<color name="twoDark">#599E2D</color>
 	<color name="flatThreeDark">@color/minorDarker</color>
 	<color name="threeDark">@color/majorDarker</color>
 	<color name="fourDark">@color/subDominantDarker</color>

@@ -30,54 +30,13 @@ class MelodyToolbar(
 		backgroundColor = context.color(R.color.colorPrimaryDark)
 	}
 
-  private lateinit var lengthPicker: NumberPicker
-  private lateinit var subdivisionsPerBeatPicker: NumberPicker
-  private lateinit var lengthLayout: RelativeLayout
-  private val lengthDialog = context.alert {
-    customView {
-      lengthLayout = relativeLayout {
-        val numberPickers = linearLayout {
-          orientation = HORIZONTAL
-          id = View.generateViewId()
-
-          lengthPicker = numberPicker {
-            value = 1
-            minValue = 1
-            maxValue = 20000
-            wrapSelectorWheel = false
-          }.lparams(wrapContent, wrapContent)
-
-          textView {
-            text = "/"
-            gravity = Gravity.CENTER
-          }.lparams(wrapContent, matchParent)
-
-          subdivisionsPerBeatPicker = numberPicker {
-            value = 1
-            minValue = 1
-            maxValue = 24
-            wrapSelectorWheel = false
-          }.lparams(wrapContent, wrapContent)
-        }.lparams(wrapContent, wrapContent) {
-          centerHorizontally()
-        }
-        button {
-          text = "OK"
-          id = View.generateViewId()
-        }.lparams(wrapContent, wrapContent) {
-          below(numberPickers)
-          centerHorizontally()
-        }
-      }.lparams(wrapContent, wrapContent)
-    }
-  }
+  private val lengthDialog = LengthDialog(context)
 
 	private val lengthButton: Button = button {
 		text = "0/0"
 		onClick {
 			//context.toast("TODO")
       try {
-        (lengthLayout.parent as? ViewGroup)?.removeView(lengthLayout)
         lengthDialog.show()
       } catch(t: Throwable) {
         error("Error showing length dialog", t)
@@ -184,8 +143,8 @@ class MelodyToolbar(
 
 		lengthButton.text =
 			"${viewModel.openedMelody.elements.size}/${viewModel.openedMelody.subdivisionsPerBeat}"
-    lengthPicker.value = viewModel.openedMelody.elements.size
-    subdivisionsPerBeatPicker.value = viewModel.openedMelody.subdivisionsPerBeat
+    lengthDialog.lengthPicker.value = viewModel.openedMelody.elements.size
+    lengthDialog.subdivisionsPerBeatPicker.value = viewModel.openedMelody.subdivisionsPerBeat
 	}
 	private fun updateMelody() = viewModel.melodyElementAdapter?.notifyDataSetChanged()
 

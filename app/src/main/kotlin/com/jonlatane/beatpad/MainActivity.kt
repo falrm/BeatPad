@@ -9,18 +9,17 @@ import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.Orbifold.*
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
+import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
-import com.jonlatane.beatpad.storage.MelodyStorage
+import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.util.show
 import com.jonlatane.beatpad.view.keyboard.KeyboardIOHandler
-import com.jonlatane.beatpad.view.tempo.TempoTracking
-import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
-import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.view.orbifold.ANIMATION_DURATION
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
+import com.jonlatane.beatpad.view.tempo.TempoTracking
 import kotlinx.android.synthetic.main.activity_main.*
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.contentView
@@ -181,7 +180,7 @@ class MainActivity : OldBaseActivity() {
 			R.id.intermediate_mode -> orbifold.orbifold = intermediate
 			R.id.advanced_mode -> orbifold.orbifold = advanced
 			R.id.master_mode -> orbifold.orbifold = master
-			R.id.chainsmokers_mode -> orbifold.orbifold = chainsmokers
+			R.id.chainsmokers_mode -> orbifold.orbifold = funkyChainsmokingAnimals
 			R.id.pop_mode -> orbifold.orbifold = pop
 			R.id.conduct -> startActivity<ConductorActivity>()
 			R.id.play -> startActivity<InstrumentActivity>()

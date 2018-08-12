@@ -97,7 +97,7 @@ class ConductorActivity : OldBaseActivity(), AnkoLogger {
             R.id.intermediate_mode -> orbifold.orbifold = intermediate
             R.id.advanced_mode -> orbifold.orbifold = advanced
             R.id.master_mode -> orbifold.orbifold = master
-            R.id.chainsmokers_mode -> orbifold.orbifold = chainsmokers
+            R.id.chainsmokers_mode -> orbifold.orbifold = funkyChainsmokingAnimals
             R.id.pop_mode -> orbifold.orbifold = pop
         }
         return true
