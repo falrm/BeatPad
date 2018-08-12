@@ -4,24 +4,19 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
-import android.util.AttributeSet
-import android.widget.LinearLayout
-import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.util.color
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.dip
-import org.jetbrains.anko.sp
-import org.jetbrains.anko.textColor
+import org.jetbrains.anko.*
+import android.view.ViewGroup
+
+
 
 class HarmonyElementView @JvmOverloads constructor(
   context: Context,
-  attrs: AttributeSet? = null,
-  defStyle: Int = 0,
   var viewModel: HarmonyViewModel? = null
-): TextView(context, attrs, defStyle) {
+): _RelativeLayout(context) {
   val harmony: Harmony? get() = viewModel?.harmony
   var elementPosition = 0
   val element: Harmony.Element? get() = harmony?.elements?.get(elementPosition)
@@ -30,16 +25,44 @@ class HarmonyElementView @JvmOverloads constructor(
     elementPosition % subdivisionsPerBeat == 0
   } ?: false
 
-
   init {
+    clipChildren = false
+    clipToPadding = false
+  }
+
+  fun setAllParentsClip(enabled: Boolean) {
+    var v: ViewGroup = this
+    while (v.parent != null && v.parent is ViewGroup) {
+      val viewGroup = v.parent as ViewGroup
+      viewGroup.clipChildren = enabled
+      viewGroup.clipToPadding = enabled
+      v = viewGroup
+    }
+  }
+
+  val chordText = textView {
+    text = "hi"
     textSize = 20f
     maxLines = 1
-    ellipsize
+    clipChildren = false
+    clipToPadding = false
+    //ellipsize  = TextUtils.TruncateAt.END
+  }.lparams(wrapContent, wrapContent) {
+    alignParentLeft()
+    setMargins(dip(10), dip(5), dip(-100), dip(5))
   }
+
+
   private val paint = Paint()
   private var bounds = Rect()
   override fun onDraw(canvas: Canvas) {
-    text = "  ${(element as? Harmony.Element.Change)?.chord?.name ?: ""}"
+    super.onDraw(canvas)
+    canvas.getClipBounds(bounds)
+    canvas.drawRhythm()
+  }
+
+  override fun invalidate() {
+    chordText.text = (element as? Harmony.Element.Change)?.chord?.name ?: ""
     backgroundColor = chord?.run {
       when {
         isDominant -> color(R.color.dominant)
@@ -50,13 +73,18 @@ class HarmonyElementView @JvmOverloads constructor(
         else -> null
       }
     } ?: color(android.R.color.white)
-    super.onDraw(canvas)
-    canvas.getClipBounds(bounds)
-    canvas.drawRhythm()
+
+    var v: ViewGroup = this
+    while (v.parent != null && v.parent is ViewGroup) {
+      val viewGroup = v.parent as ViewGroup
+      viewGroup.clipChildren = false
+      viewGroup.clipToPadding = false
+      v = viewGroup
+    }
+    super.invalidate()
   }
 
   private fun Canvas.drawRhythm() {
-    val x = bounds.left.toFloat() + if(isDownbeat) 10f else 1f
     paint.color = 0xAA212121.toInt()
     drawRect(
       bounds.left.toFloat(),

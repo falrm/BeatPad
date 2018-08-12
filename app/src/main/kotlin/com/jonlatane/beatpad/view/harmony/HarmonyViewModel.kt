@@ -15,7 +15,6 @@ open class HarmonyViewModel {
     chordAdapter?.notifyDataSetChanged()
   }
   var harmonyView: HideableRelativeLayout? = null
-  lateinit var harmonyChordScroller: NonDelayedRecyclerView
   var chordAdapter: HarmonyChordAdapter? = null
 
   companion object {

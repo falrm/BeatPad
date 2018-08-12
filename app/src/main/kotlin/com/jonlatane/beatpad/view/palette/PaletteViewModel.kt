@@ -10,6 +10,7 @@ import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.view.HideableRecyclerView
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
+import com.jonlatane.beatpad.view.harmony.HarmonyView
 import com.jonlatane.beatpad.view.harmony.HarmonyViewModel
 import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
@@ -26,7 +27,7 @@ class PaletteViewModel : MelodyViewModel() {
   }
 
   val harmonyViewModel = HarmonyViewModel()
-  lateinit var harmonyView: HideableRelativeLayout
+  lateinit var harmonyView: HarmonyView
 
   var palette: Palette by observable(initialValue = Palette()) { _, _, new ->
     editingSequence = null
