@@ -29,7 +29,7 @@ class HarmonyChordAdapter(
 			HarmonyChordHolder(
 				viewModel = viewModel,
 				element = HarmonyElementView(context, viewModel = viewModel).lparams {
-					width = dimen(R.dimen.subdivision_controller_size)
+					width = elementWidth
 					height = wrapContent
 				},
 				adapter = this@HarmonyChordAdapter
@@ -38,7 +38,9 @@ class HarmonyChordAdapter(
 	}
 
 	override fun onBindViewHolder(holder: HarmonyChordHolder, elementPosition: Int) {
+    holder.element.setAllParentsClip(false)
 		holder.element.elementPosition = elementPosition
+    holder.element.layoutWidth = elementWidth
 		holder.element.invalidate()
 	}
 

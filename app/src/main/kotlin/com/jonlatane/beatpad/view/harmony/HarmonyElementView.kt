@@ -10,7 +10,7 @@ import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.*
 import android.view.ViewGroup
-
+import com.jonlatane.beatpad.util.vibrate
 
 
 class HarmonyElementView @JvmOverloads constructor(
@@ -26,22 +26,34 @@ class HarmonyElementView @JvmOverloads constructor(
   } ?: false
 
   init {
+    isClickable = true
     clipChildren = false
     clipToPadding = false
-  }
+    setOnClickListener {
+      chord?.let {
+        viewModel?.paletteViewModel?.orbifold?.chord = it
+      }
+    }
+    setOnLongClickListener {
+      vibrate(150)
+      when(element) {
+        is Harmony.Element.Change -> when {
+          harmony?.elements?.count { it is Harmony.Element.Change } ?: 0 > 1 -> {
 
-  fun setAllParentsClip(enabled: Boolean) {
-    var v: ViewGroup = this
-    while (v.parent != null && v.parent is ViewGroup) {
-      val viewGroup = v.parent as ViewGroup
-      viewGroup.clipChildren = enabled
-      viewGroup.clipToPadding = enabled
-      v = viewGroup
+          }
+          else -> {
+            context.toast("Cannot convert to sustain!")
+          }
+        }
+        is Harmony.Element.Sustain -> {
+
+        }
+      }
+      true
     }
   }
 
   val chordText = textView {
-    text = "hi"
     textSize = 20f
     maxLines = 1
     clipChildren = false
@@ -82,6 +94,16 @@ class HarmonyElementView @JvmOverloads constructor(
       v = viewGroup
     }
     super.invalidate()
+  }
+
+  fun setAllParentsClip(enabled: Boolean) {
+    var v: ViewGroup = this
+    while (v.parent != null && v.parent is ViewGroup) {
+      val viewGroup = v.parent as ViewGroup
+      viewGroup.clipChildren = enabled
+      viewGroup.clipToPadding = enabled
+      v = viewGroup
+    }
   }
 
   private fun Canvas.drawRhythm() {

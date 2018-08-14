@@ -8,9 +8,11 @@ import com.jonlatane.beatpad.model.harmony.chord.Dom7
 import com.jonlatane.beatpad.model.harmony.chord.Maj
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.NonDelayedRecyclerView
+import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import kotlin.properties.Delegates.observable
 
 open class HarmonyViewModel {
+  var paletteViewModel: PaletteViewModel? = null
   var harmony by observable<Harmony?>(createBaseHarmony()) { _, _, _ ->
     chordAdapter?.notifyDataSetChanged()
   }

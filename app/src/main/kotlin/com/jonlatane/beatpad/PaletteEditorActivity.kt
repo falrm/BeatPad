@@ -18,6 +18,7 @@ import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.formatted
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.util.isHidden
+import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.palette.PaletteUI
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.AnkoLogger
@@ -83,13 +84,7 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
     }
     ShakeDetector.onShakeListener = object : ShakeDetector.OnShakeListener {
       override fun onShake() {
-        val v = getSystemService(VIBRATOR_SERVICE) as Vibrator
-        // Vibrate for 500 milliseconds
-        if (Build.VERSION.SDK_INT >= 26) {
-          v.vibrate(VibrationEffect.createOneShot(150, 255))
-        } else {
-          v.vibrate(150)
-        }
+        vibrate(150)
         showConfirmDialog(
           this@PaletteEditorActivity,
           "Erase everything to start from scratch?"

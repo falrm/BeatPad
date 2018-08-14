@@ -27,6 +27,7 @@ class PaletteViewModel : MelodyViewModel() {
   }
 
   val harmonyViewModel = HarmonyViewModel()
+    .apply { paletteViewModel = this@PaletteViewModel }
   lateinit var harmonyView: HarmonyView
 
   var palette: Palette by observable(initialValue = Palette()) { _, _, new ->

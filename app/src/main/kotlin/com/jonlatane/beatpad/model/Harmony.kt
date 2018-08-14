@@ -26,6 +26,11 @@ class Harmony(
     class Sustain(
       var change: Change
     ) : Element() {
+      constructor(element: Element): this(when(element) {
+        is Sustain -> element.change
+        is Change -> element
+      })
+
       override var chord: Chord
       set(value) { change.chord = value }
       get() = change.chord
