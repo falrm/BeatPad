@@ -7,6 +7,11 @@ val Int.mod12Nearest get(): Int = mod12.let {
 		else -> it - 12
 	}
 }
+
+fun Int.toOtherBase(mySubdivisions: Int = 24, theirSubdivisions:Int = 24) {
+
+}
+
 val Int.mod7 get() = ((this % 12) + 12) % 12
 val Int.fromOctaveToOffset get() = (this - 4) * 12
 val Float.to255Int

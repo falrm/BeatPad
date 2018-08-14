@@ -35,7 +35,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
   private val upcomingAttacks = Vector<Attack>(16)
 
   private fun loadUpcomingAttacks() {
-    val currentBeat: Double = tickPosition.toDouble() / ticksPerBeat
+
     var currentAttackIndex = 0
     palette?.parts?.map { part ->
       part.melodies/*.filter { it.enabled }*/.forEach { melody ->
@@ -46,7 +46,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
 
         if (
           true == (melody as? RationalMelody)
-            ?.populateAttack(currentBeat, part, part.instrument, attack, melodyOffset)
+            ?.populateAttack(part, part.instrument, attack, melodyOffset)
         ) {
           currentAttackIndex++
           upcomingAttacks += attack
@@ -79,11 +79,8 @@ object BeatClockPaletteConsumer : AnkoLogger {
 
         info("Executing attack $attack")
 
-        viewModel?.let { viewModel ->
-          if (melody == viewModel.editingSequence) {
-            viewModel.markPlaying(tickPosition)
-          }
-        }
+        viewModel?.markPlaying(tickPosition)
+
         attack.chosenTones.forEach { tone ->
           instrument.play(tone, attack.velocity.to127Int)
         }
@@ -126,7 +123,12 @@ object BeatClockPaletteConsumer : AnkoLogger {
 
   //private fun Melody<*>.
 
-  private fun RationalMelody.populateAttack(currentBeat: Double, part: Part, partInstrument: Instrument, attack: Attack, melodyOffset: Int): Boolean {
+  /**
+   * [currentBeat] could be, for instance, 1.2.
+   * That would be be at subdivision 5 (index 4) at 4 subdivisions per beat.
+   */
+  private fun RationalMelody.populateAttack(part: Part, partInstrument: Instrument, attack: Attack, melodyOffset: Int): Boolean {
+    val currentBeat: Double = tickPosition.toDouble() / ticksPerBeat
     val melodyLength: Double = length.toDouble() / subdivisionsPerBeat
     val positionInMelody: Double = currentBeat % melodyLength
 
@@ -150,6 +152,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
             attack.part = part
             attack.instrument = partInstrument
             attack.melody = this
+            attack.velocity = change.velocity
 
             change.tones.forEach { tone ->
               val transposedTone = tone + melodyOffset

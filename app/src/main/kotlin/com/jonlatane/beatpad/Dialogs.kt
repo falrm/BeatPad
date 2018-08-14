@@ -70,24 +70,6 @@ fun showInstrumentPicker(
 	builder.show()
 }
 
-fun showTempoPicker(activity: MainActivity) {
-	val dialog = Dialog(activity)
-	dialog.setTitle("Select Tempo")
-	dialog.setContentView(R.layout.dialog_choose_tempo)
-	val picker = dialog.findViewById<NumberPicker>(R.id.numberPicker1)
-	picker.maxValue = 960
-	picker.minValue = 15
-	picker.value = activity.sequencerThread.beatsPerMinute
-	picker.wrapSelectorWheel = false
-	picker.setOnValueChangedListener { _, _, _ ->
-		val bpm = picker.value
-		activity.sequencerThread.beatsPerMinute = bpm
-		activity.updateTempoButton()
-	}
-	dialog.show()
-}
-
-
 fun showConfirmDialog(
 	context: Context,
 	promptText: String = "Are you sure?",

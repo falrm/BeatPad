@@ -4,8 +4,8 @@ import android.graphics.PointF
 import android.view.MotionEvent
 import com.jonlatane.beatpad.model.Melody
 
-interface EventArticulationHandler : BaseEventHandler {
-
+interface MelodyEventArticulationHandler : BaseMelodyEventHandler {
+/*
 	fun onTouchArticulateEvent(event: MotionEvent): Boolean {
 		// get pointer index from the event object
 		val pointerIndex = event.actionIndex
@@ -18,15 +18,12 @@ interface EventArticulationHandler : BaseEventHandler {
 				f.x = event.getX(pointerIndex)
 				f.y = event.getY(pointerIndex)
 				downPointers.put(pointerId, f)
-				when (element) {
-					is Melody.Element.Note -> {
-						(element as Melody.Element.Note)
-						true
-					}
-					is Melody.Element.Sustain -> {
-						(element as Melody.Element.Sustain).note
-						true
-					}
+				if(isChange) {
+					(element as Melody.Element.Note)
+					true
+				} else {
+					(element as Melody.Element.Sustain).note
+					true
 				}
 			}
 
@@ -79,4 +76,5 @@ interface EventArticulationHandler : BaseEventHandler {
 			duration++
 		}
 	}
+	*/
 }

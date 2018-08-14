@@ -38,10 +38,10 @@ object MelodyStorage : AnkoLogger {
 			root.remove("type")
 			return when(type) {
 				"rational" -> mapper.readValue(root.toString(), RationalMelody::class.java)
-				"audio" -> mapper.readValue(root.toString(), RecordedAudioMelody::class.java)
+				//"audio" -> mapper.readValue(root.toString(), RecordedAudioMelody::class.java)
 				else -> TODO()
 			}.apply {
-				var lastNote: Note? = null
+				var lastNote: RationalMelody.Element? = null
 				elements.indices.forEach { index ->
 					elements[index] = elements[index].let {
 						when(it) {

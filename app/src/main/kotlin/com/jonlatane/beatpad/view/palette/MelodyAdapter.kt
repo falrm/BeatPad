@@ -43,7 +43,7 @@ class MelodyAdapter(
 		holder.patternPosition = patternPosition
 	}
 
-	fun insert(sequence: Melody): Melody {
+	fun insert(sequence: Melody<*>): Melody<*> {
 		part.melodies.add(sequence)
 		notifyItemInserted(part.melodies.size - 1)
 		return sequence

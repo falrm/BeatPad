@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.view.melody
 
+import BeatClockPaletteConsumer.ticksPerBeat
 import android.view.View
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.storage.PaletteStorage
@@ -8,10 +9,11 @@ import com.jonlatane.beatpad.view.NonDelayedRecyclerView
 import com.jonlatane.beatpad.view.NonDelayedScrollView
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.floor
 import kotlin.properties.Delegates.observable
 
 open class MelodyViewModel {
-	var openedMelody by observable<Melody<*>?>(null) { _, _, _ ->
+	var openedMelody by observable<Melody<*>?>(PaletteStorage.baseMelody) { _, _, _ ->
 		melodyElementAdapter?.notifyDataSetChanged()
 	}
 	var playbackPosition by observable<Int?>(null) { _, old, new ->
@@ -42,10 +44,16 @@ open class MelodyViewModel {
 
 	internal fun markPlaying(tickPosition: Int) {
 		try {
-			openedMelody?.let {
+      openedMelody?.let {
+        val currentBeat: Double = tickPosition.toDouble() / BeatClockPaletteConsumer.ticksPerBeat
+        val melodyLength: Double = it.length.toDouble() / it.subdivisionsPerBeat
+        val positionInMelody: Double = currentBeat % melodyLength
 
-			}
-			playbackPosition = index
+        // This is the closest element in the current melody to our tick position
+        val indexCandidate = floor(positionInMelody * it.subdivisionsPerBeat).toInt()
+
+        playbackPosition = indexCandidate
+      }
 		} catch (t: Throwable) {
 		}
 	}

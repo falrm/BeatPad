@@ -63,7 +63,7 @@ class MelodyToolbar(
 		it.inflate(R.menu.melody_relative_menu)
 		it.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
-				R.id.fixedPositionMelody -> { viewModel.openedMelody.apply {
+				R.id.fixedPositionMelody -> { viewModel.openedMelody?.apply {
 						if(shouldConformWithHarmony) {
 							transposeInPlace(viewModel.orbifold.chord.root.mod12Nearest)
 						}
@@ -71,7 +71,7 @@ class MelodyToolbar(
 						tonic = 0
 					}
 				}
-				R.id.relativeToCurrentChord -> viewModel.openedMelody.apply {
+				R.id.relativeToCurrentChord -> viewModel.openedMelody?.apply {
 					val newRoot = viewModel.orbifold.chord.root.mod12
 					if(!shouldConformWithHarmony) {
 						transposeInPlace((tonic - newRoot).mod12Nearest)
@@ -79,51 +79,51 @@ class MelodyToolbar(
 					shouldConformWithHarmony = true
 					tonic = newRoot
 				}
-				R.id.c -> viewModel.openedMelody.apply {
+				R.id.c -> viewModel.openedMelody?.apply {
 					shouldConformWithHarmony = true
 					tonic = 0
 				}
-				R.id.cSharp -> viewModel.openedMelody.apply {
+				R.id.cSharp -> viewModel.openedMelody?.apply {
 					shouldConformWithHarmony = true
 					tonic = 1
 				}
-				R.id.d -> viewModel.openedMelody.apply {
+				R.id.d -> viewModel.openedMelody?.apply {
 					shouldConformWithHarmony = true
 					tonic = 2
 				}
-				R.id.dSharp -> viewModel.openedMelody.apply {
+				R.id.dSharp -> viewModel.openedMelody?.apply {
 					shouldConformWithHarmony = true
 					tonic = 3
 				}
-				R.id.e -> viewModel.openedMelody.apply {
+				R.id.e -> viewModel.openedMelody?.apply {
 					shouldConformWithHarmony = true
 					tonic = 4
 				}
-				R.id.f -> viewModel.openedMelody.apply {
+				R.id.f -> viewModel.openedMelody?.apply {
 					shouldConformWithHarmony = true
 					tonic = 5
 				}
-				R.id.fSharp -> viewModel.openedMelody.apply {
+				R.id.fSharp -> viewModel.openedMelody?.apply {
 					shouldConformWithHarmony = true
 					tonic = 6
 				}
-				R.id.g -> viewModel.openedMelody.apply {
+				R.id.g -> viewModel.openedMelody?.apply {
 					shouldConformWithHarmony = true
 					tonic = 7
 				}
-				R.id.gSharp -> viewModel.openedMelody.apply {
+				R.id.gSharp -> viewModel.openedMelody?.apply {
 					shouldConformWithHarmony = true
 					tonic = 8
 				}
-				R.id.a -> viewModel.openedMelody.apply {
+				R.id.a -> viewModel.openedMelody?.apply {
 					shouldConformWithHarmony = true
 					tonic = 9
 				}
-				R.id.aSharp -> viewModel.openedMelody.apply {
+				R.id.aSharp -> viewModel.openedMelody?.apply {
 					shouldConformWithHarmony = true
 					tonic = 10
 				}
-				R.id.b -> viewModel.openedMelody.apply {
+				R.id.b -> viewModel.openedMelody?.apply {
 					shouldConformWithHarmony = true
 					tonic = 11
 				}
@@ -136,33 +136,28 @@ class MelodyToolbar(
 
 	@SuppressLint("SetTextI18n")
 	fun updateButtonText() {
-		relativeToButton.text = when {
-			!viewModel.openedMelody.shouldConformWithHarmony -> "Fixed Position"
-			else -> "Relative to ${Chord.mod12Names[viewModel.openedMelody.tonic.mod12]}"
-		}
+		relativeToButton.text = viewModel.openedMelody?.let {
+			when {
+				!it.shouldConformWithHarmony -> "Fixed Position"
+				else -> "Relative to ${Chord.mod12Names[it.tonic.mod12]}"
+			}
+		} ?: "oops"
 
-		lengthButton.text =
-			"${viewModel.openedMelody.elements.size}/${viewModel.openedMelody.subdivisionsPerBeat}"
-    lengthDialog.lengthPicker.value = viewModel.openedMelody.elements.size
-    lengthDialog.subdivisionsPerBeatPicker.value = viewModel.openedMelody.subdivisionsPerBeat
+
+		lengthButton.text = "${viewModel.openedMelody?.length}/${viewModel.openedMelody?.subdivisionsPerBeat}"
+		lengthDialog.lengthPicker.value = viewModel.openedMelody?.length ?: 1
+		lengthDialog.subdivisionsPerBeatPicker.value = viewModel.openedMelody?.subdivisionsPerBeat ?: 1
 	}
 	private fun updateMelody() = viewModel.melodyElementAdapter?.notifyDataSetChanged()
 
-
-	private fun Melody.transposeInPlace(interval: Int) {
-		val transposed = transpose(interval)
-		transposed.elements.forEachIndexed { index, element ->
-			elements[index] = element
-		}
-	}
 	private val upButton = button {
 		text = "Up"
 		onClick {
-			viewModel.openedMelody.transposeInPlace(1)
+			viewModel.openedMelody?.transposeInPlace(1)
 			updateMelody()
 		}
 		onLongClick {
-			viewModel.openedMelody.transposeInPlace(12)
+			viewModel.openedMelody?.transposeInPlace(12)
 			context.toast("Octave Up")
 			updateMelody()
 		}
@@ -175,11 +170,11 @@ class MelodyToolbar(
 	private val downButton = button {
 		text = "Down"
 		onClick {
-			viewModel.openedMelody.transposeInPlace(-1)
+			viewModel.openedMelody?.transposeInPlace(-1)
 			updateMelody()
 		}
 		onLongClick {
-			viewModel.openedMelody.transposeInPlace(-12)
+			viewModel.openedMelody?.transposeInPlace(-12)
 			context.toast("Octave Down")
 			updateMelody()
 		}
