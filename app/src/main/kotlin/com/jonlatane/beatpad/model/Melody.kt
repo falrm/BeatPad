@@ -1,24 +1,14 @@
 package com.jonlatane.beatpad.model
 
 import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.util.mod12
 import java.util.*
 
-interface Melody: Pattern<Melody.Element> {
+interface Melody<ElementType: Transposable<ElementType>>: Pattern<ElementType> {
 	var id: UUID
 	var shouldConformWithHarmony: Boolean
-	var enabled: Boolean
 	var velocityFactor: Float
 	val type get() = "base"
-
-	override fun transpose(interval: Int): Melody {
-		return RationalMelody(
-			elements.map {
-				it.transpose(interval)
-			}
-		)
-	}
 
 	fun offsetUnder(chord: Chord) = when {
 		shouldConformWithHarmony -> {
@@ -32,40 +22,7 @@ interface Melody: Pattern<Melody.Element> {
 		else -> 0
 	}
 
-	sealed class Element: Transposable<Element> {
-		/**
-		 * All the notes of any Melody should be given as though the tonic center is at 0.
-		 */
-		class Note(
-			var tones: MutableSet<Int> = mutableSetOf(),
-			var velocity: Float = 1f
-		) : Element() {
-			override fun transpose(interval: Int): Note {
-				return Note(
-					tones = tones.map { it + interval }.toMutableSet(),
-					velocity = velocity
-				)
-			}
-			fun offsetUnder(chord: Chord, melody: Melody) = when {
-				melody.shouldConformWithHarmony -> {
-					chord.root.mod12.let {root ->
-						when {
-							root > 6 -> root - 12
-							else -> root
-						}
-					}
-				}
-				else -> 0
-			}
-		}
-
-		class Sustain(
-			var note: Note
-		) : Element() {
-			override fun transpose(interval: Int): Element {
-				return Sustain(note.transpose(interval))
-			}
-		}
-
-	}
+	interface Element<MelodyType: Melody<ElementType>, ElementType: Transposable<ElementType>>: Transposable<ElementType> {
+    fun offsetUnder(chord: Chord, melody: MelodyType): Int
+  }
 }

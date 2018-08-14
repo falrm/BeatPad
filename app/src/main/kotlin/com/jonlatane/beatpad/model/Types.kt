@@ -1,9 +1,9 @@
 package com.jonlatane.beatpad.model
 
+import com.jonlatane.beatpad.model.melody.RationalMelody
+
 /**
  * Provided for import convenience.
  */
-typealias MelodyElement = Melody.Element
-typealias Rest = Melody.Element.Note // Yes, a Rest is just a Note.
-typealias Note = Melody.Element.Note
-typealias Sustain = Melody.Element.Sustain
+typealias HarmonyElement = Harmony.Element
+typealias RationalElement = RationalMelody.Element

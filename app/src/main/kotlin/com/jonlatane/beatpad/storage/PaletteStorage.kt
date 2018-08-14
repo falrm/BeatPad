@@ -12,6 +12,7 @@ import com.fasterxml.jackson.module.kotlin.treeToValue
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Rest
+import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
@@ -38,7 +39,7 @@ object PaletteStorage : AnkoLogger {
 		override fun serialize(value: Palette, jgen: JsonGenerator, provider: SerializerProvider) {
 			jgen.writeStartObject()
 			jgen.writeObjectField("id", value.id)
-			jgen.writeObjectField("chords", value.chords)
+			jgen.writeObjectField("sections", value.sections)
 			jgen.writeObjectField("parts", value.parts)
       jgen.writeObjectField("keyboardPart", value.keyboardPart?.id)
       jgen.writeObjectField("colorboardPart", value.colorboardPart?.id)
@@ -63,6 +64,13 @@ object PaletteStorage : AnkoLogger {
         parts.add(Part())
       }
 
+      val sections: MutableList<Section> = root["sections"].asIterable()
+        .map { mapper.treeToValue<Section>(it) }
+        .toMutableList()
+      if(sections.isEmpty()) {
+        sections.add(Section())
+      }
+
       val keyboardPart = parts.firstOrNull { it.id == UUID.fromString(mapper.treeToValue(root["keyboardPart"])) }
         ?: parts[0]
       val colorboardPart = parts.firstOrNull { it.id == UUID.fromString(mapper.treeToValue(root["colorboardPart"])) }
@@ -72,9 +80,7 @@ object PaletteStorage : AnkoLogger {
 
 			return Palette(
 				id = mapper.treeToValue(root["id"]),
-				chords = root["chords"].asIterable()
-					.map { mapper.treeToValue<Chord>(it) }
-					.toMutableList(),
+				sections = sections,
         parts = parts,
 
         keyboardPart = keyboardPart,

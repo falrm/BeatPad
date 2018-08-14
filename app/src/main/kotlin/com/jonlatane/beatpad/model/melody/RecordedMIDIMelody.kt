@@ -4,7 +4,7 @@ import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.util.between01
 import java.util.*
 
-abstract class RecordedMIDIMelody(
+/*abstract class RecordedMIDIMelody(
 	override val elements: MutableList<Melody.Element>,
 	override var subdivisionsPerBeat: Int = 24,
 	override var tonic: Int = 0
@@ -17,4 +17,4 @@ abstract class RecordedMIDIMelody(
 	override var enabled = true
 	override var shouldConformWithHarmony = false
 	override val type get() = "midi"
-}
+}*/

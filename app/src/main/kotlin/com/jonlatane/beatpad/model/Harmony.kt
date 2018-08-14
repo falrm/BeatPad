@@ -1,15 +1,19 @@
 package com.jonlatane.beatpad.model
 
 import com.jonlatane.beatpad.model.harmony.chord.Chord
+import java.util.*
 
-class Harmony(
-  elements: List<Harmony.Element> = emptyList(),
+data class Harmony(
+  // TODO: Is having [tonic] in a Pattern always good?
+  override var tonic: Int = 0,
+  override val changes: NavigableMap<Int, Harmony.Element> = TreeMap(),
+  override var length: Int = 1,
   override var subdivisionsPerBeat: Int = 1
 ) : Pattern<Harmony.Element> {
-  override val elements: MutableList<Harmony.Element> = elements.toMutableList()
-  override var tonic: Int = 0
+
   override fun transpose(interval: Int) = Harmony(
-    elements.map { it.transpose(interval) },
+    tonic,
+    TreeMap(changes.mapValues { it.value.transpose(interval) }),
     subdivisionsPerBeat
   )
 
@@ -23,19 +27,20 @@ class Harmony(
       }
     }
 
-    class Sustain(
+    class NoChange(
       var change: Change
     ) : Element() {
       constructor(element: Element): this(when(element) {
-        is Sustain -> element.change
+        is NoChange -> element.change
         is Change -> element
       })
 
       override var chord: Chord
-      set(value) { change.chord = value }
-      get() = change.chord
+        set(value) { change.chord = value }
+        get() = change.chord
+
       override fun transpose(interval: Int): Element {
-        return Sustain(change.transpose(interval))
+        return NoChange(change.transpose(interval))
       }
     }
 

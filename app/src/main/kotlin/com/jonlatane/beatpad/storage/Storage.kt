@@ -29,6 +29,7 @@ object Storage: AnkoLogger {
 	fun loadPalette(context: Context): Palette = try {
 		val json: String = InputStreamReader(context.openFileInput("palette.json")).use { it.readText() }
 		info("Loading palette: $json")
+		info("Json last char: ${json[json.length - 1]}")
 		val palette = AppObjectMapper.readValue(json, Palette::class.java)
 		info("Loaded palette!")
 		palette

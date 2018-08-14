@@ -8,7 +8,6 @@ import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.view.HideableRecyclerView
-import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
 import com.jonlatane.beatpad.view.harmony.HarmonyView
 import com.jonlatane.beatpad.view.harmony.HarmonyViewModel
@@ -42,7 +41,7 @@ class PaletteViewModel : MelodyViewModel() {
     orbifold.chord = new.chord
     toolbarView.updateTempoButton()
     partListAdapter?.notifyDataSetChanged()
-    chordListAdapter?.notifyDataSetChanged()
+    sectionListAdapter?.notifyDataSetChanged()
   }
 
   var editingSequence by observable<Melody?>(null) { _, _, new ->
@@ -59,7 +58,7 @@ class PaletteViewModel : MelodyViewModel() {
 
   lateinit var chordListView: View
   var partListAdapter: PartListAdapter? = null
-  var chordListAdapter: ChordListAdapter? = null
+  var sectionListAdapter: SectionListAdapter? = null
   lateinit var partListView: HideableRecyclerView
   lateinit var toolbarView: PaletteToolbar
   lateinit var keyboardView: KeyboardView

@@ -5,7 +5,7 @@ import java.util.*
 
 class Part(val instrument: Instrument = MIDIInstrument()) {
 	var id: UUID = UUID.randomUUID()
-	val melodies = mutableListOf<Melody>()
+	val melodies = mutableListOf<Melody<*>>()
 	var volume: Float
 		get() = instrument.volume
 		set(value) { instrument.volume = value }

@@ -2,7 +2,6 @@ package com.jonlatane.beatpad.view.melody
 
 import android.view.View
 import com.jonlatane.beatpad.model.Melody
-import com.jonlatane.beatpad.output.controller.ToneSequencePlayerThread
 import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.NonDelayedRecyclerView
@@ -12,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.properties.Delegates.observable
 
 open class MelodyViewModel {
-	var openedMelody by observable<Melody>(PaletteStorage.baseMelody) { _, _, _ ->
+	var openedMelody by observable<Melody<*>?>(null) { _, _, _ ->
 		melodyElementAdapter?.notifyDataSetChanged()
 	}
 	var playbackPosition by observable<Int?>(null) { _, old, new ->
@@ -34,7 +33,6 @@ open class MelodyViewModel {
 	lateinit var melodyCenterVerticalScroller: NonDelayedScrollView
 	lateinit var melodyCenterHorizontalScroller: NonDelayedRecyclerView
 	var melodyElementAdapter: MelodyElementAdapter? = null
-	lateinit var sequencerThread: ToneSequencePlayerThread
 	val bottoms = mutableListOf<View>()
 
 	internal fun redraw() {
@@ -42,9 +40,12 @@ open class MelodyViewModel {
 		verticalAxis?.invalidate()
 	}
 
-	internal fun markPlaying(element: Melody.Element) {
+	internal fun markPlaying(tickPosition: Int) {
 		try {
-			playbackPosition = openedMelody.elements.indexOf(element)
+			openedMelody?.let {
+
+			}
+			playbackPosition = index
 		} catch (t: Throwable) {
 		}
 	}

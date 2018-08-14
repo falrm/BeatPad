@@ -9,49 +9,49 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.ser.BeanSerializerFactory
+import com.fasterxml.jackson.databind.ser.FilterProvider
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.jonlatane.beatpad.model.*
+import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.harmony.chord.Maj7
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.model.melody.RecordedAudioMelody
 import org.jetbrains.anko.AnkoLogger
 
-object MelodyStorage : AnkoLogger {
-	object Serializer: StdSerializer<Melody>(Melody::class.java) {
-		override fun serialize(value: Melody, jgen: JsonGenerator, provider: SerializerProvider) {
+object HarmonyStorage : AnkoLogger {
+	object Serializer: StdSerializer<Harmony>(Harmony::class.java) {
+		override fun serialize(value: Harmony, jgen: JsonGenerator, provider: SerializerProvider) {
 			jgen.writeStartObject()
-			val javaType = provider.constructType(Melody::class.java)
+			val javaType = provider.constructType(Harmony::class.java)
 			val beanDesc: BeanDescription = provider.config.introspect(javaType)
 			val serializer = BeanSerializerFactory.instance.findBeanSerializer(provider,
 				javaType,
 				beanDesc)
 			serializer.unwrappingSerializer(null).serialize(value, jgen, provider)
-			jgen.writeObjectField("type", value.type)
 			jgen.writeEndObject()
 		}
 	}
-	object Deserializer: StdDeserializer<Melody>(Melody::class.java) {
-		override fun deserialize(jp: JsonParser, context: DeserializationContext): Melody {
+	object Deserializer: StdDeserializer<Harmony>(Harmony::class.java) {
+		override fun deserialize(jp: JsonParser, context: DeserializationContext): Harmony {
 			val mapper = jp.codec as ObjectMapper
 			val root = mapper.readTree<ObjectNode>(jp)
 			/*send you own condition*/
-			val type = root.get("type").asText()
-			root.remove("type")
-			return when(type) {
-				"rational" -> mapper.readValue(root.toString(), RationalMelody::class.java)
-				"audio" -> mapper.readValue(root.toString(), RecordedAudioMelody::class.java)
-				else -> TODO()
-			}.apply {
-				var lastNote: Note? = null
+//			val type = root.get("type").asText()
+//			root.remove("type")
+			return mapper.readValue(root.toString(), Harmony::class.java).apply {
+				var lastNote: Harmony.Element.Change? = null
 				elements.indices.forEach { index ->
 					elements[index] = elements[index].let {
 						when(it) {
-							is Note -> {
+							is Harmony.Element.Change -> {
 								lastNote = it
 								it
 							}
-							is Sustain -> {
-								if (lastNote == null) Rest() // Invalid Sustain location
-								else Sustain(lastNote!!)
+							is Harmony.Element.NoChange -> {
+								if (lastNote == null) Harmony.Element.Change(Chord(0, Maj7)) // Invalid Sustain location
+								else Harmony.Element.NoChange(lastNote!!)
 							}
 						}
 					}
@@ -60,14 +60,13 @@ object MelodyStorage : AnkoLogger {
 		}
 	}
 
-	object ElementDeserializer: StdDeserializer<MelodyElement>(MelodyElement::class.java) {
-		override fun deserialize(jp: JsonParser, context: DeserializationContext): MelodyElement {
+	object ElementDeserializer: StdDeserializer<Harmony.Element>(Harmony.Element::class.java) {
+		override fun deserialize(jp: JsonParser, context: DeserializationContext): Harmony.Element {
 			val mapper = jp.codec as ObjectMapper
 			val root = mapper.readTree<ObjectNode>(jp)
 			/*send you own condition*/
-			val klass = if(root.has("tones")) Note::class.java else Sustain::class.java
+			val klass = if(root.has("change")) Harmony.Element.NoChange::class.java else Harmony.Element.Change::class.java
 			return mapper.readValue(root.toString(), klass)
 		}
-
 	}
 }

@@ -45,7 +45,7 @@ class HarmonyElementView @JvmOverloads constructor(
             context.toast("Cannot convert to sustain!")
           }
         }
-        is Harmony.Element.Sustain -> {
+        is Harmony.Element.NoChange -> {
 
         }
       }

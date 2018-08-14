@@ -12,7 +12,7 @@ import java.util.*
  */
 class Palette (
   var id: UUID = UUID.randomUUID(),
-  val chords: MutableList<Chord> = mutableListOf(),
+  val sections: MutableList<Section> = mutableListOf(Section()),
   val parts: MutableList<Part> = mutableListOf(),
 
   var keyboardPart: Part? = null,
