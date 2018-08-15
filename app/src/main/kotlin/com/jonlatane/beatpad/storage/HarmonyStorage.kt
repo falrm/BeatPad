@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.storage
 
+/*
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.BeanDescription
@@ -59,14 +60,4 @@ object HarmonyStorage : AnkoLogger {
 			}
 		}
 	}
-
-	object ElementDeserializer: StdDeserializer<Harmony.Element>(Harmony.Element::class.java) {
-		override fun deserialize(jp: JsonParser, context: DeserializationContext): Harmony.Element {
-			val mapper = jp.codec as ObjectMapper
-			val root = mapper.readTree<ObjectNode>(jp)
-			/*send you own condition*/
-			val klass = if(root.has("change")) Harmony.Element.NoChange::class.java else Harmony.Element.Change::class.java
-			return mapper.readValue(root.toString(), klass)
-		}
-	}
-}
+}*/

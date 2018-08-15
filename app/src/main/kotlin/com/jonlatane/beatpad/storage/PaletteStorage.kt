@@ -11,63 +11,63 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.fasterxml.jackson.module.kotlin.treeToValue
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
-import com.jonlatane.beatpad.model.Rest
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.model.harmony.Orbifold
-import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import org.jetbrains.anko.AnkoLogger
 import java.util.*
 
 
 object PaletteStorage : AnkoLogger {
-	const val paletteModelVersion = 5
+  const val paletteModelVersion = 5
 
-	val basePalette
-		get() = Palette().apply {
-			parts.add(Part())
-		}
+  val basePalette
+    get() = Palette().apply {
+      parts.add(Part())
+    }
 
-	val baseMelody
-		get() = RationalMelody(
-			elements = (1..16).map { Rest() }.toMutableList(),
-			subdivisionsPerBeat = 4
-		)
+  val baseMelody
+    get() = RationalMelody(
+      changes = TreeMap((0..15).map { it to RationalMelody.Element() }.toMap()),
+      length = 16,
+      subdivisionsPerBeat = 4
+    )
 
 
-	object Serializer : StdSerializer<Palette>(Palette::class.java) {
-		override fun serialize(value: Palette, jgen: JsonGenerator, provider: SerializerProvider) {
-			jgen.writeStartObject()
-			jgen.writeObjectField("id", value.id)
-			jgen.writeObjectField("sections", value.sections)
-			jgen.writeObjectField("parts", value.parts)
+  object Serializer : StdSerializer<Palette>(Palette::class.java) {
+    override fun serialize(value: Palette, jgen: JsonGenerator, provider: SerializerProvider) {
+      jgen.writeStartObject()
+      jgen.writeObjectField("id", value.id)
+      jgen.writeObjectField("sections", value.sections)
+      jgen.writeObjectField("parts", value.parts)
       jgen.writeObjectField("keyboardPart", value.keyboardPart?.id)
       jgen.writeObjectField("colorboardPart", value.colorboardPart?.id)
       jgen.writeObjectField("splatPart", value.splatPart?.id)
       jgen.writeObjectField("bpm", value.bpm)
       jgen.writeObjectField("orbifold", value.orbifold.name)
       jgen.writeObjectField("chord", value.chord)
-			jgen.writeObjectField("modelVersion", paletteModelVersion)
-			jgen.writeEndObject()
-		}
-	}
-	object Deserializer : StdDeserializer<Palette>(Palette::class.java) {
-		override fun deserialize(jp: JsonParser, context: DeserializationContext): Palette {
-			val mapper = jp.codec as ObjectMapper
-			val root = mapper.readTree<ObjectNode>(jp)
+      jgen.writeObjectField("modelVersion", paletteModelVersion)
+      jgen.writeEndObject()
+    }
+  }
+
+  object Deserializer : StdDeserializer<Palette>(Palette::class.java) {
+    override fun deserialize(jp: JsonParser, context: DeserializationContext): Palette {
+      val mapper = jp.codec as ObjectMapper
+      val root = mapper.readTree<ObjectNode>(jp)
 
 
       val parts: MutableList<Part> = root["parts"].asIterable()
         .map { mapper.treeToValue<Part>(it) }
         .toMutableList()
-      if(parts.isEmpty()) {
+      if (parts.isEmpty()) {
         parts.add(Part())
       }
 
       val sections: MutableList<Section> = root["sections"].asIterable()
         .map { mapper.treeToValue<Section>(it) }
         .toMutableList()
-      if(sections.isEmpty()) {
+      if (sections.isEmpty()) {
         sections.add(Section())
       }
 
@@ -78,9 +78,9 @@ object PaletteStorage : AnkoLogger {
       val splatPart = parts.firstOrNull { it.id == UUID.fromString(mapper.treeToValue(root["splatPart"])) }
         ?: parts[0]
 
-			return Palette(
-				id = mapper.treeToValue(root["id"]),
-				sections = sections,
+      return Palette(
+        id = mapper.treeToValue(root["id"]),
+        sections = sections,
         parts = parts,
 
         keyboardPart = keyboardPart,
@@ -91,7 +91,7 @@ object PaletteStorage : AnkoLogger {
         orbifold = Orbifold.valueOf(mapper.treeToValue(root["orbifold"])),
         chord = mapper.treeToValue(root["chord"])
 
-			)
-		}
-	}
+      )
+    }
+  }
 }

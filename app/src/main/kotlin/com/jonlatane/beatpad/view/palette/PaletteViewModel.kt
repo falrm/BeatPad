@@ -44,7 +44,7 @@ class PaletteViewModel : MelodyViewModel() {
     sectionListAdapter?.notifyDataSetChanged()
   }
 
-  var editingSequence by observable<Melody?>(null) { _, _, new ->
+  var editingSequence by observable<Melody<*>?>(null) { _, _, new ->
     if (new != null) {
       openedMelody = new
       colorboardView.hide()

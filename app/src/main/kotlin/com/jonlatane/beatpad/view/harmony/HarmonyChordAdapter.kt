@@ -44,5 +44,5 @@ class HarmonyChordAdapter(
 		holder.element.invalidate()
 	}
 
-	override fun getItemCount(): Int = viewModel.harmony?.elements?.size ?: 0
+	override fun getItemCount(): Int = viewModel.harmony?.length ?: 0
 }

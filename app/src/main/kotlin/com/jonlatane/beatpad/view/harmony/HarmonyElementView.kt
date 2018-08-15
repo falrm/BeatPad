@@ -10,6 +10,7 @@ import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.*
 import android.view.ViewGroup
+import com.jonlatane.beatpad.util.but
 import com.jonlatane.beatpad.util.vibrate
 
 
@@ -19,8 +20,8 @@ class HarmonyElementView @JvmOverloads constructor(
 ): _RelativeLayout(context) {
   val harmony: Harmony? get() = viewModel?.harmony
   var elementPosition = 0
-  val element: Harmony.Element? get() = harmony?.elements?.get(elementPosition)
-  val chord: Chord? get() = element?.chord
+  val element: Chord? get() = harmony?.changes?.get(elementPosition)
+  val chord: Chord? get() = element
   inline val isDownbeat: Boolean get() = harmony?.run {
     elementPosition % subdivisionsPerBeat == 0
   } ?: false
@@ -36,17 +37,21 @@ class HarmonyElementView @JvmOverloads constructor(
     }
     setOnLongClickListener {
       vibrate(150)
-      when(element) {
-        is Harmony.Element.Change -> when {
-          harmony?.elements?.count { it is Harmony.Element.Change } ?: 0 > 1 -> {
-
+      harmony?.let { harmony ->
+        when {
+          harmony.isChangeAt(elementPosition) -> {
+            when {
+              harmony.changes.values.any { it != null } -> {
+                context.toast("Should select this chord")
+              }
+              else -> {
+                context.toast("Should select this chord, but not let you delete it")
+              }
+            }
           }
           else -> {
-            context.toast("Cannot convert to sustain!")
+            context.toast("Should create a chord here")
           }
-        }
-        is Harmony.Element.NoChange -> {
-
         }
       }
       true
@@ -74,7 +79,7 @@ class HarmonyElementView @JvmOverloads constructor(
   }
 
   override fun invalidate() {
-    chordText.text = (element as? Harmony.Element.Change)?.chord?.name ?: ""
+    chordText.text = chord?.name ?: "!!!!!"
     backgroundColor = chord?.run {
       when {
         isDominant -> color(R.color.dominant)

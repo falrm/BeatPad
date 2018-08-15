@@ -63,7 +63,7 @@ object Storage: AnkoLogger {
 	}
 
 
-	fun storeSequence(melody: Melody, context: Context) = try {
+	fun storeSequence(melody: Melody<*>, context: Context) = try {
 		val outputStreamWriter = OutputStreamWriter(context.openFileOutput("sequence.json", Context.MODE_PRIVATE))
 		val json = AppObjectMapper.writeValueAsString(melody)
 		info("Stored Melody: $json")
@@ -73,7 +73,7 @@ object Storage: AnkoLogger {
 		Log.e("Exception", "File send failed: " + e.toString())
 	}
 
-	fun loadSequence(context: Context): Melody = try {
+	fun loadSequence(context: Context): Melody<*> = try {
 		val json: String = InputStreamReader(context.openFileInput("sequence.json")).use { it.readText() }
 		info("Loaded Melody: $json")
 		AppObjectMapper.readValue(json, Melody::class.java)

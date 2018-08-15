@@ -73,7 +73,7 @@ inline fun ViewManager.melodyView(
 				}
 
 				zoomHandler = { xDelta, yDelta ->
-					AnkoLogger<MelodyUI>().info("Zooming: xDelta=$xDelta, yDelta=$yDelta")
+					AnkoLogger<MelodyViewModel>().info("Zooming: xDelta=$xDelta, yDelta=$yDelta")
 					when {
 						(xDelta.toInt() != 0 || yDelta.toInt() != 0) -> {
 							viewModel.melodyElementAdapter?.apply {

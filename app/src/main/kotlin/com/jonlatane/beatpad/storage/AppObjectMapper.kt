@@ -9,12 +9,11 @@ import com.jonlatane.beatpad.model.harmony.chord.Chord
 object AppObjectMapper : ObjectMapper() {
 	init {
 		val module = SimpleModule().apply {
-      addSerializer(Harmony::class.java, HarmonyStorage.Serializer)
-      addDeserializer(Harmony.Element::class.java, HarmonyStorage.ElementDeserializer)
-      addDeserializer(Harmony::class.java, HarmonyStorage.Deserializer)
+      //addSerializer(Harmony::class.java, HarmonyStorage.Serializer)
+      //addDeserializer(Harmony::class.java, HarmonyStorage.Deserializer)
 
 			addSerializer(Melody::class.java, MelodyStorage.Serializer)
-			addDeserializer(MelodyElement::class.java, MelodyStorage.ElementDeserializer)
+			//addDeserializer(MelodyElement::class.java, MelodyStorage.ElementDeserializer)
 			addDeserializer(Melody::class.java, MelodyStorage.Deserializer)
 
 			addDeserializer(Instrument::class.java, InstrumentStorage.Deserializer)
