@@ -1,5 +1,9 @@
 import com.jonlatane.beatpad.model.*
+import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.harmony.chord.Maj
 import com.jonlatane.beatpad.model.melody.RationalMelody
+import com.jonlatane.beatpad.output.service.convertPatternIndex
+import com.jonlatane.beatpad.output.service.let
 import com.jonlatane.beatpad.util.to127Int
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import kotlinx.io.pool.DefaultPool
@@ -15,6 +19,18 @@ object BeatClockPaletteConsumer : AnkoLogger {
   var viewModel: PaletteViewModel? by observable(null) { _, _, _ ->
 
   }
+  var section: Section? = null
+  set(value) {
+    field = value
+    viewModel?.notifySectionChange()
+  }
+  val harmony: Harmony? get() = section?.harmony
+  private val harmonyPosition: Int?
+    get() = harmony?.let { tickPosition.convertPatternIndex(ticksPerBeat, it) }
+  private val harmonyChord: Chord?
+    get() = (harmony to harmonyPosition).let { harmony, harmonyPosition ->
+      harmony.changeBefore(harmonyPosition)
+    }
   var tickPosition: Int = 0 // Always relative to ticksPerBeat
   var ticksPerBeat = 24 // Mutable so you can use, say, 36, to play beats against
   // input dotted-quarters
@@ -37,16 +53,15 @@ object BeatClockPaletteConsumer : AnkoLogger {
   private fun loadUpcomingAttacks() {
 
     var currentAttackIndex = 0
+    val chord = harmonyChord ?: viewModel?.orbifold?.chord
+    info("Harmony index: $harmonyPosition; Chord: $chord")
     palette?.parts?.map { part ->
       part.melodies/*.filter { it.enabled }*/.forEach { melody ->
         val attack = attackPool.borrow()
-        val melodyOffset = viewModel?.orbifold?.chord?.let { chord ->
-          melody.offsetUnder(chord)
-        } ?: 0
 
         if (
           true == (melody as? RationalMelody)
-            ?.populateAttack(part, part.instrument, attack, melodyOffset)
+            ?.populateAttack(part, chord, attack)
         ) {
           currentAttackIndex++
           upcomingAttacks += attack
@@ -127,7 +142,12 @@ object BeatClockPaletteConsumer : AnkoLogger {
    * [currentBeat] could be, for instance, 1.2.
    * That would be be at subdivision 5 (index 4) at 4 subdivisions per beat.
    */
-  private fun RationalMelody.populateAttack(part: Part, partInstrument: Instrument, attack: Attack, melodyOffset: Int): Boolean {
+  private fun RationalMelody.populateAttack(
+    part: Part,
+    chord: Chord?,
+    attack: Attack
+  ): Boolean {
+    val offset = chord?.let { offsetUnder(it) } ?: 0
     val currentBeat: Double = tickPosition.toDouble() / ticksPerBeat
     val melodyLength: Double = length.toDouble() / subdivisionsPerBeat
     val positionInMelody: Double = currentBeat % melodyLength
@@ -150,13 +170,13 @@ object BeatClockPaletteConsumer : AnkoLogger {
           isChangeAt(indexCandidate) -> {
             val change = changeBefore(indexCandidate)
             attack.part = part
-            attack.instrument = partInstrument
+            attack.instrument = part.instrument
             attack.melody = this
             attack.velocity = change.velocity
 
             change.tones.forEach { tone ->
-              val transposedTone = tone + melodyOffset
-              val chosenTone = viewModel?.orbifold?.chord?.closestTone(transposedTone)
+              val transposedTone = tone + offset
+              val chosenTone = chord?.closestTone(transposedTone)
                 ?: transposedTone
               attack.chosenTones.add(chosenTone)
             }

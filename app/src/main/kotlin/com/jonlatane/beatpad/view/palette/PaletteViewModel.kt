@@ -5,7 +5,9 @@ import android.view.View
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
+import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
+import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.view.HideableRecyclerView
 import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
@@ -34,6 +36,9 @@ class PaletteViewModel : MelodyViewModel() {
     if (new.parts.isEmpty()) {
       new.parts.add(Part())
     }
+    if (new.parts.isEmpty()) {
+      new.sections.add(Section(harmony = PaletteStorage.baseHarmony))
+    }
     keyboardPart = new.keyboardPart ?: new.parts[0]
     colorboardPart = new.colorboardPart ?: new.parts[0]
     splatPart = new.splatPart ?: new.parts[0]
@@ -42,6 +47,7 @@ class PaletteViewModel : MelodyViewModel() {
     toolbarView.updateTempoButton()
     partListAdapter?.notifyDataSetChanged()
     sectionListAdapter?.notifyDataSetChanged()
+    BeatClockPaletteConsumer.section = new.sections.first()
   }
 
   var editingSequence by observable<Melody<*>?>(null) { _, _, new ->
@@ -87,6 +93,11 @@ class PaletteViewModel : MelodyViewModel() {
     val result = editingSequence != null
     editingSequence = null
     return result
+  }
+
+  fun notifySectionChange() {
+    harmonyViewModel.chordAdapter?.notifyDataSetChanged()
+    melodyElementAdapter?.notifyDataSetChanged()
   }
 
   private fun editMelodyMode() {

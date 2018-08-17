@@ -21,7 +21,7 @@ class HarmonyElementView @JvmOverloads constructor(
   val harmony: Harmony? get() = viewModel?.harmony
   var elementPosition = 0
   val element: Chord? get() = harmony?.changes?.get(elementPosition)
-  val chord: Chord? get() = element
+  val chord: Chord? get() = try { harmony?.changeBefore(elementPosition) } catch(e: NoSuchElementException) { null }
   inline val isDownbeat: Boolean get() = harmony?.run {
     elementPosition % subdivisionsPerBeat == 0
   } ?: false
@@ -79,7 +79,7 @@ class HarmonyElementView @JvmOverloads constructor(
   }
 
   override fun invalidate() {
-    chordText.text = chord?.name ?: "!!!!!"
+    chordText.text = element?.name ?: ""
     backgroundColor = chord?.run {
       when {
         isDominant -> color(R.color.dominant)

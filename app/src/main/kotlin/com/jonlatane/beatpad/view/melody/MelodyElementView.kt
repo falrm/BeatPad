@@ -7,12 +7,17 @@ import android.graphics.PointF
 import android.util.AttributeSet
 import android.util.SparseArray
 import android.view.MotionEvent
+import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.harmony.chord.Maj
 import com.jonlatane.beatpad.model.melody.RationalMelody
+import com.jonlatane.beatpad.output.service.let
+import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
+import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.warn
@@ -28,10 +33,10 @@ class MelodyElementView @JvmOverloads constructor(
     showSteps = true
   }
 
-  lateinit var viewModel: MelodyViewModel
+  internal var viewModel: MelodyViewModel? = null
 
   override var elementPosition = 0
-  override val melody: Melody<*>? get() = viewModel.openedMelody
+  override val melody: Melody<*>? get() = viewModel?.openedMelody
   inline val nextElement: Transposable<*>?
     get() = changes[elementPosition % (melody?.length ?: Int.MAX_VALUE)]
   inline val isDownbeat: Boolean
@@ -41,29 +46,39 @@ class MelodyElementView @JvmOverloads constructor(
   //override var initialHeight: Int? = null
   override val renderVertically = true
   override val halfStepsOnScreen = 88f
-  override val drawPadding = dip(5)
-  override val nonRootPadding = dip(5)
-  override var chord: Chord
-    get() = viewModel.orbifold.chord
-    set(value) {
-      throw UnsupportedOperationException()
+  override val drawPadding: Int
+    get() = if (width > dip(37f)) dip(5)
+    else Math.max(0, width - dip(32f))
+  override val nonRootPadding get() = drawPadding
+  private val harmony: Harmony? get() = (viewModel as? PaletteViewModel)?.harmonyViewModel?.harmony
+  private val harmonyPosition: Int?
+    get() = (melody to harmony).let { melody, harmony ->
+      elementPosition.convertPatternIndex(melody, harmony)
     }
+  private val harmonyChord: Chord?
+    get() = (harmony to harmonyPosition).let { harmony, harmonyPosition ->
+      harmony.changeBefore(harmonyPosition)
+    }
+  override var chord: Chord
+    get() = harmonyChord ?: viewModel?.orbifold?.chord ?: Chord(0, Maj)
+    set(_) = TODO("Why?")
   override val melodyOffset: Int
-    get() = viewModel.openedMelody?.offsetUnder(viewModel.orbifold.chord) ?: 0
+    get() = viewModel?.let { it.openedMelody?.offsetUnder(it.orbifold.chord)  } ?: 0
 
   override fun onDraw(canvas: Canvas) {
-    colorGuideAlpha = if (viewModel.playbackPosition == elementPosition) 255 else 187
+    colorGuideAlpha = if (viewModel?.playbackPosition == elementPosition) 255 else 187
     super.onDraw(canvas)
     canvas.drawStepNotes()
     canvas.drawRhythm()
   }
 
   override fun onTouchEvent(event: MotionEvent): Boolean {
-    return when (viewModel.melodyEditingModifiers.modifier) {
+    return when (viewModel?.melodyEditingModifiers?.modifier) {
       MelodyEditingModifiers.Modifier.None -> false
       MelodyEditingModifiers.Modifier.Editing -> onTouchEditEvent(event)
       MelodyEditingModifiers.Modifier.Articulating -> true//onTouchArticulateEvent(event)
       MelodyEditingModifiers.Modifier.Transposing -> true
+      else -> false
     }
   }
 

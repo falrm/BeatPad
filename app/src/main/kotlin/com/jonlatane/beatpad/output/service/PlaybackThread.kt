@@ -4,6 +4,7 @@ import BeatClockPaletteConsumer.tickPosition
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.error
 import org.jetbrains.anko.info
+import org.jetbrains.anko.verbose
 
 internal class PlaybackThread : Thread(), AnkoLogger {
   companion object {
@@ -19,10 +20,10 @@ internal class PlaybackThread : Thread(), AnkoLogger {
         if (!stopped) {
           val start = System.currentTimeMillis()
           val tickTime: Long = 60000L / (BeatClockPaletteConsumer.palette!!.bpm.toInt() * subdivisionsPerBeat)
-          when {
+          /*when {
             tickPosition % subdivisionsPerBeat == 0 -> tickPosition / subdivisionsPerBeat
             else -> null
-          }?.let { info("Quarter #$it") }
+          }?.let { info("Quarter #$it") }*/
           info("Tick @${BeatClockPaletteConsumer.tickPosition}")
           tryWithRetries { BeatClockPaletteConsumer.tick() }
           val sleepTime = (tickTime - (System.currentTimeMillis() - start)).let {

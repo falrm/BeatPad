@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.model
 
 import java.util.*
+import kotlin.NoSuchElementException
 
 /**
  * A [Pattern] can be thought of a sequence of changes, all at points in time expressible

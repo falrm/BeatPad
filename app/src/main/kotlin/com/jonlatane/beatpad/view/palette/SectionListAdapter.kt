@@ -7,6 +7,7 @@ import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Section
+import com.jonlatane.beatpad.storage.PaletteStorage
 import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.wrapContent
@@ -34,7 +35,7 @@ class SectionListAdapter(
 				setOnClickListener {
 					//viewModel.orbifold.disableNextTransitionAnimation()
 					//viewModel.orbifold.chord = c
-					viewModel.harmonyViewModel.harmony = section.harmony
+          BeatClockPaletteConsumer.section = section
 				}
 				setOnLongClickListener {
 					viewModel.palette.sections.removeAt(position)
@@ -57,16 +58,20 @@ class SectionListAdapter(
 			text = "+"
 			backgroundResource = R.drawable.orbifold_chord
 			setOnClickListener {
-				viewModel.palette.sections.add(Section.forList(viewModel.palette.sections))
+				addSection()
 				notifyItemInserted(viewModel.palette.sections.size - 1)
 			}
 			setOnLongClickListener {
-				viewModel.palette.sections.add(Section.forList(viewModel.palette.sections))
+        addSection()
 				notifyItemInserted(viewModel.palette.sections.size)
 				true
 			}
 		}
 	}
+
+  private fun addSection() = viewModel.palette.sections.add(
+    Section.forList(viewModel.palette.sections, harmony = PaletteStorage.baseHarmony)
+  )
 
 	override fun getItemCount(): Int = viewModel.palette.sections.size + 1
 }

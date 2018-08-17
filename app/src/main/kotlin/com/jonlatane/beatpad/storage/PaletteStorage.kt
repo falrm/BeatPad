@@ -9,10 +9,14 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.fasterxml.jackson.module.kotlin.treeToValue
+import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.model.harmony.Orbifold
+import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.harmony.chord.Dom7
+import com.jonlatane.beatpad.model.harmony.chord.Maj
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import org.jetbrains.anko.AnkoLogger
 import java.util.*
@@ -22,16 +26,28 @@ object PaletteStorage : AnkoLogger {
   const val paletteModelVersion = 5
 
   val basePalette
-    get() = Palette().apply {
-      parts.add(Part())
-    }
+    get() = Palette(
+      sections = mutableListOf(Section(harmony = baseHarmony)),
+      parts = mutableListOf(Part())
+    )
 
   val baseMelody
     get() = RationalMelody(
-      changes = TreeMap((0..15).map { it to RationalMelody.Element() }.toMap()),
-      length = 16,
+      changes = TreeMap((0..63).map { it to RationalMelody.Element() }.toMap()),
+      length = 64,
       subdivisionsPerBeat = 4
     )
+
+  val baseHarmony: Harmony
+    get() {
+      val change1 = Chord(0, Maj)
+      val change2 = Chord(7, Dom7)
+      return Harmony(
+        changes = TreeMap(mapOf(0 to change1, 32 to change2)),
+        length = 64,
+        subdivisionsPerBeat = 4
+      )
+    }
 
 
   object Serializer : StdSerializer<Palette>(Palette::class.java) {
@@ -68,7 +84,7 @@ object PaletteStorage : AnkoLogger {
         .map { mapper.treeToValue<Section>(it) }
         .toMutableList()
       if (sections.isEmpty()) {
-        sections.add(Section())
+        sections.add(Section(harmony = baseHarmony))
       }
 
       val keyboardPart = parts.firstOrNull { it.id == UUID.fromString(mapper.treeToValue(root["keyboardPart"])) }
