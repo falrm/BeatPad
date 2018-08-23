@@ -29,6 +29,7 @@ val Maj = intArrayOf(root, M3, P5)
 val Maj6 = Maj + M6
 val Maj69 = Maj6 + M2
 val MajAdd9 = Maj + M2
+val MajAddFlat9 = Maj + m2
 val Maj7 = Maj + M7
 val Maj9 = Maj7 + M2
 val Maj11 = Maj9 + P4
@@ -57,7 +58,19 @@ val dim = intArrayOf(root, m3, d5)
 val halfDim7 = min7flat5
 val dim7 = dim + d7
 val Aug = intArrayOf(root, M3, A5)
-val sus = intArrayOf(root, P4, P5)
+
+// Sus chords
+
+private fun susOf(extension: IntArray): IntArray = extension.map {
+  when (it) {
+    m3, M3 -> P4
+    else -> it
+  }
+}.toIntArray()
+val sus = susOf(Maj)
+val Maj6sus = susOf(Maj6)
+val Dom7sus = susOf(Dom7)
+val Dom9sus = susOf(Dom9)
 
 // Modern harmonic modes
 val Ionian = Maj13add11

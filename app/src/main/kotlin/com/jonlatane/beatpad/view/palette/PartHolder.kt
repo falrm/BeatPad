@@ -85,6 +85,7 @@ class PartHolder(
 					) {
 						viewModel.palette.parts.removeAt(partPosition)
 						adapter.notifyItemRemoved(partPosition)
+						adapter.notifyDataSetChanged()
 					}
 				else -> context.toast("TODO!")
 			}

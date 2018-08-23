@@ -17,11 +17,11 @@ inline fun ViewManager.melodyToneAxis(theme: Int = 0, init: MelodyToneAxis.() ->
 	= ankoView({ MelodyToneAxis(it) }, theme, init)
 
 
-fun ViewManager.bottomScroller(theme: Int = 0)
-	= bottomScroller(theme) {}
+fun ViewManager.melodyEditingModifiers(theme: Int = 0)
+	= melodyEditingModifiers(theme) {}
 
-inline fun ViewManager.bottomScroller(theme: Int = 0, init: BottomScroller.() -> Unit)
-	= ankoView({ BottomScroller(it) }, theme, init)
+inline fun ViewManager.melodyEditingModifiers(theme: Int = 0, init: MelodyEditingModifiers.() -> Unit)
+	= ankoView({ MelodyEditingModifiers(it) }, theme, init)
 
 inline fun ViewManager.melodyToolbar(viewModel: MelodyViewModel, theme: Int = 0, init: MelodyToolbar.() -> Unit = {})
 	= ankoView({ MelodyToolbar(it, viewModel) }, theme, init)

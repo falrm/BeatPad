@@ -9,9 +9,8 @@ import com.jonlatane.beatpad.util.mod12
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.withAlpha
 
-interface ColorGuide : AlphaDrawer {
+interface ColorGuide : CanvasToneDrawer {
 	var colorGuideAlpha: Int
-	var chord: Chord
 	val drawPadding: Int
 	val nonRootPadding: Int get() = MainApplication.instance.dip(13)
 	val drawnColorGuideAlpha: Int // In case you want to scale by the View's alpha :)
@@ -52,41 +51,5 @@ interface ColorGuide : AlphaDrawer {
 				)
 			}
 		}
-	}
-
-
-	data class OnScreenNote(
-		var tone: Int = 0,
-		var pressed: Boolean = false,
-		var bottom: Float = 0f,
-		var top: Float = 0f
-	)
-
-	val onScreenNotes: List<OnScreenNote> get() {
-		val result = kotlin.collections.mutableListOf<OnScreenNote>()
-		val orientationRange = highestPitch - lowestPitch + 1 - halfStepsOnScreen
-		val bottomMostPoint: Float = lowestPitch + (Orientation.normalizedDevicePitch() * orientationRange)
-		val bottomMostNote: Int = java.lang.Math.floor(bottomMostPoint.toDouble()).toInt()
-		var currentScreenNote = OnScreenNote(
-			tone = chord.closestTone(bottomMostNote),
-			pressed = false,
-			bottom = 0f,
-			top = (bottomMostNote - bottomMostPoint) * axisLength / halfStepsOnScreen
-		)
-		for (toneMaybeNotInChord in (bottomMostNote..(bottomMostNote + halfStepsOnScreen.toInt() + 2))) {
-			val toneInChord = chord.closestTone(toneMaybeNotInChord)
-			if (toneInChord != currentScreenNote.tone) {
-				result.add(currentScreenNote)
-				currentScreenNote = OnScreenNote(
-					tone = toneInChord,
-					pressed = false,
-					bottom = currentScreenNote.top,
-					top = currentScreenNote.top
-				)
-			}
-			currentScreenNote.top += axisLength / halfStepsOnScreen
-		}
-		result.add(currentScreenNote)
-		return result
 	}
 }

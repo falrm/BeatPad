@@ -1,7 +1,5 @@
 package com.jonlatane.beatpad.storage
 
-import android.content.Context
-import android.util.Log
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.BeanDescription
@@ -16,11 +14,6 @@ import com.jonlatane.beatpad.model.*
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.model.melody.RecordedAudioMelody
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.error
-import org.jetbrains.anko.info
-import java.io.IOException
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
 
 object MelodyStorage : AnkoLogger {
 	object Serializer: StdSerializer<Melody>(Melody::class.java) {
@@ -67,8 +60,8 @@ object MelodyStorage : AnkoLogger {
 		}
 	}
 
-	object ElementSerializer: StdDeserializer<Melement>(Melement::class.java) {
-		override fun deserialize(jp: JsonParser, context: DeserializationContext): Melement {
+	object ElementSerializer: StdDeserializer<MelodyElement>(MelodyElement::class.java) {
+		override fun deserialize(jp: JsonParser, context: DeserializationContext): MelodyElement {
 			val mapper = jp.codec as ObjectMapper
 			val root = mapper.readTree<ObjectNode>(jp)
 			/*send you own condition*/

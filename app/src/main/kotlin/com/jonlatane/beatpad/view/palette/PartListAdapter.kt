@@ -15,7 +15,7 @@ class PartListAdapter(
 	private val recyclerView: _RecyclerView
 ) : RecyclerView.Adapter<PartHolder>(), PartHolderLayout {
 	companion object {
-		const val MAX_PARTS = 5
+		const val MAX_PARTS = 8
 	}
 	var editingVolume by observable(false) { _, _, editingVolume ->
 		recyclerView.applyToHolders<PartHolder> { it.editingVolume = editingVolume }
@@ -25,7 +25,7 @@ class PartListAdapter(
 		viewModel.partListAdapter = this
 	}
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PartHolder? {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PartHolder {
 		return recyclerView.partHolder(viewModel, this)
 	}
 

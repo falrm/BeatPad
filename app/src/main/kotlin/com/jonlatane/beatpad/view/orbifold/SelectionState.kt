@@ -8,10 +8,21 @@ import org.jetbrains.anko.info
 import org.jetbrains.anko.verbose
 
 object SelectionState : NavigationState, AnkoLogger {
+  fun computeMaxTranslations(width: Int, height: Int): Pair<Float, Float> {
+    val maxXDisparityFactor = 3f
+    val maxYDisparityFactor = 1.5f
+    var maxTX = width * 0.4f
+    var maxTY = height * 0.4f
+    if(maxTX > maxXDisparityFactor * maxTY) {
+      maxTX = maxXDisparityFactor * maxTY
+    } else if (maxTY > maxYDisparityFactor * maxTX ){
+      maxTY = maxYDisparityFactor * maxTX
+    }
+    return maxTX to maxTY
+  }
   override fun animateTo(v: OrbifoldView) {
     val theta = Math.PI / v.sequences.size
-    val maxTX = v.width * 0.4f
-    val maxTY = v.height * 0.4f
+    val (maxTX, maxTY) = computeMaxTranslations(v.width, v.height)// = v.width * 0.4f
 
     v.halfStepUp.animate()
       .translationY(-(v.halfStepUp.scaledHeight + v.centralChord.scaledHeight) / 2f)
@@ -43,7 +54,7 @@ object SelectionState : NavigationState, AnkoLogger {
       width = v.centralChord.scaledWidth,
       duration = ANIMATION_DURATION
     )
-    for (i in 0..v.sequences.size - 1) {
+    for (i in 0 until v.sequences.size) {
       val sv = v.sequences[i]
       val forwardAngle = i * theta - (Math.PI - theta) / 2
       val sin = Math.sin(forwardAngle)
@@ -60,12 +71,11 @@ object SelectionState : NavigationState, AnkoLogger {
 
   internal fun skipToSelectionPhase(v: OrbifoldView, sv: OrbifoldView.SequenceViews) {
     val theta = Math.PI / v.sequences.size
-    val maxTX = v.width * 0.4f
-    val maxTY = v.height * 0.4f
+    val (maxTX, maxTY) = computeMaxTranslations(v.width, v.height)// = v.width * 0.4f
     var x = 0f
     var y = 0f
     var forwardAngle = 0.0
-    for (i in 0..v.sequences.size - 1) {
+    for (i in 0 until v.sequences.size) {
       if (sv === v.sequences[i]) {
         forwardAngle = i * theta - (Math.PI - theta) / 2
         val sin = Math.sin(forwardAngle)
@@ -74,7 +84,7 @@ object SelectionState : NavigationState, AnkoLogger {
         y = (maxTY * sin).toFloat()
       }
     }
-    skipAxisToSelectionPhase(sv, x, y);
+    skipAxisToSelectionPhase(sv, x, y)
     skipConnectorsToSelectionPhase(sv, x, y, forwardAngle, v.selectedChord)
     skipChordsToSelectionPhase(sv, x, y, v.selectedChord)
   }

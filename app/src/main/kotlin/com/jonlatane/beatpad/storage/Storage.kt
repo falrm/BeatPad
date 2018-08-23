@@ -28,11 +28,12 @@ object Storage: AnkoLogger {
 
 	fun loadPalette(context: Context): Palette = try {
 		val json: String = InputStreamReader(context.openFileInput("palette.json")).use { it.readText() }
-		info("Loaded palette: $json")
+		info("Loading palette: $json")
 		val palette = AppObjectMapper.readValue(json, Palette::class.java)
+		info("Loaded palette!")
 		palette
 	} catch (t: Throwable) {
-		//error("Failed to load stored palette", t)
+		error("Failed to load stored palette", t)
 		PaletteStorage.basePalette
 	}
 

@@ -1,10 +1,15 @@
 package com.jonlatane.beatpad.view.melody
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
-import android.widget.LinearLayout
+import android.widget.NumberPicker
 import android.widget.PopupMenu
+import android.widget.RelativeLayout
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.harmony.chord.Chord
@@ -16,20 +21,26 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
 
-
 class MelodyToolbar(
 	context: Context,
 	val viewModel: MelodyViewModel
-): _LinearLayout(context) {
+): _LinearLayout(context), AnkoLogger {
 	init {
-		orientation = LinearLayout.HORIZONTAL
+		orientation = HORIZONTAL
 		backgroundColor = context.color(R.color.colorPrimaryDark)
 	}
 
+  private val lengthDialog = LengthDialog(context)
+
 	private val lengthButton: Button = button {
-		text = ""
+		text = "0/0"
 		onClick {
-			context.toast("TODO")
+			//context.toast("TODO")
+      try {
+        lengthDialog.show()
+      } catch(t: Throwable) {
+        error("Error showing length dialog", t)
+      }
 		}
 	}.lparams {
 		width = matchParent
@@ -132,6 +143,8 @@ class MelodyToolbar(
 
 		lengthButton.text =
 			"${viewModel.openedMelody.elements.size}/${viewModel.openedMelody.subdivisionsPerBeat}"
+    lengthDialog.lengthPicker.value = viewModel.openedMelody.elements.size
+    lengthDialog.subdivisionsPerBeatPicker.value = viewModel.openedMelody.subdivisionsPerBeat
 	}
 	private fun updateMelody() = viewModel.melodyElementAdapter?.notifyDataSetChanged()
 

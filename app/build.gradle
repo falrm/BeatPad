@@ -1,7 +1,9 @@
 buildscript {
-	ext.kotlin_version = '1.2.41'
+	ext.kotlin_version = '1.2.51'
 	ext.anko_version = '0.10.4'
-	ext.support_version = '27.0.2'
+	ext.kotlinx_io_version = '0.1.0-alpha-2'
+  ext.support_version = '27.1.1'
+  ext.constraint_layout_version = '1.1.2'
 	ext.jackson_version = '2.9.3'
 	repositories {
 		jcenter()
@@ -30,8 +32,8 @@ android {
 		applicationId "com.jonlatane.beatpad"
 		minSdkVersion 21
 		targetSdkVersion 27
-		versionCode 8
-		versionName "Polyphonica 0.2"
+		versionCode 12
+		versionName "Polyphonica 0.5.1"
 		multiDexEnabled true
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 	}
@@ -60,7 +62,7 @@ dependencies {
 	implementation "com.android.support:appcompat-v7:$support_version"
 	implementation "com.android.support:design:$support_version"
 	implementation "com.android.support:recyclerview-v7:$support_version"
-	implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+	implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"
 
 	implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 	implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
@@ -74,12 +76,19 @@ dependencies {
 	implementation "org.jetbrains.anko:anko-sdk25-coroutines:$anko_version"
 	implementation "org.jetbrains.anko:anko-appcompat-v7-coroutines:$anko_version"
 	implementation "org.jetbrains.anko:anko-constraint-layout:$anko_version"
-	implementation "com.android.support.constraint:constraint-layout:1.1.0-beta5"
+	implementation "org.jetbrains.anko:anko-commons:$anko_version"
+	implementation "org.jetbrains.anko:anko-design:$anko_version"
+
+	implementation("org.jetbrains.kotlinx:kotlinx-io-jvm:$kotlinx_io_version") {
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-common'
+  }
 
 	androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
 		exclude group: 'com.android.support', module: 'support-annotations'
 	})
 	implementation "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
+	implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4.1"
+
 
 	implementation 'com.github.billthefarmer:mididriver:v1.13'
 	implementation 'org.apache.commons:commons-lang3:3.5'

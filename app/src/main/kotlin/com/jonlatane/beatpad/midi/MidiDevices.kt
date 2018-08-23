@@ -10,8 +10,9 @@ import com.jonlatane.beatpad.MainApplication
 import android.os.HandlerThread
 import org.jetbrains.anko.*
 
-
 object MidiDevices : AnkoLogger {
+
+	@get:RequiresApi(Build.VERSION_CODES.M)
 	internal val manager: MidiManager by lazy {
 		MainApplication.instance.getSystemService(Context.MIDI_SERVICE) as MidiManager
 	}
@@ -71,6 +72,6 @@ object MidiDevices : AnkoLogger {
 	@get:RequiresApi(Build.VERSION_CODES.M)
 	internal val MidiDeviceInfo.name: String
 		get() {
-			return properties[MidiDeviceInfo.PROPERTY_NAME].toString()
+			return properties[MidiDeviceInfo.PROPERTY_NAME]?.toString() ?: "Unnamed MIDI Device"
 		}
 }

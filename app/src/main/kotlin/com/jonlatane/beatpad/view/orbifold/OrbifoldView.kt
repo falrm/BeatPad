@@ -47,7 +47,7 @@ class OrbifoldView @JvmOverloads constructor(
 		}
 		onChordChangedListener?.invoke(chord)
 	}
-	var orbifold: Orbifold by observable(Orbifold.functional) {
+	var orbifold: Orbifold by observable(Orbifold.intermediate) {
 		_, _, new ->
 		(Orbifold.ALL_ORBITS - new).forEach {
 			removeSequence(it)

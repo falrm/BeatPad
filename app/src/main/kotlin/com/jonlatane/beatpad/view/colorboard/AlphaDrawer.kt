@@ -9,8 +9,8 @@ interface AlphaDrawer {
 	val renderVertically: Boolean
 	val axisLength: Float
 	val halfStepsOnScreen: Float
-	val highestPitch get() = 48 // Top C on an 88-key piano
-	val lowestPitch get() = -39 // Bottom A, ditto
+	val highestPitch get() = TOP // Top C on an 88-key piano
+	val lowestPitch get() = BOTTOM // Bottom A, ditto
 	fun color(resourceId: Int): Int
 
 	companion object {

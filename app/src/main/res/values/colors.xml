@@ -33,28 +33,28 @@
 		These colors, along with the green "tonic" above, are the 12 colors used on the Colorboard
 		and in the Sequence Editor
 	-->
-	<color name="flatTwo">@color/diminished</color>
-	<color name="two">@color/subDominant</color>
+	<color name="flatTwo">#A32E6C</color>
+	<color name="two">#80E340</color>
 	<color name="flatThree">@color/minor</color>
 	<color name="three">@color/major</color>
 	<color name="four">@color/subDominant</color>
 	<color name="flatFive">@color/diminished</color>
 	<color name="five">@color/dominant</color>
 	<color name="sharpFive">@color/augmented</color>
-	<color name="six">@color/major</color>
-	<color name="flatSeven">@color/minor</color>
-	<color name="seven">@color/augmented</color>
+	<color name="six">#4C9AFF</color>
+	<color name="flatSeven">#A03BDB</color>
+	<color name="seven">#2EBBB5</color>
 
-	<color name="flatTwoDark">@color/diminishedDarker</color>
-	<color name="twoDark">@color/subDominantDarker</color>
+	<color name="flatTwoDark">#7F2455</color>
+	<color name="twoDark">#599E2D</color>
 	<color name="flatThreeDark">@color/minorDarker</color>
 	<color name="threeDark">@color/majorDarker</color>
 	<color name="fourDark">@color/subDominantDarker</color>
 	<color name="flatFiveDark">@color/diminishedDarker</color>
 	<color name="fiveDark">@color/dominantDarker</color>
 	<color name="sharpFiveDark">@color/augmentedDarker</color>
-	<color name="sixDark">@color/majorDarker</color>
-	<color name="flatSevenDark">@color/minorDarker</color>
-	<color name="sevenDark">@color/augmentedDarker</color>
+	<color name="sixDark">#4082D6</color>
+	<color name="flatSevenDark">#8230B2</color>
+	<color name="sevenDark">#24918C</color>
 
 </resources>

@@ -37,7 +37,9 @@ class ZoomableScrollView @JvmOverloads constructor(
 				return zoomHandler?.invoke(xDelta, yDelta) ?: false
 			}
 		}
-	)
+	).apply {
+
+	}
 
 	override fun dispatchTouchEvent(event: MotionEvent): Boolean {
 		if(scrollingEnabled) {
