@@ -11,6 +11,7 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.nonDelayedRecyclerView
 import com.jonlatane.beatpad.view.nonDelayedScrollView
+import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import com.jonlatane.beatpad.view.zoomableScrollView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.ankoView
@@ -19,7 +20,7 @@ import org.jetbrains.anko.sdk25.coroutines.onScrollChange
 
 inline fun ViewManager.melodyView(
 	theme: Int = 0,
-	viewModel: MelodyViewModel,
+	viewModel: PaletteViewModel,
 
 	//ui: AnkoContext<Any>,
 	init: HideableRelativeLayout.() -> Unit

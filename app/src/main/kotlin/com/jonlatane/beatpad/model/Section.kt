@@ -5,7 +5,7 @@ import java.util.*
 data class Section(
   val id: UUID = UUID.randomUUID(),
   val name: String = generateNewSectionName(emptyList()),
-  val harmony: Harmony = Harmony(),
+  var harmony: Harmony? = null,
   val melodies: MutableSet<Melody<*>> = mutableSetOf()
 ) {
   companion object {

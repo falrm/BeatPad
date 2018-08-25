@@ -4,13 +4,14 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
+import android.view.MenuItem
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.*
 import android.view.ViewGroup
-import com.jonlatane.beatpad.util.but
+import android.widget.PopupMenu
 import com.jonlatane.beatpad.util.vibrate
 
 
@@ -22,6 +23,8 @@ class HarmonyElementView @JvmOverloads constructor(
   var elementPosition = 0
   val element: Chord? get() = harmony?.changes?.get(elementPosition)
   val chord: Chord? get() = try { harmony?.changeBefore(elementPosition) } catch(e: NoSuchElementException) { null }
+
+  private val editChangeMenu: PopupMenu
   inline val isDownbeat: Boolean get() = harmony?.run {
     elementPosition % subdivisionsPerBeat == 0
   } ?: false
@@ -30,29 +33,39 @@ class HarmonyElementView @JvmOverloads constructor(
     isClickable = true
     clipChildren = false
     clipToPadding = false
+
+    editChangeMenu = PopupMenu(context, this)
+    editChangeMenu.inflate(R.menu.harmony_element_menu)
+    editChangeMenu.setOnMenuItemClickListener { item ->
+      when (item.itemId) {
+      //R.id.newDrawnPattern -> adapter.newToneSequence()
+        R.id.newChordChange -> {context.toast("TODO")}
+        R.id.editChordChange -> {context.toast("TODO")}
+        R.id.removeChordChange -> {context.toast("TODO")}
+        else -> context.toast("TODO!")
+      }
+      true
+    }
+
     setOnClickListener {
       chord?.let {
         viewModel?.paletteViewModel?.orbifold?.chord = it
       }
     }
+
     setOnLongClickListener {
       vibrate(150)
       harmony?.let { harmony ->
+        val isChange = harmony.isChangeAt(elementPosition)
+        viewModel?.selectedChord = chord
+        editChangeMenu.menu.findItem(R.id.newChordChange).isVisible = !isChange
+        editChangeMenu.menu.findItem(R.id.removeChordChange).isVisible = harmony.changes.values.count { it != null } > 1
         when {
           harmony.isChangeAt(elementPosition) -> {
-            when {
-              harmony.changes.values.any { it != null } -> {
-                context.toast("Should select this chord")
-              }
-              else -> {
-                context.toast("Should select this chord, but not let you delete it")
-              }
-            }
-          }
-          else -> {
-            context.toast("Should create a chord here")
+
           }
         }
+        editChangeMenu.show()
       }
       true
     }

@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.melody
 
 import android.view.ViewManager
+import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.custom.ankoView
 
 
@@ -23,5 +24,5 @@ fun ViewManager.melodyEditingModifiers(theme: Int = 0)
 inline fun ViewManager.melodyEditingModifiers(theme: Int = 0, init: MelodyEditingModifiers.() -> Unit)
 	= ankoView({ MelodyEditingModifiers(it) }, theme, init)
 
-inline fun ViewManager.melodyToolbar(viewModel: MelodyViewModel, theme: Int = 0, init: MelodyToolbar.() -> Unit = {})
+inline fun ViewManager.melodyToolbar(viewModel: PaletteViewModel, theme: Int = 0, init: MelodyToolbar.() -> Unit = {})
 	= ankoView({ MelodyToolbar(it, viewModel) }, theme, init)

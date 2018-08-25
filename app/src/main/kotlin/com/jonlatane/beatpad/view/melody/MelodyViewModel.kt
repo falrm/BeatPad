@@ -1,8 +1,10 @@
 package com.jonlatane.beatpad.view.melody
 
-import BeatClockPaletteConsumer.ticksPerBeat
+import BeatClockPaletteConsumer
 import android.view.View
 import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.Transposable
+import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.NonDelayedRecyclerView

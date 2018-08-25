@@ -11,19 +11,24 @@ import android.widget.NumberPicker
 import android.widget.PopupMenu
 import android.widget.RelativeLayout
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.melody.RationalMelody
+import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.mod12
 import com.jonlatane.beatpad.util.mod12Nearest
 import com.jonlatane.beatpad.util.toolbarStyle
+import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
 
 class MelodyToolbar(
 	context: Context,
-	val viewModel: MelodyViewModel
+	val viewModel: PaletteViewModel
 ): _LinearLayout(context), AnkoLogger {
 	init {
 		orientation = HORIZONTAL
@@ -65,19 +70,27 @@ class MelodyToolbar(
 			when (item.itemId) {
 				R.id.fixedPositionMelody -> { viewModel.openedMelody?.apply {
 						if(shouldConformWithHarmony) {
-							transposeInPlace(viewModel.orbifold.chord.root.mod12Nearest)
+              viewModel.harmonyViewModel.harmony?.let { harmony ->
+                transposeOutOf(harmony)
+              } ?: {
+                transposeInPlace(viewModel.orbifold.chord.root.mod12Nearest)
+              }()
 						}
 						shouldConformWithHarmony = false
-						tonic = 0
+            tonic = 0
 					}
 				}
 				R.id.relativeToCurrentChord -> viewModel.openedMelody?.apply {
-					val newRoot = viewModel.orbifold.chord.root.mod12
-					if(!shouldConformWithHarmony) {
-						transposeInPlace((tonic - newRoot).mod12Nearest)
-					}
+					val newTonic = viewModel.chord.root.mod12
+          if(!shouldConformWithHarmony) {
+            viewModel.harmonyViewModel.harmony?.let {harmony ->
+                transposeInPlace(harmony)
+            } ?: {
+                transposeInPlace((tonic - newTonic).mod12Nearest)
+            }()
+          }
 					shouldConformWithHarmony = true
-					tonic = newRoot
+					tonic = newTonic
 				}
 				R.id.c -> viewModel.openedMelody?.apply {
 					shouldConformWithHarmony = true
@@ -149,6 +162,48 @@ class MelodyToolbar(
 		lengthDialog.subdivisionsPerBeatPicker.value = viewModel.openedMelody?.subdivisionsPerBeat ?: 1
 	}
 	private fun updateMelody() = viewModel.melodyElementAdapter?.notifyDataSetChanged()
+
+  private fun Melody<*>.transposeInPlace(interval: Int) {
+    when(this) {
+      is RationalMelody -> {
+        val transposed = transpose(interval)
+        transposed.changes.forEach { index, element ->
+          changes[index] = element
+        }
+      }
+      else -> TODO("Melody type cannot be transposed!")
+    }
+  }
+
+  private fun Melody<*>.transposeInPlace(harmony: Harmony) {
+    when(this) {
+      is RationalMelody -> {
+        changes.forEach { index, element ->
+          val harmonyPosition = index.convertPatternIndex(this, harmony)
+          val chordInHarmony = harmony.changeBefore(harmonyPosition)
+          val interval = (tonic - chordInHarmony.root).mod12Nearest
+          val transposed = element.transpose(interval)
+          changes[index] = transposed
+        }
+      }
+      else -> TODO("Melody type cannot be transposed!")
+    }
+  }
+
+  private fun Melody<*>.transposeOutOf(harmony: Harmony) {
+    when(this) {
+      is RationalMelody -> {
+        changes.forEach { index, element ->
+          val harmonyPosition = index.convertPatternIndex(this, harmony)
+          val chordInHarmony = harmony.changeBefore(harmonyPosition)
+          val interval = (chordInHarmony.root - tonic).mod12Nearest + tonic.mod12Nearest
+          val transposed = element.transpose(chordInHarmony.root.mod12Nearest)
+          changes[index] = transposed
+        }
+      }
+      else -> TODO("Melody type cannot be transposed!")
+    }
+  }
 
 	private val upButton = button {
 		text = "Up"

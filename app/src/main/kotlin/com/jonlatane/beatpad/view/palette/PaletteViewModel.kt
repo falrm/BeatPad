@@ -62,7 +62,7 @@ class PaletteViewModel : MelodyViewModel() {
     melodyToolbar.updateButtonText()
   }
 
-  lateinit var chordListView: View
+  lateinit var sectionListView: View
   var partListAdapter: PartListAdapter? = null
   var sectionListAdapter: SectionListAdapter? = null
   lateinit var partListView: HideableRecyclerView
@@ -97,6 +97,7 @@ class PaletteViewModel : MelodyViewModel() {
 
   fun notifySectionChange() {
     harmonyViewModel.chordAdapter?.notifyDataSetChanged()
+    sectionListAdapter?.notifyDataSetChanged()
     melodyElementAdapter?.notifyDataSetChanged()
   }
 

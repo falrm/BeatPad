@@ -10,12 +10,12 @@ import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 
-fun ViewManager.chordListView(
+fun ViewManager.sectionListView(
 	theme: Int = 0,
 	viewModel: PaletteViewModel
-) = chordListView(theme, viewModel, {})
+) = sectionListView(theme, viewModel, {})
 
-inline fun ViewManager.chordListView(
+inline fun ViewManager.sectionListView(
 	theme: Int = 0,
 	viewModel: PaletteViewModel,
 	init: _RecyclerView.() -> Unit

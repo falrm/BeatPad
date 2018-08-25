@@ -54,6 +54,15 @@ object BeatClockPaletteConsumer : AnkoLogger {
 
     var currentAttackIndex = 0
     val chord = harmonyChord ?: viewModel?.orbifold?.chord
+    viewModel?.orbifold?.post {
+      if(
+        section?.harmony != null
+        && chord != viewModel?.orbifold?.chord
+        && chord != null
+      ) {
+        viewModel?.orbifold?.chord = chord
+      }
+    }
     info("Harmony index: $harmonyPosition; Chord: $chord")
     palette?.parts?.map { part ->
       part.melodies/*.filter { it.enabled }*/.forEach { melody ->

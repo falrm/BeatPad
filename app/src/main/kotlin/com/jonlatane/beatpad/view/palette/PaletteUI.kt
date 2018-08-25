@@ -15,11 +15,10 @@ import com.jonlatane.beatpad.view.melody.melodyView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.*
-import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
 import java.util.concurrent.Executors
 
-class PaletteUI() : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
+class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
   private val executorService = Executors.newScheduledThreadPool(2)
   val viewModel = PaletteViewModel()
   val previewInstrument = MIDIInstrument().apply {
@@ -93,7 +92,7 @@ class PaletteUI() : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       alignParentTop()
     }
 
-    viewModel.chordListView = chordListView(viewModel = viewModel) {
+    viewModel.sectionListView = sectionListView(viewModel = viewModel) {
       id = R.id.chord_list
     }.lparams {
       below(viewModel.orbifold)
@@ -102,18 +101,18 @@ class PaletteUI() : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       height = wrapContent
     }
 
-    viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
-      id = R.id.toolbar
+    viewModel.harmonyView = harmonyView(viewModel = viewModel.harmonyViewModel) {
+      id = R.id.harmony
     }.lparams {
-      below(viewModel.chordListView)
+      below(viewModel.sectionListView)
       width = matchParent
       height = wrapContent
     }
 
-    viewModel.harmonyView = harmonyView(viewModel = viewModel.harmonyViewModel) {
-      id = R.id.harmony
+    viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
+      id = R.id.toolbar
     }.lparams {
-      below(viewModel.toolbarView)
+      below(viewModel.harmonyView)
       width = matchParent
       height = wrapContent
     }
@@ -121,27 +120,27 @@ class PaletteUI() : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
     viewModel.partListView = partListView(viewModel = viewModel) {
       id = R.id.part_list
     }.lparams {
+      below(viewModel.toolbarView)
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      below(viewModel.harmonyView)
     }
 
     viewModel.melodyView = melodyView(viewModel = viewModel) {
       id = R.id.melody
       alpha = 0f
     }.lparams {
+      below(viewModel.toolbarView)
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      below(viewModel.harmonyView)
     }
   }
 
   private fun _RelativeLayout.landscapeLayout(ui: AnkoContext<PaletteEditorActivity>) {
     val leftSideWidth = dip(350f)
 
-    viewModel.chordListView = chordListView(viewModel = viewModel) {
+    viewModel.sectionListView = sectionListView(viewModel = viewModel) {
       id = R.id.chord_list
     }.lparams {
       width = leftSideWidth
@@ -156,7 +155,7 @@ class PaletteUI() : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       id = R.id.orbifold
     }.lparams {
       alignParentLeft()
-      below(viewModel.chordListView)
+      below(viewModel.sectionListView)
       width = leftSideWidth
       height = if (isTablet) {
         Math.round(leftSideWidth * 1.5f)

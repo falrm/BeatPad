@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Delete Section"
+          android:id="@+id/deleteSection"/>
+    <item android:title="Add Harmony"
+        android:id="@+id/addHarmonyToSection"/>
+    <item android:title="Remove Harmony"
+          android:id="@+id/removeHarmonyFromSection"/>
+</menu>

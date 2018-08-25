@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.model
 
 import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.melody.RecordedAudioMelody
 import com.jonlatane.beatpad.util.mod12
 import java.util.*
 
@@ -22,17 +23,28 @@ interface Melody<ElementType : Transposable<ElementType>> : Pattern<ElementType>
     else -> 0
   }
 
-  fun transposeInPlace(interval: Int) {
-    val transposed = transpose(interval)
-    transposed.changes.forEach { index, element ->
-      changes[index] = element
-    }
-  }
-
   interface Element<
     MelodyType : Melody<ElementType>,
     ElementType : Transposable<ElementType>
   > : Transposable<ElementType> {
     fun offsetUnder(chord: Chord, melody: MelodyType): Int
+  }
+
+  abstract class BaseElement<
+    MelodyType : Melody<ElementType>,
+    ElementType : Transposable<ElementType>
+    >: Element<MelodyType, ElementType> {
+
+    override fun offsetUnder(chord: Chord, melody: MelodyType) = when {
+      melody.shouldConformWithHarmony -> {
+        chord.root.mod12.let { root ->
+          when {
+            root > 6 -> root - 12
+            else -> root
+          }
+        }
+      }
+      else -> 0
+    }
   }
 }

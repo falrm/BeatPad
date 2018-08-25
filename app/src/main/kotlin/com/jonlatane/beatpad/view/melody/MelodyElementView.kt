@@ -63,7 +63,7 @@ class MelodyElementView @JvmOverloads constructor(
     get() = harmonyChord ?: viewModel?.orbifold?.chord ?: Chord(0, Maj)
     set(_) = TODO("Why?")
   override val melodyOffset: Int
-    get() = viewModel?.let { it.openedMelody?.offsetUnder(it.orbifold.chord)  } ?: 0
+    get() = viewModel?.let { it.openedMelody?.offsetUnder(chord)  } ?: 0
 
   override fun onDraw(canvas: Canvas) {
     colorGuideAlpha = if (viewModel?.playbackPosition == elementPosition) 255 else 187
