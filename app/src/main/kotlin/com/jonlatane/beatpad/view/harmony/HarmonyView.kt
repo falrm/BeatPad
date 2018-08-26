@@ -9,19 +9,21 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.NonDelayedRecyclerView
+import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.nonDelayedRecyclerView
+import com.jonlatane.beatpad.view.palette.PaletteViewModel
+import com.jonlatane.beatpad.view.zoomableRecyclerView
 import org.jetbrains.anko.*
 
 class HarmonyView(
   context: Context,
-  val viewModel: HarmonyViewModel,
+  val viewModel: PaletteViewModel,
   init: HideableRelativeLayout.() -> Unit = {}
 ) : HideableRelativeLayout(context) {
-  val harmonyElementRecycler: NonDelayedRecyclerView
   init {
     viewModel.harmonyView = this
     backgroundColor = color(R.color.colorPrimaryDark)
-    harmonyElementRecycler = nonDelayedRecyclerView {
+    viewModel.harmonyViewModel.harmonyElementRecycler = zoomableRecyclerView {
       id = R.id.center_h_scroller
       isFocusableInTouchMode = true
       clipChildren = false
@@ -36,9 +38,24 @@ class HarmonyView(
       layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
         isItemPrefetchEnabled = false
       }
+
+
+      zoomHandler = { xDelta, yDelta ->
+        AnkoLogger<MelodyViewModel>().info("Zooming: xDelta=$xDelta, yDelta=$yDelta")
+        when {
+          (xDelta.toInt() != 0) -> {
+            viewModel.harmonyViewModel.chordAdapter?.apply {
+              elementWidth += xDelta.toInt()
+              notifyDataSetChanged()
+            }
+            true
+          }
+          else -> false
+        }
+      }
       overScrollMode = View.OVER_SCROLL_NEVER
-      viewModel.chordAdapter = HarmonyChordAdapter(viewModel, this)
-      adapter = viewModel.chordAdapter
+      viewModel.harmonyViewModel.chordAdapter = HarmonyChordAdapter(viewModel, this)
+      adapter = viewModel.harmonyViewModel.chordAdapter
       adapter.registerAdapterDataObserver(
         object : RecyclerView.AdapterDataObserver() {
           override fun onItemRangeInserted(start: Int, count: Int) {

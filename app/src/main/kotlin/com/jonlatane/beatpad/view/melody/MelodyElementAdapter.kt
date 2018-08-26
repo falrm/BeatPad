@@ -24,17 +24,19 @@ class MelodyElementAdapter(
   @Volatile
   var elementWidth = recyclerView.run { dimen(R.dimen.subdivision_controller_size) }
     @Synchronized set(value) {
-      field = when {
-        value > minimumElementWidth -> {
-          value
+      if(field != value) {
+        field = when {
+          value > minimumElementWidth -> {
+            value
+          }
+          else -> minimumElementWidth
         }
-        else -> minimumElementWidth
+        info("Setting width to $field")
+        recyclerView.applyToHolders<MelodyElementHolder> {
+          it.element.layoutWidth = field
+        }
+        (viewModel as? PaletteViewModel)?.harmonyViewModel?.chordAdapter?.elementWidth = field
       }
-      info("Setting width to $field")
-      recyclerView.applyToHolders<MelodyElementHolder> {
-        it.element.layoutWidth = field
-      }
-      (viewModel as? PaletteViewModel)?.harmonyViewModel?.chordAdapter?.elementWidth = field
     }
 
   @Volatile

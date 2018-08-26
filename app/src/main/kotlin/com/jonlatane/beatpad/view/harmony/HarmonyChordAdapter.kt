@@ -5,30 +5,34 @@ import android.view.ViewGroup
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.applyToHolders
 import com.jonlatane.beatpad.util.layoutWidth
+import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dimen
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.wrapContent
 
 class HarmonyChordAdapter(
-	val viewModel: HarmonyViewModel,
+	val viewModel: PaletteViewModel,
 	val recyclerView: _RecyclerView
 ) : RecyclerView.Adapter<HarmonyChordHolder>(), AnkoLogger {
 
   @Volatile
   var elementWidth = recyclerView.run { dimen(R.dimen.subdivision_controller_size) }
     @Synchronized set(value) {
-      field = value
-      recyclerView.applyToHolders<HarmonyChordHolder> {
-        it.element.layoutWidth = field
-      }
+			if (field != value) {
+				field = value
+				recyclerView.applyToHolders<HarmonyChordHolder> {
+					it.element.layoutWidth = field
+				}
+				(viewModel as? PaletteViewModel)?.melodyElementAdapter?.elementWidth = field
+			}
     }
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HarmonyChordHolder {
 		return with(recyclerView) {
 			HarmonyChordHolder(
-				viewModel = viewModel,
-				element = HarmonyElementView(context, viewModel = viewModel).lparams {
+				viewModel = viewModel.harmonyViewModel,
+				element = HarmonyElementView(context, viewModel = viewModel.harmonyViewModel).lparams {
 					width = elementWidth
 					height = wrapContent
 				},
@@ -44,5 +48,5 @@ class HarmonyChordAdapter(
 		holder.element.invalidate()
 	}
 
-	override fun getItemCount(): Int = viewModel.harmony?.length ?: 0
+	override fun getItemCount(): Int = viewModel.harmonyViewModel.harmony?.length ?: 0
 }

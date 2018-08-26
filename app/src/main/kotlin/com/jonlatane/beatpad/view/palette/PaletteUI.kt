@@ -70,8 +70,17 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
         viewModel.melodyCenterHorizontalScroller.addOnScrollListener(object: RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
-            info("onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
-            val otherLayoutManager = viewModel.harmonyView.harmonyElementRecycler.layoutManager as LinearLayoutManager
+            //info("onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
+            val otherLayoutManager = viewModel.harmonyViewModel.harmonyElementRecycler!!.layoutManager as LinearLayoutManager
+            val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter?.elementWidth ?: Int.MAX_VALUE)
+            otherLayoutManager.scrollToPositionWithOffset(recyclerView.firstVisibleItemPosition, offset)
+          }
+        })
+        viewModel.harmonyViewModel.harmonyElementRecycler?.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+          override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            //info("onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
+            val otherLayoutManager = viewModel.melodyCenterHorizontalScroller.layoutManager as LinearLayoutManager
             val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter?.elementWidth ?: Int.MAX_VALUE)
             otherLayoutManager.scrollToPositionWithOffset(recyclerView.firstVisibleItemPosition, offset)
           }
@@ -101,7 +110,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       height = wrapContent
     }
 
-    viewModel.harmonyView = harmonyView(viewModel = viewModel.harmonyViewModel) {
+    viewModel.harmonyView = harmonyView(viewModel = viewModel) {
       id = R.id.harmony
     }.lparams {
       below(viewModel.sectionListView)
@@ -189,7 +198,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
 
     }
 
-    viewModel.harmonyView = harmonyView(viewModel = viewModel.harmonyViewModel) {
+    viewModel.harmonyView = harmonyView(viewModel = viewModel) {
       id = R.id.harmony
     }.lparams {
       width = matchParent
