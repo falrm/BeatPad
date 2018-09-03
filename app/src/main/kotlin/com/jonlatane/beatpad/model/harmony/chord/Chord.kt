@@ -170,6 +170,8 @@ class Chord : Parcelable, Transposable<Chord> {
 	val hasMinor2: Boolean get() = heptatonics.hasMinor2
 	val isDominant: Boolean get() = heptatonics.isDominant
 
+	override fun toString() = "$name ($root+$extension)"
+
 	companion object {
 		val mod12Names = arrayOf("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 		val mod7Names = arrayOf("C", "D", "E", "F", "G", "A", "B")

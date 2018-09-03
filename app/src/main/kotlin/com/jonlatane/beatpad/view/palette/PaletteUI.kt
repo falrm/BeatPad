@@ -70,18 +70,21 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
         viewModel.melodyCenterHorizontalScroller.addOnScrollListener(object: RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
-            //info("onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
+            info("onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
             val otherLayoutManager = viewModel.harmonyViewModel.harmonyElementRecycler!!.layoutManager as LinearLayoutManager
-            val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter?.elementWidth ?: Int.MAX_VALUE)
+            val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter?.elementWidth
+              ?: Int.MAX_VALUE)
             otherLayoutManager.scrollToPositionWithOffset(recyclerView.firstVisibleItemPosition, offset)
+            viewModel.harmonyViewModel.harmonyView!!.syncScrollingChordText()
           }
         })
         viewModel.harmonyViewModel.harmonyElementRecycler?.addOnScrollListener(object: RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
-            //info("onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
+            info("onScrolled in harmony: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
             val otherLayoutManager = viewModel.melodyCenterHorizontalScroller.layoutManager as LinearLayoutManager
-            val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter?.elementWidth ?: Int.MAX_VALUE)
+            val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter?.elementWidth
+              ?: Int.MAX_VALUE)
             otherLayoutManager.scrollToPositionWithOffset(recyclerView.firstVisibleItemPosition, offset)
           }
         })

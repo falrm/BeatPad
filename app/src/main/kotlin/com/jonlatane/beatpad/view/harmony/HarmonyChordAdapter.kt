@@ -5,9 +5,11 @@ import android.view.ViewGroup
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.applyToHolders
 import com.jonlatane.beatpad.util.layoutWidth
+import com.jonlatane.beatpad.view.melody.MelodyElementAdapter.Companion.minimumElementWidthDp
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dimen
+import org.jetbrains.anko.dip
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.wrapContent
 
@@ -15,12 +17,18 @@ class HarmonyChordAdapter(
 	val viewModel: PaletteViewModel,
 	val recyclerView: _RecyclerView
 ) : RecyclerView.Adapter<HarmonyChordHolder>(), AnkoLogger {
+  private val minimumElementWidth: Int = recyclerView.run { dip(minimumElementWidthDp) }
 
   @Volatile
   var elementWidth = recyclerView.run { dimen(R.dimen.subdivision_controller_size) }
     @Synchronized set(value) {
 			if (field != value) {
-				field = value
+        field = when {
+          value > minimumElementWidth -> {
+            value
+          }
+          else -> minimumElementWidth
+        }
 				recyclerView.applyToHolders<HarmonyChordHolder> {
 					it.element.layoutWidth = field
 				}
@@ -42,7 +50,6 @@ class HarmonyChordAdapter(
 	}
 
 	override fun onBindViewHolder(holder: HarmonyChordHolder, elementPosition: Int) {
-    holder.element.setAllParentsClip(false)
 		holder.element.elementPosition = elementPosition
     holder.element.layoutWidth = elementWidth
 		holder.element.invalidate()

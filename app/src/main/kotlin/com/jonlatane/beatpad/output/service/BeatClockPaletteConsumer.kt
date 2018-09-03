@@ -43,7 +43,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
     var velocity: Float = 1f
   )
 
-  private val attackPool = object : DefaultPool<Attack>(16) {
+  private val attackPool: DefaultPool<Attack> = object : DefaultPool<Attack>(16) {
     override fun produceInstance() = Attack()
     override fun clearInstance(instance: Attack): Attack = instance.apply { chosenTones.clear() }
   }

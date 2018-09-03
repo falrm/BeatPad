@@ -47,13 +47,13 @@ class HarmonyElementView @JvmOverloads constructor(
       true
     }
 
-    setOnClickListener {
+    setOnClickListener { _ ->
       chord?.let {
         viewModel?.paletteViewModel?.orbifold?.chord = it
       }
     }
 
-    setOnLongClickListener {
+    setOnLongClickListener { _ ->
       vibrate(150)
       harmony?.let { harmony ->
         val isChange = harmony.isChangeAt(elementPosition)
@@ -92,7 +92,6 @@ class HarmonyElementView @JvmOverloads constructor(
   }
 
   override fun invalidate() {
-    chordText.text = element?.name ?: ""
     backgroundColor = chord?.run {
       when {
         isDominant -> color(R.color.dominant)
@@ -112,16 +111,6 @@ class HarmonyElementView @JvmOverloads constructor(
       v = viewGroup
     }
     super.invalidate()
-  }
-
-  fun setAllParentsClip(enabled: Boolean) {
-    var v: ViewGroup = this
-    while (v.parent != null && v.parent is ViewGroup) {
-      val viewGroup = v.parent as ViewGroup
-      viewGroup.clipChildren = enabled
-      viewGroup.clipToPadding = enabled
-      v = viewGroup
-    }
   }
 
   private fun Canvas.drawRhythm() {

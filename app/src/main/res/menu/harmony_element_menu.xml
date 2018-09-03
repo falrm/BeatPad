@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:title="Add Chord Change"
           android:id="@+id/newChordChange"/>
-    <item android:title="Edit Chord Change"
+    <item android:title="Edit Chord"
         android:id="@+id/editChordChange"/>
     <item android:title="Remove Chord Change"
           android:id="@+id/removeChordChange"/>

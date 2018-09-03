@@ -16,7 +16,7 @@ class MelodyElementAdapter(
   val recyclerView: _RecyclerView
 ) : RecyclerView.Adapter<MelodyElementHolder>(), AnkoLogger {
   private val axis get() = viewModel.verticalAxis!!
-  private val minimumElementWidth = recyclerView.run { dip(7f) }
+  private val minimumElementWidth = recyclerView.run { dip(minimumElementWidthDp) }
   private val maximumElementWidth get() = viewModel.melodyCenterVerticalScroller.width / 2
   private val minimumElementHeight get() = viewModel.melodyCenterVerticalScroller.height
   private val maximumElementHeight get() = viewModel.melodyCenterVerticalScroller.height * 3
@@ -84,4 +84,8 @@ class MelodyElementAdapter(
   }
 
   override fun getItemCount(): Int = viewModel.openedMelody?.length ?: 0
+
+  companion object {
+    const val minimumElementWidthDp: Float = 11f
+  }
 }

@@ -9,7 +9,7 @@ import com.jonlatane.beatpad.view.palette.PaletteViewModel
 
 open class HarmonyViewModel {
   var paletteViewModel: PaletteViewModel? = null
-  var harmonyView: HideableRelativeLayout? = null
+  var harmonyView: HarmonyView? = null
   var chordAdapter: HarmonyChordAdapter? = null
   var selectedChord: Chord? = null
   var harmonyElementRecycler: ZoomableRecyclerView? = null
@@ -18,4 +18,5 @@ open class HarmonyViewModel {
     chordAdapter?.notifyDataSetChanged()
   }
   val harmony: Harmony? get() = BeatClockPaletteConsumer.section?.harmony
+  var selectedHarmonyElements: IntRange? = null
 }

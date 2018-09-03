@@ -1,19 +1,12 @@
 package com.jonlatane.beatpad.view.melody
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
-import android.widget.NumberPicker
 import android.widget.PopupMenu
-import android.widget.RelativeLayout
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
-import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.service.convertPatternIndex

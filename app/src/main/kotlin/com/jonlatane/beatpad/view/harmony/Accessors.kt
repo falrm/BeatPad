@@ -9,4 +9,4 @@ fun ViewManager.harmonyView(
   viewModel: PaletteViewModel,
   theme: Int = 0,
   init: HarmonyView.() -> Unit = {}
-) = ankoView({ HarmonyView(it, viewModel) }, theme, init)
+): HarmonyView = ankoView({ HarmonyView(it, viewModel) }, theme, init)

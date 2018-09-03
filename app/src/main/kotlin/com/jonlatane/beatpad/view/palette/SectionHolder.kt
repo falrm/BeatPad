@@ -37,12 +37,11 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
 ) {
   val adapter: SectionListAdapter get() = viewModel.sectionListAdapter!!
   val section: Section?
-    get() = try {
-      viewModel.palette.sections[adapterPosition]
-    } catch (e: IndexOutOfBoundsException) {
-      null
+    get() = when (adapterPosition) {
+      viewModel.palette.sections.size -> null
+      else                            -> viewModel.palette.sections[adapterPosition]
     }
-  val sectionName by lazy { itemView.findViewById<TextView>(R.id.section_name) }
+  val sectionName: TextView by lazy { itemView.findViewById<TextView>(R.id.section_name) }
   val menu: PopupMenu by lazy {
     PopupMenu(parent.context, sectionName).also {
       it.inflate(R.menu.section_menu)
@@ -81,13 +80,25 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
       }
     }
   }
-  private val deleteSection: MenuItem by lazy { menu.menu.findItem(R.id.deleteSection) }
-  private val addHarmony: MenuItem by lazy { menu.menu.findItem(R.id.addHarmonyToSection) }
-  private val removeHarmony: MenuItem by lazy { menu.menu.findItem(R.id.removeHarmonyFromSection) }
+  private val deleteSection: MenuItem get() = menu.menu.findItem(R.id.deleteSection)
+  private val addHarmony: MenuItem get() = menu.menu.findItem(R.id.addHarmonyToSection)
+  private val removeHarmony: MenuItem get() = menu.menu.findItem(R.id.removeHarmonyFromSection)
 
   fun invalidate() {
-    addHarmony.isVisible = section?.harmony == null ?: false
-    removeHarmony.isVisible = section?.harmony != null ?: false
+    addHarmony.isVisible = when(section) {
+      null -> false
+      else -> when(section!!.harmony) {
+        null -> true
+        else -> false
+      }
+    }
+    removeHarmony.isVisible = when(section) {
+      null -> false
+      else -> when(section!!.harmony) {
+        null -> false
+        else -> true
+      }
+    }
     itemView.backgroundResource = when (section) {
       BeatClockPaletteConsumer.section -> arrayOf(
         R.drawable.orbifold_chord_major,
