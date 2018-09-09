@@ -26,10 +26,13 @@ class MelodyElementAdapter(
     @Synchronized set(value) {
       if(field != value) {
         field = when {
-          value > minimumElementWidth -> {
-            value
+          value < minimumElementWidth -> {
+            minimumElementWidth
           }
-          else -> minimumElementWidth
+          value > maximumElementWidth -> {
+            maximumElementWidth
+          }
+          else -> value
         }
         info("Setting width to $field")
         recyclerView.applyToHolders<MelodyElementHolder> {
@@ -43,10 +46,13 @@ class MelodyElementAdapter(
   var elementHeight = recyclerView.run { dip(1000f) }
     @Synchronized set(value) {
       field = when {
-        value > minimumElementHeight -> {
-          value
+        value < minimumElementHeight -> {
+          minimumElementHeight
         }
-        else -> minimumElementHeight
+        value > maximumElementHeight -> {
+          maximumElementHeight
+        }
+        else -> value
       }
 
       info("Setting height to $field")
@@ -77,7 +83,7 @@ class MelodyElementAdapter(
   }
 
   override fun onBindViewHolder(holder: MelodyElementHolder, elementPosition: Int) {
-    holder.element.elementPosition = elementPosition
+    holder.element.beatPosition = elementPosition
     holder.element.layoutWidth = elementWidth
     holder.element.layoutHeight = elementHeight
     holder.element.invalidate()

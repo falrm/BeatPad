@@ -51,13 +51,13 @@ interface MelodyEventArticulationHandler : BaseMelodyEventHandler {
 	fun getElementArticulation(): Int {
 		var lookBehinds = 0
 		while(
-			elements[(elementPosition - lookBehinds)] is Melody.Element.Sustain || false
+			elements[(beatPosition - lookBehinds)] is Melody.Element.Sustain || false
 
 		) {
 			lookBehinds++
 		}
 		var duration = 1
-		while(elements[elementPosition + duration] is Melody.Element.Sustain) {
+		while(elements[beatPosition + duration] is Melody.Element.Sustain) {
 			duration += 1
 		}
 		return duration + lookBehinds
@@ -65,7 +65,7 @@ interface MelodyEventArticulationHandler : BaseMelodyEventHandler {
 
 	fun setElementArticulation(value: Int) {
 		var lookBehinds = 0
-		while(elements[(elementPosition - lookBehinds)] is Melody.Element.Sustain) {
+		while(elements[(beatPosition - lookBehinds)] is Melody.Element.Sustain) {
 			lookBehinds++
 		}
 		var duration = 1

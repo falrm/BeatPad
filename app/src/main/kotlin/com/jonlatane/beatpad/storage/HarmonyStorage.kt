@@ -18,7 +18,7 @@ import com.jonlatane.beatpad.model.*
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.harmony.chord.Maj7
 import com.jonlatane.beatpad.model.melody.RationalMelody
-import com.jonlatane.beatpad.model.melody.RecordedAudioMelody
+import com.jonlatane.beatpad.model.melody.RecordedMIDIMelody
 import org.jetbrains.anko.AnkoLogger
 
 object HarmonyStorage : AnkoLogger {

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PointF
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.util.SparseArray
 import android.view.MotionEvent
@@ -13,7 +14,6 @@ import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.harmony.chord.Maj
 import com.jonlatane.beatpad.model.melody.RationalMelody
-import com.jonlatane.beatpad.output.service.let
 import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
@@ -35,12 +35,8 @@ class MelodyElementView @JvmOverloads constructor(
 
   internal var viewModel: MelodyViewModel? = null
 
-  override var elementPosition = 0
+  var beatPosition = 0
   override val melody: Melody<*>? get() = viewModel?.openedMelody
-  inline val nextElement: Transposable<*>?
-    get() = changes[elementPosition % (melody?.length ?: Int.MAX_VALUE)]
-  inline val isDownbeat: Boolean
-    get() = elementPosition % (melody?.subdivisionsPerBeat ?: Int.MAX_VALUE) == 0
 
   override val downPointers = SparseArray<PointF>()
   //override var initialHeight: Int? = null
@@ -51,25 +47,41 @@ class MelodyElementView @JvmOverloads constructor(
     else Math.max(0, width - dip(32f))
   override val nonRootPadding get() = drawPadding
   private val harmony: Harmony? get() = (viewModel as? PaletteViewModel)?.harmonyViewModel?.harmony
-  private val harmonyPosition: Int?
-    get() = (melody to harmony).let { melody, harmony ->
-      elementPosition.convertPatternIndex(melody, harmony)
-    }
-  private val harmonyChord: Chord?
-    get() = (harmony to harmonyPosition).let { harmony, harmonyPosition ->
-      harmony.changeBefore(harmonyPosition)
-    }
-  override var chord: Chord
-    get() = harmonyChord ?: viewModel?.orbifold?.chord ?: Chord(0, Maj)
-    set(_) = TODO("Why?")
+
   override val melodyOffset: Int
     get() = viewModel?.let { it.openedMelody?.offsetUnder(chord)  } ?: 0
 
+  val overallBounds = Rect()
   override fun onDraw(canvas: Canvas) {
-    colorGuideAlpha = if (viewModel?.playbackPosition == elementPosition) 255 else 187
     super.onDraw(canvas)
-    canvas.drawStepNotes()
-    canvas.drawRhythm()
+    canvas.getClipBounds(overallBounds)
+    val overallWidth = overallBounds.right - overallBounds.left
+    bounds.apply {
+      top = overallBounds.top
+      bottom = overallBounds.bottom
+      left = overallBounds.left
+      right = overallBounds.right
+    }
+    canvas.renderSteps()
+    melody?.let { melody ->
+      val elementRange: IntRange = (beatPosition * melody.subdivisionsPerBeat) until
+          Math.min((beatPosition + 1) * melody.subdivisionsPerBeat, melody.length - 1)
+      val elementCount = elementRange.last - elementRange.first // In case this is not a full beat
+      for((elementIndex, elementPosition) in elementRange.withIndex()) {
+        bounds.apply {
+          left = (overallWidth.toFloat() * elementIndex / elementCount).toInt()
+          right = (overallWidth.toFloat() * (elementIndex+1) / elementCount).toInt()
+        }
+        chord = harmony?.let { harmony ->
+          val harmonyPosition = elementPosition.convertPatternIndex(melody, harmony)
+          harmony.changeBefore(harmonyPosition)
+        } ?: viewModel?.orbifold?.chord ?: DEFAULT_CHORD
+        canvas.drawColorGuide()
+        canvas.drawStepNotes(melody, elementPosition)
+        canvas.drawRhythm(elementIndex)
+        colorGuideAlpha = if (viewModel?.playbackPosition == beatPosition) 255 else 187
+      }
+    }
   }
 
   override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -82,16 +94,32 @@ class MelodyElementView @JvmOverloads constructor(
     }
   }
 
+
+  override fun getElement(x: Float): Transposable<*>? {
+    return melody?.let { melody ->
+      val elementRange: IntRange = (beatPosition * melody.subdivisionsPerBeat) until
+        Math.min((beatPosition + 1) * melody.subdivisionsPerBeat, melody.length - 1)
+      val elementCount = elementRange.last - elementRange.first // In case this is not a full beat
+      // Index starts at 0
+      val elementIndex: Int = (elementCount * x / width).toInt()
+      val elementPosition = Math.min(beatPosition * melody.subdivisionsPerBeat + elementIndex, melody.length - 1)
+      return melody.changes[elementPosition]
+    }
+  }
+
   override fun getTone(y: Float): Int {
     return Math.round(lowestPitch + 88 * (height - y) / height)
   }
 
   private val p = Paint()
-  private fun Canvas.drawStepNotes() {
+  private fun Canvas.drawStepNotes(melody: Melody<*>, elementPosition: Int) {
+    val element: Transposable<*>? = melody.changes[elementPosition]
+    val nextElement: Transposable<*>? = melody.changes[elementPosition]
+    val isChange = element != null
     p.color = if (isChange) 0xAA212121.toInt() else 0xAA424242.toInt()
 
     try {
-      val tones: Set<Int> = melody?.changeBefore(elementPosition).let {
+      val tones: Set<Int> = melody.changeBefore(elementPosition).let {
         (it as? RationalMelody.Element)?.tones
       } ?: emptySet()
 
@@ -117,14 +145,18 @@ class MelodyElementView @JvmOverloads constructor(
     }
   }
 
-  private fun Canvas.drawRhythm() {
+  private fun Canvas.drawRhythm(elementIndex: Int) {
     p.color = 0xAA212121.toInt()
     drawRect(
       bounds.left.toFloat(),
       bounds.top.toFloat(),
-      bounds.left.toFloat() + if (isDownbeat) 10f else 5f,
+      bounds.left.toFloat() + if (elementIndex == 0) 10f else 5f,
       bounds.bottom.toFloat(),
       p
     )
+  }
+
+  companion object {
+    private val DEFAULT_CHORD = Chord(0, intArrayOf(0,1,2,3,4,5,6,7,8,9,10,11))
   }
 }

@@ -29,6 +29,10 @@ class ColorboardInputView @JvmOverloads constructor(
 
 	override fun onDraw(canvas: Canvas) {
 		super.onDraw(canvas)
+		canvas.getClipBounds(bounds)
+		canvas.drawColorGuide()
+		canvas.renderSteps()
+
 		paint.color = 0xCC000000.toInt()
 		for (i in 0 until activePointers.size()) {
 			val key = activePointers.keyAt(i)

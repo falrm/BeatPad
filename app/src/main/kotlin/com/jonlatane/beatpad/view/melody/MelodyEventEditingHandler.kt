@@ -19,9 +19,11 @@ interface MelodyEventEditingHandler : BaseMelodyEventHandler, AlphaDrawer {
 		when (maskedAction) {
 
 			MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
+				val element = getElement(event.getX(pointerIndex))
+				val isChange = element != null
 				val tone = getTone(event.getY(pointerIndex))
 				if(isChange && element is RationalMelody.Element) {
-					val tones = (element as RationalMelody.Element).tones
+					val tones = element.tones
 					val targetTone = tone - melodyOffset
 					if(!tones.remove(targetTone)) tones.add(targetTone)
 				}

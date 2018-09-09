@@ -1,7 +1,6 @@
 package com.jonlatane.beatpad.model
 
 import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.model.melody.RecordedAudioMelody
 import com.jonlatane.beatpad.util.mod12
 import java.util.*
 

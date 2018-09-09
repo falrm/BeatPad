@@ -37,7 +37,7 @@ object MelodyStorage : AnkoLogger {
 			root.remove("type")
 			return when(type) {
 				"rational" -> mapper.readValue(root.toString(), RationalMelody::class.java)
-				//"audio" -> mapper.readValue(root.toString(), RecordedAudioMelody::class.java)
+				//"audio" -> mapper.readValue(root.toString(), RecordedMIDIMelody::class.java)
 				else -> TODO()
 			}
 		}

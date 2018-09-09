@@ -18,6 +18,8 @@ open class MelodyViewModel {
 	var openedMelody by observable<Melody<*>?>(PaletteStorage.baseMelody) { _, _, _ ->
 		melodyElementAdapter?.notifyDataSetChanged()
 	}
+
+	/**TODO: This should really be based on [BeatClockPaletteConsumer.ticksPerBeat] */
 	var playbackPosition by observable<Int?>(null) { _, old, new ->
 		old?.let { melodyView.post { melodyElementAdapter?.invalidate(it) } }
 		new?.let { melodyView.post { melodyElementAdapter?.invalidate(it) } }

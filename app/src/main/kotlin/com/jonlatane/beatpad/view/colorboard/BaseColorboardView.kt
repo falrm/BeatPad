@@ -1,21 +1,14 @@
 package com.jonlatane.beatpad.view.colorboard
 
-import android.app.Application
 import android.content.Context
-import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
-import com.jonlatane.beatpad.MainApplication
-import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.harmony.chord.Maj7
 import com.jonlatane.beatpad.util.color
-import com.jonlatane.beatpad.util.mod12
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.dip
-import org.jetbrains.anko.withAlpha
 
 abstract class BaseColorboardView @JvmOverloads constructor(
 	context: Context,
@@ -32,11 +25,4 @@ abstract class BaseColorboardView @JvmOverloads constructor(
 	override var paint = Paint()
 	override var bounds = Rect()
 	override fun color(resourceId: Int) = context.color(resourceId)
-
-	override fun onDraw(canvas: Canvas) {
-		super.onDraw(canvas)
-		canvas.getClipBounds(bounds)
-		canvas.drawColorGuide()
-		canvas.renderSteps()
-	}
 }
