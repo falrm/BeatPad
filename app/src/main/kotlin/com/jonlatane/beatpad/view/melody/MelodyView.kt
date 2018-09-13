@@ -2,11 +2,9 @@ package com.jonlatane.beatpad.view.melody
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewManager
-import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.nonDelayedRecyclerView
@@ -99,7 +97,7 @@ inline fun ViewManager.melodyView(
 						isItemPrefetchEnabled = false
 					}
 					overScrollMode = View.OVER_SCROLL_NEVER
-					viewModel.melodyElementAdapter = MelodyElementAdapter(viewModel, this)
+					viewModel.melodyElementAdapter = MelodyBeatAdapter(viewModel, this)
 					adapter = viewModel.melodyElementAdapter
 					adapter.registerAdapterDataObserver(
 						object : RecyclerView.AdapterDataObserver() {

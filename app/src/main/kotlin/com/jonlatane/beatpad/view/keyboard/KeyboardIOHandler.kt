@@ -46,7 +46,7 @@ class KeyboardIOHandler(
 			.map { it.viewTreeObserver }
 			.forEach {
 				it.addOnPreDrawListener {
-					catchRogues()
+					//catchRogues()
 					true
 				}
 			}

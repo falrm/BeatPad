@@ -1,10 +1,6 @@
 package com.jonlatane.beatpad.view.melody
 
-import android.graphics.PointF
-import android.view.MotionEvent
-import com.jonlatane.beatpad.model.Melody
-
-interface MelodyEventArticulationHandler : BaseMelodyEventHandler {
+interface MelodyBeatEventArticulationHandler : MelodyBeatEventHandlerBase {
 /*
 	fun onTouchArticulateEvent(event: MotionEvent): Boolean {
 		// get pointer index from the event object
@@ -41,7 +37,7 @@ interface MelodyEventArticulationHandler : BaseMelodyEventHandler {
 		}
 	}
 
-	private fun getArticulatoryNeighbors(): Map<Int, MelodyElementView> {
+	private fun getArticulatoryNeighbors(): Map<Int, MelodyBeatView> {
 		TODO()
 	}
 

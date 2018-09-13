@@ -1,28 +1,36 @@
-package com.jonlatane.beatpad.view.melody
+package com.jonlatane.beatpad.view.beat
 
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import android.view.ViewGroup
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.applyToHolders
 import com.jonlatane.beatpad.util.layoutHeight
 import com.jonlatane.beatpad.util.layoutWidth
+import com.jonlatane.beatpad.view.melody.MelodyBeatAdapter
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 
 
-class MelodyElementAdapter(
-  val viewModel: MelodyViewModel,
-  val recyclerView: _RecyclerView
-) : RecyclerView.Adapter<MelodyElementHolder>(), AnkoLogger {
-  private val axis get() = viewModel.verticalAxis!!
-  private val minimumElementWidth = recyclerView.run { dip(minimumElementWidthDp) }
-  private val maximumElementWidth get() = viewModel.melodyCenterVerticalScroller.width / 2
-  private val minimumElementHeight get() = viewModel.melodyCenterVerticalScroller.height
-  private val maximumElementHeight get() = viewModel.melodyCenterVerticalScroller.height * 3
+class BeatAdapter<ViewModelType, ViewType>
+(
+  var viewModel: ViewModelType,
+  val recyclerView: _RecyclerView,
+  inline val viewGenerator: BeatAdapter<ViewModelType, ViewType>.() -> ViewType,
+  inline val lengthGetter: BeatAdapter<ViewModelType, ViewType>.() -> Int?
+) : RecyclerView.Adapter<MelodyBeatHolder<ViewType>>(), AnkoLogger
+  where ViewType: BeatView,
+        ViewType: View,
+        ViewModelType: BeatViewModel{
+  private val axis get() = viewModel.axis
+  private val minimumElementWidth = recyclerView.run { dip(MelodyBeatAdapter.minimumBeatWidthDp) }
+  private val maximumElementWidth get() = viewModel.beatScrollingArea.width / 2
+  private val minimumElementHeight get() = viewModel.beatScrollingArea.height
+  private val maximumElementHeight get() = viewModel.beatScrollingArea.height * 3
 
   @Volatile
-  var elementWidth = recyclerView.run { dimen(R.dimen.subdivision_controller_size) }
+  var elementWidth = recyclerView.run { dip(MelodyBeatAdapter.initialBeatWidthDp) }
     @Synchronized set(value) {
       if(field != value) {
         field = when {
@@ -35,7 +43,7 @@ class MelodyElementAdapter(
           else -> value
         }
         info("Setting width to $field")
-        recyclerView.applyToHolders<MelodyElementHolder> {
+        recyclerView.applyToHolders<MelodyBeatHolder<ViewType>> {
           it.element.layoutWidth = field
         }
         (viewModel as? PaletteViewModel)?.harmonyViewModel?.chordAdapter?.elementWidth = field
@@ -56,10 +64,10 @@ class MelodyElementAdapter(
       }
 
       info("Setting height to $field")
-      recyclerView.applyToHolders<MelodyElementHolder> {
+      recyclerView.applyToHolders<MelodyBeatHolder<ViewType>> {
         it.element.layoutHeight = field
       }
-      axis.layoutHeight = field
+      axis?.layoutHeight = field
     }
 
 
@@ -67,31 +75,27 @@ class MelodyElementAdapter(
     recyclerView.layoutManager.findViewByPosition(position)?.invalidate()
   }
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyElementHolder {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyBeatHolder<ViewType> {
     return with(recyclerView) {
-      MelodyElementHolder(
+      MelodyBeatHolder(
         viewModel = viewModel,
-        element = MelodyElementView(context).apply {
-          viewModel = this@MelodyElementAdapter.viewModel
+        element = viewGenerator().apply {
+          viewModel = this@BeatAdapter.viewModel
         }.lparams {
           width = elementWidth
           height = elementHeight
         },
-        adapter = this@MelodyElementAdapter
+        adapter = this@BeatAdapter
       )
     }
   }
 
-  override fun onBindViewHolder(holder: MelodyElementHolder, elementPosition: Int) {
+  override fun onBindViewHolder(holder: MelodyBeatHolder<ViewType>, elementPosition: Int) {
     holder.element.beatPosition = elementPosition
     holder.element.layoutWidth = elementWidth
     holder.element.layoutHeight = elementHeight
     holder.element.invalidate()
   }
 
-  override fun getItemCount(): Int = viewModel.openedMelody?.length ?: 0
-
-  companion object {
-    const val minimumElementWidthDp: Float = 11f
-  }
+  override fun getItemCount(): Int = lengthGetter() ?: 0
 }

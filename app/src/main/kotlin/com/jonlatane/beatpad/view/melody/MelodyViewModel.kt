@@ -3,8 +3,6 @@ package com.jonlatane.beatpad.view.melody
 import BeatClockPaletteConsumer
 import android.view.View
 import com.jonlatane.beatpad.model.Melody
-import com.jonlatane.beatpad.model.Transposable
-import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.NonDelayedRecyclerView
@@ -38,7 +36,7 @@ open class MelodyViewModel {
 	lateinit var melodyEditingModifiers: MelodyEditingModifiers
 	lateinit var melodyCenterVerticalScroller: NonDelayedScrollView
 	lateinit var melodyCenterHorizontalScroller: NonDelayedRecyclerView
-	var melodyElementAdapter: MelodyElementAdapter? = null
+	var melodyElementAdapter: MelodyBeatAdapter? = null
 	val bottoms = mutableListOf<View>()
 
 	internal fun redraw() {

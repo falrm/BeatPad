@@ -17,6 +17,9 @@ import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 
 class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
   private val executorService = Executors.newScheduledThreadPool(2)
@@ -54,7 +57,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       }
 
       onLayoutChange { view: View?, i: Int, i1: Int, i2: Int, i3: Int, i4: Int, i5: Int, i6: Int, i7: Int ->
-        if(viewModel.editingSequence == null) {
+        if (viewModel.editingSequence == null) {
           viewModel.melodyView.translationX = viewModel.melodyView.width.toFloat()
         }
       }
@@ -67,25 +70,36 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
           .translationX(viewModel.melodyView.width.toFloat())
           .withEndAction { viewModel.melodyView.alpha = 1f }
           .start()
-        viewModel.melodyCenterHorizontalScroller.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+
+        // Some tasty un-threadsafe spaghetti for syncing the two RecyclerViews for Harmony and Melody
+        var inScrollingStack = false
+        viewModel.melodyCenterHorizontalScroller.addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
-            info("onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
-            val otherLayoutManager = viewModel.harmonyViewModel.harmonyElementRecycler!!.layoutManager as LinearLayoutManager
-            val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter?.elementWidth
-              ?: Int.MAX_VALUE)
-            otherLayoutManager.scrollToPositionWithOffset(recyclerView.firstVisibleItemPosition, offset)
-            viewModel.harmonyViewModel.harmonyView!!.syncScrollingChordText()
+            //info("onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
+            if (!inScrollingStack) {
+              inScrollingStack = true
+              val otherLayoutManager = viewModel.harmonyViewModel.harmonyElementRecycler!!.layoutManager as LinearLayoutManager
+              val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter?.elementWidth
+                ?: Int.MAX_VALUE)
+              otherLayoutManager.scrollToPositionWithOffset(recyclerView.firstVisibleItemPosition, offset)
+              viewModel.harmonyViewModel.harmonyView!!.syncScrollingChordText()
+            }
+            inScrollingStack = false
           }
         })
-        viewModel.harmonyViewModel.harmonyElementRecycler?.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+        viewModel.harmonyViewModel.harmonyElementRecycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
-            info("onScrolled in harmony: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
-            val otherLayoutManager = viewModel.melodyCenterHorizontalScroller.layoutManager as LinearLayoutManager
-            val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter?.elementWidth
-              ?: Int.MAX_VALUE)
-            otherLayoutManager.scrollToPositionWithOffset(recyclerView.firstVisibleItemPosition, offset)
+            //info("onScrolled in harmony: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
+            if (!inScrollingStack) {
+              inScrollingStack = true
+              val otherLayoutManager = viewModel.melodyCenterHorizontalScroller.layoutManager as LinearLayoutManager
+              val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter?.elementWidth
+                ?: Int.MAX_VALUE)
+              otherLayoutManager.scrollToPositionWithOffset(recyclerView.firstVisibleItemPosition, offset)
+            }
+            inScrollingStack = false
           }
         })
       }

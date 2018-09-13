@@ -8,8 +8,8 @@ import org.jetbrains.anko.custom.ankoView
 fun ViewManager.melodyElementView(theme: Int = 0)
 	= melodyElementView(theme) {}
 
-inline fun ViewManager.melodyElementView(theme: Int = 0, init: MelodyElementView.() -> Unit)
-	= ankoView({ MelodyElementView(it) }, theme, init)
+inline fun ViewManager.melodyElementView(theme: Int = 0, init: MelodyBeatView.() -> Unit)
+	= ankoView({ MelodyBeatView(it) }, theme, init)
 
 fun ViewManager.melodyToneAxis(theme: Int = 0)
 	= melodyToneAxis(theme) {}

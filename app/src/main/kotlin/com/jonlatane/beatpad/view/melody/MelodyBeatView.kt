@@ -12,7 +12,6 @@ import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.model.harmony.chord.Maj
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
@@ -20,14 +19,17 @@ import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dip
+import org.jetbrains.anko.info
 import org.jetbrains.anko.warn
 
-
-class MelodyElementView @JvmOverloads constructor(
+/**
+ * BeatViews
+ */
+class MelodyBeatView @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet? = null,
   defStyle: Int = 0
-) : BaseColorboardView(context, attrs, defStyle), MelodyEventArticulationHandler, MelodyEventEditingHandler, AnkoLogger {
+) : BaseColorboardView(context, attrs, defStyle), MelodyBeatEventArticulationHandler, MelodyBeatEventEditingHandler, AnkoLogger {
 
   init {
     showSteps = true
@@ -35,23 +37,26 @@ class MelodyElementView @JvmOverloads constructor(
 
   internal var viewModel: MelodyViewModel? = null
 
-  var beatPosition = 0
+  override var beatPosition = 0
   override val melody: Melody<*>? get() = viewModel?.openedMelody
 
   override val downPointers = SparseArray<PointF>()
   //override var initialHeight: Int? = null
   override val renderVertically = true
   override val halfStepsOnScreen = 88f
+  inline val elementRange: IntRange? get() = melody?.let { melody ->
+    (beatPosition * melody.subdivisionsPerBeat) until
+      Math.min((beatPosition + 1) * melody.subdivisionsPerBeat, melody.length)
+  }
+  inline val IntRange.size get() = last - first + 1
+  val drawWidth get() = elementRange?.let { (width.toFloat() / it.size).toInt() } ?: 0
   override val drawPadding: Int
-    get() = if (width > dip(37f)) dip(5)
-    else Math.max(0, width - dip(32f))
+    get() = if (drawWidth > dip(37f)) dip(5)
+    else Math.max(0, drawWidth - dip(32f))
   override val nonRootPadding get() = drawPadding
   private val harmony: Harmony? get() = (viewModel as? PaletteViewModel)?.harmonyViewModel?.harmony
 
-  override val melodyOffset: Int
-    get() = viewModel?.let { it.openedMelody?.offsetUnder(chord)  } ?: 0
-
-  val overallBounds = Rect()
+  private val overallBounds = Rect()
   override fun onDraw(canvas: Canvas) {
     super.onDraw(canvas)
     canvas.getClipBounds(overallBounds)
@@ -64,9 +69,9 @@ class MelodyElementView @JvmOverloads constructor(
     }
     canvas.renderSteps()
     melody?.let { melody ->
-      val elementRange: IntRange = (beatPosition * melody.subdivisionsPerBeat) until
-          Math.min((beatPosition + 1) * melody.subdivisionsPerBeat, melody.length - 1)
-      val elementCount = elementRange.last - elementRange.first // In case this is not a full beat
+      val elementRange: IntRange = elementRange!! /*(beatPosition * melody.subdivisionsPerBeat) until
+          Math.min((beatPosition + 1) * melody.subdivisionsPerBeat, melody.length - 1)*/
+      val elementCount = elementRange.size
       for((elementIndex, elementPosition) in elementRange.withIndex()) {
         bounds.apply {
           left = (overallWidth.toFloat() * elementIndex / elementCount).toInt()
@@ -84,6 +89,9 @@ class MelodyElementView @JvmOverloads constructor(
     }
   }
 
+  //override val chord: Chord get() = super.chord
+  override fun melodyOffsetAt(elementPosition: Int) = viewModel?.let { it.openedMelody?.offsetUnder(chord)  } ?: 0
+
   override fun onTouchEvent(event: MotionEvent): Boolean {
     return when (viewModel?.melodyEditingModifiers?.modifier) {
       MelodyEditingModifiers.Modifier.None -> false
@@ -94,16 +102,12 @@ class MelodyElementView @JvmOverloads constructor(
     }
   }
 
-
-  override fun getElement(x: Float): Transposable<*>? {
+  override fun getPositionAndElement(x: Float): Pair<Int, Transposable<*>?>? {
     return melody?.let { melody ->
-      val elementRange: IntRange = (beatPosition * melody.subdivisionsPerBeat) until
-        Math.min((beatPosition + 1) * melody.subdivisionsPerBeat, melody.length - 1)
-      val elementCount = elementRange.last - elementRange.first // In case this is not a full beat
-      // Index starts at 0
-      val elementIndex: Int = (elementCount * x / width).toInt()
+      val elementRange: IntRange = elementRange!!
+      val elementIndex: Int = (elementRange.size * x / width).toInt()
       val elementPosition = Math.min(beatPosition * melody.subdivisionsPerBeat + elementIndex, melody.length - 1)
-      return melody.changes[elementPosition]
+      return elementIndex to melody.changes[elementPosition]
     }
   }
 
@@ -127,7 +131,7 @@ class MelodyElementView @JvmOverloads constructor(
         val leftMargin = if (isChange) drawPadding else 0
         val rightMargin = if (nextElement == null) drawPadding else 0
         tones.forEach { tone ->
-          val realTone = tone + melodyOffset
+          val realTone = tone + melodyOffsetAt(elementPosition)
           val top = height - height * (realTone - AlphaDrawer.BOTTOM) / 88f
           val bottom = height - height * (realTone - AlphaDrawer.BOTTOM + 1) / 88f
           drawRect(

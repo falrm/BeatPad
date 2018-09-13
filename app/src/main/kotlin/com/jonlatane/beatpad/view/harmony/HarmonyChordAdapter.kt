@@ -2,13 +2,12 @@ package com.jonlatane.beatpad.view.harmony
 
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
-import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.applyToHolders
 import com.jonlatane.beatpad.util.layoutWidth
-import com.jonlatane.beatpad.view.melody.MelodyElementAdapter.Companion.minimumElementWidthDp
+import com.jonlatane.beatpad.view.melody.MelodyBeatAdapter.Companion.initialBeatWidthDp
+import com.jonlatane.beatpad.view.melody.MelodyBeatAdapter.Companion.minimumBeatWidthDp
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.dimen
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.wrapContent
@@ -17,10 +16,10 @@ class HarmonyChordAdapter(
 	val viewModel: PaletteViewModel,
 	val recyclerView: _RecyclerView
 ) : RecyclerView.Adapter<HarmonyChordHolder>(), AnkoLogger {
-  private val minimumElementWidth: Int = recyclerView.run { dip(minimumElementWidthDp) }
+  private val minimumElementWidth: Int = recyclerView.run { dip(minimumBeatWidthDp) }
 
   @Volatile
-  var elementWidth = recyclerView.run { dimen(R.dimen.subdivision_controller_size) }
+  var elementWidth = recyclerView.run { dip(initialBeatWidthDp) }
     @Synchronized set(value) {
 			if (field != value) {
         field = when {
