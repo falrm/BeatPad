@@ -9,6 +9,7 @@ import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
+import org.jetbrains.anko.verbose
 import java.lang.Math.max
 import java.util.*
 import kotlin.math.floor
@@ -63,7 +64,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
         viewModel?.orbifold?.chord = chord
       }
     }
-    info("Harmony index: $harmonyPosition; Chord: $chord")
+    verbose { "Harmony index: $harmonyPosition; Chord: $chord" }
     palette?.parts?.map { part ->
       part.melodies/*.filter { it.enabled }*/.forEach { melody ->
         val attack = attackPool.borrow()
@@ -94,16 +95,18 @@ object BeatClockPaletteConsumer : AnkoLogger {
         // Stop current notes from this attack's melody
         for (activeAttack in activeAttacks) {
           if (activeAttack.melody == attack.melody) {
-            info("Ending attack $activeAttack")
+            verbose { "Ending attack $activeAttack" }
             destroyAttack(activeAttack)
             break
           }
         }
         // And play the new notes
 
-        info("Executing attack $attack")
+        verbose { "Executing attack $attack" }
 
-        viewModel?.markPlaying(tickPosition)
+        viewModel?.harmonyView?.post {
+          viewModel?.playbackTick = tickPosition
+        }
 
         attack.chosenTones.forEach { tone ->
           instrument.play(tone, attack.velocity.to127Int)

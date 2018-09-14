@@ -204,7 +204,7 @@ class MelodyToolbar(
 			viewModel.openedMelody?.transposeInPlace(1)
 			updateMelody()
 		}
-		onLongClick {
+		onLongClick(returnValue = true) {
 			viewModel.openedMelody?.transposeInPlace(12)
 			context.toast("Octave Up")
 			updateMelody()
@@ -221,7 +221,7 @@ class MelodyToolbar(
 			viewModel.openedMelody?.transposeInPlace(-1)
 			updateMelody()
 		}
-		onLongClick {
+		onLongClick(returnValue = true) {
 			viewModel.openedMelody?.transposeInPlace(-12)
 			context.toast("Octave Down")
 			updateMelody()

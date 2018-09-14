@@ -9,12 +9,12 @@ fun Int.convertPatternIndex(
 ): Int = convertPatternIndex(from.subdivisionsPerBeat, to)
 
 fun Int.convertPatternIndex(
-  fromSubdivisionsPerBeat: Int,
+  from: Int,
   to: Pattern<*>
 ): Int {
   // In the context of the "from" melody, in, say, sixteenth notes (subdivisionsPerBeat=4),
   // if this is 5, then currentBeat is 1.25.
-  val fromBeat: Double = this.toDouble() / fromSubdivisionsPerBeat
+  val fromBeat: Double = this.toDouble() / from
 
   val toLength: Double = to.length.toDouble() / to.subdivisionsPerBeat
   val positionInToPattern: Double = fromBeat % toLength

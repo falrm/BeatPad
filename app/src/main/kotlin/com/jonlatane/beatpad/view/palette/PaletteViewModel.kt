@@ -24,7 +24,7 @@ import kotlin.properties.Delegates.observable
  */
 class PaletteViewModel : MelodyViewModel() {
   init {
-    BeatClockPaletteConsumer.viewModel = this
+    //BeatClockPaletteConsumer.viewModel = this
   }
 
   val harmonyViewModel = HarmonyViewModel()

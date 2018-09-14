@@ -108,7 +108,7 @@ class HarmonyView(
         .headMap(lastItemPosition)
         .tailMap(Math.min(firstItemPosition, harmony.lowerKey(firstItemPosition)))
     }
-    info("Visible changes: $visibleChanges")
+    verbose { "Visible changes: $visibleChanges" }
     val horizontalScrollOffset =  viewModel.harmonyViewModel
       .harmonyElementRecycler?.computeHorizontalScrollOffset()?.let { it % viewModel.harmonyViewModel.chordAdapter!!.elementWidth } ?: 0
 
@@ -124,7 +124,7 @@ class HarmonyView(
               - horizontalScrollOffset
             )
         ).toFloat()
-        info("Setting translationX of $text to $translationX")
+        verbose { "Setting translationX of $text to $translationX" }
         this.translationX = translationX
       }
     }

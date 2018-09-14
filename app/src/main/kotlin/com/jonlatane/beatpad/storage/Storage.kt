@@ -9,6 +9,7 @@ import com.jonlatane.beatpad.storage.AppObjectMapper.writer
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.error
 import org.jetbrains.anko.info
+import org.jetbrains.anko.verbose
 import java.io.IOException
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
@@ -17,21 +18,23 @@ object Storage: AnkoLogger {
 
 
 	fun storePalette(palette: Palette, context: Context) = try {
-		val outputStreamWriter = OutputStreamWriter(context.openFileOutput("palette.json", Context.MODE_PRIVATE))
-		val json = stringify(palette)
-		info("Stored palette: $json")
-		outputStreamWriter.write(json)
-		outputStreamWriter.close()
+		context.openFileOutput("palette.json", Context.MODE_PRIVATE).use { fileOutputStream ->
+			writer.writeValue(fileOutputStream, palette)
+		}
+		verbose {
+			"Stored palette: ${stringify(palette) }"
+		}
 	} catch (e: IOException) {
 		error("File send failed: " + e.toString())
 	}
 
 	fun loadPalette(context: Context): Palette = try {
-		val json: String = InputStreamReader(context.openFileInput("palette.json")).use { it.readText() }
-		info("Loading palette: $json")
-		info("Json last char: ${json[json.length - 1]}")
-		val palette = AppObjectMapper.readValue(json, Palette::class.java)
-		info("Loaded palette!")
+		val palette = context.openFileInput("palette.json").use { fileInputStream ->
+			AppObjectMapper.readValue(fileInputStream, Palette::class.java)
+		}
+		verbose {
+			"Loaded palette: ${stringify(palette)}"
+		}
 		palette
 	} catch (t: Throwable) {
 		error("Failed to load stored palette", t)

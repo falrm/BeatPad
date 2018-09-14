@@ -2,7 +2,6 @@ package com.jonlatane.beatpad.view.melody
 
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
-import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.applyToHolders
 import com.jonlatane.beatpad.util.layoutHeight
 import com.jonlatane.beatpad.util.layoutWidth
@@ -63,8 +62,8 @@ class MelodyBeatAdapter(
     }
 
 
-  fun invalidate(position: Int) {
-    recyclerView.layoutManager.findViewByPosition(position)?.invalidate()
+  fun invalidate(beatPosition: Int) {
+    recyclerView.layoutManager.findViewByPosition(beatPosition)?.invalidate()
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyBeatHolder {

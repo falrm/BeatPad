@@ -82,6 +82,7 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
       it.action = PlaybackService.Companion.Action.STARTFOREGROUND_ACTION
       MainApplication.instance.startService(it)
     }
+    BeatClockPaletteConsumer.viewModel = viewModel
     ShakeDetector.onShakeListener = object : ShakeDetector.OnShakeListener {
       override fun onShake() {
         vibrate(150)
@@ -99,15 +100,11 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 
   override fun onPause() {
     super.onPause()
+    BeatClockPaletteConsumer.viewModel = null
     AudioTrackCache.releaseAll()
     //ui.sequencerThread.stopped = true
-    Storage.storePalette(viewModel.palette, this)
+    //Storage.storePalette(viewModel.palette, this)
     ShakeDetector.onShakeListener = null
-  }
-
-  override fun onStop() {
-    super.onStop()
-    Storage.storePalette(viewModel.palette, this)
   }
 
   override fun onDestroy() {
@@ -117,7 +114,6 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 
   override fun onRestoreInstanceState(savedInstanceState: Bundle) {
     super.onRestoreInstanceState(savedInstanceState)
-    ui.sequencerInstrument.instrument = savedInstanceState.getByte("sequencerInstrument", GeneralMidiConstants.SYNTH_BASS_1)
     if (savedInstanceState.getBoolean("pianoHidden")) {
       viewModel.keyboardView.hide(animated = false)
     }

@@ -19,7 +19,6 @@ import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dip
-import org.jetbrains.anko.info
 import org.jetbrains.anko.warn
 
 /**
@@ -81,10 +80,15 @@ class MelodyBeatView @JvmOverloads constructor(
           val harmonyPosition = elementPosition.convertPatternIndex(melody, harmony)
           harmony.changeBefore(harmonyPosition)
         } ?: viewModel?.orbifold?.chord ?: DEFAULT_CHORD
+        colorGuideAlpha = if (
+          viewModel?.playbackTick?.convertPatternIndex(
+            from = BeatClockPaletteConsumer.ticksPerBeat,
+            to = melody
+          ) == elementPosition
+        ) 255 else 187
         canvas.drawColorGuide()
         canvas.drawStepNotes(melody, elementPosition)
         canvas.drawRhythm(elementIndex)
-        colorGuideAlpha = if (viewModel?.playbackPosition == beatPosition) 255 else 187
       }
     }
   }
