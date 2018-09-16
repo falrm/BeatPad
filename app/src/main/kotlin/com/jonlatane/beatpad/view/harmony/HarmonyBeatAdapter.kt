@@ -12,10 +12,10 @@ import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 
-class HarmonyChordAdapter(
+class HarmonyBeatAdapter(
 	val viewModel: PaletteViewModel,
 	val recyclerView: _RecyclerView
-) : RecyclerView.Adapter<HarmonyChordHolder>(), AnkoLogger {
+) : RecyclerView.Adapter<HarmonyBeatHolder>(), AnkoLogger {
   private val minimumElementWidth: Int = recyclerView.run { dip(minimumBeatWidthDp) }
 
   @Volatile
@@ -28,22 +28,22 @@ class HarmonyChordAdapter(
           }
           else -> minimumElementWidth
         }
-				recyclerView.applyToHolders<HarmonyChordHolder> {
+				recyclerView.applyToHolders<HarmonyBeatHolder> {
 					it.element.layoutWidth = field
 				}
 				(viewModel as? PaletteViewModel)?.melodyViewModel?.melodyElementAdapter?.elementWidth = field
 			}
     }
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HarmonyChordHolder {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HarmonyBeatHolder {
 		return with(recyclerView) {
-			HarmonyChordHolder(
+			HarmonyBeatHolder(
 				viewModel = viewModel.harmonyViewModel,
-				element = HarmonyElementView(context, viewModel = viewModel.harmonyViewModel).lparams {
+				element = HarmonyBeatView(context, viewModel = viewModel.harmonyViewModel).lparams {
 					width = elementWidth
 					height = matchParent//dip(45)
 				},
-				adapter = this@HarmonyChordAdapter
+				adapter = this@HarmonyBeatAdapter
 			)
 		}
 	}
@@ -52,7 +52,7 @@ class HarmonyChordAdapter(
     recyclerView.layoutManager.findViewByPosition(beatPosition)?.invalidate()
   }
 
-	override fun onBindViewHolder(holder: HarmonyChordHolder, beatPosition: Int) {
+	override fun onBindViewHolder(holder: HarmonyBeatHolder, beatPosition: Int) {
 		holder.element.beatPosition = beatPosition
     holder.element.layoutWidth = elementWidth
 		holder.element.invalidate()

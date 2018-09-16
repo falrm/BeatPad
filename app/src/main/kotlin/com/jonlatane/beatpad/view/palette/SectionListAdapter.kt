@@ -19,7 +19,7 @@ class SectionListAdapter(
 
   internal fun addSection() {
     viewModel.palette.sections.add(
-      Section.forList(viewModel.palette.sections, harmony = PaletteStorage.baseHarmony)
+      Section.forList(viewModel.palette.sections)
     )
     notifyItemInserted (viewModel.palette.sections.size - 1)
   }

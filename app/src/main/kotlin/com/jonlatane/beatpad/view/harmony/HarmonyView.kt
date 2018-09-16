@@ -2,7 +2,6 @@ package com.jonlatane.beatpad.view.harmony
 
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -81,7 +80,7 @@ class HarmonyView(
         }
       }
       overScrollMode = View.OVER_SCROLL_NEVER
-      viewModel.harmonyViewModel.chordAdapter = HarmonyChordAdapter(viewModel, this)
+      viewModel.harmonyViewModel.chordAdapter = HarmonyBeatAdapter(viewModel, this)
       adapter = viewModel.harmonyViewModel.chordAdapter
       /*adapter.registerAdapterDataObserver(
         object : RecyclerView.AdapterDataObserver() {

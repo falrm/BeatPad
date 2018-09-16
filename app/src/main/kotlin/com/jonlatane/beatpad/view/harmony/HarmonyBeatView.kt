@@ -20,7 +20,7 @@ import org.jetbrains.anko.toast
 import org.jetbrains.anko.withAlpha
 
 
-class HarmonyElementView @JvmOverloads constructor(
+class HarmonyBeatView @JvmOverloads constructor(
   context: Context,
   var viewModel: HarmonyViewModel? = null
 ): View(context) {

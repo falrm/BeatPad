@@ -11,7 +11,7 @@ data class Section(
   companion object {
     fun forList(
       sectionList: List<Section>,
-      harmony: Harmony = Harmony(),
+      harmony: Harmony? = null,
       melodies: MutableSet<Melody<*>> = mutableSetOf()
     ) = Section(
       name = generateNewSectionName(sectionList),
