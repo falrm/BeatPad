@@ -10,7 +10,6 @@ import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
-import org.jetbrains.anko.wrapContent
 
 class HarmonyChordAdapter(
 	val viewModel: PaletteViewModel,
@@ -41,15 +40,15 @@ class HarmonyChordAdapter(
 				viewModel = viewModel.harmonyViewModel,
 				element = HarmonyElementView(context, viewModel = viewModel.harmonyViewModel).lparams {
 					width = elementWidth
-					height = wrapContent
+					height = dip(45)
 				},
 				adapter = this@HarmonyChordAdapter
 			)
 		}
 	}
 
-	override fun onBindViewHolder(holder: HarmonyChordHolder, elementPosition: Int) {
-		holder.element.elementPosition = elementPosition
+	override fun onBindViewHolder(holder: HarmonyChordHolder, beatPosition: Int) {
+		holder.element.beatPosition = beatPosition
     holder.element.layoutWidth = elementWidth
 		holder.element.invalidate()
 	}

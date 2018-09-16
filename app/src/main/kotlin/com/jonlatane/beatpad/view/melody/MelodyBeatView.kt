@@ -14,6 +14,7 @@ import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.service.convertPatternIndex
+import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
@@ -47,7 +48,6 @@ class MelodyBeatView @JvmOverloads constructor(
     (beatPosition * melody.subdivisionsPerBeat) until
       Math.min((beatPosition + 1) * melody.subdivisionsPerBeat, melody.length)
   }
-  inline val IntRange.size get() = last - first + 1
   val drawWidth get() = elementRange?.let { (width.toFloat() / it.size).toInt() } ?: 0
   override val drawPadding: Int
     get() = if (drawWidth > dip(37f)) dip(5)

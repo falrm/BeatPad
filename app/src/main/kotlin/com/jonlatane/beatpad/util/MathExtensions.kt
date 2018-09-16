@@ -1,5 +1,7 @@
 package com.jonlatane.beatpad.util
 
+inline val IntRange.size get() = last - first + 1
+
 val Int.mod12 get() = ((this % 12) + 12) % 12
 val Int.mod12Nearest get(): Int = mod12.let {
 	when {
