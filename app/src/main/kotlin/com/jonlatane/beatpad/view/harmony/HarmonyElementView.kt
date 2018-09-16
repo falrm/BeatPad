@@ -156,6 +156,9 @@ class HarmonyElementView @JvmOverloads constructor(
         canvas.drawRhythm(elementIndex)
       }
     }
+    if(harmony == null) {
+      canvas.drawRhythm(0)
+    }
   }
 
   fun getPositionAndElement(x: Float): Pair<Int, Chord?>? {

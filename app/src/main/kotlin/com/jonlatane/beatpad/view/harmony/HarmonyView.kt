@@ -40,7 +40,9 @@ class HarmonyView(
       alignParentLeft()
       alignParentTop()
     }
-    override fun disposeInstance(instance: TextView) {
+
+    override fun validateInstance(instance: TextView) {
+      super.validateInstance(instance)
       instance.apply {
         info("Clearing textview $text")
         text = ""
@@ -52,18 +54,13 @@ class HarmonyView(
   init {
     viewModel.harmonyView = this
     backgroundColor = color(R.color.colorPrimaryDark)
+    val textView1 = chordChangeLabelPool.borrow().apply {
+      id = View.generateViewId()
+    }
     viewModel.harmonyViewModel.harmonyElementRecycler = zoomableRecyclerView {
       id = R.id.center_h_scroller
       isFocusableInTouchMode = true
       elevation = 3f
-    }.lparams {
-      width = ViewGroup.LayoutParams.MATCH_PARENT
-      height = ViewGroup.LayoutParams.WRAP_CONTENT
-      topMargin = dip(5)
-      marginStart = dip(30)
-      alignParentRight()
-      alignParentTop()
-    }.apply {
       layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
         isItemPrefetchEnabled = false
       }
@@ -74,7 +71,7 @@ class HarmonyView(
         AnkoLogger<MelodyViewModel>().info("Zooming: xDelta=$xDelta, yDelta=$yDelta")
         when {
           (xDelta.toInt() != 0) -> {
-            viewModel.harmonyViewModel.chordAdapter?.apply {
+            viewModel.harmonyViewModel.chordAdapter.apply {
               elementWidth += xDelta.toInt()
               notifyDataSetChanged()
             }
@@ -86,7 +83,7 @@ class HarmonyView(
       overScrollMode = View.OVER_SCROLL_NEVER
       viewModel.harmonyViewModel.chordAdapter = HarmonyChordAdapter(viewModel, this)
       adapter = viewModel.harmonyViewModel.chordAdapter
-      adapter.registerAdapterDataObserver(
+      /*adapter.registerAdapterDataObserver(
         object : RecyclerView.AdapterDataObserver() {
           override fun onItemRangeInserted(start: Int, count: Int) {
             //updateEmptyViewVisibility(this@recyclerView)
@@ -95,7 +92,19 @@ class HarmonyView(
           override fun onItemRangeRemoved(start: Int, count: Int) {
             //updateEmptyViewVisibility(this@recyclerView)
           }
-        })
+        })*/
+    }.lparams(0, 0)
+
+
+    post {
+      viewModel.harmonyViewModel.harmonyElementRecycler?.lparams {
+        width = ViewGroup.LayoutParams.MATCH_PARENT
+        height = textView1.height + dip(10f)
+        topMargin = dip(5)
+        marginStart = dip(30)
+        alignParentRight()
+        alignParentTop()
+      }
     }
   }
 
@@ -113,7 +122,7 @@ class HarmonyView(
       val visibleChanges: SortedMap<Int, Chord> = harmony.changes
           .headMap(upperBound, true)
           .tailMap(lowerBound)
-      info { "Visible changes: $visibleChanges" }
+      verbose { "Visible changes: $visibleChanges" }
       val horizontalScrollOffset =  viewModel.harmonyViewModel
         .harmonyElementRecycler?.computeHorizontalScrollOffset()?.let { it % viewModel.harmonyViewModel.chordAdapter!!.elementWidth } ?: 0
 
@@ -143,6 +152,9 @@ class HarmonyView(
       chordChangeLabels.toMap().forEach { key, textView ->
         chordChangeLabels.remove(key)
         chordChangeLabelPool.recycle(textView)
+      }
+      chordChangeLabels[-1] = chordChangeLabelPool.borrow().apply {
+        text = "No harmony"
       }
     }
   }

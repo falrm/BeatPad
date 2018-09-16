@@ -9,6 +9,7 @@ import com.jonlatane.beatpad.view.melody.MelodyBeatAdapter.Companion.minimumBeat
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dip
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 
 class HarmonyChordAdapter(
@@ -40,7 +41,7 @@ class HarmonyChordAdapter(
 				viewModel = viewModel.harmonyViewModel,
 				element = HarmonyElementView(context, viewModel = viewModel.harmonyViewModel).lparams {
 					width = elementWidth
-					height = dip(45)
+					height = matchParent//dip(45)
 				},
 				adapter = this@HarmonyChordAdapter
 			)
@@ -59,5 +60,5 @@ class HarmonyChordAdapter(
 
 	override fun getItemCount(): Int = viewModel.harmonyViewModel.harmony?.let { harmony ->
 		Math.ceil(harmony.length.toDouble() / harmony.subdivisionsPerBeat).toInt()
-	}?: 1 // Always render at least one item, for layout sanity
+	}?: 16 // Always render at least one item, for layout sanity. 16 is kind of a hack though.
 }
