@@ -116,7 +116,7 @@ class HarmonyView(
       val visibleChanges: SortedMap<Int, Chord> = harmony.changes
           .headMap(upperBound, true)
           .tailMap(lowerBound)
-      verbose { "Visible changes: $visibleChanges" }
+      info { "Visible changes: $visibleChanges" }
       val horizontalScrollOffset =  viewModel.harmonyViewModel
         .harmonyElementRecycler?.computeHorizontalScrollOffset()?.let { it % viewModel.harmonyViewModel.chordAdapter!!.elementWidth } ?: 0
 
@@ -135,10 +135,7 @@ class HarmonyView(
           verbose { "Setting translationX of $text to $translationX" }
           this.translationX = translationX
         }
-      }
-
-      visibleChanges.let { changes ->
-        val entriesToRemove = chordChangeLabels.filterKeys { !changes.containsKey(it) }
+        val entriesToRemove = chordChangeLabels.filterKeys { !visibleChanges.containsKey(it) }
         entriesToRemove.forEach { key, textView ->
           chordChangeLabels.remove(key)
           chordChangeLabelPool.recycle(textView)
@@ -146,6 +143,10 @@ class HarmonyView(
       }
     } else {
       //No harmony, render some placeholder stuff
+      chordChangeLabels.toMap().forEach { key, textView ->
+        chordChangeLabels.remove(key)
+        chordChangeLabelPool.recycle(textView)
+      }
     }
   }
 }

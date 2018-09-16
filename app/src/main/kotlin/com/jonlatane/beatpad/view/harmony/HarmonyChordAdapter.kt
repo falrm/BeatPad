@@ -53,5 +53,7 @@ class HarmonyChordAdapter(
 		holder.element.invalidate()
 	}
 
-	override fun getItemCount(): Int = viewModel.harmonyViewModel.harmony?.length ?: 0
+	override fun getItemCount(): Int = viewModel.harmonyViewModel.harmony?.let { harmony ->
+		Math.ceil(harmony.length.toDouble() / harmony.subdivisionsPerBeat).toInt()
+	}?: 1 // Always render at least one item, for layout sanity
 }

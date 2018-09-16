@@ -99,6 +99,7 @@ class PaletteViewModel : MelodyViewModel() {
 
   fun notifySectionChange() {
     harmonyViewModel.chordAdapter?.notifyDataSetChanged()
+    harmonyView.syncScrollingChordText()
     sectionListAdapter?.notifyDataSetChanged()
     melodyElementAdapter?.notifyDataSetChanged()
   }

@@ -17,6 +17,6 @@ open class HarmonyViewModel {
     field = value
     chordAdapter?.notifyDataSetChanged()
   }
-  val harmony: Harmony? get() = BeatClockPaletteConsumer.section?.harmony
+  val harmony: Harmony? get() = BeatClockPaletteConsumer.harmony
   var selectedHarmonyElements: IntRange? = null
 }

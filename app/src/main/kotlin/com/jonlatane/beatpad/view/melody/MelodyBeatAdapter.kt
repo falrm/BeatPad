@@ -88,8 +88,9 @@ class MelodyBeatAdapter(
     holder.element.invalidate()
   }
 
-  //TODO: This is 4x what it should be.
-  override fun getItemCount(): Int = viewModel.openedMelody?.length ?: 0
+  override fun getItemCount(): Int = viewModel.openedMelody?.let { melody ->
+    Math.ceil(melody.length.toDouble() / melody.subdivisionsPerBeat).toInt()
+  }?: 1 // Always render at least one item, for layout sanity
 
   companion object {
     const val initialBeatWidthDp: Float = 150f
