@@ -83,9 +83,11 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
               val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter?.elementWidth
                 ?: Int.MAX_VALUE)
               otherLayoutManager.scrollToPositionWithOffset(recyclerView.firstVisibleItemPosition, offset)
-              viewModel.harmonyViewModel.harmonyView!!.syncScrollingChordText()
             }
             inScrollingStack = false
+            viewModel.harmonyViewModel.harmonyView!!.post {
+              viewModel.harmonyViewModel.harmonyView!!.syncScrollingChordText()
+            }
           }
         })
         viewModel.harmonyViewModel.harmonyElementRecycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {

@@ -54,12 +54,6 @@ class HarmonyView(
       id = R.id.center_h_scroller
       isFocusableInTouchMode = true
       elevation = 3f
-      addOnScrollListener(object: RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-          super.onScrolled(recyclerView, dx, dy)
-          syncScrollingChordText()
-        }
-      })
     }.lparams {
       width = ViewGroup.LayoutParams.MATCH_PARENT
       height = ViewGroup.LayoutParams.WRAP_CONTENT
