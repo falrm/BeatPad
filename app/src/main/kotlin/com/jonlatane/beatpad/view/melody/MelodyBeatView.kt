@@ -28,17 +28,16 @@ import org.jetbrains.anko.warn
 class MelodyBeatView @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet? = null,
-  defStyle: Int = 0
+  defStyle: Int = 0,
+  val viewModel: MelodyViewModel
 ) : BaseColorboardView(context, attrs, defStyle), MelodyBeatEventArticulationHandler, MelodyBeatEventEditingHandler, AnkoLogger {
 
   init {
     showSteps = true
   }
 
-  internal var viewModel: MelodyViewModel? = null
-
   override var beatPosition = 0
-  override val melody: Melody<*>? get() = viewModel?.openedMelody
+  override val melody: Melody<*>? get() = viewModel.openedMelody
 
   override val downPointers = SparseArray<PointF>()
   //override var initialHeight: Int? = null
@@ -79,9 +78,9 @@ class MelodyBeatView @JvmOverloads constructor(
         chord = harmony?.let { harmony ->
           val harmonyPosition = elementPosition.convertPatternIndex(melody, harmony)
           harmony.changeBefore(harmonyPosition)
-        } ?: viewModel?.orbifold?.chord ?: DEFAULT_CHORD
+        } ?: viewModel.paletteViewModel.orbifold?.chord ?: DEFAULT_CHORD
         colorGuideAlpha = if (
-          viewModel?.playbackTick?.convertPatternIndex(
+          viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
             from = BeatClockPaletteConsumer.ticksPerBeat,
             to = melody
           ) == elementPosition

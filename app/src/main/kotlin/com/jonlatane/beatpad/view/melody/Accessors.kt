@@ -5,11 +5,11 @@ import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.custom.ankoView
 
 
-fun ViewManager.melodyElementView(theme: Int = 0)
-	= melodyElementView(theme) {}
+fun ViewManager.melodyElementView(theme: Int = 0, viewModel: MelodyViewModel)
+	= melodyElementView(theme, viewModel = viewModel) {}
 
-inline fun ViewManager.melodyElementView(theme: Int = 0, init: MelodyBeatView.() -> Unit)
-	= ankoView({ MelodyBeatView(it) }, theme, init)
+inline fun ViewManager.melodyElementView(theme: Int = 0, viewModel: MelodyViewModel, init: MelodyBeatView.() -> Unit)
+	= ankoView({ MelodyBeatView(it, viewModel = viewModel) }, theme, init)
 
 fun ViewManager.melodyToneAxis(theme: Int = 0)
 	= melodyToneAxis(theme) {}

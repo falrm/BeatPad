@@ -8,7 +8,4 @@ class MelodyBeatHolder(
 	private val adapter: MelodyBeatAdapter
 ) : RecyclerView.ViewHolder(element) {
 	private val context get() = element.context
-	init {
-		element.viewModel = viewModel
-	}
 }

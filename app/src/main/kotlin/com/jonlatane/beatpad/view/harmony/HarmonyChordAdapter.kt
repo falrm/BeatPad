@@ -30,7 +30,7 @@ class HarmonyChordAdapter(
 				recyclerView.applyToHolders<HarmonyChordHolder> {
 					it.element.layoutWidth = field
 				}
-				(viewModel as? PaletteViewModel)?.melodyElementAdapter?.elementWidth = field
+				(viewModel as? PaletteViewModel)?.melodyViewModel?.melodyElementAdapter?.elementWidth = field
 			}
     }
 
@@ -46,6 +46,10 @@ class HarmonyChordAdapter(
 			)
 		}
 	}
+
+  fun invalidate(beatPosition: Int) {
+    recyclerView.layoutManager.findViewByPosition(beatPosition)?.invalidate()
+  }
 
 	override fun onBindViewHolder(holder: HarmonyChordHolder, beatPosition: Int) {
 		holder.element.beatPosition = beatPosition

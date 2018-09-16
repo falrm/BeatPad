@@ -15,6 +15,7 @@ import com.jonlatane.beatpad.view.harmony.HarmonyView
 import com.jonlatane.beatpad.view.harmony.HarmonyViewModel
 import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
+import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import kotlin.properties.Delegates.observable
 
@@ -22,16 +23,39 @@ import kotlin.properties.Delegates.observable
  * The PaletteViewModel still assumes we'll only be editing
  * one Melody at a time.
  */
-class PaletteViewModel : MelodyViewModel() {
+class PaletteViewModel {
   init {
     //BeatClockPaletteConsumer.viewModel = this
   }
+
+  var playbackTick by observable<Int?>(null) { _, old, new ->
+    arrayOf(old, new).filterNotNull().map { tickPosition ->
+      (tickPosition.toDouble() / BeatClockPaletteConsumer.ticksPerBeat).toInt()
+    }.toSet().forEach { melodyBeat ->
+      melodyViewModel.melodyElementAdapter.invalidate(melodyBeat)
+      harmonyViewModel.chordAdapter.invalidate(melodyBeat)
+    }
+  }
+
+  val melodyViewModel = MelodyViewModel(this)
+  var melodyView
+    get() = melodyViewModel.melodyView
+    set(value) {
+      melodyViewModel.melodyView = value
+    }
+  var melodyElementAdapter
+    get() = melodyViewModel.melodyElementAdapter
+    set(value) {
+      melodyViewModel.melodyElementAdapter = value
+    }
 
   val harmonyViewModel = HarmonyViewModel()
     .apply { paletteViewModel = this@PaletteViewModel }
   var harmonyView: HarmonyView
     get() = harmonyViewModel.harmonyView!!
     set(value) { harmonyViewModel.harmonyView = value }
+
+  lateinit var orbifold: OrbifoldView
 
   var palette: Palette by observable(initialValue = Palette()) { _, _, new ->
     editingSequence = null
@@ -54,14 +78,13 @@ class PaletteViewModel : MelodyViewModel() {
 
   var editingSequence by observable<Melody<*>?>(null) { _, _, new ->
     if (new != null) {
-      openedMelody = new
+      melodyViewModel.openedMelody = new
       colorboardView.hide()
       keyboardView.hide()
       editMelodyMode()
     } else {
       partListMode()
     }
-    melodyToolbar.updateButtonText()
   }
 
   lateinit var sectionListView: View
@@ -101,11 +124,11 @@ class PaletteViewModel : MelodyViewModel() {
     harmonyViewModel.chordAdapter?.notifyDataSetChanged()
     harmonyView.syncScrollingChordText()
     sectionListAdapter?.notifyDataSetChanged()
-    melodyElementAdapter?.notifyDataSetChanged()
+    melodyViewModel.melodyElementAdapter?.notifyDataSetChanged()
   }
 
   private fun editMelodyMode() {
-    melodyView.animate()
+    melodyViewModel.melodyView.animate()
       .translationX(0f)
       .alpha(1f)
       .start()

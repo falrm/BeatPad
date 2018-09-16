@@ -25,21 +25,22 @@ inline fun ViewManager.melodyView(
 )
 	= //with(ui) {
 	ankoView({
-		viewModel.melodyView = HideableRelativeLayout(it).apply {
-			viewModel.melodyToolbar = melodyToolbar(viewModel) {
+		val melodyViewModel = viewModel.melodyViewModel
+		melodyViewModel.melodyView = HideableRelativeLayout(it).apply {
+			melodyViewModel.melodyToolbar = melodyToolbar(viewModel) {
 				id = R.id.melody_toolbar
 			}.lparams {
 				width = matchParent
 				height = wrapContent
 				alignParentTop()
 			}
-			viewModel.melodyEditingModifiers = melodyEditingModifiers {
+			melodyViewModel.melodyEditingModifiers = melodyEditingModifiers {
 				id = R.id.bottom_scroller
 				onHeldDownChanged = { heldDown ->
 					//if (heldDown) holdToEdit?.animate()?.alpha(0f)?.translationY(100f)
 					//else holdToEdit?.animate()?.alpha(1f)?.translationY(0f)
-					viewModel.melodyCenterHorizontalScroller.scrollingEnabled = !heldDown
-					viewModel.melodyCenterVerticalScroller.scrollingEnabled = !heldDown
+          melodyViewModel.melodyCenterHorizontalScroller.scrollingEnabled = !heldDown
+          melodyViewModel.melodyCenterVerticalScroller.scrollingEnabled = !heldDown
 				}
 			}.lparams {
 				alignParentBottom()
@@ -48,10 +49,10 @@ inline fun ViewManager.melodyView(
 				height = dimen(R.dimen.subdivision_controller_size)
 				leftMargin = dip(30)
 			}
-			viewModel.melodyLeftScroller = nonDelayedScrollView {
+      melodyViewModel.melodyLeftScroller = nonDelayedScrollView {
 				id = R.id.left_scroller
 				linearLayout {
-					viewModel.verticalAxis = melodyToneAxis().lparams {
+          melodyViewModel.verticalAxis = melodyToneAxis().lparams {
 						width = dip(30)
 						height = dip(1000f)
 					}
@@ -61,14 +62,14 @@ inline fun ViewManager.melodyView(
 			}.lparams {
 				width = dip(30)
 				height = ViewGroup.LayoutParams.MATCH_PARENT
-				below(viewModel.melodyToolbar)
-				above(viewModel.melodyEditingModifiers)
+				below(melodyViewModel.melodyToolbar)
+				above(melodyViewModel.melodyEditingModifiers)
 				alignParentLeft()
 			}
-			viewModel.melodyCenterVerticalScroller = zoomableScrollView {
+      melodyViewModel.melodyCenterVerticalScroller = zoomableScrollView {
 				id = R.id.center_v_scroller
 				onScrollChange { _, _, scrollY, _, _ ->
-					viewModel.melodyLeftScroller.scrollY = scrollY
+          melodyViewModel.melodyLeftScroller.scrollY = scrollY
 				}
 
 				zoomHandler = { xDelta, yDelta ->
@@ -86,7 +87,7 @@ inline fun ViewManager.melodyView(
 					}
 				}
 
-				viewModel.melodyCenterHorizontalScroller = nonDelayedRecyclerView {
+        melodyViewModel.melodyCenterHorizontalScroller = nonDelayedRecyclerView {
 					id = R.id.center_h_scroller
 					isFocusableInTouchMode = true
 				}.lparams {
@@ -97,7 +98,7 @@ inline fun ViewManager.melodyView(
 						isItemPrefetchEnabled = false
 					}
 					overScrollMode = View.OVER_SCROLL_NEVER
-					viewModel.melodyElementAdapter = MelodyBeatAdapter(viewModel, this)
+					viewModel.melodyElementAdapter = MelodyBeatAdapter(melodyViewModel, this)
 					adapter = viewModel.melodyElementAdapter
 					adapter.registerAdapterDataObserver(
 						object : RecyclerView.AdapterDataObserver() {
@@ -114,9 +115,9 @@ inline fun ViewManager.melodyView(
 				width = ViewGroup.LayoutParams.MATCH_PARENT
 				height = ViewGroup.LayoutParams.MATCH_PARENT
 				alignParentRight()
-				above(viewModel.melodyEditingModifiers)
-				rightOf(viewModel.melodyLeftScroller)
-				below(viewModel.melodyToolbar)
+				above(melodyViewModel.melodyEditingModifiers)
+				rightOf(melodyViewModel.melodyLeftScroller)
+				below(melodyViewModel.melodyToolbar)
 			}
 
 		}

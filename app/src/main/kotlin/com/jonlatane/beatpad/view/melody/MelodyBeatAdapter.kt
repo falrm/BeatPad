@@ -6,7 +6,9 @@ import com.jonlatane.beatpad.util.applyToHolders
 import com.jonlatane.beatpad.util.layoutHeight
 import com.jonlatane.beatpad.util.layoutWidth
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
-import org.jetbrains.anko.*
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.dip
+import org.jetbrains.anko.info
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 
 
@@ -37,7 +39,7 @@ class MelodyBeatAdapter(
         recyclerView.applyToHolders<MelodyBeatHolder> {
           it.element.layoutWidth = field
         }
-        (viewModel as? PaletteViewModel)?.harmonyViewModel?.chordAdapter?.elementWidth = field
+        viewModel.paletteViewModel.harmonyViewModel.chordAdapter.elementWidth = field
       }
     }
 
@@ -70,9 +72,7 @@ class MelodyBeatAdapter(
     return with(recyclerView) {
       MelodyBeatHolder(
         viewModel = viewModel,
-        element = MelodyBeatView(context).apply {
-          viewModel = this@MelodyBeatAdapter.viewModel
-        }.lparams {
+        element = MelodyBeatView(context, viewModel = viewModel).lparams {
           width = elementWidth
           height = elementHeight
         },

@@ -1,26 +1,23 @@
 package com.jonlatane.beatpad.view.harmony
 
+import BeatClockPaletteConsumer
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.Rect
 import android.util.SparseArray
-import android.view.MenuItem
 import android.view.View
+import android.widget.PopupMenu
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.util.color
-import org.jetbrains.anko.*
-import android.view.ViewGroup
-import android.widget.PopupMenu
-import com.jonlatane.beatpad.model.Melody
-import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.output.service.convertPatternIndex
+import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.util.vibrate
-import com.jonlatane.beatpad.view.melody.MelodyBeatView
+import org.jetbrains.anko.toast
+import org.jetbrains.anko.withAlpha
 
 
 class HarmonyElementView @JvmOverloads constructor(
@@ -99,6 +96,16 @@ class HarmonyElementView @JvmOverloads constructor(
       right = overallBounds.right
     }
 
+
+    paint.color = 0xFFFFFFFF.toInt()
+    canvas.drawRect(
+      bounds.left.toFloat(),
+      bounds.top.toFloat(),
+      bounds.right.toFloat(),
+      bounds.bottom.toFloat(),
+      paint
+    )
+
     harmony?.let { harmony ->
       val elementRange: IntRange = elementRange!! /*(beatPosition * melody.subdivisionsPerBeat) until
           Math.min((beatPosition + 1) * melody.subdivisionsPerBeat, melody.length - 1)*/
@@ -131,7 +138,14 @@ class HarmonyElementView @JvmOverloads constructor(
             else -> color(android.R.color.white)
           }
         }
-        paint.color = paint.color.withAlpha(0xFF)
+
+        val paintAlpha = if (
+          viewModel?.paletteViewModel?.playbackTick?.convertPatternIndex(
+            from = BeatClockPaletteConsumer.ticksPerBeat,
+            to = harmony
+          ) == elementPosition
+        ) 255 else 187
+        paint.color = paint.color.withAlpha(paintAlpha)
         canvas.drawRect(
           bounds.left.toFloat(),
           bounds.top.toFloat(),

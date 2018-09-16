@@ -44,6 +44,7 @@ class HarmonyView(
       info("Clearing textview $text")
       text = ""
       translationX = 0f
+      invalidate()
     }
   }
 
