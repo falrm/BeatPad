@@ -40,11 +40,12 @@ class HarmonyView(
       alignParentLeft()
       alignParentTop()
     }
-    override fun clearInstance(instance: TextView): TextView = instance.apply {
-      info("Clearing textview $text")
-      text = ""
-      translationX = 0f
-      invalidate()
+    override fun disposeInstance(instance: TextView) {
+      instance.apply {
+        info("Clearing textview $text")
+        text = ""
+        translationX = 0f
+      }
     }
   }
 
@@ -66,6 +67,7 @@ class HarmonyView(
       layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
         isItemPrefetchEnabled = false
       }
+      overScrollMode = View.OVER_SCROLL_NEVER
 
 
       zoomHandler = { xDelta, yDelta ->
@@ -130,11 +132,11 @@ class HarmonyView(
           verbose { "Setting translationX of $text to $translationX" }
           this.translationX = translationX
         }
-        val entriesToRemove = chordChangeLabels.filterKeys { !visibleChanges.containsKey(it) }
-        entriesToRemove.forEach { key, textView ->
-          chordChangeLabels.remove(key)
-          chordChangeLabelPool.recycle(textView)
-        }
+      }
+      val entriesToRemove = chordChangeLabels.filterKeys { !visibleChanges.containsKey(it) }
+      entriesToRemove.forEach { key, textView ->
+        chordChangeLabels.remove(key)
+        chordChangeLabelPool.recycle(textView)
       }
     } else {
       //No harmony, render some placeholder stuff

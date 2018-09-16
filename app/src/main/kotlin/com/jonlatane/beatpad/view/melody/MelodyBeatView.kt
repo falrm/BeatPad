@@ -52,7 +52,7 @@ class MelodyBeatView @JvmOverloads constructor(
     get() = if (drawWidth > dip(37f)) dip(5)
     else Math.max(0, drawWidth - dip(32f))
   override val nonRootPadding get() = drawPadding
-  private val harmony: Harmony? get() = (viewModel as? PaletteViewModel)?.harmonyViewModel?.harmony
+  private val harmony: Harmony? get() = viewModel.paletteViewModel.harmonyViewModel.harmony
 
   private val overallBounds = Rect()
   override fun onDraw(canvas: Canvas) {
@@ -78,7 +78,7 @@ class MelodyBeatView @JvmOverloads constructor(
         chord = harmony?.let { harmony ->
           val harmonyPosition = elementPosition.convertPatternIndex(melody, harmony)
           harmony.changeBefore(harmonyPosition)
-        } ?: viewModel.paletteViewModel.orbifold?.chord ?: DEFAULT_CHORD
+        } ?: viewModel.paletteViewModel.orbifold.chord ?: DEFAULT_CHORD
         colorGuideAlpha = if (
           viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
             from = BeatClockPaletteConsumer.ticksPerBeat,

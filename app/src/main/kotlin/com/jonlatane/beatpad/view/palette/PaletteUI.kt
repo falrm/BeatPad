@@ -80,14 +80,13 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
             if (!inScrollingStack) {
               inScrollingStack = true
               val otherLayoutManager = viewModel.harmonyViewModel.harmonyElementRecycler!!.layoutManager as LinearLayoutManager
-              val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyViewModel.melodyElementAdapter?.elementWidth
-                ?: Int.MAX_VALUE)
+              val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyViewModel.melodyElementAdapter.elementWidth)
               otherLayoutManager.scrollToPositionWithOffset(recyclerView.firstVisibleItemPosition, offset)
+              //viewModel.harmonyViewModel.harmonyView?.post {
+                viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
+              //}
             }
             inScrollingStack = false
-            viewModel.harmonyViewModel.harmonyView!!.post {
-              viewModel.harmonyViewModel.harmonyView!!.syncScrollingChordText()
-            }
           }
         })
         viewModel.harmonyViewModel.harmonyElementRecycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -97,9 +96,11 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
             if (!inScrollingStack) {
               inScrollingStack = true
               val otherLayoutManager = viewModel.melodyViewModel.melodyCenterHorizontalScroller.layoutManager as LinearLayoutManager
-              val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter?.elementWidth
-                ?: Int.MAX_VALUE)
+              val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter.elementWidth)
               otherLayoutManager.scrollToPositionWithOffset(recyclerView.firstVisibleItemPosition, offset)
+              //viewModel.harmonyViewModel.harmonyView?.post {
+                viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
+              //}
             }
             inScrollingStack = false
           }
