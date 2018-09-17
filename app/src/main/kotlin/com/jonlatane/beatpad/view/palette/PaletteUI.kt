@@ -72,13 +72,12 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
           .start()
 
         // Some tasty un-threadsafe spaghetti for syncing the two RecyclerViews for Harmony and Melody
-        var inScrollingStack = false
+        val inScrollingStack = AtomicBoolean(false)
         viewModel.melodyViewModel.melodyCenterHorizontalScroller.addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
             info("onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
-            if (!inScrollingStack) {
-              inScrollingStack = true
+            if (!inScrollingStack.getAndSet(true)) {
               val otherLayoutManager = viewModel.harmonyViewModel.harmonyElementRecycler!!.layoutManager as LinearLayoutManager
               val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyViewModel.melodyElementAdapter.elementWidth)
               otherLayoutManager.scrollToPositionWithOffset(recyclerView.firstVisibleItemPosition, offset)
@@ -86,15 +85,14 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
                 viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
               //}
             }
-            inScrollingStack = false
+            inScrollingStack.set(false)
           }
         })
         viewModel.harmonyViewModel.harmonyElementRecycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
             info("onScrolled in harmony: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
-            if (!inScrollingStack) {
-              inScrollingStack = true
+            if (!inScrollingStack.getAndSet(true)) {
               val otherLayoutManager = viewModel.melodyViewModel.melodyCenterHorizontalScroller.layoutManager as LinearLayoutManager
               val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter.elementWidth)
               otherLayoutManager.scrollToPositionWithOffset(recyclerView.firstVisibleItemPosition, offset)
@@ -102,7 +100,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
                 viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
               //}
             }
-            inScrollingStack = false
+            inScrollingStack.set(false)
           }
         })
       }
