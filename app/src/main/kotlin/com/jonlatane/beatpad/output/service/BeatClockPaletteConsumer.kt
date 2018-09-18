@@ -25,6 +25,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
     field = value
     viewModel?.notifySectionChange()
   }
+  var chord: Chord? = null
   val harmony: Harmony? get() = section?.harmony
   private val harmonyPosition: Int?
     get() = harmony?.let { tickPosition.convertPatternIndex(ticksPerBeat, it) }
@@ -54,14 +55,14 @@ object BeatClockPaletteConsumer : AnkoLogger {
   private fun loadUpcomingAttacks() {
 
     var currentAttackIndex = 0
-    val chord = harmonyChord ?: viewModel?.orbifold?.chord
-    viewModel?.orbifold?.post {
-      if(
-        section?.harmony != null
-        && chord != viewModel?.orbifold?.chord
-        && chord != null
-      ) {
-        viewModel?.orbifold?.chord = chord
+    chord = (harmonyChord ?: chord)?.also { chord ->
+      viewModel?.orbifold?.post {
+        if (
+          section?.harmony != null
+          && chord != viewModel?.orbifold?.chord
+        ) {
+          viewModel?.orbifold?.chord = chord
+        }
       }
     }
     verbose { "Harmony index: $harmonyPosition; Chord: $chord" }

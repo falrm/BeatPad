@@ -24,19 +24,22 @@ internal class PlaybackThread : Thread(), AnkoLogger {
             tickPosition % subdivisionsPerBeat == 0 -> tickPosition / subdivisionsPerBeat
             else -> null
           }?.let { info("Quarter #$it") }*/
-          verbose("Tick @${BeatClockPaletteConsumer.tickPosition}")
+          info { "Tick @${BeatClockPaletteConsumer.tickPosition} (T:${System.currentTimeMillis()}" }
           tryWithRetries { BeatClockPaletteConsumer.tick() }
-          val sleepTime = (tickTime - (System.currentTimeMillis() - start)).let {
+          /*val sleepTime = (tickTime - (System.currentTimeMillis() - start)).let {
             when {
               it < 0 -> 0L
               it > 800 -> 800L
               else -> it
             }
           }
-          Thread.sleep(sleepTime)
+          Thread.sleep(sleepTime)*/
+          while(System.currentTimeMillis() < start + tickTime) {
+            //Thread.sleep(1L)
+          }
         } else {
           BeatClockPaletteConsumer.clearActiveAttacks()
-          Thread.sleep(10)
+          //Thread.sleep(10)
         }
       } catch (t: Throwable) {
         error( "Error during background playback", t)
@@ -44,7 +47,7 @@ internal class PlaybackThread : Thread(), AnkoLogger {
     }
   }
 
-  private inline fun tryWithRetries(maxAttempts: Int = 3, action: () -> Unit) {
+  private inline fun tryWithRetries(maxAttempts: Int = 1, action: () -> Unit) {
     var attempts = 0
     while (attempts++ < maxAttempts) {
       try {
