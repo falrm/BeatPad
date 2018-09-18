@@ -32,7 +32,7 @@ class HarmonyBeatAdapter(
 					it.element.layoutWidth = field
 				}
 				(viewModel as? PaletteViewModel)?.melodyViewModel?.melodyElementAdapter?.elementWidth = field
-			}
+      }
     }
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HarmonyBeatHolder {

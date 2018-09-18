@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import com.jonlatane.beatpad.util.applyToHolders
 import com.jonlatane.beatpad.util.layoutHeight
 import com.jonlatane.beatpad.util.layoutWidth
-import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.info
@@ -16,11 +15,18 @@ class MelodyBeatAdapter(
   val viewModel: MelodyViewModel,
   val recyclerView: _RecyclerView
 ) : RecyclerView.Adapter<MelodyBeatHolder>(), AnkoLogger {
+  companion object {
+    const val initialBeatWidthDp: Float = 150f
+    const val initialBeatHeightDp: Float = 1000f
+    const val minimumBeatWidthDp: Float = 30f
+    const val maximumBeatHeightDp: Float = 2500f
+  }
+
   private val axis get() = viewModel.verticalAxis!!
   private val minimumElementWidth = recyclerView.run { dip(minimumBeatWidthDp) }
-  private val maximumElementWidth get() = viewModel.melodyCenterVerticalScroller.width
+  private val maximumElementWidth get() = viewModel.melodyCenterVerticalScroller.width / 2
   private val minimumElementHeight get() = viewModel.melodyCenterVerticalScroller.height
-  private val maximumElementHeight get() = viewModel.melodyCenterVerticalScroller.height * 3
+  private val maximumElementHeight get() = recyclerView.run { dip(maximumBeatHeightDp) }
 
   @Volatile
   var elementWidth = recyclerView.run { dip(initialBeatWidthDp) }
@@ -44,7 +50,7 @@ class MelodyBeatAdapter(
     }
 
   @Volatile
-  var elementHeight = recyclerView.run { dip(1000f) }
+  var elementHeight = recyclerView.run { dip(initialBeatHeightDp) }
     @Synchronized set(value) {
       field = when {
         value < minimumElementHeight -> {
@@ -92,8 +98,4 @@ class MelodyBeatAdapter(
     Math.ceil(melody.length.toDouble() / melody.subdivisionsPerBeat).toInt()
   }?: 1 // Always render at least one item, for layout sanity
 
-  companion object {
-    const val initialBeatWidthDp: Float = 150f
-    const val minimumBeatWidthDp: Float = 30f
-  }
 }
