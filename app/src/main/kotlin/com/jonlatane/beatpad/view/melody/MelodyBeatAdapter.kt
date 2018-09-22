@@ -45,7 +45,7 @@ class MelodyBeatAdapter(
         recyclerView.applyToHolders<MelodyBeatHolder> {
           it.element.layoutWidth = field
         }
-        viewModel.paletteViewModel.harmonyViewModel.chordAdapter.elementWidth = field
+        viewModel.paletteViewModel.harmonyViewModel.beatAdapter.elementWidth = field
       }
     }
 

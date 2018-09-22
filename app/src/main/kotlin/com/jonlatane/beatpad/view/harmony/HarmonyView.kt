@@ -70,7 +70,7 @@ class HarmonyView(
         AnkoLogger<MelodyViewModel>().info("Zooming: xDelta=$xDelta, yDelta=$yDelta")
         when {
           (xDelta.toInt() != 0) -> {
-            viewModel.harmonyViewModel.chordAdapter.apply {
+            viewModel.harmonyViewModel.beatAdapter.apply {
               elementWidth += xDelta.toInt()
               notifyDataSetChanged()
             }
@@ -80,8 +80,8 @@ class HarmonyView(
         }
       }
       overScrollMode = View.OVER_SCROLL_NEVER
-      viewModel.harmonyViewModel.chordAdapter = HarmonyBeatAdapter(viewModel, this)
-      adapter = viewModel.harmonyViewModel.chordAdapter
+      viewModel.harmonyViewModel.beatAdapter = HarmonyBeatAdapter(viewModel, this)
+      adapter = viewModel.harmonyViewModel.beatAdapter
       /*adapter.registerAdapterDataObserver(
         object : RecyclerView.AdapterDataObserver() {
           override fun onItemRangeInserted(start: Int, count: Int) {
@@ -123,7 +123,7 @@ class HarmonyView(
           .tailMap(lowerBound)
       verbose { "Visible changes: $visibleChanges" }
       val horizontalScrollOffset =  viewModel.harmonyViewModel
-        .harmonyElementRecycler?.computeHorizontalScrollOffset()?.let { it % viewModel.harmonyViewModel.chordAdapter!!.elementWidth } ?: 0
+        .harmonyElementRecycler?.computeHorizontalScrollOffset()?.let { it % viewModel.harmonyViewModel.beatAdapter!!.elementWidth } ?: 0
 
       visibleChanges.forEach { position, chord ->
         val label = chordChangeLabels[position]
@@ -133,7 +133,7 @@ class HarmonyView(
           val translationX = Math.max(
             0f,
             (
-              ((position.toFloat()/harmony.subdivisionsPerBeat - firstBeatPosition) * viewModel.harmonyViewModel.chordAdapter!!.elementWidth)
+              ((position.toFloat()/harmony.subdivisionsPerBeat - firstBeatPosition) * viewModel.harmonyViewModel.beatAdapter!!.elementWidth)
                 - horizontalScrollOffset
               )
           )

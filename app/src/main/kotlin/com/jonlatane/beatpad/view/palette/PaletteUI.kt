@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.view.colorboard.colorboardView
@@ -18,8 +17,6 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.atomic.AtomicReference
 
 class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
   private val executorService = Executors.newScheduledThreadPool(2)
@@ -57,6 +54,8 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
         BeatClockPaletteConsumer.chord = chord
       }
 
+      viewModel.orbifold.onOrbifoldChangeListener = { viewModel.palette.orbifold = it }
+
       onLayoutChange { view: View?, i: Int, i1: Int, i2: Int, i3: Int, i4: Int, i5: Int, i6: Int, i7: Int ->
         if (viewModel.editingSequence == null) {
           viewModel.melodyView.translationX = viewModel.melodyView.width.toFloat()
@@ -80,7 +79,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
             if (!inScrollingStack.getAndSet(true)) {
               info("onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
               val otherLayoutManager = viewModel.harmonyViewModel.harmonyElementRecycler!!.layoutManager as LinearLayoutManager
-              val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyViewModel.melodyElementAdapter.elementWidth)
+              val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyViewModel.beatAdapter.elementWidth)
               otherLayoutManager.scrollToPositionWithOffset(
                 recyclerView.firstVisibleItemPosition,
                 offset

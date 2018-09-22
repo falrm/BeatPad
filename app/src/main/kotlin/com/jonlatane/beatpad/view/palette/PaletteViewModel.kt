@@ -32,8 +32,8 @@ class PaletteViewModel {
     arrayOf(old, new).filterNotNull().map { tickPosition ->
       (tickPosition.toDouble() / BeatClockPaletteConsumer.ticksPerBeat).toInt()
     }.toSet().forEach { melodyBeat ->
-      melodyViewModel.melodyElementAdapter.invalidate(melodyBeat)
-      harmonyViewModel.chordAdapter.invalidate(melodyBeat)
+      melodyViewModel.beatAdapter.invalidate(melodyBeat)
+      harmonyViewModel.beatAdapter.invalidate(melodyBeat)
     }
   }
 
@@ -44,9 +44,9 @@ class PaletteViewModel {
       melodyViewModel.melodyView = value
     }
   var melodyElementAdapter
-    get() = melodyViewModel.melodyElementAdapter
+    get() = melodyViewModel.beatAdapter
     set(value) {
-      melodyViewModel.melodyElementAdapter = value
+      melodyViewModel.beatAdapter = value
     }
 
   val harmonyViewModel = HarmonyViewModel()
@@ -121,10 +121,9 @@ class PaletteViewModel {
   }
 
   fun notifySectionChange() {
-    harmonyViewModel.chordAdapter.notifyDataSetChanged()
-    harmonyView.syncScrollingChordText()
+    harmonyViewModel.notifyHarmonyChanged()
     sectionListAdapter?.notifyDataSetChanged()
-    melodyViewModel.melodyElementAdapter.notifyDataSetChanged()
+    melodyViewModel.beatAdapter.notifyDataSetChanged()
   }
 
   private fun editMelodyMode() {

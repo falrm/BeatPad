@@ -11,7 +11,6 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.storage.PaletteStorage
-import com.jonlatane.beatpad.util.vibrate
 import org.jetbrains.anko.*
 
 class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : RecyclerView.ViewHolder(
@@ -39,7 +38,7 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
   val section: Section?
     get() = when (adapterPosition) {
       viewModel.palette.sections.size -> null
-      else                            -> viewModel.palette.sections[adapterPosition]
+      else                            -> viewModel.palette.sections.getOrNull(adapterPosition)
     }
   val sectionName: TextView by lazy { itemView.findViewById<TextView>(R.id.section_name) }
   val menu: PopupMenu by lazy {
@@ -48,30 +47,43 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
       it.setOnMenuItemClickListener { item ->
         when (item) {
           deleteSection -> {
-            showConfirmDialog(
-              sectionName.context,
-              "Really delete section?",
-              "Yes, delete section"
-            ) {
-              viewModel.palette.sections.removeAt(adapterPosition)
-              viewModel.sectionListAdapter?.notifyItemRemoved(adapterPosition)
-              viewModel.sectionListAdapter?.notifyItemRangeChanged(
-                adapterPosition,
-                viewModel.palette.sections.size - adapterPosition
-              )
+            if(viewModel.palette.sections.size <= 1) {
+              parent.context.toast("Cannot delete the final section!")
+            } else {
+              showConfirmDialog(
+                sectionName.context,
+                "Really delete section?",
+                "Yes, delete section"
+              ) {
+                val originalPosition = adapterPosition
+                val originalSection = section
+                viewModel.palette.sections.removeAt(adapterPosition)
+                viewModel.sectionListAdapter?.notifyItemRemoved(adapterPosition)
+                viewModel.sectionListAdapter?.notifyItemRangeChanged(
+                  adapterPosition,
+                  viewModel.palette.sections.size - adapterPosition
+                )
+                if (originalSection == BeatClockPaletteConsumer.section) {
+                  BeatClockPaletteConsumer.section = viewModel.palette.sections.getOrElse(originalPosition - 1) {
+                    _ -> viewModel.palette.sections[0]
+                  }
+                }
+              }
             }
           }
           removeHarmony -> {
             section?.harmony = null
             if (BeatClockPaletteConsumer.section == section) {
-              viewModel.harmonyViewModel.chordAdapter?.notifyDataSetChanged()
+              viewModel.harmonyViewModel.notifyHarmonyChanged()
+              viewModel.melodyViewModel.beatAdapter.notifyDataSetChanged()
             }
             invalidate()
           }
           addHarmony -> {
             section?.harmony = PaletteStorage.baseHarmony
             if (BeatClockPaletteConsumer.section == section) {
-              viewModel.harmonyViewModel.chordAdapter?.notifyDataSetChanged()
+              viewModel.harmonyViewModel.notifyHarmonyChanged()
+              viewModel.melodyViewModel.beatAdapter.notifyDataSetChanged()
             }
             invalidate()
           }
@@ -85,6 +97,7 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
   private val removeHarmony: MenuItem get() = menu.menu.findItem(R.id.removeHarmonyFromSection)
 
   fun invalidate() {
+    deleteSection.isVisible = viewModel.palette.sections.size > 1
     addHarmony.isVisible = when(section) {
       null -> false
       else -> when(section!!.harmony) {

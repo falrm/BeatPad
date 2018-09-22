@@ -35,11 +35,11 @@ internal class PlaybackThread : Thread(), AnkoLogger {
           }
           Thread.sleep(sleepTime)*/
           while(System.currentTimeMillis() < start + tickTime) {
-            //Thread.sleep(1L)
+            Thread.sleep(3L)
           }
         } else {
           BeatClockPaletteConsumer.clearActiveAttacks()
-          //Thread.sleep(10)
+          Thread.sleep(10)
         }
       } catch (t: Throwable) {
         error( "Error during background playback", t)

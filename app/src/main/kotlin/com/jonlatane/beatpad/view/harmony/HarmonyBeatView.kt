@@ -58,6 +58,7 @@ class HarmonyBeatView @JvmOverloads constructor(
     setOnClickListener { event ->
       val chord = getPositionAndElement(event.x)?.second
       chord?.let {
+        viewModel?.paletteViewModel?.orbifold?.disableNextTransitionAnimation()
         viewModel?.paletteViewModel?.orbifold?.chord = it
       }
     }
@@ -166,7 +167,7 @@ class HarmonyBeatView @JvmOverloads constructor(
       val elementRange: IntRange = elementRange!!
       val elementIndex: Int = (elementRange.size * x / width).toInt()
       val elementPosition = Math.min(beatPosition * harmony.subdivisionsPerBeat + elementIndex, harmony.length - 1)
-      return elementIndex to harmony.changes[elementPosition]
+      return elementIndex to harmony.changeBefore(elementPosition)
     }
   }
 

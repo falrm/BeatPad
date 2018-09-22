@@ -1,6 +1,5 @@
 package com.jonlatane.beatpad.view.melody
 
-import android.view.View
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.view.HideableRelativeLayout
@@ -14,7 +13,7 @@ class MelodyViewModel(
   val paletteViewModel: PaletteViewModel
 ) {
 	var openedMelody by observable<Melody<*>?>(PaletteStorage.baseMelody) { _, _, _ ->
-		melodyElementAdapter.notifyDataSetChanged()
+		beatAdapter.notifyDataSetChanged()
     melodyToolbar.updateButtonText()
 	}
 	val playing = AtomicBoolean(false)
@@ -25,10 +24,10 @@ class MelodyViewModel(
 	lateinit var melodyEditingModifiers: MelodyEditingModifiers
 	lateinit var melodyCenterVerticalScroller: NonDelayedScrollView
 	lateinit var melodyCenterHorizontalScroller: NonDelayedRecyclerView
-	lateinit var melodyElementAdapter: MelodyBeatAdapter
+	lateinit var beatAdapter: MelodyBeatAdapter
 
 	internal fun redraw() {
-		melodyElementAdapter.notifyDataSetChanged()
+		beatAdapter.notifyDataSetChanged()
 		verticalAxis?.invalidate()
 	}
 }

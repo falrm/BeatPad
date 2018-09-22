@@ -3,7 +3,6 @@ package com.jonlatane.beatpad.view.beat
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
-import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.applyToHolders
 import com.jonlatane.beatpad.util.layoutHeight
 import com.jonlatane.beatpad.util.layoutWidth
@@ -46,7 +45,7 @@ class BeatAdapter<ViewModelType, ViewType>
         recyclerView.applyToHolders<MelodyBeatHolder<ViewType>> {
           it.element.layoutWidth = field
         }
-        (viewModel as? PaletteViewModel)?.harmonyViewModel?.chordAdapter?.elementWidth = field
+        (viewModel as? PaletteViewModel)?.harmonyViewModel?.beatAdapter?.elementWidth = field
       }
     }
 
