@@ -103,7 +103,7 @@ class PaletteToolbar(ctx: Context,
   }
 
   val volumeButton = button {
-    text = "Vol"
+    text = "Mix"
     toolbarStyle()
   }.lparams {
     width = matchParent
@@ -111,7 +111,7 @@ class PaletteToolbar(ctx: Context,
     weight = 1f
   }.onClick {
     viewModel.partListAdapter?.let {
-      it.editingVolume = !it.editingVolume
+      it.editingMix = !it.editingMix
     }
   }
 

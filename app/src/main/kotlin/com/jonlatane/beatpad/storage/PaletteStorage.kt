@@ -14,9 +14,7 @@ import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.model.harmony.Orbifold
-import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.model.harmony.chord.Dom7
-import com.jonlatane.beatpad.model.harmony.chord.Maj
+import com.jonlatane.beatpad.model.harmony.chord.*
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import org.jetbrains.anko.AnkoLogger
 import java.util.*
@@ -40,10 +38,18 @@ object PaletteStorage : AnkoLogger {
 
   val baseHarmony: Harmony
     get() {
-      val change1 = Chord(0, Maj)
-      val change2 = Chord(7, Dom7)
       return Harmony(
-        changes = TreeMap(mapOf(0 to change1, 32 to change2)),
+        changes = TreeMap(
+          mapOf(
+            0  to Chord(0, Maj),
+            16 to Chord(11, min7flat5),
+            24 to Chord(4, MajAddFlat9),
+            32 to Chord(9, min7),
+            40 to Chord(2, Dom7),
+            48 to Chord(2, min9),
+            56 to Chord(7, sus11)
+          )
+        ),
         length = 64,
         subdivisionsPerBeat = 4
       )

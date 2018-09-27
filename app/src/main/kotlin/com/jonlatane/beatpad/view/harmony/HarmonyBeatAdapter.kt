@@ -33,6 +33,7 @@ class HarmonyBeatAdapter(
 				}
 				(viewModel as? PaletteViewModel)?.melodyViewModel?.beatAdapter?.elementWidth = field
       }
+			viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
     }
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HarmonyBeatHolder {

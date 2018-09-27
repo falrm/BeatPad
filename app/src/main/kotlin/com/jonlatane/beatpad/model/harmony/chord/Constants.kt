@@ -68,6 +68,10 @@ private fun susOf(extension: IntArray): IntArray = extension.map {
   }
 }.toIntArray()
 val sus = susOf(Maj)
+val sus7 = susOf(Dom7)
+val sus9 = susOf(Dom9)
+val sus11 = susOf(Dom11)
+val sus13 = susOf(Dom13)
 val Maj6sus = susOf(Maj6)
 val Dom7sus = susOf(Dom7)
 val Dom9sus = susOf(Dom9)

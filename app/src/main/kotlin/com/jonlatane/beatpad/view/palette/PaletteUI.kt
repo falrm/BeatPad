@@ -77,16 +77,16 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
             if (!inScrollingStack.getAndSet(true)) {
-              info("onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
+              verbose { "onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}" }
               val otherLayoutManager = viewModel.harmonyViewModel.harmonyElementRecycler!!.layoutManager as LinearLayoutManager
               val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyViewModel.beatAdapter.elementWidth)
               otherLayoutManager.scrollToPositionWithOffset(
                 recyclerView.firstVisibleItemPosition,
                 offset
               )
-              //viewModel.harmonyViewModel.harmonyView?.post {
+              viewModel.harmonyViewModel.harmonyView?.post {
                 viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
-              //}
+              }
             }
             post {
               inScrollingStack.set(false)
@@ -97,7 +97,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
             if (!inScrollingStack.getAndSet(true)) {
-              info("onScrolled in harmony: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
+              verbose { "onScrolled in harmony: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}" }
               val otherLayoutManager = viewModel.melodyViewModel.melodyCenterHorizontalScroller.layoutManager as LinearLayoutManager
               val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter.elementWidth)
               otherLayoutManager.scrollToPositionWithOffset(

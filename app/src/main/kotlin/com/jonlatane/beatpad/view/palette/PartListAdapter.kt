@@ -17,7 +17,7 @@ class PartListAdapter(
 	companion object {
 		const val MAX_PARTS = 8
 	}
-	var editingVolume by observable(false) { _, _, editingVolume ->
+	var editingMix by observable(false) { _, _, editingVolume ->
 		recyclerView.applyToHolders<PartHolder> { it.editingVolume = editingVolume }
 	}
 
@@ -31,7 +31,7 @@ class PartListAdapter(
 
 	override fun onBindViewHolder(holder: PartHolder, partPosition: Int) {
 		holder.partPosition = partPosition
-		holder.editingVolume = editingVolume
+		holder.editingVolume = editingMix
 	}
 
 	override fun getItemCount(): Int = when {

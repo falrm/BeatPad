@@ -121,24 +121,36 @@ class HarmonyView(
       val visibleChanges: SortedMap<Int, Chord> = harmony.changes
           .headMap(upperBound, true)
           .tailMap(lowerBound)
-      verbose { "Visible changes: $visibleChanges" }
-      val horizontalScrollOffset =  viewModel.harmonyViewModel
-        .harmonyElementRecycler?.computeHorizontalScrollOffset()?.let { it % viewModel.harmonyViewModel.beatAdapter!!.elementWidth } ?: 0
+      info { "Visible changes: $visibleChanges" }
+
+
+      val locationOnScreen = intArrayOf(-1, -1)
 
       visibleChanges.forEach { position, chord ->
         val label = chordChangeLabels[position]
           ?: chordChangeLabelPool.borrow().also { chordChangeLabels[position] = it }
         label.apply {
-          if(text == "") text = chord.name
-          val translationX = Math.max(
+          val beatPosition = (position.toFloat() / harmony.subdivisionsPerBeat).toInt()
+          (viewModel.harmonyViewModel.harmonyElementRecycler?.layoutManager as? LinearLayoutManager)
+            ?.findViewByPosition(beatPosition)
+            ?.let { view: View ->
+              view.getLocationOnScreen(locationOnScreen)
+              val beatViewX = locationOnScreen[0]
+              viewModel.harmonyViewModel.harmonyElementRecycler!!.getLocationOnScreen(locationOnScreen)
+              val recyclerViewX = locationOnScreen[0]
+              info { "Location of view for $text @ (beat $beatPosition) is ${beatViewX}" }
+              this@apply.translationX = Math.max(0f, (beatViewX - recyclerViewX).toFloat())
+              this@apply.text = chord.name
+            }
+          /*val translationX = Math.max(
             0f,
             (
-              ((position.toFloat()/harmony.subdivisionsPerBeat - firstBeatPosition) * viewModel.harmonyViewModel.beatAdapter!!.elementWidth)
+              ((position.toFloat()/harmony.subdivisionsPerBeat - firstBeatPosition) * viewModel.harmonyViewModel.beatAdapter.elementWidth)
                 - horizontalScrollOffset
               )
           )
-          verbose { "Setting translationX of $text to $translationX" }
-          this.translationX = translationX
+          info { "Setting translationX of $text to $translationX based on firstBeatPosition=$firstBeatPosition, position=$position, offset=$horizontalScrollOffset" }
+          this.translationX = translationX*/
         }
       }
       val entriesToRemove = chordChangeLabels.filterKeys { !visibleChanges.containsKey(it) }

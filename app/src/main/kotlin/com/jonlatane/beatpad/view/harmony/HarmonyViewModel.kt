@@ -20,8 +20,8 @@ open class HarmonyViewModel {
   var selectedHarmonyElements: IntRange? = null
   fun notifyHarmonyChanged() {
     beatAdapter.notifyDataSetChanged()
-    harmonyView?.post {
+    //harmonyView?.post {
       harmonyView?.syncScrollingChordText()
-    }
+    //}
   }
 }
