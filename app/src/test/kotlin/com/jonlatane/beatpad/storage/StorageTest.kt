@@ -9,9 +9,9 @@ import org.assertj.core.api.Assertions.*
 class StorageTest : Test({
 	val palette = PaletteStorage.basePalette
 	test("Storage") {
-		val data = PaletteStorage.stringify(palette)
-		println(data)
-		val newPalette = PaletteStorage.parse(data)
-		println(PaletteStorage.stringify(newPalette))
+//		val data = PaletteStorage.stringify(palette)
+//		println(data)
+//		val newPalette = PaletteStorage.parse(data)
+//		println(PaletteStorage.stringify(newPalette))
 	}
 })
