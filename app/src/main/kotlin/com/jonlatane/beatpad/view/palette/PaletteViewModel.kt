@@ -5,15 +5,17 @@ import android.view.View
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
+import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
+import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.view.HideableRecyclerView
-import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
 import com.jonlatane.beatpad.view.harmony.HarmonyView
 import com.jonlatane.beatpad.view.harmony.HarmonyViewModel
 import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
+import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import kotlin.properties.Delegates.observable
 
@@ -21,19 +23,47 @@ import kotlin.properties.Delegates.observable
  * The PaletteViewModel still assumes we'll only be editing
  * one Melody at a time.
  */
-class PaletteViewModel : MelodyViewModel() {
+class PaletteViewModel {
   init {
-    BeatClockPaletteConsumer.viewModel = this
+    //BeatClockPaletteConsumer.viewModel = this
   }
+
+  var playbackTick by observable<Int?>(null) { _, old, new ->
+    arrayOf(old, new).filterNotNull().map { tickPosition ->
+      (tickPosition.toDouble() / BeatClockPaletteConsumer.ticksPerBeat).toInt()
+    }.toSet().forEach { melodyBeat ->
+      melodyViewModel.beatAdapter.invalidate(melodyBeat)
+      harmonyViewModel.beatAdapter.invalidate(melodyBeat)
+    }
+  }
+
+  val melodyViewModel = MelodyViewModel(this)
+  var melodyView
+    get() = melodyViewModel.melodyView
+    set(value) {
+      melodyViewModel.melodyView = value
+    }
+  var melodyElementAdapter
+    get() = melodyViewModel.beatAdapter
+    set(value) {
+      melodyViewModel.beatAdapter = value
+    }
 
   val harmonyViewModel = HarmonyViewModel()
     .apply { paletteViewModel = this@PaletteViewModel }
-  lateinit var harmonyView: HarmonyView
+  var harmonyView: HarmonyView
+    get() = harmonyViewModel.harmonyView!!
+    set(value) { harmonyViewModel.harmonyView = value }
+
+  lateinit var orbifold: OrbifoldView
 
   var palette: Palette by observable(initialValue = Palette()) { _, _, new ->
     editingSequence = null
     if (new.parts.isEmpty()) {
       new.parts.add(Part())
+    }
+    if (new.parts.isEmpty()) {
+      new.sections.add(Section(harmony = PaletteStorage.baseHarmony))
     }
     keyboardPart = new.keyboardPart ?: new.parts[0]
     colorboardPart = new.colorboardPart ?: new.parts[0]
@@ -42,24 +72,24 @@ class PaletteViewModel : MelodyViewModel() {
     orbifold.chord = new.chord
     toolbarView.updateTempoButton()
     partListAdapter?.notifyDataSetChanged()
-    chordListAdapter?.notifyDataSetChanged()
+    sectionListAdapter?.notifyDataSetChanged()
+    BeatClockPaletteConsumer.section = new.sections.first()
   }
 
-  var editingSequence by observable<Melody?>(null) { _, _, new ->
+  var editingSequence by observable<Melody<*>?>(null) { _, _, new ->
     if (new != null) {
-      openedMelody = new
+      melodyViewModel.openedMelody = new
       colorboardView.hide()
       keyboardView.hide()
       editMelodyMode()
     } else {
       partListMode()
     }
-    melodyToolbar.updateButtonText()
   }
 
-  lateinit var chordListView: View
+  lateinit var sectionListView: View
   var partListAdapter: PartListAdapter? = null
-  var chordListAdapter: ChordListAdapter? = null
+  var sectionListAdapter: SectionListAdapter? = null
   lateinit var partListView: HideableRecyclerView
   lateinit var toolbarView: PaletteToolbar
   lateinit var keyboardView: KeyboardView
@@ -90,8 +120,14 @@ class PaletteViewModel : MelodyViewModel() {
     return result
   }
 
+  fun notifySectionChange() {
+    harmonyViewModel.notifyHarmonyChanged()
+    sectionListAdapter?.notifyDataSetChanged()
+    melodyViewModel.beatAdapter.notifyDataSetChanged()
+  }
+
   private fun editMelodyMode() {
-    melodyView.animate()
+    melodyViewModel.melodyView.animate()
       .translationX(0f)
       .alpha(1f)
       .start()

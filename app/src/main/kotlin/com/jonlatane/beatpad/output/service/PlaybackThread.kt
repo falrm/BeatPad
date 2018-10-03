@@ -4,6 +4,7 @@ import BeatClockPaletteConsumer.tickPosition
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.error
 import org.jetbrains.anko.info
+import org.jetbrains.anko.verbose
 
 internal class PlaybackThread : Thread(), AnkoLogger {
   companion object {
@@ -19,20 +20,23 @@ internal class PlaybackThread : Thread(), AnkoLogger {
         if (!stopped) {
           val start = System.currentTimeMillis()
           val tickTime: Long = 60000L / (BeatClockPaletteConsumer.palette!!.bpm.toInt() * subdivisionsPerBeat)
-          when {
+          /*when {
             tickPosition % subdivisionsPerBeat == 0 -> tickPosition / subdivisionsPerBeat
             else -> null
-          }?.let { info("Quarter #$it") }
-          info("Tick @${BeatClockPaletteConsumer.tickPosition}")
+          }?.let { info("Quarter #$it") }*/
+          info { "Tick @${BeatClockPaletteConsumer.tickPosition} (T:${System.currentTimeMillis()}" }
           tryWithRetries { BeatClockPaletteConsumer.tick() }
-          val sleepTime = (tickTime - (System.currentTimeMillis() - start)).let {
+          /*val sleepTime = (tickTime - (System.currentTimeMillis() - start)).let {
             when {
               it < 0 -> 0L
               it > 800 -> 800L
               else -> it
             }
           }
-          Thread.sleep(sleepTime)
+          Thread.sleep(sleepTime)*/
+          while(System.currentTimeMillis() < start + tickTime) {
+            Thread.sleep(3L)
+          }
         } else {
           BeatClockPaletteConsumer.clearActiveAttacks()
           Thread.sleep(10)
@@ -43,7 +47,7 @@ internal class PlaybackThread : Thread(), AnkoLogger {
     }
   }
 
-  private inline fun tryWithRetries(maxAttempts: Int = 3, action: () -> Unit) {
+  private inline fun tryWithRetries(maxAttempts: Int = 1, action: () -> Unit) {
     var attempts = 0
     while (attempts++ < maxAttempts) {
       try {

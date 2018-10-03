@@ -10,9 +10,9 @@ import java.util.*
  * and [Part]s. It's, conveniently, basically a full encapsulation of the
  * state of the app's UI
  */
-class Palette (
-  var id: UUID = UUID.randomUUID(),
-  val chords: MutableList<Chord> = mutableListOf(),
+data class Palette (
+  val id: UUID = UUID.randomUUID(),
+  val sections: MutableList<Section> = mutableListOf(Section()),
   val parts: MutableList<Part> = mutableListOf(),
 
   var keyboardPart: Part? = null,

@@ -15,10 +15,6 @@
   limitations under the License.
 -->
 <resources>
-
-	<!--
-			Generate an id which can be used when the location menu item is added in MainActivity
-	-->
 	<item name="bottom_scroller" type="id"/>
 	<item name="melody_toolbar" type="id"/>
 	<item name="left_scroller" type="id"/>
@@ -37,5 +33,6 @@
 	<item name="part_name" type="id"/>
 	<item name="part_patterns" type="id"/>
 	<item name="part_volume" type="id"/>
+	<item name="section_name" type="id"/>
 
 </resources>

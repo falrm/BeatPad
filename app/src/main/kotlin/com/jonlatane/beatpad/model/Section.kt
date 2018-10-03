@@ -1,19 +1,26 @@
 package com.jonlatane.beatpad.model
 
-import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.model.harmony.chord.Maj7
+import java.util.*
 
 data class Section(
-  val melodies: MutableSet<Melody> = mutableSetOf()
+  val id: UUID = UUID.randomUUID(),
+  val name: String = generateNewSectionName(emptyList()),
+  var harmony: Harmony? = null,
+  val melodies: MutableSet<Melody<*>> = mutableSetOf()
 ) {
-  var chord: Chord? = Chord(0, Maj7)
-  set(value) {
-    harmony = null
-    field = value
-  }
-  var harmony: Harmony? = null
-  set(value) {
-    chord = null
-    field = value
+  companion object {
+    fun forList(
+      sectionList: List<Section>,
+      harmony: Harmony? = null,
+      melodies: MutableSet<Melody<*>> = mutableSetOf()
+    ) = Section(
+      name = generateNewSectionName(sectionList),
+      harmony = harmony,
+      melodies = melodies
+    )
+
+    fun generateNewSectionName(sectionList: List<Section>) = "Section ${(1..100).firstOrNull { index ->
+      sectionList.none { it.name == "Section $index" }
+    }?.toString() ?: ":)"}"
   }
 }

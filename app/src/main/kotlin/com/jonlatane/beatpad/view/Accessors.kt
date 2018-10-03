@@ -34,3 +34,9 @@ fun ViewManager.nonDelayedRecyclerView(theme: Int = 0)
 
 inline fun ViewManager.nonDelayedRecyclerView(theme: Int = 0, init: NonDelayedRecyclerView.() -> Unit)
 	= ankoView({ NonDelayedRecyclerView(it) }, theme, init)
+
+fun ViewManager.zoomableRecyclerView(theme: Int = 0)
+	= nonDelayedScrollView(theme) {}
+
+inline fun ViewManager.zoomableRecyclerView(theme: Int = 0, init: ZoomableRecyclerView.() -> Unit)
+	= ankoView({ ZoomableRecyclerView(it) }, theme, init)

@@ -5,7 +5,7 @@ import com.jonlatane.beatpad.util.HideableView
 import org.jetbrains.anko._RelativeLayout
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 
-class NonDelayedRecyclerView @JvmOverloads constructor(
+open class NonDelayedRecyclerView @JvmOverloads constructor(
 	ctx: android.content.Context,
 	var scrollingEnabled: Boolean = true
 ): HideableRecyclerView(ctx) {

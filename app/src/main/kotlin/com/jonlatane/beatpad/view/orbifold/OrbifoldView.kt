@@ -39,6 +39,10 @@ class OrbifoldView @JvmOverloads constructor(
 		_, _, listener ->
 		listener?.invoke(chord)
 	}
+	var onOrbifoldChangeListener: ((Orbifold) -> Unit)? by observable<((Orbifold) -> Unit)?>(null) {
+		_, _, listener ->
+		listener?.invoke(orbifold)
+	}
 	var chord: Chord by observable(Chord(0, Maj13)) { _, _, chord ->
 		if (selectedChord != null) {
 			animateTo(InitialState)
@@ -55,6 +59,7 @@ class OrbifoldView @JvmOverloads constructor(
 		new.indices.forEach {
 			addSequence(it, new[it])
 		}
+		onOrbifoldChangeListener?.invoke(new)
 	}
 	internal var centralChord: TextView
 	internal lateinit var centralChordBackground: View

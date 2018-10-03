@@ -1,11 +1,11 @@
 package com.jonlatane.beatpad.view.melody
 
-import android.graphics.PointF
-import android.view.MotionEvent
 import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.Transposable
+import com.jonlatane.beatpad.view.beat.BeatEventHandlerBase
 
-interface EventArticulationHandler : BaseEventHandler {
-
+interface MelodyBeatEventArticulationHandler : MelodyBeatEventHandlerBase {
+/*
 	fun onTouchArticulateEvent(event: MotionEvent): Boolean {
 		// get pointer index from the event object
 		val pointerIndex = event.actionIndex
@@ -18,15 +18,12 @@ interface EventArticulationHandler : BaseEventHandler {
 				f.x = event.getX(pointerIndex)
 				f.y = event.getY(pointerIndex)
 				downPointers.put(pointerId, f)
-				when (element) {
-					is Melody.Element.Note -> {
-						(element as Melody.Element.Note)
-						true
-					}
-					is Melody.Element.Sustain -> {
-						(element as Melody.Element.Sustain).note
-						true
-					}
+				if(isChange) {
+					(element as Melody.Element.Note)
+					true
+				} else {
+					(element as Melody.Element.Sustain).note
+					true
 				}
 			}
 
@@ -44,7 +41,7 @@ interface EventArticulationHandler : BaseEventHandler {
 		}
 	}
 
-	private fun getArticulatoryNeighbors(): Map<Int, MelodyElementView> {
+	private fun getArticulatoryNeighbors(): Map<Int, MelodyBeatView> {
 		TODO()
 	}
 
@@ -54,13 +51,13 @@ interface EventArticulationHandler : BaseEventHandler {
 	fun getElementArticulation(): Int {
 		var lookBehinds = 0
 		while(
-			elements[(elementPosition - lookBehinds)] is Melody.Element.Sustain || false
+			elements[(beatPosition - lookBehinds)] is Melody.Element.Sustain || false
 
 		) {
 			lookBehinds++
 		}
 		var duration = 1
-		while(elements[elementPosition + duration] is Melody.Element.Sustain) {
+		while(elements[beatPosition + duration] is Melody.Element.Sustain) {
 			duration += 1
 		}
 		return duration + lookBehinds
@@ -68,7 +65,7 @@ interface EventArticulationHandler : BaseEventHandler {
 
 	fun setElementArticulation(value: Int) {
 		var lookBehinds = 0
-		while(elements[(elementPosition - lookBehinds)] is Melody.Element.Sustain) {
+		while(elements[(beatPosition - lookBehinds)] is Melody.Element.Sustain) {
 			lookBehinds++
 		}
 		var duration = 1
@@ -79,4 +76,5 @@ interface EventArticulationHandler : BaseEventHandler {
 			duration++
 		}
 	}
+	*/
 }

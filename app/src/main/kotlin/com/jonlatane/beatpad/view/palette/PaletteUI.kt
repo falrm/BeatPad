@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.view.colorboard.colorboardView
@@ -15,11 +14,11 @@ import com.jonlatane.beatpad.view.melody.melodyView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
 import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.*
-import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 
-class PaletteUI() : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
+class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
   private val executorService = Executors.newScheduledThreadPool(2)
   val viewModel = PaletteViewModel()
   val previewInstrument = MIDIInstrument().apply {
@@ -43,19 +42,22 @@ class PaletteUI() : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
 
       keyboardsLayout()
 
-      viewModel.orbifold.onChordChangedListener = { c: Chord ->
-        val tones = c.getTones()
-        viewModel.colorboardView.chord = c
+      viewModel.orbifold.onChordChangedListener = { chord ->
+        val tones = chord.getTones()
+        viewModel.colorboardView.chord = chord
         //viewModel.harmonyController.tones = tones
-        viewModel.keyboardView.ioHandler.highlightChord(c)
-        viewModel.verticalAxis?.chord = c
-        viewModel.splatController?.tones = c.getTones()
-        viewModel.palette.chord = c
-        viewModel.redraw()
+        viewModel.keyboardView.ioHandler.highlightChord(chord)
+        viewModel.melodyViewModel.verticalAxis?.chord = chord
+        viewModel.splatController?.tones = chord.getTones()
+        viewModel.palette.chord = chord
+        viewModel.melodyViewModel.redraw()
+        BeatClockPaletteConsumer.chord = chord
       }
 
+      viewModel.orbifold.onOrbifoldChangeListener = { viewModel.palette.orbifold = it }
+
       onLayoutChange { view: View?, i: Int, i1: Int, i2: Int, i3: Int, i4: Int, i5: Int, i6: Int, i7: Int ->
-        if(viewModel.editingSequence == null) {
+        if (viewModel.editingSequence == null) {
           viewModel.melodyView.translationX = viewModel.melodyView.width.toFloat()
         }
       }
@@ -68,13 +70,47 @@ class PaletteUI() : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
           .translationX(viewModel.melodyView.width.toFloat())
           .withEndAction { viewModel.melodyView.alpha = 1f }
           .start()
-        viewModel.melodyCenterHorizontalScroller.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+
+        // Some tasty un-threadsafe spaghetti for syncing the two RecyclerViews for Harmony and Melody
+        val inScrollingStack = AtomicBoolean(false)
+        viewModel.melodyViewModel.melodyCenterHorizontalScroller.addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
-            info("onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}")
-            val otherLayoutManager = viewModel.harmonyView.harmonyElementRecycler.layoutManager as LinearLayoutManager
-            val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter?.elementWidth ?: Int.MAX_VALUE)
-            otherLayoutManager.scrollToPositionWithOffset(recyclerView.firstVisibleItemPosition, offset)
+            if (!inScrollingStack.getAndSet(true)) {
+              verbose { "onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}" }
+              val otherLayoutManager = viewModel.harmonyViewModel.harmonyElementRecycler!!.layoutManager as LinearLayoutManager
+              val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyViewModel.beatAdapter.elementWidth)
+              otherLayoutManager.scrollToPositionWithOffset(
+                recyclerView.firstVisibleItemPosition,
+                offset
+              )
+              viewModel.harmonyViewModel.harmonyView?.post {
+                viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
+              }
+            }
+            post {
+              inScrollingStack.set(false)
+            }
+          }
+        })
+        viewModel.harmonyViewModel.harmonyElementRecycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+          override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            if (!inScrollingStack.getAndSet(true)) {
+              verbose { "onScrolled in harmony: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}" }
+              val otherLayoutManager = viewModel.melodyViewModel.melodyCenterHorizontalScroller.layoutManager as LinearLayoutManager
+              val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter.elementWidth)
+              otherLayoutManager.scrollToPositionWithOffset(
+                recyclerView.firstVisibleItemPosition,
+                offset
+              )
+              //viewModel.harmonyViewModel.harmonyView?.post {
+                viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
+              //}
+            }
+            post {
+              inScrollingStack.set(false)
+            }
           }
         })
       }
@@ -93,7 +129,7 @@ class PaletteUI() : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       alignParentTop()
     }
 
-    viewModel.chordListView = chordListView(viewModel = viewModel) {
+    viewModel.sectionListView = sectionListView(viewModel = viewModel) {
       id = R.id.chord_list
     }.lparams {
       below(viewModel.orbifold)
@@ -102,18 +138,18 @@ class PaletteUI() : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       height = wrapContent
     }
 
-    viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
-      id = R.id.toolbar
+    viewModel.harmonyView = harmonyView(viewModel = viewModel) {
+      id = R.id.harmony
     }.lparams {
-      below(viewModel.chordListView)
+      below(viewModel.sectionListView)
       width = matchParent
       height = wrapContent
     }
 
-    viewModel.harmonyView = harmonyView(viewModel = viewModel.harmonyViewModel) {
-      id = R.id.harmony
+    viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
+      id = R.id.toolbar
     }.lparams {
-      below(viewModel.toolbarView)
+      below(viewModel.harmonyView)
       width = matchParent
       height = wrapContent
     }
@@ -121,27 +157,27 @@ class PaletteUI() : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
     viewModel.partListView = partListView(viewModel = viewModel) {
       id = R.id.part_list
     }.lparams {
+      below(viewModel.toolbarView)
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      below(viewModel.harmonyView)
     }
 
     viewModel.melodyView = melodyView(viewModel = viewModel) {
       id = R.id.melody
       alpha = 0f
     }.lparams {
+      below(viewModel.toolbarView)
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      below(viewModel.harmonyView)
     }
   }
 
   private fun _RelativeLayout.landscapeLayout(ui: AnkoContext<PaletteEditorActivity>) {
     val leftSideWidth = dip(350f)
 
-    viewModel.chordListView = chordListView(viewModel = viewModel) {
+    viewModel.sectionListView = sectionListView(viewModel = viewModel) {
       id = R.id.chord_list
     }.lparams {
       width = leftSideWidth
@@ -156,7 +192,7 @@ class PaletteUI() : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       id = R.id.orbifold
     }.lparams {
       alignParentLeft()
-      below(viewModel.chordListView)
+      below(viewModel.sectionListView)
       width = leftSideWidth
       height = if (isTablet) {
         Math.round(leftSideWidth * 1.5f)
@@ -190,7 +226,7 @@ class PaletteUI() : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
 
     }
 
-    viewModel.harmonyView = harmonyView(viewModel = viewModel.harmonyViewModel) {
+    viewModel.harmonyView = harmonyView(viewModel = viewModel) {
       id = R.id.harmony
     }.lparams {
       width = matchParent

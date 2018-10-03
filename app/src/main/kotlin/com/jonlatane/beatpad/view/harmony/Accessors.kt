@@ -1,11 +1,12 @@
 package com.jonlatane.beatpad.view.harmony
 
 import android.view.ViewManager
+import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.custom.ankoView
 
 
 fun ViewManager.harmonyView(
-  viewModel: HarmonyViewModel,
+  viewModel: PaletteViewModel,
   theme: Int = 0,
   init: HarmonyView.() -> Unit = {}
-) = ankoView({ HarmonyView(it, viewModel) }, theme, init)
+): HarmonyView = ankoView({ HarmonyView(it, viewModel) }, theme, init)
