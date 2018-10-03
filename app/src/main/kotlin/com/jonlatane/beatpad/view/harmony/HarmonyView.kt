@@ -2,6 +2,7 @@ package com.jonlatane.beatpad.view.harmony
 
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
+import android.text.TextUtils
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -31,6 +32,8 @@ class HarmonyView(
     override fun produceInstance() = textView {
       textSize = 20f
       maxLines = 1
+      singleLine = true
+      ellipsize = TextUtils.TruncateAt.END
       typeface = MainApplication.chordTypeface
       elevation = 5f
     }.lparams(width = wrapContent, height = wrapContent) {
@@ -115,32 +118,53 @@ class HarmonyView(
     // Render the harmony if there is one
     val harmony: Harmony? = viewModel.harmonyViewModel.harmony
     if (harmony != null) {
-      val upperBound = (lastBeatPosition + 1) * harmony.subdivisionsPerBeat
-      val lowerBound = Math.min(harmony.subdivisionsPerBeat * firstBeatPosition, harmony.lowerKey(firstBeatPosition))
+      val changes = harmony.changes
+      val subdivisionsPerBeat = harmony.subdivisionsPerBeat
+      val upperBound = (lastBeatPosition + 1) * subdivisionsPerBeat
+      val strictLowerBound = subdivisionsPerBeat * firstBeatPosition
+      val lowerBound = Math.min(strictLowerBound, harmony.lowerKey(strictLowerBound))
 
       val visibleChanges: SortedMap<Int, Chord> = harmony.changes
           .headMap(upperBound, true)
           .tailMap(lowerBound)
-      info { "Visible changes: $visibleChanges" }
+      info { "Visible changes for beats [$firstBeatPosition, $lastBeatPosition]/[$lowerBound, $upperBound]: $visibleChanges" }
 
 
       val locationOnScreen = intArrayOf(-1, -1)
+      val recyclerView = viewModel.harmonyViewModel.harmonyElementRecycler!!
 
       visibleChanges.forEach { position, chord ->
         val label = chordChangeLabels[position]
           ?: chordChangeLabelPool.borrow().also { chordChangeLabels[position] = it }
-        label.apply {
-          val beatPosition = (position.toFloat() / harmony.subdivisionsPerBeat).toInt()
-          (viewModel.harmonyViewModel.harmonyElementRecycler?.layoutManager as? LinearLayoutManager)
-            ?.findViewByPosition(beatPosition)
-            ?.let { view: View ->
+        label.apply textView@{
+          val beatPosition = (position.toFloat() / subdivisionsPerBeat).toInt()
+          (recyclerView.layoutManager as LinearLayoutManager)
+            .run {
+              findViewByPosition(beatPosition) ?:
+              if(beatPosition < firstBeatPosition)findViewByPosition(firstBeatPosition)
+              else null
+            }?.let { view: View ->
               view.getLocationOnScreen(locationOnScreen)
               val beatViewX = locationOnScreen[0]
-              viewModel.harmonyViewModel.harmonyElementRecycler!!.getLocationOnScreen(locationOnScreen)
+              val chordPositionOffset = view.width * (position % subdivisionsPerBeat).toFloat() / subdivisionsPerBeat
+              val chordPositionX = beatViewX + chordPositionOffset
+              recyclerView.getLocationOnScreen(locationOnScreen)
               val recyclerViewX = locationOnScreen[0]
-              info { "Location of view for $text @ (beat $beatPosition) is ${beatViewX}" }
-              this@apply.translationX = Math.max(0f, (beatViewX - recyclerViewX).toFloat())
-              this@apply.text = chord.name
+              val chordTranslationX = (chordPositionX - recyclerViewX).toFloat()
+              info { "Location of view for $text @ (beat $beatPosition) is $chordTranslationX" }
+              this@textView.translationX = Math.max(0f, chordTranslationX)
+              this@textView.text = chord.name
+              this@textView.layoutParams = this@textView.layoutParams.apply {
+                maxWidth = (view.width * 1.5f).toInt()
+                if(
+                  chordTranslationX < 0
+                  && harmony.changeBefore((beatPosition + 1) * harmony.subdivisionsPerBeat) != chord
+                ) {
+                  alpha = -chordTranslationX / view.width
+                } else {
+                  alpha = 1f
+                }
+              }
             }
           /*val translationX = Math.max(
             0f,
@@ -166,6 +190,10 @@ class HarmonyView(
       }
       chordChangeLabels[-1] = chordChangeLabelPool.borrow().apply {
         text = "No harmony"
+        layoutParams = this.layoutParams.apply {
+          maxWidth = Int.MAX_VALUE
+          alpha = 1f
+        }
       }
     }
   }

@@ -93,7 +93,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
             }
           }
         })
-        viewModel.harmonyViewModel.harmonyElementRecycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        viewModel.harmonyViewModel.harmonyElementRecycler!!.addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
             if (!inScrollingStack.getAndSet(true)) {
@@ -104,9 +104,9 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
                 recyclerView.firstVisibleItemPosition,
                 offset
               )
-              //viewModel.harmonyViewModel.harmonyView?.post {
+              viewModel.harmonyViewModel.harmonyView?.post {
                 viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
-              //}
+              }
             }
             post {
               inScrollingStack.set(false)
