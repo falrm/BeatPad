@@ -159,6 +159,7 @@ class HarmonyView(
               info { "Location of view for $text @ (beat $beatPosition) is $chordTranslationX" }
               this@textView.translationX = chordTranslationX
               this@textView.text = chord.name
+              this@textView.alpha = 1f
               this@textView.layoutParams = this@textView.layoutParams.apply {
                 maxWidth = (view.width * 1.5f).toInt()
               }
@@ -195,6 +196,7 @@ class HarmonyView(
       }
       chordChangeLabels[-1] = chordChangeLabelPool.borrow().apply {
         text = "No harmony"
+        alpha = 1f
         layoutParams = this.layoutParams.apply {
           maxWidth = Int.MAX_VALUE
         }
