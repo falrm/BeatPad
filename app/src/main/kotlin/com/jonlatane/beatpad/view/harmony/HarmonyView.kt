@@ -137,7 +137,7 @@ class HarmonyView(
 
       var lastView: TextView? = null
       var lastTranslationX: Float? = null
-      visibleChanges.forEach { position, chord ->
+      visibleChanges.forEach { (position, chord) ->
         val label = chordChangeLabels[position]
           ?: chordChangeLabelPool.borrow().also { chordChangeLabels[position] = it }
         label.apply textView@{
@@ -184,13 +184,13 @@ class HarmonyView(
         }
       }
       val entriesToRemove = chordChangeLabels.filterKeys { !visibleChanges.containsKey(it) }
-      entriesToRemove.forEach { key, textView ->
+      entriesToRemove.forEach { (key, textView) ->
         chordChangeLabels.remove(key)
         chordChangeLabelPool.recycle(textView)
       }
     } else {
       //No harmony, render some placeholder stuff
-      chordChangeLabels.toMap().forEach { key, textView ->
+      chordChangeLabels.toMap().forEach { (key, textView) ->
         chordChangeLabels.remove(key)
         chordChangeLabelPool.recycle(textView)
       }
