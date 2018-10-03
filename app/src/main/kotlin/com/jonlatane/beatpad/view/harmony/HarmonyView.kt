@@ -10,6 +10,7 @@ import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.output.service.let
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
@@ -49,6 +50,7 @@ class HarmonyView(
         info("Clearing textview $text")
         text = ""
         translationX = 0f
+        alpha = 1f
       }
     }
   }
@@ -133,6 +135,8 @@ class HarmonyView(
       val locationOnScreen = intArrayOf(-1, -1)
       val recyclerView = viewModel.harmonyViewModel.harmonyElementRecycler!!
 
+      var lastView: TextView? = null
+      var lastTranslationX: Float? = null
       visibleChanges.forEach { position, chord ->
         val label = chordChangeLabels[position]
           ?: chordChangeLabelPool.borrow().also { chordChangeLabels[position] = it }
@@ -150,21 +154,22 @@ class HarmonyView(
               val chordPositionX = beatViewX + chordPositionOffset
               recyclerView.getLocationOnScreen(locationOnScreen)
               val recyclerViewX = locationOnScreen[0]
-              val chordTranslationX = (chordPositionX - recyclerViewX).toFloat()
+              val chordTranslationX = Math.max(0f, (chordPositionX - recyclerViewX).toFloat())
+
               info { "Location of view for $text @ (beat $beatPosition) is $chordTranslationX" }
-              this@textView.translationX = Math.max(0f, chordTranslationX)
+              this@textView.translationX = chordTranslationX
               this@textView.text = chord.name
               this@textView.layoutParams = this@textView.layoutParams.apply {
                 maxWidth = (view.width * 1.5f).toInt()
-                if(
-                  chordTranslationX < 0
-                  && harmony.changeBefore((beatPosition + 1) * harmony.subdivisionsPerBeat) != chord
-                ) {
-                  alpha = -chordTranslationX / view.width
-                } else {
-                  alpha = 1f
+              }
+
+              (lastTranslationX to lastView).let { lastTranslationX, lastView ->
+                if(chordTranslationX - lastTranslationX < lastView.width) {
+                  lastView.alpha = (chordTranslationX - lastTranslationX) / lastView.width
                 }
               }
+              lastView = this@textView
+              lastTranslationX = chordTranslationX
             }
           /*val translationX = Math.max(
             0f,
@@ -192,7 +197,6 @@ class HarmonyView(
         text = "No harmony"
         layoutParams = this.layoutParams.apply {
           maxWidth = Int.MAX_VALUE
-          alpha = 1f
         }
       }
     }
