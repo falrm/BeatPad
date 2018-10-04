@@ -33,7 +33,7 @@ android {
 		minSdkVersion 21
 		targetSdkVersion 27
 		versionCode 21
-		versionName "Sectional 0.6.5-dev"
+		versionName "Sectional 0.6.10"
 		multiDexEnabled true
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 	}
