@@ -73,7 +73,9 @@ class PaletteViewModel {
     toolbarView.updateTempoButton()
     partListAdapter?.notifyDataSetChanged()
     sectionListAdapter?.notifyDataSetChanged()
-    BeatClockPaletteConsumer.section = new.sections.first()
+    if(BeatClockPaletteConsumer.section == null) {
+      BeatClockPaletteConsumer.section = new.sections.first()
+    }
   }
 
   var editingSequence by observable<Melody<*>?>(null) { _, _, new ->

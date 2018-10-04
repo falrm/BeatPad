@@ -128,25 +128,24 @@ class HarmonyBeatView @JvmOverloads constructor(
         ) 255 else 187
         canvas.drawColorGuide()
         canvas.drawStepNotes(melody, elementPosition)*/
+        val isPlaying = viewModel?.paletteViewModel?.playbackTick?.convertPatternIndex(
+          from = BeatClockPaletteConsumer.ticksPerBeat,
+          to = harmony
+        ) == elementPosition
+
         val chord = harmony.changeBefore(elementPosition)
         paint.color = chord.run {
           when {
-            isDominant -> color(R.color.dominant)
-            isDiminished -> color(R.color.diminished)
-            isMinor -> color(R.color.minor)
-            isAugmented -> color(R.color.augmented)
-            isMajor -> color(R.color.major)
-            else -> color(android.R.color.white)
+            isDominant -> color(R.color.dominant).withAlpha(if(isPlaying) 255 else 187)
+            isDiminished -> color(R.color.diminished).withAlpha(if(isPlaying) 255 else 187)
+            isMinor -> color(R.color.minor).withAlpha(if(isPlaying) 255 else 187)
+            isAugmented -> color(R.color.augmented).withAlpha(if(isPlaying) 255 else 187)
+            isMajor -> color(R.color.major).withAlpha(if(isPlaying) 255 else 187 )
+            // Tint the white beat - an inverse
+            else -> color(R.color.colorPrimaryDark).withAlpha(if(isPlaying) 100 else 0)
           }
         }
 
-        val paintAlpha = if (
-          viewModel?.paletteViewModel?.playbackTick?.convertPatternIndex(
-            from = BeatClockPaletteConsumer.ticksPerBeat,
-            to = harmony
-          ) == elementPosition
-        ) 255 else 187
-        paint.color = paint.color.withAlpha(paintAlpha)
         canvas.drawRect(
           bounds.left.toFloat(),
           bounds.top.toFloat(),

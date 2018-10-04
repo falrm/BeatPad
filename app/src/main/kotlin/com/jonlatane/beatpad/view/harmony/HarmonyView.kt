@@ -129,7 +129,7 @@ class HarmonyView(
       val visibleChanges: SortedMap<Int, Chord> = harmony.changes
           .headMap(upperBound, true)
           .tailMap(lowerBound)
-      info { "Visible changes for beats [$firstBeatPosition, $lastBeatPosition]/[$lowerBound, $upperBound]: $visibleChanges" }
+      verbose { "Visible changes for beats [$firstBeatPosition, $lastBeatPosition]/[$lowerBound, $upperBound]: $visibleChanges" }
 
 
       val locationOnScreen = intArrayOf(-1, -1)
@@ -156,7 +156,7 @@ class HarmonyView(
               val recyclerViewX = locationOnScreen[0]
               val chordTranslationX = Math.max(0f, (chordPositionX - recyclerViewX).toFloat())
 
-              info { "Location of view for $text @ (beat $beatPosition) is $chordTranslationX" }
+              verbose { "Location of view for $text @ (beat $beatPosition) is $chordTranslationX" }
               this@textView.translationX = chordTranslationX
               this@textView.text = chord.name
               this@textView.alpha = 1f
@@ -165,22 +165,13 @@ class HarmonyView(
               }
 
               (lastTranslationX to lastView).let { lastTranslationX, lastView ->
-                if(chordTranslationX - lastTranslationX < lastView.width) {
+                if(chordTranslationX - lastTranslationX <= lastView.width) {
                   lastView.alpha = (chordTranslationX - lastTranslationX) / lastView.width
                 }
               }
               lastView = this@textView
               lastTranslationX = chordTranslationX
             }
-          /*val translationX = Math.max(
-            0f,
-            (
-              ((position.toFloat()/harmony.subdivisionsPerBeat - firstBeatPosition) * viewModel.harmonyViewModel.beatAdapter.elementWidth)
-                - horizontalScrollOffset
-              )
-          )
-          info { "Setting translationX of $text to $translationX based on firstBeatPosition=$firstBeatPosition, position=$position, offset=$horizontalScrollOffset" }
-          this.translationX = translationX*/
         }
       }
       val entriesToRemove = chordChangeLabels.filterKeys { !visibleChanges.containsKey(it) }
