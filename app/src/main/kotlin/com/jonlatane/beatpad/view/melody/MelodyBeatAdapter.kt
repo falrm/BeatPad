@@ -29,7 +29,7 @@ class MelodyBeatAdapter(
   private val maximumElementHeight get() = recyclerView.run { dip(maximumBeatHeightDp) }
 
   @Volatile
-  var elementWidth = recyclerView.run { dip(initialBeatWidthDp) }
+  var elementWidth: Int = recyclerView.run { dip(initialBeatWidthDp) }
     @Synchronized set(value) {
       if(field != value) {
         field = when {
@@ -45,8 +45,8 @@ class MelodyBeatAdapter(
         recyclerView.applyToHolders<MelodyBeatHolder> {
           it.element.layoutWidth = field
         }
-        viewModel.paletteViewModel.harmonyViewModel.beatAdapter.elementWidth = field
       }
+      viewModel.paletteViewModel.harmonyViewModel.beatAdapter.elementWidth = field
     }
 
   @Volatile

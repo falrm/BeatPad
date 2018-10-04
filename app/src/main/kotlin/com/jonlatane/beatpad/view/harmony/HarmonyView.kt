@@ -166,7 +166,10 @@ class HarmonyView(
 
               (lastTranslationX to lastView).let { lastTranslationX, lastView ->
                 if(chordTranslationX - lastTranslationX <= lastView.width) {
-                  lastView.alpha = (chordTranslationX - lastTranslationX) / lastView.width
+                  val newAlpha = ((chordTranslationX - lastTranslationX) / lastView.width)
+                    .takeIf { it.isFinite() } ?: 0f
+                  verbose { "Setting alpha of ${lastView.text} to $newAlpha"}
+                  lastView.alpha = newAlpha
                 }
               }
               lastView = this@textView
