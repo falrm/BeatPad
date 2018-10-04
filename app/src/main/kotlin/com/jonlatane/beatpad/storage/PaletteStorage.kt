@@ -42,7 +42,7 @@ object PaletteStorage : AnkoLogger {
         changes = TreeMap(
           mapOf(
             0  to Chord(0, Maj),
-            13 to Chord(0, Aug),
+            //13 to Chord(0, Aug),
             16 to Chord(11, min7flat5),
             24 to Chord(4, MajAddFlat9),
             32 to Chord(9, min7),

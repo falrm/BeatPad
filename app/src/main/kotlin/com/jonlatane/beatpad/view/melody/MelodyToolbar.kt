@@ -163,7 +163,7 @@ class MelodyToolbar(
     when(this) {
       is RationalMelody -> {
         val transposed = transpose(interval)
-        transposed.changes.forEach { index, element ->
+        transposed.changes.forEach { (index, element) ->
           changes[index] = element
         }
       }
@@ -174,7 +174,7 @@ class MelodyToolbar(
   private fun Melody<*>.transposeInPlace(harmony: Harmony) {
     when(this) {
       is RationalMelody -> {
-        changes.forEach { index, element ->
+        changes.forEach { (index, element) ->
           val harmonyPosition = index.convertPatternIndex(this, harmony)
           val chordInHarmony = harmony.changeBefore(harmonyPosition)
           val interval = (tonic - chordInHarmony.root).mod12Nearest
@@ -189,7 +189,7 @@ class MelodyToolbar(
   private fun Melody<*>.transposeOutOf(harmony: Harmony) {
     when(this) {
       is RationalMelody -> {
-        changes.forEach { index, element ->
+        changes.forEach { (index, element) ->
           val harmonyPosition = index.convertPatternIndex(this, harmony)
           val chordInHarmony = harmony.changeBefore(harmonyPosition)
           val interval = (chordInHarmony.root - tonic).mod12Nearest + tonic.mod12Nearest
