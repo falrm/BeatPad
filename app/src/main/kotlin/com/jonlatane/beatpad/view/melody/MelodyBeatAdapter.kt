@@ -28,9 +28,10 @@ class MelodyBeatAdapter(
   private val minimumElementHeight get() = viewModel.melodyCenterVerticalScroller.height
   private val maximumElementHeight get() = recyclerView.run { dip(maximumBeatHeightDp) }
 
-  @Volatile
+//  @Volatile
   var elementWidth: Int = recyclerView.run { dip(initialBeatWidthDp) }
-    @Synchronized set(value) {
+//    @Synchronized
+    set(value) {
       if(field != value) {
         field = when {
           value < minimumElementWidth -> {
@@ -49,9 +50,10 @@ class MelodyBeatAdapter(
       viewModel.paletteViewModel.harmonyViewModel.beatAdapter.elementWidth = field
     }
 
-  @Volatile
+//  @Volatile
   var elementHeight = recyclerView.run { dip(initialBeatHeightDp) }
-    @Synchronized set(value) {
+//    @Synchronized
+    set(value) {
       field = when {
         value < minimumElementHeight -> {
           minimumElementHeight

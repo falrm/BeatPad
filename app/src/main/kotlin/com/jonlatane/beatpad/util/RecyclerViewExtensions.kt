@@ -11,7 +11,8 @@ fun <HolderType: RecyclerView.ViewHolder>RecyclerView.applyToHolders(
 ) {
   (0 until adapter.itemCount).
     mapNotNull { findViewHolderForAdapterPosition(it) as? HolderType }
-    .forEach { post { mutation(it) } }
+    .forEach { mutation(it) }
+  adapter.notifyDataSetChanged()
 
 	/*(0 until childCount)
 		.map { getChildViewHolder(getChildAt(it)) as HolderType }

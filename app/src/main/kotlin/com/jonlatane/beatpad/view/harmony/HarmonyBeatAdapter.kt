@@ -18,9 +18,10 @@ class HarmonyBeatAdapter(
 ) : RecyclerView.Adapter<HarmonyBeatHolder>(), AnkoLogger {
   private val minimumElementWidth: Int = recyclerView.run { dip(minimumBeatWidthDp) }
 
-  @Volatile
+//  @Volatile
   var elementWidth = recyclerView.run { dip(initialBeatWidthDp) }
-    @Synchronized set(value) {
+//    @Synchronized
+		set(value) {
 			if (field != value) {
         field = when {
           value > minimumElementWidth -> {

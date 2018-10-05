@@ -54,7 +54,7 @@ class PaletteToolbar(ctx: Context,
   val tempoTapper = button {
     text = ""
     toolbarStyle()
-    onLongClick {
+    onLongClick(returnValue = true) {
       showTempoPicker()
     }
   }.lparams {

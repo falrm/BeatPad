@@ -85,24 +85,18 @@ var View.translationXY: Float
 
 var View.layoutWidth get() = this.layoutParams.width
 	set(value) {
-		val layoutParams = this.layoutParams
-		layoutParams.width = value
-		this.layoutParams = layoutParams
+		layoutParams = layoutParams.apply { width = value }
 	}
 
 var View.layoutHeight get() = this.layoutParams.height
 	set(value) {
-		val layoutParams = this.layoutParams
-		layoutParams.height = value
-		this.layoutParams = layoutParams
+		layoutParams = layoutParams.apply { height = value }
 	}
 
-
 fun View.animateWidth(width: Int, duration: Long = defaultDuration) {
-	val anim = ValueAnimator.ofInt(this.measuredWidth, width)
+	val anim = ValueAnimator.ofInt(measuredWidth, width)
 	anim.addUpdateListener { valueAnimator ->
-		val value = valueAnimator.animatedValue as Int
-		this.layoutWidth = value
+		layoutWidth = valueAnimator.animatedValue as Int
 	}
 	anim.setDuration(duration).start()
 }
@@ -111,8 +105,7 @@ fun View.animateHeight(height: Int, duration: Long = defaultDuration) {
 	val anim = ValueAnimator.ofInt(this.measuredHeight, height)
   anim.interpolator = LinearInterpolator()
 	anim.addUpdateListener { valueAnimator ->
-		val value = valueAnimator.animatedValue as Int
-		this.layoutHeight = value
+		this.layoutHeight = valueAnimator.animatedValue as Int
 	}
 	anim.setDuration(duration).start()
 }
