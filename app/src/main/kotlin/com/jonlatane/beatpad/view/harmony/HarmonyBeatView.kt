@@ -18,6 +18,9 @@ import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.util.vibrate
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.withAlpha
+import android.view.MotionEvent
+
+
 
 
 class HarmonyBeatView @JvmOverloads constructor(
@@ -38,6 +41,7 @@ class HarmonyBeatView @JvmOverloads constructor(
   //val chord: Chord? get() = try { harmony?.changeBefore(elementPosition) } catch(e: NoSuchElementException) { null }
 
   private val editChangeMenu: PopupMenu
+  private val lastTouchDownXY = FloatArray(2)
 
   init {
     isClickable = true
@@ -55,12 +59,23 @@ class HarmonyBeatView @JvmOverloads constructor(
       true
     }
 
-    setOnClickListener { event ->
-      val chord = getPositionAndElement(event.x)?.second
+    setOnClickListener { _ ->
+      val chord = getPositionAndElement(lastTouchDownXY[0])?.second
       chord?.let {
         viewModel?.paletteViewModel?.orbifold?.disableNextTransitionAnimation()
         viewModel?.paletteViewModel?.orbifold?.chord = it
       }
+    }
+
+    setOnTouchListener { v, event ->
+      // save the X,Y coordinates
+      if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+        lastTouchDownXY[0] = event.x
+        lastTouchDownXY[1] = event.y
+      }
+
+      // let the touch event pass on to whoever needs it
+      false
     }
 
     setOnLongClickListener { _ ->
@@ -153,12 +168,17 @@ class HarmonyBeatView @JvmOverloads constructor(
           bounds.bottom.toFloat(),
           paint
         )
-        canvas.drawRhythm(elementIndex)
+        canvas.drawRhythm(harmony, elementIndex)
       }
     }
     if(harmony == null) {
-      canvas.drawRhythm(0)
+      canvas.drawRhythm(null, 0)
     }
+    bounds.apply {
+      left = overallBounds.right
+      right = overallBounds.right
+    }
+    canvas.drawRhythm(harmony, harmony?.subdivisionsPerBeat ?: 1)
   }
 
   fun getPositionAndElement(x: Float): Pair<Int, Chord?>? {
@@ -166,16 +186,17 @@ class HarmonyBeatView @JvmOverloads constructor(
       val elementRange: IntRange = elementRange!!
       val elementIndex: Int = (elementRange.size * x / width).toInt()
       val elementPosition = Math.min(beatPosition * harmony.subdivisionsPerBeat + elementIndex, harmony.length - 1)
-      return elementIndex to harmony.changeBefore(elementPosition)
+      return elementPosition to harmony.changeBefore(elementPosition)
     }
   }
 
-  private fun Canvas.drawRhythm(elementIndex: Int) {
+  private fun Canvas.drawRhythm(harmony: Harmony?, elementIndex: Int) {
     paint.color = 0xAA212121.toInt()
+    val halfWidth = if (elementIndex % (harmony?.subdivisionsPerBeat ?: 1) == 0) 5f else 1f
     drawRect(
-      bounds.left.toFloat(),
+      bounds.left.toFloat() - halfWidth,
       bounds.top.toFloat(),
-      bounds.left.toFloat() + if (elementIndex == 0) 10f else 5f,
+      bounds.left.toFloat() + halfWidth,
       bounds.bottom.toFloat(),
       paint
     )

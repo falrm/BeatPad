@@ -1,11 +1,13 @@
 package com.jonlatane.beatpad.view.orbifold
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.harmony.Orbit
 import com.jonlatane.beatpad.model.harmony.Orbifold
@@ -169,7 +171,9 @@ class OrbifoldView @JvmOverloads constructor(
       elevation = defaultElevation
       tag = null
     } as TextView
-    return result
+    return result.apply {
+      typeface = MainApplication.chordTypeface
+    }
   }
 
   private fun inflateAxisView(): View {

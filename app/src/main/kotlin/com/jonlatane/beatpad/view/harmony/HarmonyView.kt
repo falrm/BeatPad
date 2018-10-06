@@ -35,7 +35,7 @@ class HarmonyView(
       maxLines = 1
       singleLine = true
       ellipsize = TextUtils.TruncateAt.END
-      typeface = MainApplication.chordTypeface
+      typeface = MainApplication.chordTypefaceBold
       elevation = 5f
     }.lparams(width = wrapContent, height = wrapContent) {
       topMargin = dip(10)

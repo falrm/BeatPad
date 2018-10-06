@@ -5,6 +5,7 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.widget.SeekBar
 import android.widget.TextView
+import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
@@ -25,6 +26,7 @@ interface PartHolderLayout {
 				singleLine = true
 				ellipsize = TextUtils.TruncateAt.MARQUEE
 				marqueeRepeatLimit = -1
+				typeface = MainApplication.chordTypeface
 				isSelected = true
 				gravity = Gravity.CENTER_HORIZONTAL
 				backgroundResource = R.drawable.part_background
