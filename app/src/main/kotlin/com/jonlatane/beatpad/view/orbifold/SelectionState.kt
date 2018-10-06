@@ -24,13 +24,23 @@ object SelectionState : NavigationState, AnkoLogger {
     val theta = Math.PI / v.sequences.size
     val (maxTX, maxTY) = computeMaxTranslations(v.width, v.height)// = v.width * 0.4f
 
+    v.centralChord.animate()
+      .translationX(0f)
+      .translationY(0f)
+      .scaleX(CENTRAL_CHORD_SCALE).scaleY(CENTRAL_CHORD_SCALE)
+      .alpha(1f).setDuration(ANIMATION_DURATION).start()
+
     v.halfStepUp.animate()
+      .translationX(0f)
       .translationY(-(v.halfStepUp.scaledHeight + v.centralChord.scaledHeight) / 2f)
       .translationZ(0f)
+      .scaleX(HALF_STEP_SCALE).scaleY(HALF_STEP_SCALE)
       .alpha(1f).setDuration(ANIMATION_DURATION).start()
     v.halfStepDown.animate()
+      .translationX(0f)
       .translationY((v.halfStepDown.scaledHeight + v.centralChord.scaledHeight) / 2f)
       .translationZ(0f)
+      .scaleX(HALF_STEP_SCALE).scaleY(HALF_STEP_SCALE)
       .alpha(1f).setDuration(ANIMATION_DURATION).start()
 
     v.halfStepBackground.animateHeight(
@@ -169,8 +179,10 @@ object SelectionState : NavigationState, AnkoLogger {
     val forwardAlpha = if (v.centralChord.text == sv.forward.text) 0.2f else 1f
     val backAlpha = if (v.centralChord.text == sv.back.text) 0.2f else 1f
     sv.forward.animate()
+      .scaleX(1f).scaleY(1f)
       .translationX(tX).translationY(tY).alpha(forwardAlpha).setDuration(ANIMATION_DURATION).start()
     sv.back.animate()
+      .scaleX(1f).scaleY(1f)
       .translationX(-tX).translationY(tY).alpha(backAlpha).setDuration(ANIMATION_DURATION).start()
   }
 

@@ -49,8 +49,8 @@ class MelodyBeatView @JvmOverloads constructor(
   }
   val drawWidth get() = elementRange?.let { (width.toFloat() / it.size).toInt() } ?: 0
   override val drawPadding: Int
-    get() = if (drawWidth > dip(37f)) dip(5)
-    else Math.max(0, drawWidth - dip(32f))
+    get() = if (drawWidth > dip(27f)) dip(5)
+    else Math.max(0, drawWidth - dip(22f))
   override val nonRootPadding get() = drawPadding
   private val harmony: Harmony? get() = viewModel.paletteViewModel.harmonyViewModel.harmony
 
@@ -87,16 +87,22 @@ class MelodyBeatView @JvmOverloads constructor(
         ) 255 else 187
         canvas.drawColorGuide()
         canvas.drawStepNotes(melody, elementPosition)
-        canvas.drawRhythm(elementIndex)
+        canvas.drawRhythm(melody, elementIndex)
       }
+
+      bounds.apply {
+        left = overallWidth
+        right = overallWidth
+      }
+      canvas.drawRhythm(melody, melody.subdivisionsPerBeat)
     }
   }
 
   //override val chord: Chord get() = super.chord
-  override fun melodyOffsetAt(elementPosition: Int) = viewModel?.let { it.openedMelody?.offsetUnder(chord)  } ?: 0
+  override fun melodyOffsetAt(elementPosition: Int) = viewModel.let { it.openedMelody?.offsetUnder(chord)  } ?: 0
 
   override fun onTouchEvent(event: MotionEvent): Boolean {
-    return when (viewModel?.melodyEditingModifiers?.modifier) {
+    return when (viewModel.melodyEditingModifiers.modifier) {
       MelodyEditingModifiers.Modifier.None -> false
       MelodyEditingModifiers.Modifier.Editing -> onTouchEditEvent(event)
       MelodyEditingModifiers.Modifier.Articulating -> true//onTouchArticulateEvent(event)
@@ -152,12 +158,13 @@ class MelodyBeatView @JvmOverloads constructor(
     }
   }
 
-  private fun Canvas.drawRhythm(elementIndex: Int) {
+  private fun Canvas.drawRhythm(melody: Melody<*>, elementIndex: Int) {
     p.color = 0xAA212121.toInt()
+    val halfWidth = if (elementIndex % melody.subdivisionsPerBeat == 0) 5f else 1f
     drawRect(
-      bounds.left.toFloat(),
+      bounds.left.toFloat() - halfWidth,
       bounds.top.toFloat(),
-      bounds.left.toFloat() + if (elementIndex == 0) 10f else 5f,
+      bounds.left.toFloat() + halfWidth,
       bounds.bottom.toFloat(),
       p
     )
