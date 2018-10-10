@@ -47,7 +47,7 @@ class HarmonyView(
     override fun validateInstance(instance: TextView) {
       super.validateInstance(instance)
       instance.apply {
-        info("Clearing textview $text")
+        verbose { "Clearing textview $text" }
         text = ""
         translationX = 0f
         alpha = 1f

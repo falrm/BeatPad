@@ -16,8 +16,10 @@ import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.chord.*
 import com.jonlatane.beatpad.model.melody.RationalMelody
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import org.jetbrains.anko.AnkoLogger
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 
 object PaletteStorage : AnkoLogger {
@@ -25,7 +27,7 @@ object PaletteStorage : AnkoLogger {
 
   val basePalette
     get() = Palette(
-      sections = mutableListOf(Section(harmony = baseHarmony)),
+      sections = mutableListOf(Section()),
       parts = mutableListOf(Part())
     )
 
@@ -87,6 +89,10 @@ object PaletteStorage : AnkoLogger {
         parts.add(Part())
       }
 
+      // Re-initialize MIDI channels for any parts
+      val channel = AtomicInteger(0)
+      parts.forEach { (it.instrument as? MIDIInstrument)?.channel = channel.getAndIncrement().toByte() }
+
       val sections: MutableList<Section> = root["sections"].asIterable()
         .map { mapper.treeToValue<Section>(it) }
         .toMutableList()
@@ -100,6 +106,7 @@ object PaletteStorage : AnkoLogger {
         ?: parts[0]
       val splatPart = parts.firstOrNull { it.id == UUID.fromString(mapper.treeToValue(root["splatPart"])) }
         ?: parts[0]
+
 
       return Palette(
         id = mapper.treeToValue(root["id"]),

@@ -5,31 +5,18 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.view.colorboard.colorboardView
 import com.jonlatane.beatpad.view.harmony.harmonyView
 import com.jonlatane.beatpad.view.keyboard.keyboardView
 import com.jonlatane.beatpad.view.melody.melodyView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
-import org.billthefarmer.mididriver.GeneralMidiConstants
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
-import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
 class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
-  private val executorService = Executors.newScheduledThreadPool(2)
   val viewModel = PaletteViewModel()
-  val previewInstrument = MIDIInstrument().apply {
-    channel = 4
-    instrument = GeneralMidiConstants.SYNTH_BASS_1
-  }
-  val sequencerInstrument = MIDIInstrument().apply {
-    channel = 5
-    instrument = GeneralMidiConstants.SYNTH_BASS_1
-  }
-
 
   override fun createView(ui: AnkoContext<PaletteEditorActivity>) = with(ui) {
 
@@ -45,7 +32,6 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       viewModel.orbifold.onChordChangedListener = { chord ->
         val tones = chord.getTones()
         viewModel.colorboardView.chord = chord
-        //viewModel.harmonyController.tones = tones
         viewModel.keyboardView.ioHandler.highlightChord(chord)
         viewModel.melodyViewModel.verticalAxis?.chord = chord
         viewModel.splatController?.tones = chord.getTones()
@@ -57,7 +43,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       viewModel.orbifold.onOrbifoldChangeListener = { viewModel.palette.orbifold = it }
 
       onLayoutChange { view: View?, i: Int, i1: Int, i2: Int, i3: Int, i4: Int, i5: Int, i6: Int, i7: Int ->
-        if (viewModel.editingSequence == null) {
+        if (viewModel.editingMelody == null) {
           viewModel.melodyView.translationX = viewModel.melodyView.width.toFloat()
         }
       }

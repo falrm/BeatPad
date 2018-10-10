@@ -8,6 +8,7 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.Button
 import android.widget.LinearLayout
+import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.NonDelayedHorizontalScrollView
 import org.jetbrains.anko._LinearLayout
 import org.jetbrains.anko.button
@@ -54,8 +55,8 @@ class MelodyEditingModifiers @JvmOverloads constructor(
 			this.layoutParams = layoutParams
 		}
 
-	fun View.animateWeight(height: Float, duration: Long = 300L) {
-		val anim = ValueAnimator.ofFloat(this.layoutWeight, height)
+	fun View.animateWeight(weight: Float, duration: Long = 300L) {
+		val anim = ValueAnimator.ofFloat(this.layoutWeight, weight)
 		anim.interpolator = LinearInterpolator()
 		anim.addUpdateListener { valueAnimator ->
 			val value = valueAnimator.animatedValue as Float
@@ -92,10 +93,12 @@ class MelodyEditingModifiers @JvmOverloads constructor(
 						// We have a new pointer. Lets add it to the list of pointers
 						modifier = modifierOf(button)
 						button.animateWeight(20f)
+            vibrate(10)
 					}
 					MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> {
 						modifier = Modifier.None
 						button.animateWeight(1f)
+            vibrate(10)
 					}
 				}
 				true

@@ -32,7 +32,7 @@ class MelodyHolder(
 		newPatternMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
 				R.id.newDrawnPattern ->
-					viewModel.editingSequence = adapter.insert(newPattern())
+					viewModel.editingMelody = adapter.insert(newPattern())
 				R.id.newMidiPattern -> context.toast("TODO!")
 				R.id.newAudioPattern -> context.toast("TODO!")
 				else -> context.toast("Impossible!")
@@ -42,7 +42,7 @@ class MelodyHolder(
 		editPatternMenu.inflate(R.menu.part_melody_edit_menu)
 		editPatternMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
-				R.id.editPattern -> viewModel.editingSequence = pattern
+				R.id.editPattern -> viewModel.editingMelody = pattern
 				R.id.removePattern -> showConfirmDialog(
 					context,
 					promptText = "Really delete this melody?",
@@ -76,7 +76,7 @@ class MelodyHolder(
 			text = ""
 			backgroundResource = R.drawable.orbifold_chord
 			setOnClickListener {
-				viewModel.editingSequence = pattern
+				viewModel.editingMelody = pattern
 			}
 			setOnLongClickListener {
 				editPatternMenu.show()
@@ -90,7 +90,7 @@ class MelodyHolder(
 			text = "+"
 			backgroundResource = R.drawable.orbifold_chord
 			setOnClickListener {
-				viewModel.editingSequence = adapter.insert(newPattern())
+				viewModel.editingMelody = adapter.insert(newPattern())
 			}
 			setOnLongClickListener {
 				newPatternMenu.show()

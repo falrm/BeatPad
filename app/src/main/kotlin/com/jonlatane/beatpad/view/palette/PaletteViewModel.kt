@@ -58,7 +58,7 @@ class PaletteViewModel {
   lateinit var orbifold: OrbifoldView
 
   var palette: Palette by observable(initialValue = Palette()) { _, _, new ->
-    editingSequence = null
+    editingMelody = null
     if (new.parts.isEmpty()) {
       new.parts.add(Part())
     }
@@ -78,7 +78,7 @@ class PaletteViewModel {
     }
   }
 
-  var editingSequence by observable<Melody<*>?>(null) { _, _, new ->
+  var editingMelody: Melody<*>? by observable<Melody<*>?>(null) { _, _, new ->
     if (new != null) {
       melodyViewModel.openedMelody = new
       colorboardView.hide()
@@ -117,8 +117,8 @@ class PaletteViewModel {
   }
 
   fun onBackPressed(): Boolean {
-    val result = editingSequence != null
-    editingSequence = null
+    val result = editingMelody != null
+    editingMelody = null
     return result
   }
 
