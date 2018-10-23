@@ -29,7 +29,7 @@ class MelodyToneAxis @JvmOverloads constructor(
 	override fun onDraw(canvas: Canvas) {
 		super.onDraw(canvas)
 		canvas.getClipBounds(bounds)
-		canvas.drawColorGuide()
+		//canvas.drawColorGuide()
 		canvas.renderSteps()
 		drawStepNotes(canvas)
 	}

@@ -19,6 +19,9 @@ import org.jetbrains.anko.button
 class MelodyEditingModifiers @JvmOverloads constructor(
 	context: Context
 ) : _LinearLayout(context) {
+  companion object {
+    const val vibrationMs = 10
+  }
 	sealed class Modifier {
 		object None: Modifier()
 		object Editing: Modifier()
@@ -93,12 +96,12 @@ class MelodyEditingModifiers @JvmOverloads constructor(
 						// We have a new pointer. Lets add it to the list of pointers
 						modifier = modifierOf(button)
 						button.animateWeight(20f)
-            vibrate(10)
+            vibrate(vibrationMs)
 					}
 					MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> {
 						modifier = Modifier.None
 						button.animateWeight(1f)
-            vibrate(10)
+            vibrate(vibrationMs)
 					}
 				}
 				true
