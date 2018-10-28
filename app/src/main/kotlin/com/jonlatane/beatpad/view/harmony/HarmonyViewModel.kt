@@ -10,14 +10,19 @@ open class HarmonyViewModel {
   var paletteViewModel: PaletteViewModel? = null
   var harmonyView: HarmonyView? = null
   lateinit var beatAdapter: HarmonyBeatAdapter
-  var selectedChord: Chord? = null
+  //var selectedChord: Chord? = null
   var harmonyElementRecycler: ZoomableRecyclerView? = null
   set(value) {
     field = value
     beatAdapter.notifyDataSetChanged()
   }
   val harmony: Harmony? get() = BeatClockPaletteConsumer.harmony
+  var isEditingChord: Boolean = false
   var selectedHarmonyElements: IntRange? = null
+  set(value) {
+    field = value
+    beatAdapter.notifyDataSetChanged()
+  }
   fun notifyHarmonyChanged() {
     beatAdapter.notifyDataSetChanged()
     //harmonyView?.post {

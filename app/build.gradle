@@ -27,7 +27,7 @@ kotlin {
 
 android {
 	compileSdkVersion 27
-	buildToolsVersion '28.0.2'
+	buildToolsVersion '28.0.3'
 	defaultConfig {
 		applicationId "com.jonlatane.beatpad"
 		minSdkVersion 21

@@ -42,17 +42,25 @@ class HarmonyBeatView @JvmOverloads constructor(
 
   private val editChangeMenu: PopupMenu
   private val lastTouchDownXY = FloatArray(2)
+  private val lastTouchDownX get() = lastTouchDownXY[0]
+  private val lastTouchDownY get() = lastTouchDownXY[1]
 
   init {
     isClickable = true
 
     editChangeMenu = PopupMenu(context, this)
     editChangeMenu.inflate(R.menu.harmony_element_menu)
+    editChangeMenu.setOnDismissListener {
+      viewModel?.selectedHarmonyElements = null
+    }
     editChangeMenu.setOnMenuItemClickListener { item ->
       when (item.itemId) {
-      //R.id.newDrawnPattern -> adapter.newToneSequence()
-        R.id.newChordChange -> {context.toast("TODO")}
-        R.id.editChordChange -> {context.toast("TODO")}
+        R.id.newChordChange -> {
+          context.toast("TODO")
+        }
+        R.id.editChordChange -> {
+          editSelectedChord()
+        }
         R.id.removeChordChange -> {context.toast("TODO")}
         else -> context.toast("TODO!")
       }
@@ -78,9 +86,12 @@ class HarmonyBeatView @JvmOverloads constructor(
       false
     }
 
-    setOnLongClickListener { _ ->
+    setOnLongClickListener { ev ->
       vibrate(150)
       harmony?.let { harmony ->
+        getPositionAndElement(lastTouchDownX)?.let { (position, _) ->
+          viewModel?.selectedHarmonyElements = position..position
+        }
         /*val isChange = harmony.isChangeAt(elementPosition)
         viewModel?.selectedChord = chord
         editChangeMenu.menu.findItem(R.id.newChordChange).isVisible = !isChange
@@ -131,33 +142,31 @@ class HarmonyBeatView @JvmOverloads constructor(
           left = (overallWidth.toFloat() * elementIndex / elementCount).toInt()
           right = (overallWidth.toFloat() * (elementIndex+1) / elementCount).toInt()
         }
-        /*chord = harmony?.let { harmony ->
-          val harmonyPosition = elementPosition.convertPatternIndex(melody, harmony)
-          harmony.changeBefore(harmonyPosition)
-        } ?: viewModel?.orbifold?.chord ?: MelodyBeatView.DEFAULT_CHORD
-        colorGuideAlpha = if (
-          viewModel?.playbackTick?.convertPatternIndex(
-            from = BeatClockPaletteConsumer.ticksPerBeat,
-            to = melody
-          ) == elementPosition
-        ) 255 else 187
-        canvas.drawColorGuide()
-        canvas.drawStepNotes(melody, elementPosition)*/
         val isPlaying = viewModel?.paletteViewModel?.playbackTick?.convertPatternIndex(
           from = BeatClockPaletteConsumer.ticksPerBeat,
           to = harmony
         ) == elementPosition
+        val isSelected = viewModel?.selectedHarmonyElements?.contains(elementPosition) ?: false
+        val isHighlighted = isPlaying or isSelected
+        val isFaded = !isSelected && viewModel?.selectedHarmonyElements != null
+        fun Int.withHighlight() = this.withAlpha(
+          when {
+            isHighlighted -> 255
+            isFaded -> 41
+            else -> 187
+          }
+        )
 
         val chord = harmony.changeBefore(elementPosition)
         paint.color = chord.run {
           when {
-            isDominant -> color(R.color.dominant).withAlpha(if(isPlaying) 255 else 187)
-            isDiminished -> color(R.color.diminished).withAlpha(if(isPlaying) 255 else 187)
-            isMinor -> color(R.color.minor).withAlpha(if(isPlaying) 255 else 187)
-            isAugmented -> color(R.color.augmented).withAlpha(if(isPlaying) 255 else 187)
-            isMajor -> color(R.color.major).withAlpha(if(isPlaying) 255 else 187 )
-            // Tint the white beat - an inverse
-            else -> color(R.color.colorPrimaryDark).withAlpha(if(isPlaying) 100 else 0)
+            isDominant -> color(R.color.dominant).withHighlight()
+            isDiminished -> color(R.color.diminished).withHighlight()
+            isMinor -> color(R.color.minor).withHighlight()
+            isAugmented -> color(R.color.augmented).withHighlight()
+            isMajor -> color(R.color.major).withHighlight()
+            // Tint the white beat - inverse
+            else -> color(R.color.colorPrimaryDark).withAlpha(if(isHighlighted) 100 else 0)
           }
         }
 
@@ -200,5 +209,16 @@ class HarmonyBeatView @JvmOverloads constructor(
       bounds.bottom.toFloat(),
       paint
     )
+  }
+
+  private fun editSelectedChord() {
+    val chordRange = viewModel?.selectedHarmonyElements?.let {
+      val start = harmony!!.floorKey(it.first)
+      var end = harmony!!.higherKey(it.first) - 1
+      if(end < start) end = harmony!!.length - 1
+      start..end
+    }
+    viewModel?.selectedHarmonyElements = chordRange
+    viewModel?.isEditingChord = true
   }
 }
