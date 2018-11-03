@@ -5,6 +5,7 @@ import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.error
 import org.jetbrains.anko.info
 import org.jetbrains.anko.verbose
+import java.util.*
 
 internal class PlaybackThread : Thread(), AnkoLogger {
   companion object {
@@ -39,6 +40,9 @@ internal class PlaybackThread : Thread(), AnkoLogger {
           }
         } else {
           BeatClockPaletteConsumer.clearActiveAttacks()
+          synchronized(PlaybackThread) {
+            (PlaybackThread as java.lang.Object).wait()
+          }
           Thread.sleep(10)
         }
       } catch (t: Throwable) {

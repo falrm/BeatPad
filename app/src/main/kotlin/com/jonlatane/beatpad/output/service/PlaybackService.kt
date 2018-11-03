@@ -54,6 +54,9 @@ class PlaybackService : Service(), AnkoLogger {
         info("Clicked Play")
         BeatClockPaletteConsumer.tickPosition = 0
         playbackThread.stopped = false
+        synchronized(PlaybackThread) {
+          (PlaybackThread as java.lang.Object).notify()
+        }
       }
       Action.PAUSE_ACTION -> {
         info("Clicked Stop")
