@@ -44,6 +44,7 @@ class HarmonyBeatView @JvmOverloads constructor(
   private val lastTouchDownXY = FloatArray(2)
   private val lastTouchDownX get() = lastTouchDownXY[0]
   private val lastTouchDownY get() = lastTouchDownXY[1]
+  private val removeChordMenuItem get() = editChangeMenu.menu.findItem(R.id.removeChordChange)
 
   init {
     isClickable = true
@@ -51,17 +52,27 @@ class HarmonyBeatView @JvmOverloads constructor(
     editChangeMenu = PopupMenu(context, this)
     editChangeMenu.inflate(R.menu.harmony_element_menu)
     editChangeMenu.setOnDismissListener {
-      viewModel?.selectedHarmonyElements = null
+      viewModel?.apply {
+        if(!isEditingChord) selectedHarmonyElements = null
+      }
     }
     editChangeMenu.setOnMenuItemClickListener { item ->
       when (item.itemId) {
         R.id.newChordChange -> {
-          context.toast("TODO")
+          val position = viewModel?.selectedHarmonyElements!!.first
+          harmony!!.changes[position] = harmony!!.changeBefore(position)
+          viewModel?.harmonyView?.syncScrollingChordText()
+          editSelectedChord()
         }
         R.id.editChordChange -> {
           editSelectedChord()
         }
-        R.id.removeChordChange -> {context.toast("TODO")}
+        R.id.removeChordChange -> {
+          val position = viewModel?.selectedHarmonyElements!!.first
+          val key = harmony!!.floorKey(position)!!
+          harmony!!.changes.remove(key)
+          viewModel?.harmonyView?.syncScrollingChordText()
+        }
         else -> context.toast("TODO!")
       }
       true
@@ -92,15 +103,7 @@ class HarmonyBeatView @JvmOverloads constructor(
         getPositionAndElement(lastTouchDownX)?.let { (position, _) ->
           viewModel?.selectedHarmonyElements = position..position
         }
-        /*val isChange = harmony.isChangeAt(elementPosition)
-        viewModel?.selectedChord = chord
-        editChangeMenu.menu.findItem(R.id.newChordChange).isVisible = !isChange
-        editChangeMenu.menu.findItem(R.id.removeChordChange).isVisible = harmony.changes.values.count { it != null } > 1
-        when {
-          harmony.isChangeAt(elementPosition) -> {
-
-          }
-        }*/
+        removeChordMenuItem.isVisible = harmony.changes.count() > 1
         editChangeMenu.show()
       }
       true
