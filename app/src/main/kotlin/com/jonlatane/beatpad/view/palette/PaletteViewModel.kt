@@ -63,7 +63,7 @@ class PaletteViewModel {
       new.parts.add(Part())
     }
     if (new.parts.isEmpty()) {
-      new.sections.add(Section(harmony = PaletteStorage.baseHarmony))
+      new.sections.add(Section())
     }
     keyboardPart = new.keyboardPart ?: new.parts[0]
     colorboardPart = new.colorboardPart ?: new.parts[0]

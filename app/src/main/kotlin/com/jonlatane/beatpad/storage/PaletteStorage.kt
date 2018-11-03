@@ -97,7 +97,7 @@ object PaletteStorage : AnkoLogger {
         .map { mapper.treeToValue<Section>(it) }
         .toMutableList()
       if (sections.isEmpty()) {
-        sections.add(Section(harmony = baseHarmony))
+        sections.add(Section())
       }
 
       val keyboardPart = parts.firstOrNull { it.id == UUID.fromString(mapper.treeToValue(root["keyboardPart"])) }
