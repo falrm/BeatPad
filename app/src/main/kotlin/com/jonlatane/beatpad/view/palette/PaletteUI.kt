@@ -30,14 +30,17 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       keyboardsLayout()
 
       viewModel.orbifold.onChordChangedListener = { chord ->
-        val tones = chord.getTones()
-        viewModel.colorboardView.chord = chord
-        viewModel.keyboardView.ioHandler.highlightChord(chord)
-        viewModel.melodyViewModel.verticalAxis?.chord = chord
-        viewModel.splatController?.tones = chord.getTones()
-        viewModel.palette.chord = chord
-        viewModel.melodyViewModel.redraw()
-        BeatClockPaletteConsumer.chord = chord
+        if(!viewModel.harmonyViewModel.isEditingChord) {
+          viewModel.colorboardView.chord = chord
+          viewModel.keyboardView.ioHandler.highlightChord(chord)
+          viewModel.melodyViewModel.verticalAxis?.chord = chord
+          viewModel.splatController?.tones = chord.getTones()
+          viewModel.palette.chord = chord
+          viewModel.melodyViewModel.redraw()
+          BeatClockPaletteConsumer.chord = chord
+        } else {
+          viewModel.harmonyViewModel.editingChord = chord
+        }
       }
 
       viewModel.orbifold.onOrbifoldChangeListener = { viewModel.palette.orbifold = it }

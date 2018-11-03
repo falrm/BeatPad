@@ -21,20 +21,8 @@ internal class PlaybackThread : Thread(), AnkoLogger {
         if (!stopped) {
           val start = System.currentTimeMillis()
           val tickTime: Long = 60000L / (BeatClockPaletteConsumer.palette!!.bpm.toInt() * subdivisionsPerBeat)
-          /*when {
-            tickPosition % subdivisionsPerBeat == 0 -> tickPosition / subdivisionsPerBeat
-            else -> null
-          }?.let { info("Quarter #$it") }*/
           verbose { "Tick @${BeatClockPaletteConsumer.tickPosition} (T:${System.currentTimeMillis()}" }
           tryWithRetries { BeatClockPaletteConsumer.tick() }
-          /*val sleepTime = (tickTime - (System.currentTimeMillis() - start)).let {
-            when {
-              it < 0 -> 0L
-              it > 800 -> 800L
-              else -> it
-            }
-          }
-          Thread.sleep(sleepTime)*/
           while(System.currentTimeMillis() < start + tickTime) {
             Thread.sleep(3L)
           }

@@ -117,8 +117,12 @@ class PaletteViewModel {
   }
 
   fun onBackPressed(): Boolean {
-    val result = editingMelody != null
-    editingMelody = null
+    val result = harmonyViewModel.isEditingChord || editingMelody != null
+    if(harmonyViewModel.isEditingChord) {
+      harmonyViewModel.isEditingChord = false
+    } else {
+      editingMelody = null
+    }
     return result
   }
 

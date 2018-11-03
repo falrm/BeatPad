@@ -86,7 +86,7 @@ class HarmonyBeatView @JvmOverloads constructor(
       }
     }
 
-    setOnTouchListener { v, event ->
+    setOnTouchListener { _, event ->
       // save the X,Y coordinates
       if (event.actionMasked == MotionEvent.ACTION_DOWN) {
         lastTouchDownXY[0] = event.x
@@ -97,7 +97,7 @@ class HarmonyBeatView @JvmOverloads constructor(
       false
     }
 
-    setOnLongClickListener { ev ->
+    setOnLongClickListener { _ ->
       vibrate(150)
       harmony?.let { harmony ->
         getPositionAndElement(lastTouchDownX)?.let { (position, _) ->
@@ -215,11 +215,17 @@ class HarmonyBeatView @JvmOverloads constructor(
   }
 
   private fun editSelectedChord() {
+    var chord: Chord? = null
     val chordRange = viewModel?.selectedHarmonyElements?.let {
+      chord = harmony!!.changeBefore(it.first)
       val start = harmony!!.floorKey(it.first)
       var end = harmony!!.higherKey(it.first) - 1
       if(end < start) end = harmony!!.length - 1
       start..end
+    }
+    viewModel?.paletteViewModel?.orbifold?.let {
+      it.disableNextTransitionAnimation()
+      it.chord = chord!!
     }
     viewModel?.selectedHarmonyElements = chordRange
     viewModel?.isEditingChord = true

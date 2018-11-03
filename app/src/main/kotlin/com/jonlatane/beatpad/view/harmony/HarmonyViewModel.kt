@@ -14,19 +14,32 @@ open class HarmonyViewModel {
   var harmonyElementRecycler: ZoomableRecyclerView? = null
   set(value) {
     field = value
-    beatAdapter.notifyDataSetChanged()
+    notifyHarmonyChanged()
   }
   val harmony: Harmony? get() = BeatClockPaletteConsumer.harmony
   var isEditingChord: Boolean = false
+  set(value) {
+    field = value
+    if(!value) selectedHarmonyElements = null
+  }
   var selectedHarmonyElements: IntRange? = null
   set(value) {
     field = value
+    notifyHarmonyChanged()
     beatAdapter.notifyDataSetChanged()
+  }
+  var editingChord: Chord?
+  get() = selectedHarmonyElements?.let {
+    harmony!!.changeBefore(it.first)
+  }
+  set(value) {
+    selectedHarmonyElements?.let {
+      harmony!!.changes[it.first] = value
+    }
+    notifyHarmonyChanged()
   }
   fun notifyHarmonyChanged() {
     beatAdapter.notifyDataSetChanged()
-    //harmonyView?.post {
-      harmonyView?.syncScrollingChordText()
-    //}
+    harmonyView?.syncScrollingChordText()
   }
 }

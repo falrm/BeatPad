@@ -59,6 +59,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
       viewModel?.orbifold?.post {
         if (
           section?.harmony != null
+          && viewModel?.harmonyViewModel?.isEditingChord != true
           && chord != viewModel?.orbifold?.chord
         ) {
           viewModel?.orbifold?.disableNextTransitionAnimation()

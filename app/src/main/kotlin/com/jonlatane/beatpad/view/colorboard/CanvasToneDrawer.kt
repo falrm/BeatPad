@@ -115,17 +115,11 @@ interface CanvasToneDrawer : AlphaDrawer {
       )
       for (toneMaybeNotInChord in (bottomMostNote..(bottomMostNote + halfStepsOnScreen.toInt() + 2))) {
         val toneInChord = chord.closestTone(toneMaybeNotInChord)
-        if(this is MelodyBeatView) {
-          println("yolo")
-        }
         if(toneInChord == toneMaybeNotInChord) {
           currentScreenNote.center = currentScreenNote.top + (0.5f * halfStepPhysicalDistance)
         }
         if (toneInChord != currentScreenNote.tone) {
           result.add(currentScreenNote)
-          if(this is MelodyBeatView) {
-            println("yolo")
-          }
           currentScreenNote = OnScreenNote(
             tone = toneInChord,
             pressed = false,
