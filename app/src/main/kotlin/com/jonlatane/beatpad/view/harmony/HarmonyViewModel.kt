@@ -37,6 +37,7 @@ open class HarmonyViewModel {
       harmony!!.changes[it.first] = value
     }
     notifyHarmonyChanged()
+    paletteViewModel?.melodyElementAdapter?.notifyDataSetChanged()
   }
   fun notifyHarmonyChanged() {
     beatAdapter.notifyDataSetChanged()

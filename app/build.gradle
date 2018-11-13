@@ -32,8 +32,8 @@ android {
 		applicationId "com.jonlatane.beatpad"
 		minSdkVersion 21
 		targetSdkVersion 27
-		versionCode 23
-		versionName "Harmonica 0.7.0"
+		versionCode 24
+		versionName "Harmonica 0.7.1"
 		multiDexEnabled true
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 	}

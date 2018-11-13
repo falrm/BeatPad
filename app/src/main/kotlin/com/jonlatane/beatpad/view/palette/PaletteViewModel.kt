@@ -73,7 +73,7 @@ class PaletteViewModel {
     toolbarView.updateTempoButton()
     partListAdapter?.notifyDataSetChanged()
     sectionListAdapter?.notifyDataSetChanged()
-    if(BeatClockPaletteConsumer.section == null) {
+    if(!new.sections.contains(BeatClockPaletteConsumer.section)) {
       BeatClockPaletteConsumer.section = new.sections.first()
     }
   }
