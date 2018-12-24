@@ -13,7 +13,7 @@ import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.mod12
 import com.jonlatane.beatpad.util.mod12Nearest
-import com.jonlatane.beatpad.util.toolbarStyle
+import com.jonlatane.beatpad.util.toolbarTextStyle
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -53,7 +53,7 @@ class MelodyToolbar(
 		onClick {
 			relativeToMenu.show()
 		}
-		toolbarStyle()
+		toolbarTextStyle()
 	}.lparams {
 		width = matchParent
 		height = wrapContent

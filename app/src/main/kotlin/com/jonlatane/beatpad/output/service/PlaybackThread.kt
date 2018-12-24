@@ -1,10 +1,8 @@
 package com.jonlatane.beatpad.output.service
 
 import BeatClockPaletteConsumer.tickPosition
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.error
-import org.jetbrains.anko.info
-import org.jetbrains.anko.verbose
+import com.jonlatane.beatpad.R
+import org.jetbrains.anko.*
 import java.util.*
 
 internal class PlaybackThread : Thread(), AnkoLogger {
@@ -27,11 +25,12 @@ internal class PlaybackThread : Thread(), AnkoLogger {
             Thread.sleep(3L)
           }
         } else {
+          BeatClockPaletteConsumer.viewModel?.toolbarView?.playButton?.imageResource = R.drawable.icons8_play_100
           BeatClockPaletteConsumer.clearActiveAttacks()
           synchronized(PlaybackThread) {
             (PlaybackThread as java.lang.Object).wait()
           }
-          Thread.sleep(10)
+          //Thread.sleep(10)
         }
       } catch (t: Throwable) {
         error( "Error during background playback", t)

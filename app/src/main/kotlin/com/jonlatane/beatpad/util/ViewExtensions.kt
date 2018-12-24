@@ -17,6 +17,10 @@ import android.view.animation.Animation
 import android.widget.TextView
 import org.jetbrains.anko.allCaps
 import org.jetbrains.anko.singleLine
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+
+
 
 
 private val defaultDuration get() = 300L
@@ -25,7 +29,7 @@ interface HideableView {
 	var initialHeight: Int?
 }
 
-fun TextView.toolbarStyle() {
+fun TextView.toolbarTextStyle() {
 	singleLine = true
 	ellipsize = TextUtils.TruncateAt.MARQUEE
 	marqueeRepeatLimit = -1
@@ -93,10 +97,15 @@ var View.layoutHeight get() = this.layoutParams.height
 		layoutParams = layoutParams.apply { height = value }
 	}
 
-fun View.animateWidth(width: Int, duration: Long = defaultDuration) {
+fun View.animateWidth(width: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
 	val anim = ValueAnimator.ofInt(measuredWidth, width)
 	anim.addUpdateListener { valueAnimator ->
 		layoutWidth = valueAnimator.animatedValue as Int
+	}
+	endAction?.let {
+		anim.addListener(object : AnimatorListenerAdapter() {
+			override fun onAnimationEnd(animation: Animator) = it()
+		})
 	}
 	anim.setDuration(duration).start()
 }

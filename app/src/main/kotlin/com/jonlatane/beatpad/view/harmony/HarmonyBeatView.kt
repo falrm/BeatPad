@@ -2,10 +2,7 @@ package com.jonlatane.beatpad.view.harmony
 
 import BeatClockPaletteConsumer
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.PointF
-import android.graphics.Rect
+import android.graphics.*
 import android.util.SparseArray
 import android.view.View
 import android.widget.PopupMenu
@@ -114,7 +111,8 @@ class HarmonyBeatView @JvmOverloads constructor(
   private val paint = Paint()
 
   private val overallBounds = Rect()
-  private var bounds = Rect()
+  private val bounds = Rect()
+  private val hsv = FloatArray(3)
   override fun onDraw(canvas: Canvas) {
     super.onDraw(canvas)
     canvas.getClipBounds(overallBounds)
@@ -150,7 +148,7 @@ class HarmonyBeatView @JvmOverloads constructor(
           to = harmony
         ) == elementPosition
         val isSelected = viewModel?.selectedHarmonyElements?.contains(elementPosition) ?: false
-        val isHighlighted = isPlaying or isSelected
+        val isHighlighted = isPlaying
         val isFaded = !isSelected && viewModel?.selectedHarmonyElements != null
         fun Int.withHighlight() = this.withAlpha(
           when {
@@ -158,7 +156,17 @@ class HarmonyBeatView @JvmOverloads constructor(
             isFaded -> 41
             else -> 187
           }
-        )
+        ).let {
+          when {
+            isHighlighted -> {
+              Color.colorToHSV(it, hsv)
+//                hsv[1] = 0.1f
+              hsv[2] = 0.5f
+              Color.HSVToColor(hsv)
+            }
+            else          -> it
+          }
+        }
 
         val chord = harmony.changeBefore(elementPosition)
         paint.color = chord.run {
@@ -169,7 +177,7 @@ class HarmonyBeatView @JvmOverloads constructor(
             isAugmented -> color(R.color.augmented).withHighlight()
             isMajor -> color(R.color.major).withHighlight()
             // Tint the white beat - inverse
-            else -> color(R.color.colorPrimaryDark).withAlpha(if(isHighlighted) 100 else 0)
+            else -> color(R.color.colorPrimaryDark).withAlpha(if(isHighlighted || isSelected) 100 else 0)
           }
         }
 
