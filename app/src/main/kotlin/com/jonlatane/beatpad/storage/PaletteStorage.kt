@@ -121,7 +121,13 @@ object PaletteStorage : AnkoLogger {
         orbifold = Orbifold.valueOf(mapper.treeToValue(root["orbifold"])),
         chord = mapper.treeToValue(root["chord"])
 
-      )
+      ).apply {
+        sections.forEach { section ->
+          section.melodies.forEach { melodyReference ->
+            melodyReference.melody = parts.flatMap { it.melodies }.first { it.id == melodyReference.melody.id }
+          }
+        }
+      }
     }
   }
 }

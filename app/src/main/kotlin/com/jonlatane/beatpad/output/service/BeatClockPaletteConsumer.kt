@@ -69,12 +69,13 @@ object BeatClockPaletteConsumer : AnkoLogger {
     }
     verbose { "Harmony index: $harmonyPosition; Chord: $chord" }
     palette?.parts?.map { part ->
-      part.melodies/*.filter { it.enabled }*/.forEach { melody ->
+      section?.melodies?.filter { part.melodies.contains(it.melody) }?.forEach { melodyReference ->
+        val melody = melodyReference.melody
         val attack = attackPool.borrow()
 
         if (
           true == (melody as? RationalMelody)
-            ?.populateAttack(part, chord, attack)
+            ?.populateAttack(part, chord, attack, melodyReference.volume)
         ) {
           currentAttackIndex++
           upcomingAttacks += attack
@@ -87,7 +88,8 @@ object BeatClockPaletteConsumer : AnkoLogger {
 
   fun tick() {
     palette?.let { palette ->
-      val enabledMelodies = palette.parts.flatMap { it.melodies }//.filter { it.enabled }
+      val enabledMelodies = section?.melodies?.map { it.melody }
+        ?: palette.parts.flatMap { it.melodies }//.filter { it.enabled }
       val totalBeats = enabledMelodies
         .map { it.length.toFloat() / it.subdivisionsPerBeat.toFloat() }
         .reduce(::max)
@@ -160,7 +162,8 @@ object BeatClockPaletteConsumer : AnkoLogger {
   private fun RationalMelody.populateAttack(
     part: Part,
     chord: Chord?,
-    attack: Attack
+    attack: Attack,
+    volume: Float
   ): Boolean {
     val offset = chord?.let { offsetUnder(it) } ?: 0
     val currentBeat: Double = tickPosition.toDouble() / ticksPerBeat
@@ -187,7 +190,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
             attack.part = part
             attack.instrument = part.instrument
             attack.melody = this
-            attack.velocity = change.velocity
+            attack.velocity = change.velocity * volume
 
             change.tones.forEach { tone ->
               val transposedTone = tone + offset

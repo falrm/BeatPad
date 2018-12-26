@@ -15,13 +15,14 @@ import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 
 object Storage: AnkoLogger {
+	private const val openPaletteFileName = "palette.json"
 
 
 	fun storePalette(palette: Palette, context: Context) = try {
-		context.openFileOutput("palette.json", Context.MODE_PRIVATE).use { fileOutputStream ->
+		context.openFileOutput(openPaletteFileName, Context.MODE_PRIVATE).use { fileOutputStream ->
 			writer.writeValue(fileOutputStream, palette)
 		}
-		verbose {
+		info {
 			"Stored palette: ${stringify(palette) }"
 		}
 	} catch (e: IOException) {
@@ -29,10 +30,10 @@ object Storage: AnkoLogger {
 	}
 
 	fun loadPalette(context: Context): Palette = try {
-		val palette = context.openFileInput("palette.json").use { fileInputStream ->
+		val palette = context.openFileInput(openPaletteFileName).use { fileInputStream ->
 			AppObjectMapper.readValue(fileInputStream, Palette::class.java)
 		}
-		verbose {
+		info {
 			"Loaded palette: ${stringify(palette)}"
 		}
 		palette
