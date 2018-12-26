@@ -17,6 +17,7 @@ import com.jonlatane.beatpad.model.harmony.chord.Maj7
 import com.jonlatane.beatpad.model.harmony.chordsequence.Chromatic
 import com.jonlatane.beatpad.showOrbifoldPicker
 import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.view.HideableRelativeLayout
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.util.*
@@ -26,8 +27,8 @@ class OrbifoldView @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet? = null,
   defStyle: Int = 0
-) : RelativeLayout(context, attrs, defStyle) {
-  inline fun <T : View> T.lparams(
+) : HideableRelativeLayout(context) {
+  /*inline fun <T : View> T.lparams(
     width: Int = android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
     height: Int = android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
     init: RelativeLayout.LayoutParams.() -> Unit
@@ -36,7 +37,7 @@ class OrbifoldView @JvmOverloads constructor(
     layoutParams.init()
     this@lparams.layoutParams = layoutParams
     return this
-  }
+  }*/
 
   var onChordChangedListener: ((Chord) -> Unit)? by observable<((Chord) -> Unit)?>(null) { _, _, listener ->
     listener?.invoke(chord)

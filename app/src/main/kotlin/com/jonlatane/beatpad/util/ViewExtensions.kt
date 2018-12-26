@@ -19,8 +19,9 @@ import org.jetbrains.anko.allCaps
 import org.jetbrains.anko.singleLine
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-
-
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import com.jonlatane.beatpad.view.melody.BeatAdapter
 
 
 private val defaultDuration get() = 300L
@@ -141,3 +142,17 @@ fun View.hide(animated: Boolean = true) {
 }
 
 fun View.color(resId: Int) = context.color(resId)
+
+inline val RecyclerView.firstVisibleItemPosition
+  get() = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+
+fun RecyclerView.syncPositionTo(to: RecyclerView) = syncRecyclerViewPositions(this, to)
+
+private fun syncRecyclerViewPositions(from: RecyclerView, to: RecyclerView) {
+	val otherLayoutManager = to.layoutManager as LinearLayoutManager
+	val offset = -from.computeHorizontalScrollOffset() % (to.adapter as BeatAdapter).elementWidth
+	otherLayoutManager.scrollToPositionWithOffset(
+		from.firstVisibleItemPosition,
+		offset
+	)
+}

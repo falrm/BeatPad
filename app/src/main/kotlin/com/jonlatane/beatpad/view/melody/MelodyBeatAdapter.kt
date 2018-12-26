@@ -13,8 +13,8 @@ import org.jetbrains.anko.recyclerview.v7._RecyclerView
 
 class MelodyBeatAdapter(
   val viewModel: MelodyViewModel,
-  val recyclerView: _RecyclerView
-) : RecyclerView.Adapter<MelodyBeatHolder>(), AnkoLogger {
+  override val recyclerView: _RecyclerView
+) : RecyclerView.Adapter<MelodyBeatHolder>(), AnkoLogger, BeatAdapter {
   companion object {
     const val initialBeatWidthDp: Float = 150f
     const val initialBeatHeightDp: Float = 1000f
@@ -29,7 +29,7 @@ class MelodyBeatAdapter(
   private val maximumElementHeight get() = recyclerView.run { dip(maximumBeatHeightDp) }
 
 //  @Volatile
-  var elementWidth: Int = recyclerView.run { dip(initialBeatWidthDp) }
+  override var elementWidth: Int = recyclerView.run { dip(initialBeatWidthDp) }
 //    @Synchronized
     set(value) {
       if(field != value) {
@@ -70,11 +70,6 @@ class MelodyBeatAdapter(
       }
       axis.layoutHeight = field
     }
-
-
-  fun invalidate(beatPosition: Int) {
-    recyclerView.layoutManager.findViewByPosition(beatPosition)?.invalidate()
-  }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyBeatHolder {
     return with(recyclerView) {

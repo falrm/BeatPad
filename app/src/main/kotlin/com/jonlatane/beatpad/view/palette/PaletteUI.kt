@@ -6,9 +6,12 @@ import android.view.View
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.util.firstVisibleItemPosition
+//import com.jonlatane.beatpad.util.syncPositionTo
 import com.jonlatane.beatpad.view.colorboard.colorboardView
 import com.jonlatane.beatpad.view.harmony.harmonyView
 import com.jonlatane.beatpad.view.keyboard.keyboardView
+import com.jonlatane.beatpad.view.melody.BeatAdapter
 import com.jonlatane.beatpad.view.melody.melodyView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
 import org.jetbrains.anko.*
@@ -62,17 +65,14 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
 
         // Some tasty un-threadsafe spaghetti for syncing the two RecyclerViews for Harmony and Melody
         val inScrollingStack = AtomicBoolean(false)
-        viewModel.melodyViewModel.melodyCenterHorizontalScroller.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        val melodyRecycler = viewModel.melodyViewModel.melodyCenterHorizontalScroller
+        val harmonyRecycler = viewModel.harmonyViewModel.harmonyElementRecycler!!
+        melodyRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
             if (!inScrollingStack.getAndSet(true)) {
               verbose { "onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}" }
-              val otherLayoutManager = viewModel.harmonyViewModel.harmonyElementRecycler!!.layoutManager as LinearLayoutManager
-              val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyViewModel.beatAdapter.elementWidth)
-              otherLayoutManager.scrollToPositionWithOffset(
-                recyclerView.firstVisibleItemPosition,
-                offset
-              )
+              (melodyRecycler.adapter as BeatAdapter).syncPositionTo(harmonyRecycler)
               viewModel.harmonyViewModel.harmonyView?.post {
                 viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
               }
@@ -82,17 +82,18 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
             }
           }
         })
-        viewModel.harmonyViewModel.harmonyElementRecycler!!.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        harmonyRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
             if (!inScrollingStack.getAndSet(true)) {
               verbose { "onScrolled in harmony: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}" }
-              val otherLayoutManager = viewModel.melodyViewModel.melodyCenterHorizontalScroller.layoutManager as LinearLayoutManager
-              val offset = -recyclerView.computeHorizontalScrollOffset() % (viewModel.melodyElementAdapter.elementWidth)
-              otherLayoutManager.scrollToPositionWithOffset(
-                recyclerView.firstVisibleItemPosition,
-                offset
-              )
+              // For some reason syncing scrolling this way makes things choppy.
+              // This "if" statement is a hacky optimization around an ostensible Android bug
+              // (or, more likely, other bug in my code). Performance impact is still seen
+              // if you scroll the *harmony* while the *melody* is open.
+              if(viewModel.editingMelody != null) {
+                (harmonyRecycler.adapter as BeatAdapter).syncPositionTo(melodyRecycler)
+              }
               viewModel.harmonyViewModel.harmonyView?.post {
                 viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
               }
@@ -105,9 +106,6 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       }
     }
   }
-
-  val RecyclerView.firstVisibleItemPosition
-    get() = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
 
   private fun _RelativeLayout.portraitLayout() {
     viewModel.orbifold = orbifoldView {

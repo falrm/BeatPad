@@ -2,7 +2,10 @@ package com.jonlatane.beatpad.view.melody
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.Gravity
+import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.PopupMenu
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
@@ -30,7 +33,29 @@ class MelodyToolbar(
 
 	val melodyViewModel get() = viewModel.melodyViewModel
 
-  private val lengthDialog = LengthDialog(context)
+
+	fun <T: View> T.flexStyle() = this.lparams {
+		width = matchParent
+		height = dip(48)
+		weight = 1f
+	}
+
+
+	fun <T: View> T.squareButtonStyle() = this.lparams {
+		width = dip(48)
+		height = dip(48)
+		weight = 0f
+	}
+
+
+	fun <T: View> T.longSquareButtonStyle() = this.lparams {
+		width = dip(96)
+		height = dip(48)
+		weight = 0f
+	}
+
+
+	private val lengthDialog = LengthDialog(context)
 
 	private val lengthButton: Button = button {
 		text = "0/0"
@@ -42,23 +67,16 @@ class MelodyToolbar(
         error("Error showing length dialog", t)
       }
 		}
-	}.lparams {
-		width = matchParent
-		height = wrapContent
-		weight = 1f
-	}
+	}.longSquareButtonStyle()
 
 	private val relativeToButton: Button = button {
 		text = ""
+		gravity = Gravity.LEFT or Gravity.CENTER_VERTICAL
 		onClick {
 			relativeToMenu.show()
 		}
 		toolbarTextStyle()
-	}.lparams {
-		width = matchParent
-		height = wrapContent
-		weight = 1f
-	}
+	}.flexStyle()
 	private val relativeToMenu = PopupMenu(context, relativeToButton).also {
 		it.inflate(R.menu.melody_relative_menu)
 		it.setOnMenuItemClickListener { item ->
@@ -201,8 +219,9 @@ class MelodyToolbar(
     }
   }
 
-	private val upButton = button {
-		text = "Up"
+	private val upButton = imageButton {
+		imageResource = R.drawable.icons8_sort_up_100
+		scaleType = ImageView.ScaleType.FIT_CENTER
 		onClick {
       melodyViewModel.openedMelody?.transposeInPlace(1)
 			updateMelody()
@@ -212,14 +231,11 @@ class MelodyToolbar(
 			context.toast("Octave Up")
 			updateMelody()
 		}
-	}.lparams {
-		width = matchParent
-		height = wrapContent
-		weight = 1f
-	}
+	}.squareButtonStyle()
 
-	private val downButton = button {
-		text = "Down"
+	private val downButton = imageButton {
+		imageResource = R.drawable.icons8_sort_down_100
+		scaleType = ImageView.ScaleType.FIT_CENTER
 		onClick {
       melodyViewModel.openedMelody?.transposeInPlace(-1)
 			updateMelody()
@@ -229,9 +245,5 @@ class MelodyToolbar(
 			context.toast("Octave Down")
 			updateMelody()
 		}
-	}.lparams {
-		width = matchParent
-		height = wrapContent
-		weight = 1f
-	}
+	}.squareButtonStyle()
 }

@@ -22,8 +22,7 @@ class PaletteToolbar(ctx: Context,
                      val viewModel: PaletteViewModel) : _LinearLayout(ctx), AnkoLogger {
 
 
-  val loopImage = context.resources.getDrawable(R.drawable.icons8_rotate_left_100, null)
-  val metronomeImage = context.resources.getDrawable(R.drawable.icons8_metronome_filled_100_3, null).apply {
+  private val metronomeImage = context.resources.getDrawable(R.drawable.icons8_metronome_filled_100_3, null).apply {
     setBounds(0, 0, 60, 60)
   }
 
@@ -43,10 +42,10 @@ class PaletteToolbar(ctx: Context,
 
   val playButton = imageButton {
     imageResource = if(PlaybackService.instance?.isStopped != false) R.drawable.icons8_play_100
-      else R.drawable.icons8_rotate_left_100
+      else R.drawable.icons8_skip_to_start_filled_100
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
-      imageResource = R.drawable.icons8_rotate_left_100
+      imageResource = R.drawable.icons8_skip_to_start_filled_100
       val startIntent = Intent(MainApplication.instance, PlaybackService::class.java)
       startIntent.action = PlaybackService.Companion.Action.PLAY_ACTION
       BeatClockPaletteConsumer.tickPosition = 0
@@ -102,6 +101,19 @@ class PaletteToolbar(ctx: Context,
       viewModel.colorboardView.show()
     else
       viewModel.colorboardView.hide()
+  }
+  init {
+    if(context.configuration.portrait) {
+      val splatButton = imageButton {
+        imageResource = R.drawable.icons8_molecule_filled_100
+        scaleType = ImageView.ScaleType.FIT_CENTER
+      }.palletteToolbarStyle().onClick {
+        if (viewModel.orbifold.isHidden)
+          viewModel.orbifold.show()
+        else
+          viewModel.orbifold.hide()
+      }
+    }
   }
 
   val volumeButton = imageButton {

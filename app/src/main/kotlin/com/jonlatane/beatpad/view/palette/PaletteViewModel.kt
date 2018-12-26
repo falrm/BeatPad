@@ -7,8 +7,8 @@ import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
-import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.util.hide
+//import com.jonlatane.beatpad.util.syncPositionTo
 import com.jonlatane.beatpad.view.HideableRecyclerView
 import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
 import com.jonlatane.beatpad.view.harmony.HarmonyView
@@ -83,6 +83,8 @@ class PaletteViewModel {
       melodyViewModel.openedMelody = new
       colorboardView.hide()
       keyboardView.hide()
+      harmonyViewModel.beatAdapter
+        .syncPositionTo(melodyViewModel.melodyCenterHorizontalScroller)
       editMelodyMode()
     } else {
       partListMode()

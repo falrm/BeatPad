@@ -120,7 +120,6 @@ class HarmonyView(
     // Render the harmony if there is one
     val harmony: Harmony? = viewModel.harmonyViewModel.harmony
     if (harmony != null) {
-      val changes = harmony.changes
       val subdivisionsPerBeat = harmony.subdivisionsPerBeat
       val upperBound = (lastBeatPosition + 1) * subdivisionsPerBeat
       val strictLowerBound = subdivisionsPerBeat * firstBeatPosition
@@ -144,17 +143,21 @@ class HarmonyView(
           val beatPosition = (position.toFloat() / subdivisionsPerBeat).toInt()
           (recyclerView.layoutManager as LinearLayoutManager)
             .run {
-              findViewByPosition(beatPosition) ?:
-              if(beatPosition < firstBeatPosition)findViewByPosition(firstBeatPosition)
+              findViewByPosition(beatPosition)?.let { it to false } ?:
+              if(beatPosition < firstBeatPosition)findViewByPosition(firstBeatPosition) to true
               else null
-            }?.let { view: View ->
+            }?.let { (view: View, isFakeFirstBeat) ->
               view.getLocationOnScreen(locationOnScreen)
-              val beatViewX = locationOnScreen[0]
-              val chordPositionOffset = view.width * (position % subdivisionsPerBeat).toFloat() / subdivisionsPerBeat
-              val chordPositionX = beatViewX + chordPositionOffset
+              val chordPositionX = if(isFakeFirstBeat) {
+                0f
+              } else {
+                val beatViewX = locationOnScreen[0]
+                val chordPositionOffset = view.width * (position % subdivisionsPerBeat).toFloat() / subdivisionsPerBeat
+                beatViewX + chordPositionOffset
+              }
               recyclerView.getLocationOnScreen(locationOnScreen)
               val recyclerViewX = locationOnScreen[0]
-              val chordTranslationX = Math.max(0f, (chordPositionX - recyclerViewX).toFloat())
+              val chordTranslationX = Math.max(0f, chordPositionX - recyclerViewX)
 
               verbose { "Location of view for $text @ (beat $beatPosition) is $chordTranslationX" }
               this@textView.translationX = chordTranslationX
