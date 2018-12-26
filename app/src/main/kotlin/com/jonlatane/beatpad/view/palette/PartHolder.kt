@@ -11,6 +11,7 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showInstrumentPicker
+import com.jonlatane.beatpad.util.applyToHolders
 import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.backgroundColor
@@ -24,7 +25,7 @@ import kotlin.properties.Delegates.observable
 class PartHolder(
 	val viewModel: PaletteViewModel,
 	val layout: ViewGroup,
-	private val patternRecycler: _RecyclerView,
+	private val melodyRecycler: _RecyclerView,
 	private val partName: TextView,
 	private val volumeSeekBar: SeekBar,
 	private val adapter: PartListAdapter,
@@ -32,8 +33,8 @@ class PartHolder(
 ) : RecyclerView.ViewHolder(layout), AnkoLogger {
 	var partPosition by Delegates.observable(initialPart) { _, _, _ -> onPartPositionChanged() }
 	val part get() = viewModel.palette.parts[partPosition]
-	val context get() = patternRecycler.context
-	private val patternAdapter = MelodyAdapter(viewModel, patternRecycler, 0)
+	val context get() = melodyRecycler.context
+	private val patternAdapter = MelodyAdapter(viewModel, melodyRecycler, 0)
 	var editingVolume: Boolean by observable(false) { _, _, editingVolume: Boolean ->
 		if(editingVolume && isEditablePart) {
 			volumeSeekBar.animate().alpha(1f)
@@ -49,6 +50,13 @@ class PartHolder(
 			partName.isClickable = false
 			partName.isLongClickable = false
 			partName.animate().alpha(0.5f)
+			melodyRecycler.applyToHolders<MelodyHolder> {
+				if(editingVolume && !it.isAddButton) {
+					it.animateEditOn()
+				} else {
+					it.animateEditOff()
+				}
+			}
 		} else {
 			volumeSeekBar.animate().alpha(0f)
 			volumeSeekBar.isEnabled = false
@@ -91,7 +99,7 @@ class PartHolder(
 			}
 			true
 		}
-		patternRecycler.adapter = patternAdapter
+		melodyRecycler.adapter = patternAdapter
 	}
 
 	fun editInstrument() {
@@ -127,7 +135,7 @@ class PartHolder(
 				true
 			}
 		}
-		patternRecycler.apply {
+		melodyRecycler.apply {
 			visibility = View.VISIBLE
 			val sequenceListAdapter = MelodyAdapter(viewModel, this, partPosition)
 			val orientation = LinearLayoutManager.VERTICAL
@@ -156,7 +164,7 @@ class PartHolder(
 			}
 			setOnLongClickListener { true }
 		}
-		patternRecycler.apply {
+		melodyRecycler.apply {
 			visibility = View.GONE
 		}
 		volumeSeekBar.apply {

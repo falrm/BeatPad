@@ -7,6 +7,7 @@ import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
+import com.jonlatane.beatpad.util.applyToHolders
 import com.jonlatane.beatpad.util.hide
 //import com.jonlatane.beatpad.util.syncPositionTo
 import com.jonlatane.beatpad.view.HideableRecyclerView
@@ -77,6 +78,11 @@ class PaletteViewModel {
       BeatClockPaletteConsumer.section = new.sections.first()
     }
   }
+
+  var editingMix by observable(false) { _, _, editingVolume ->
+    partListAdapter?.recyclerView?.applyToHolders<PartHolder> { it.editingVolume = editingVolume }
+  }
+
 
   var editingMelody: Melody<*>? by observable<Melody<*>?>(null) { _, _, new ->
     if (new != null) {

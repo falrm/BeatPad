@@ -5,12 +5,12 @@ import android.view.View
 import android.widget.PopupMenu
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Part
+import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.storage.PaletteStorage
-import org.jetbrains.anko.backgroundResource
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.toast
-import org.jetbrains.anko.wrapContent
+import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk25.coroutines.onSeekBarChangeListener
 import kotlin.properties.Delegates
 
 class MelodyHolder(
@@ -23,7 +23,7 @@ class MelodyHolder(
 		}
 	},
 	initialMelody: Int = 0
-) : RecyclerView.ViewHolder(layout) {
+) : RecyclerView.ViewHolder(layout), AnkoLogger {
 	val partPosition: Int get() = adapter.partPosition
 	val part: Part get() = adapter.part
 	var melodyPosition: Int by Delegates.observable(initialMelody) {
@@ -72,39 +72,116 @@ class MelodyHolder(
 
 	private fun newPattern() = PaletteStorage.baseMelody
 
+  val isAddButton: Boolean
+    get() = melodyPosition >= viewModel.palette.parts[partPosition].melodies.size
+
 	private fun onPositionChanged() {
-		if(melodyPosition < viewModel.palette.parts[partPosition].melodies.size) {
-			editMode()
-		} else {
-			addMode()
-		}
+    if(isAddButton) {
+      addMode()
+    } else {
+      editMode()
+    }
 	}
 
+  internal fun animateEditOn() {
+    layout.apply {
+      name.isClickable = false
+      arrayOf(volume, inclusion).forEach {
+        it.alpha = 0f
+        it.isEnabled = true
+        it.animate().alpha(1f).start()
+      }
+    }
+  }
+
+  internal fun animateEditOff() {
+    layout.apply {
+      name.isClickable = false
+      arrayOf(volume, inclusion).forEach {
+        it.animate().alpha(0f).withEndAction {
+          it.isEnabled = false
+        }.start()
+      }
+    }
+  }
+
+
 	private fun editMode() {
-		layout.name.apply {
-      text = ""
-			backgroundResource = R.drawable.orbifold_chord
-			setOnClickListener {
-				viewModel.editingMelody = pattern
+		layout.apply {
+      arrayOf(volume, inclusion).forEach {
+				if(viewModel.editingMix) {
+          it.isEnabled = true
+          it.alpha = 1f
+        } else {
+          it.isEnabled = false
+          it.alpha = 0f
+        }
 			}
-			setOnLongClickListener {
-				editPatternMenu.show()
-				true
+      val melodyReference = BeatClockPaletteConsumer.section?.melodies?.firstOrNull { it.melody == pattern }
+      inclusion.apply {
+        imageResource = if(melodyReference != null) {
+          R.drawable.icons8_speaker_100
+        } else {
+          R.drawable.icons8_mute_100
+        }
+        onClick {
+          if(melodyReference == null) {
+            BeatClockPaletteConsumer.section?.melodies?.add(
+              Section.MelodyReference(pattern, 1f, Section.PlaybackType.Indefinite)
+            )
+          } else {
+            BeatClockPaletteConsumer.section?.melodies?.removeAll { it.melody == pattern }
+          }
+          editMode()
+        }
+      }
+      if(melodyReference != null) {
+        volume.isIndeterminate = false
+        volume.progress = (melodyReference.volume * 127).toInt()
+        volume.onSeekBarChangeListener {
+          onProgressChanged { _, progress, _ ->
+            info("Setting melody volume to ${progress.toFloat() / 127f}")
+            melodyReference.volume = progress.toFloat() / 127f
+          }
+        }
+      } else {
+        volume.progress = 0
+        volume.isIndeterminate = true
+        volume.isEnabled = false
+      }
+			name.apply {
+				text = ""
+        isClickable = !viewModel.editingMix
+				backgroundResource = R.drawable.orbifold_chord
+				setOnClickListener {
+					viewModel.editingMelody = pattern
+				}
+				setOnLongClickListener {
+					editPatternMenu.show()
+					true
+				}
+
 			}
 		}
 	}
 
 	private fun addMode() {
-		layout.name.apply {
-			text = "+"
-			backgroundResource = R.drawable.orbifold_chord
-			setOnClickListener {
-				viewModel.editingMelody = adapter.insert(newPattern())
-			}
-			setOnLongClickListener {
-				newPatternMenu.show()
-				true
-			}
-		}
-	}
+    layout.apply {
+      arrayOf(volume, inclusion).forEach {
+        it.alpha = 0f
+        it.isEnabled = false
+      }
+      name.apply {
+        text = "+"
+        backgroundResource = R.drawable.orbifold_chord
+        setOnClickListener {
+          viewModel.editingMelody = adapter.insert(newPattern())
+        }
+        setOnLongClickListener {
+          newPatternMenu.show()
+          true
+        }
+      }
+    }
+  }
 }

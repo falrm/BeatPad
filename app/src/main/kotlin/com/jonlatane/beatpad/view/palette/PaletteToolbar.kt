@@ -120,8 +120,9 @@ class PaletteToolbar(ctx: Context,
     imageResource = R.drawable.icons8_tune_100
     scaleType = ImageView.ScaleType.FIT_CENTER
   }.palletteToolbarStyle().onClick {
-    viewModel.partListAdapter?.let {
-      it.editingMix = !it.editingMix
+    viewModel.editingMix = !viewModel.editingMix
+    if(viewModel.editingMix) {
+      viewModel.editingMelody = null
     }
   }
 

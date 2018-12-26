@@ -12,13 +12,10 @@ import kotlin.properties.Delegates.observable
 
 class PartListAdapter(
 	val viewModel: PaletteViewModel,
-	private val recyclerView: _RecyclerView
+	internal val recyclerView: _RecyclerView
 ) : RecyclerView.Adapter<PartHolder>(), PartHolderLayout {
 	companion object {
 		const val MAX_PARTS = 8
-	}
-	var editingMix by observable(false) { _, _, editingVolume ->
-		recyclerView.applyToHolders<PartHolder> { it.editingVolume = editingVolume }
 	}
 
 	init {
@@ -31,7 +28,7 @@ class PartListAdapter(
 
 	override fun onBindViewHolder(holder: PartHolder, partPosition: Int) {
 		holder.partPosition = partPosition
-		holder.editingVolume = editingMix
+		holder.editingVolume = viewModel.editingMix
 	}
 
 	override fun getItemCount(): Int = when {
