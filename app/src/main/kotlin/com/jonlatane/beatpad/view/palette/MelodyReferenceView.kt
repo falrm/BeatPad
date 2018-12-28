@@ -16,6 +16,8 @@ class MelodyReferenceView(context: Context) : _RelativeLayout(context) {
   val inclusion: ImageButton
   val volume: SeekBar
   init {
+    clipChildren = false
+    clipToPadding = false
     name = textView {
       id = View.generateViewId()
       textSize = 25f

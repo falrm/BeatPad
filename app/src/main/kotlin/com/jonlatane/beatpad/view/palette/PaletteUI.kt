@@ -2,7 +2,10 @@ package com.jonlatane.beatpad.view.palette
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
+import android.widget.RelativeLayout
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.color
@@ -20,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
   val viewModel = PaletteViewModel()
+  lateinit var layout: RelativeLayout
 
   override fun createView(ui: AnkoContext<PaletteEditorActivity>) = with(ui) {
 
@@ -150,6 +154,15 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       alignParentBottom()
     }
 
+    viewModel.partListTransitionView = textView {
+      id = View.generateViewId()
+      textSize = 25f
+      background = context.getDrawable(R.drawable.orbifold_chord)
+    }.lparams(dip(30), dip(40)) {
+      below(viewModel.toolbarView)
+      alignParentLeft()
+    }
+
     viewModel.melodyView = melodyView(viewModel = viewModel) {
       id = R.id.melody
       alpha = 0f
@@ -232,6 +245,15 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       rightOf(viewModel.orbifold)
       below(viewModel.harmonyView)
       alignParentRight()
+    }
+
+    viewModel.partListTransitionView = textView {
+      id = View.generateViewId()
+      textSize = 25f
+      background = context.getDrawable(R.drawable.orbifold_chord)
+    }.lparams(0, dip(40)) {
+      rightOf(viewModel.orbifold)
+      below(viewModel.harmonyView)
     }
 
     viewModel.melodyView = melodyView(viewModel = viewModel) {

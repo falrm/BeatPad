@@ -9,12 +9,13 @@ import com.jonlatane.beatpad.view.palette.PartHolder
 fun <HolderType: RecyclerView.ViewHolder>RecyclerView.applyToHolders(
 	mutation: (HolderType) -> Unit
 ) {
-  (0 until adapter.itemCount).
-    mapNotNull { findViewHolderForAdapterPosition(it) as? HolderType }
+  viewHolders<HolderType>()
     .forEach { mutation(it) }
   adapter.notifyDataSetChanged()
-
-	/*(0 until childCount)
-		.map { getChildViewHolder(getChildAt(it)) as HolderType }
-		.forEach(mutation)*/
 }
+
+@Suppress("UNCHECKED_CAST")
+@Synchronized
+fun <HolderType: RecyclerView.ViewHolder>RecyclerView.viewHolders()
+  = (0 until adapter.itemCount).
+    mapNotNull { findViewHolderForAdapterPosition(it) as? HolderType }

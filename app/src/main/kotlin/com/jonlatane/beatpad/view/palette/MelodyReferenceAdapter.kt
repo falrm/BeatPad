@@ -7,23 +7,23 @@ import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import kotlin.properties.Delegates
 
 
-class MelodyAdapter(
+class MelodyReferenceAdapter(
 	val viewModel: PaletteViewModel,
 	val recyclerView: _RecyclerView,
 	initialPart: Int = 0
-) : RecyclerView.Adapter<MelodyHolder>() {
+) : RecyclerView.Adapter<MelodyReferenceHolder>() {
 	var partPosition by Delegates.observable(initialPart) {
 		_, _, _ -> notifyDataSetChanged()
 	}
 	val part get() = viewModel.palette.parts[partPosition]
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyHolder {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyReferenceHolder {
 		return recyclerView.run {
-			MelodyHolder(viewModel, this@MelodyAdapter)
+			MelodyReferenceHolder(viewModel, this@MelodyReferenceAdapter)
 		}
 	}
 
-	override fun onBindViewHolder(holder: MelodyHolder, patternPosition: Int) {
+	override fun onBindViewHolder(holder: MelodyReferenceHolder, patternPosition: Int) {
 		holder.melodyPosition = patternPosition
 	}
 

@@ -25,7 +25,7 @@ import kotlin.properties.Delegates.observable
 class PartHolder(
 	val viewModel: PaletteViewModel,
 	val layout: ViewGroup,
-	private val melodyRecycler: _RecyclerView,
+	internal val melodyRecycler: _RecyclerView,
 	private val partName: TextView,
 	private val volumeSeekBar: SeekBar,
 	private val adapter: PartListAdapter,
@@ -34,7 +34,7 @@ class PartHolder(
 	var partPosition by Delegates.observable(initialPart) { _, _, _ -> onPartPositionChanged() }
 	val part get() = viewModel.palette.parts[partPosition]
 	val context get() = melodyRecycler.context
-	private val patternAdapter = MelodyAdapter(viewModel, melodyRecycler, 0)
+	private val melodyReferenceAdapter = MelodyReferenceAdapter(viewModel, melodyRecycler, 0)
 	var editingVolume: Boolean by observable(false) { _, _, editingVolume: Boolean ->
 		if(editingVolume && isEditablePart) {
 			volumeSeekBar.animate().alpha(1f)
@@ -50,7 +50,7 @@ class PartHolder(
 			partName.isClickable = false
 			partName.isLongClickable = false
 			partName.animate().alpha(0.5f)
-			melodyRecycler.applyToHolders<MelodyHolder> {
+			melodyRecycler.applyToHolders<MelodyReferenceHolder> {
 				if(editingVolume && !it.isAddButton) {
 					it.animateEditOn()
 				} else {
@@ -99,7 +99,7 @@ class PartHolder(
 			}
 			true
 		}
-		melodyRecycler.adapter = patternAdapter
+		melodyRecycler.adapter = melodyReferenceAdapter
 	}
 
 	fun editInstrument() {
@@ -116,7 +116,7 @@ class PartHolder(
 		get() = partPosition < viewModel.palette.parts.size || !adapter.canAddParts()
 
 	private fun onPartPositionChanged() {
-		patternAdapter.partPosition = partPosition
+		melodyReferenceAdapter.partPosition = partPosition
 		if(isEditablePart) {
 			makeEditablePart(partPosition)
 		} else {
@@ -142,7 +142,7 @@ class PartHolder(
 		}
 		melodyRecycler.apply {
 			visibility = View.VISIBLE
-			val sequenceListAdapter = MelodyAdapter(viewModel, this, partPosition)
+			val sequenceListAdapter = MelodyReferenceAdapter(viewModel, this, partPosition)
 			val orientation = LinearLayoutManager.VERTICAL
 			backgroundColor = context.color(R.color.colorPrimaryDark)
 			layoutManager = LinearLayoutManager(context, orientation, false)

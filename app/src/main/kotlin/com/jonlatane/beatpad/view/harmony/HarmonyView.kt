@@ -146,13 +146,13 @@ class HarmonyView(
               findViewByPosition(beatPosition)?.let { it to false } ?:
               if(beatPosition < firstBeatPosition)findViewByPosition(firstBeatPosition) to true
               else null
-            }?.let { (view: View, isFakeFirstBeat) ->
-              view.getLocationOnScreen(locationOnScreen)
+            }?.let { (beatView: View, isFakeFirstBeat) ->
+              beatView.getLocationOnScreen(locationOnScreen)
               val chordPositionX = if(isFakeFirstBeat) {
                 0f
               } else {
                 val beatViewX = locationOnScreen[0]
-                val chordPositionOffset = view.width * (position % subdivisionsPerBeat).toFloat() / subdivisionsPerBeat
+                val chordPositionOffset = beatView.width * (position % subdivisionsPerBeat).toFloat() / subdivisionsPerBeat
                 beatViewX + chordPositionOffset
               }
               recyclerView.getLocationOnScreen(locationOnScreen)
@@ -164,7 +164,8 @@ class HarmonyView(
               this@textView.text = chord.name
               this@textView.alpha = 1f
               this@textView.layoutParams = this@textView.layoutParams.apply {
-                maxWidth = (view.width * 1.5f).toInt()
+                val length = (harmony.changes.higherKey(position) ?: harmony.length - 1) - position
+                maxWidth = (beatView.width * 0.85f * length.toFloat() / harmony.subdivisionsPerBeat).toInt()
               }
 
               (lastTranslationX to lastView).let { lastTranslationX, lastView ->

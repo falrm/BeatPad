@@ -20,6 +20,8 @@ interface PartHolderLayout {
 		var partPatternRecycler: _RecyclerView? = null
 		var seekBar: SeekBar? = null
 		val layout = _ConstraintLayout(context).apply {
+			clipChildren = false
+			clipToPadding = false
 			partName = textView {
 				id = R.id.part_name
 				textSize = 20f
@@ -36,6 +38,8 @@ interface PartHolderLayout {
 			partPatternRecycler = recyclerView {
 				id = R.id.part_patterns
 				elevation = 1f
+				clipChildren = false
+				clipToPadding = false
 			}.lparams(matchParent, 0) as _RecyclerView
 
 			seekBar = seekBar {
@@ -43,6 +47,7 @@ interface PartHolderLayout {
 				elevation = 2f
 				alpha = 0f
 				max = 127
+
 			}.lparams(matchParent, 0)
 
 			applyConstraintSet {
