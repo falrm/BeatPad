@@ -2,15 +2,12 @@ package com.jonlatane.beatpad.storage
 
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.BeanDescription
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.databind.ser.BeanSerializerFactory
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
-import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Section
 import org.jetbrains.anko.AnkoLogger
 
@@ -20,8 +17,9 @@ object PlaybackTypeStorage : AnkoLogger {
     override fun serialize(value: Section.PlaybackType, jgen: JsonGenerator, provider: SerializerProvider) {
       jgen.writeStartObject()
       jgen.writeObjectField("type", when(value) {
-        is Section.PlaybackType.Indefinite -> "indefinite"
+        Section.PlaybackType.Indefinite -> "indefinite"
         is Section.PlaybackType.Repeat -> "repeat"
+        Section.PlaybackType.Disabled      -> "disabled"
       })
       when(value) {
         is Section.PlaybackType.Repeat ->
@@ -39,6 +37,7 @@ object PlaybackTypeStorage : AnkoLogger {
       root.remove("type")
       return when(type) {
         "indefinite" -> Section.PlaybackType.Indefinite
+        "disabled" -> Section.PlaybackType.Disabled
         "repeat" -> mapper.readValue(root.toString(), Section.PlaybackType.Repeat::class.java)
         else -> TODO()
       }

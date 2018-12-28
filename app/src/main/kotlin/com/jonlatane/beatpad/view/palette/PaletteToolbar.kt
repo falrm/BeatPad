@@ -22,7 +22,7 @@ class PaletteToolbar(ctx: Context,
                      val viewModel: PaletteViewModel) : _LinearLayout(ctx), AnkoLogger {
 
 
-  private val metronomeImage = context.resources.getDrawable(R.drawable.icons8_metronome_filled_100_3, null).apply {
+  private val metronomeImage = context.resources.getDrawable(R.drawable.noun_metronome_415494_000000, null).apply {
     setBounds(0, 0, 60, 60)
   }
 

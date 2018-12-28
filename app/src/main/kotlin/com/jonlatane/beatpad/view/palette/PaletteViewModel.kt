@@ -138,6 +138,10 @@ class PaletteViewModel {
     harmonyViewModel.notifyHarmonyChanged()
     sectionListAdapter?.notifyDataSetChanged()
     melodyViewModel.beatAdapter.notifyDataSetChanged()
+    if(editingMix) { // Trigger an update of the mix state.
+      editingMix = editingMix
+    }
+    partListAdapter?.notifyDataSetChanged()
   }
 
   private fun editMelodyMode() {

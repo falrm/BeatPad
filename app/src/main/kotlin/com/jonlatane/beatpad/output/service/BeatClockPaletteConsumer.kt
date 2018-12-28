@@ -69,7 +69,10 @@ object BeatClockPaletteConsumer : AnkoLogger {
     }
     verbose { "Harmony index: $harmonyPosition; Chord: $chord" }
     palette?.parts?.map { part ->
-      section?.melodies?.filter { part.melodies.contains(it.melody) }?.forEach { melodyReference ->
+      section?.melodies?.filter {
+        it.playbackType != Section.PlaybackType.Disabled
+          && part.melodies.contains(it.melody)
+      }?.forEach { melodyReference ->
         val melody = melodyReference.melody
         val attack = attackPool.borrow()
 
@@ -128,9 +131,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
     upcomingAttacks.clear()
     // Clean up expired attacks
     activeAttacks.forEach { attack ->
-      val attackCameFromRunningMelody = viewModel?.palette?.parts
-        ?.flatMap { it.melodies }
-        //?.filter { it.enabled }
+      val attackCameFromRunningMelody = section?.melodies?.map { it.melody }
         ?.contains(attack.melody) ?: false
       if (!attackCameFromRunningMelody) {
         destroyAttack(attack)

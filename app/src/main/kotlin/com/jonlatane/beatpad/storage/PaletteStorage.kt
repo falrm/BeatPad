@@ -123,9 +123,12 @@ object PaletteStorage : AnkoLogger {
 
       ).apply {
         sections.forEach { section ->
+          val invalidReferences = mutableListOf<Section.MelodyReference>()
           section.melodies.forEach { melodyReference ->
-            melodyReference.melody = parts.flatMap { it.melodies }.first { it.id == melodyReference.melody.id }
+            melodyReference.melody = parts.flatMap { it.melodies }.firstOrNull { it.id == melodyReference.melody.id }
+              ?: melodyReference.also { invalidReferences.add(it) }.melody
           }
+          section.melodies.removeAll(invalidReferences)
         }
       }
     }

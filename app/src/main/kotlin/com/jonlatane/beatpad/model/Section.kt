@@ -9,6 +9,7 @@ data class Section(
   val melodies: MutableSet<MelodyReference> = mutableSetOf()
 ) {
   sealed class PlaybackType {
+    object Disabled: PlaybackType()
     object Indefinite: PlaybackType()
     class Repeat(val repetitions: Int): PlaybackType()
   }

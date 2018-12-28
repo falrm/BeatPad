@@ -39,14 +39,14 @@ class PartHolder(
 		if(editingVolume && isEditablePart) {
 			volumeSeekBar.animate().alpha(1f)
 			volumeSeekBar.isEnabled = true
-			volumeSeekBar.apply {
-				onSeekBarChangeListener {
-					onProgressChanged { _, progress, _ ->
-						info("Setting part volume to ${progress.toFloat() / 127f}")
-						part.volume = progress.toFloat() / 127f
-					}
-				}
-			}
+//			volumeSeekBar.apply {
+//				onSeekBarChangeListener {
+//					onProgressChanged { _, progress, _ ->
+//						info("Setting part volume to ${progress.toFloat() / 127f}")
+//						part.volume = progress.toFloat() / 127f
+//					}
+//				}
+//			}
 			partName.isClickable = false
 			partName.isLongClickable = false
 			partName.animate().alpha(0.5f)
@@ -134,6 +134,11 @@ class PartHolder(
 				editInstrument()
 				true
 			}
+			if(viewModel.editingMix) {
+				alpha = 0.5f
+        isClickable = false
+        isLongClickable = false
+			}
 		}
 		melodyRecycler.apply {
 			visibility = View.VISIBLE
@@ -145,6 +150,13 @@ class PartHolder(
 			adapter = sequenceListAdapter
 		}
 		volumeSeekBar.apply {
+      if(viewModel.editingMix) {
+        alpha = 1f
+        isEnabled = true
+      } else {
+        alpha = 0f
+        isEnabled = false
+      }
 			isIndeterminate = false
 			progress = (part.volume * 127).toInt()
 			onSeekBarChangeListener {

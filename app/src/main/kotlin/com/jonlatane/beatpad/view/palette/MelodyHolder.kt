@@ -86,7 +86,7 @@ class MelodyHolder(
   internal fun animateEditOn() {
     layout.apply {
       name.isClickable = false
-      arrayOf(volume, inclusion).forEach {
+      arrayOf(volume, inclusion).forEach { it: View ->
         it.alpha = 0f
         it.isEnabled = true
         it.animate().alpha(1f).start()
@@ -105,49 +105,56 @@ class MelodyHolder(
     }
   }
 
+  val Section.MelodyReference.disabled get() = playbackType == Section.PlaybackType.Disabled
+
 
 	private fun editMode() {
+    val melodyReference = BeatClockPaletteConsumer.section?.melodies?.firstOrNull { it.melody == pattern }
 		layout.apply {
-      arrayOf(volume, inclusion).forEach {
+      volume.apply {
 				if(viewModel.editingMix) {
-          it.isEnabled = true
-          it.alpha = 1f
+          isEnabled = true
+          alpha = 1f
         } else {
-          it.isEnabled = false
-          it.alpha = 0f
+          isEnabled = false
+          alpha = 0f
         }
 			}
-      val melodyReference = BeatClockPaletteConsumer.section?.melodies?.firstOrNull { it.melody == pattern }
       inclusion.apply {
-        imageResource = if(melodyReference != null) {
-          R.drawable.icons8_speaker_100
-        } else {
+        imageResource = if(melodyReference == null || melodyReference.disabled) {
           R.drawable.icons8_mute_100
+        } else {
+          R.drawable.icons8_speaker_100
         }
+        isEnabled = true
+        alpha = 1f
         onClick {
           if(melodyReference == null) {
             BeatClockPaletteConsumer.section?.melodies?.add(
-              Section.MelodyReference(pattern, 1f, Section.PlaybackType.Indefinite)
+              Section.MelodyReference(pattern, 0.5f, Section.PlaybackType.Indefinite)
             )
+          } else if(melodyReference.disabled) {
+            melodyReference.playbackType = Section.PlaybackType.Indefinite
           } else {
-            BeatClockPaletteConsumer.section?.melodies?.removeAll { it.melody == pattern }
+            melodyReference.playbackType = Section.PlaybackType.Disabled
           }
           editMode()
         }
       }
-      if(melodyReference != null) {
-        volume.isIndeterminate = false
-        volume.progress = (melodyReference.volume * 127).toInt()
-        volume.onSeekBarChangeListener {
-          onProgressChanged { _, progress, _ ->
-            info("Setting melody volume to ${progress.toFloat() / 127f}")
-            melodyReference.volume = progress.toFloat() / 127f
+      volume.apply {
+        if(melodyReference == null || melodyReference.disabled) {
+          isIndeterminate = true
+          isEnabled = false
+        } else {
+          isIndeterminate = false
+          progress = (melodyReference.volume * 127).toInt()
+          onSeekBarChangeListener {
+            onProgressChanged { _, progress, _ ->
+              info("Setting melody volume to ${progress.toFloat() / 127f}")
+              melodyReference.volume = progress.toFloat() / 127f
+            }
           }
         }
-      } else {
-        volume.progress = 0
-        volume.isIndeterminate = true
-        volume.isEnabled = false
       }
 			name.apply {
 				text = ""
@@ -160,7 +167,7 @@ class MelodyHolder(
 					editPatternMenu.show()
 					true
 				}
-
+        alpha = if(melodyReference == null || melodyReference.disabled) 0.5f else 1f
 			}
 		}
 	}
