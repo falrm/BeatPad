@@ -30,6 +30,7 @@ class MelodyReferenceAdapter(
 	fun insert(sequence: Melody<*>): Melody<*> {
 		part.melodies.add(sequence)
 		notifyItemInserted(part.melodies.size - 1)
+		notifyItemChanged(part.melodies.size)
 		return sequence
 	}
 

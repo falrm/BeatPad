@@ -27,7 +27,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
 
   override fun createView(ui: AnkoContext<PaletteEditorActivity>) = with(ui) {
 
-    relativeLayout {
+    layout = relativeLayout {
       if (configuration.portrait) {
         portraitLayout()
       } else {
@@ -109,6 +109,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
         })
       }
     }
+    layout
   }
 
   private fun _RelativeLayout.portraitLayout() {

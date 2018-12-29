@@ -171,7 +171,7 @@ class PaletteViewModel {
     partListView.viewHolders<PartHolder>().mapNotNull { partHolder ->
       partHolder.melodyRecycler.viewHolders<MelodyReferenceHolder>()
         .firstOrNull { it.melody == editingMelody }
-    }.firstOrNull()?.let { melodyReferenceHolder ->
+    }/*.let { listOf<MelodyReferenceHolder?>(null) }*/.firstOrNull()?.let { melodyReferenceHolder ->
       melodyReferenceHolder.enableMelodyReference()
       melodyReferenceHolder.onPositionChanged()
       val name = melodyReferenceHolder.layout.name
@@ -206,6 +206,13 @@ class PaletteViewModel {
   }
 
   private fun editMelodyModeBoring() {
+    partListTransitionView.apply {
+      translationX = partListView.width.toFloat()
+      translationY = 0f
+      layoutWidth = partListView.width
+      layoutHeight = partListView.height
+      animate().translationX(0f).start()
+    }
     melodyViewModel.melodyView.animate()
       .translationX(0f)
       .alpha(1f)
@@ -217,7 +224,7 @@ class PaletteViewModel {
     partListView.viewHolders<PartHolder>().mapNotNull { partHolder ->
       partHolder.melodyRecycler.viewHolders<MelodyReferenceHolder>()
         .firstOrNull { !it.isAddButton && it.melody == oldValue }
-    }.firstOrNull()?.let { melodyReferenceHolder ->
+    }/*let { listOf<MelodyReferenceHolder?>(null) }.*/.firstOrNull()?.let { melodyReferenceHolder ->
       val name = melodyReferenceHolder.layout.name
       val partListLocation = intArrayOf(-1, -1)
       val nameLocation = intArrayOf(-1, -1)
