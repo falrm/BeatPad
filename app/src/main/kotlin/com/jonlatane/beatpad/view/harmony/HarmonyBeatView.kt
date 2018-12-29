@@ -1,9 +1,11 @@
 package com.jonlatane.beatpad.view.harmony
 
 import BeatClockPaletteConsumer
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.SparseArray
+import android.view.MotionEvent
 import android.view.View
 import android.widget.PopupMenu
 import com.jonlatane.beatpad.R
@@ -15,16 +17,14 @@ import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.util.vibrate
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.withAlpha
-import android.view.MotionEvent
 
 
-
-
-class HarmonyBeatView @JvmOverloads constructor(
+@SuppressLint("ViewConstructor")
+class HarmonyBeatView constructor(
   context: Context,
-  var viewModel: HarmonyViewModel? = null
+  var viewModel: HarmonyViewModel
 ): View(context) {
-  val harmony: Harmony? get() = viewModel?.harmony
+  val harmony: Harmony? get() = viewModel.harmony
 
   var beatPosition = 0
 
@@ -54,11 +54,12 @@ class HarmonyBeatView @JvmOverloads constructor(
       }
     }
     editChangeMenu.setOnMenuItemClickListener { item ->
+      viewModel.isEditingChord = false
       when (item.itemId) {
         R.id.newChordChange -> {
-          val position = viewModel?.selectedHarmonyElements!!.first
+          val position = viewModel.selectedHarmonyElements!!.first
           harmony!!.changes[position] = harmony!!.changeBefore(position)
-          viewModel?.harmonyView?.syncScrollingChordText()
+          viewModel.harmonyView?.syncScrollingChordText()
           editSelectedChord()
         }
         R.id.editChordChange -> {
@@ -68,6 +69,7 @@ class HarmonyBeatView @JvmOverloads constructor(
           val position = viewModel?.selectedHarmonyElements!!.first
           val key = harmony!!.floorKey(position)!!
           harmony!!.changes.remove(key)
+          viewModel?.selectedHarmonyElements = null
           viewModel?.harmonyView?.syncScrollingChordText()
         }
         else -> context.toast("TODO!")

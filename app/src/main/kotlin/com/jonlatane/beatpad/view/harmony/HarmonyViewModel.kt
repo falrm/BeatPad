@@ -18,10 +18,6 @@ open class HarmonyViewModel {
   }
   val harmony: Harmony? get() = BeatClockPaletteConsumer.harmony
   var isEditingChord: Boolean = false
-  set(value) {
-    field = value
-    if(!value) selectedHarmonyElements = null
-  }
   var selectedHarmonyElements: IntRange? = null
   set(value) {
     field = value

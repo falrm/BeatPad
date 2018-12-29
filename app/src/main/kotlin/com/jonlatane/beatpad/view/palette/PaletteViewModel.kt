@@ -127,15 +127,35 @@ class PaletteViewModel {
     palette.splatPart = new
   }
 
-  fun onBackPressed(): Boolean {
-    val result = harmonyViewModel.isEditingChord || editingMelody != null
-    if(harmonyViewModel.isEditingChord) {
+  fun onBackPressed(): Boolean = when {
+    harmonyViewModel.isEditingChord -> {
       harmonyViewModel.isEditingChord = false
-    } else {
-      editingMelody = null
+      harmonyViewModel.selectedHarmonyElements = null
+      true
     }
-    return result
+    editingMelody != null -> {
+      editingMelody = null
+      true
+    }
+    editingMix -> {
+      editingMix = false
+      true
+    }
+    else -> false
   }
+
+//  fun onBackPressed(): Boolean {
+//    val result = harmonyViewModel.isEditingChord || editingMix || editingMelody != null
+//    if(harmonyViewModel.isEditingChord) {
+//      harmonyViewModel.isEditingChord = false
+//      harmonyViewModel.selectedHarmonyElements = null
+//    } else if(editingMix) {
+//      editingMix = false
+//    } else {
+//      editingMelody = null
+//    }
+//    return result
+//  }
 
   fun notifySectionChange() {
     harmonyViewModel.notifyHarmonyChanged()
@@ -166,17 +186,21 @@ class PaletteViewModel {
         translationY = nameLocation[1].toFloat() - partListLocation[1]
         layoutWidth = name.width
         layoutHeight = name.height
-        animateWidth(partListView.width)
-        animateHeight(partListView.height)
-        animate().translationX(0f).translationY(0f).alpha(1f)
-          .withEndAction {
-            melodyViewModel.melodyView.let { melodyView ->
-              melodyView.alpha = 0f
-              melodyView.translationX = 0f
-              melodyView.animate().alpha(1f).withEndAction {
-              }.start()
-            }
-          }.start()
+        //animate().alpha(1f).withEndAction {
+        post {
+          animateWidth(partListView.width)
+          animateHeight(partListView.height)
+          animate().translationX(0f).translationY(0f)
+            .withEndAction {
+              melodyViewModel.melodyView.let { melodyView ->
+                melodyView.alpha = 0f
+                melodyView.translationX = 0f
+                melodyView.animate().alpha(1f).withEndAction {
+                }.start()
+              }
+            }.start()
+        }
+        //}.start()
       }
     } ?: editMelodyModeBoring()
   }
@@ -211,9 +235,13 @@ class PaletteViewModel {
         melodyView.alpha = 0f
         animateWidth(name.width)
         animateHeight(name.height)
-        animate().translationX(targetTranslateX).translationY(targetTranslateY).alpha(0f)
+        animate().translationX(targetTranslateX).translationY(targetTranslateY)//.alpha(0f)
           .withEndAction {
-
+            animate().alpha(0f).withEndAction {
+              layoutWidth = 0
+              translationX = 0f
+              translationY = 0f
+            }.start()
           }.start()
       }
     } ?: partListModeBoring()

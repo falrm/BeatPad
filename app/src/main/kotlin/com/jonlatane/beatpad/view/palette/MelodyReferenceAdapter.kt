@@ -33,5 +33,6 @@ class MelodyReferenceAdapter(
 		return sequence
 	}
 
-	override fun getItemCount(): Int = viewModel.palette.parts[partPosition].melodies.size + 1
+	override fun getItemCount(): Int = viewModel.palette.parts.getOrNull(partPosition)?.melodies
+		?.let { it.size + 1 } ?: 0
 }

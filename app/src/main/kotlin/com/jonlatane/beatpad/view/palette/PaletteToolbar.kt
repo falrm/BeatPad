@@ -122,7 +122,9 @@ class PaletteToolbar(ctx: Context,
   }.palletteToolbarStyle().onClick {
     viewModel.editingMix = !viewModel.editingMix
     if(viewModel.editingMix) {
-      viewModel.editingMelody = null
+      post {
+        viewModel.editingMelody = null
+      }
     }
   }
 
