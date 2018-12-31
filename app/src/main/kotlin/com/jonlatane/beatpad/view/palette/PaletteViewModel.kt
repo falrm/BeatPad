@@ -80,7 +80,8 @@ class PaletteViewModel {
   }
 
   var editingMix by observable(false) { _, _, editingVolume ->
-    partListAdapter?.recyclerView?.applyToHolders<PartHolder> { it.editingVolume = editingVolume }
+    partListAdapter?.recyclerView?.viewHolders<PartHolder>()
+      ?.forEach { it.editingVolume = editingVolume }
   }
 
 
@@ -189,7 +190,7 @@ class PaletteViewModel {
         //animate().alpha(1f).withEndAction {
         post {
           animateWidth(partListView.width)
-          animateHeight(partListView.height)
+          animateHeight(partListView.height + orbifold.height)
           animate().translationX(0f).translationY(0f)
             .withEndAction {
               melodyViewModel.melodyView.let { melodyView ->

@@ -109,10 +109,10 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 
   override fun onRestoreInstanceState(savedInstanceState: Bundle) {
     super.onRestoreInstanceState(savedInstanceState)
-    if (savedInstanceState.getBoolean("keyboardHidden")) {
+    if (savedInstanceState.getBoolean("keyboardHidden", true)) {
       viewModel.keyboardView.hide(animated = false)
     }
-    if (savedInstanceState.getBoolean("colorboardHidden")) {
+    if (savedInstanceState.getBoolean("colorboardHidden", true)) {
       viewModel.colorboardView.hide(animated = false)
     }
     savedInstanceState.getString("editingMelodyId")?.let { melodyId: String ->

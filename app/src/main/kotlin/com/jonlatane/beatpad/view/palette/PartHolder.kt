@@ -50,13 +50,6 @@ class PartHolder(
 			partName.isClickable = false
 			partName.isLongClickable = false
 			partName.animate().alpha(0.5f)
-			melodyRecycler.applyToHolders<MelodyReferenceHolder> {
-				if(editingVolume && !it.isAddButton) {
-					it.animateEditOn()
-				} else {
-					it.animateEditOff()
-				}
-			}
 		} else {
 			volumeSeekBar.animate().alpha(0f)
 			volumeSeekBar.isEnabled = false
@@ -64,6 +57,15 @@ class PartHolder(
 			partName.isLongClickable = true
 			partName.animate().alpha(1f)
 		}
+    melodyRecycler.applyToHolders<MelodyReferenceHolder> {
+      if(editingVolume && !it.isAddButton) {
+        info("animateEditOn")
+        it.animateEditOn()
+      } else {
+        info("animateEditOff")
+        it.animateEditOff()
+      }
+    }
 	}
 
 	private val editPartMenu = PopupMenu(partName.context, partName)
@@ -112,7 +114,7 @@ class PartHolder(
 		}
 	}
 
-	private val isEditablePart: Boolean
+  val isEditablePart: Boolean
 		get() = partPosition < viewModel.palette.parts.size || !adapter.canAddParts()
 
 	private fun onPartPositionChanged() {

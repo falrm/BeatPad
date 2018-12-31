@@ -20,8 +20,8 @@ interface PartHolderLayout {
 		var partPatternRecycler: _RecyclerView? = null
 		var seekBar: SeekBar? = null
 		val layout = _ConstraintLayout(context).apply {
-			clipChildren = false
-			clipToPadding = false
+//			clipChildren = false
+//			clipToPadding = false
 			partName = textView {
 				id = R.id.part_name
 				textSize = 20f
@@ -32,14 +32,14 @@ interface PartHolderLayout {
 				isSelected = true
 				gravity = Gravity.CENTER_HORIZONTAL
 				backgroundResource = R.drawable.part_background
-				elevation = 1f
+				elevation = 2f
 			}.lparams(matchParent, wrapContent)
 
 			partPatternRecycler = recyclerView {
 				id = R.id.part_patterns
 				elevation = 1f
-				clipChildren = false
-				clipToPadding = false
+//				clipChildren = false
+//				clipToPadding = false
 			}.lparams(matchParent, 0) as _RecyclerView
 
 			seekBar = seekBar {

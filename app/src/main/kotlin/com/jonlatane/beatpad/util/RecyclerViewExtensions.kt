@@ -16,6 +16,6 @@ fun <HolderType: RecyclerView.ViewHolder>RecyclerView.applyToHolders(
 
 @Suppress("UNCHECKED_CAST")
 @Synchronized
-fun <HolderType: RecyclerView.ViewHolder>RecyclerView.viewHolders()
+fun <HolderType: RecyclerView.ViewHolder>RecyclerView.viewHolders(): List<HolderType>
   = (0 until adapter.itemCount).
     mapNotNull { findViewHolderForAdapterPosition(it) as? HolderType }

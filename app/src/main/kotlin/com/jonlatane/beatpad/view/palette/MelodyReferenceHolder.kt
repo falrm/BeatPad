@@ -1,5 +1,7 @@
 package com.jonlatane.beatpad.view.palette
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.PopupMenu
@@ -13,6 +15,9 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onSeekBarChangeListener
 import kotlin.properties.Delegates
+import android.graphics.PorterDuff
+
+
 
 class MelodyReferenceHolder(
   val viewModel: PaletteViewModel,
@@ -153,10 +158,17 @@ class MelodyReferenceHolder(
         }
       }
       volume.apply {
+
         if(melodyReference == null || melodyReference!!.disabled) {
           isIndeterminate = true
           isEnabled = false
+          arrayOf(progressDrawable, thumb).forEach {
+            it.colorFilter = null
+          }
         } else {
+          arrayOf(progressDrawable, thumb).forEach {
+            it.setColorFilter( Color.WHITE, PorterDuff.Mode.SRC_IN)
+          }
           isIndeterminate = false
           progress = (melodyReference!!.volume * 127).toInt()
           onSeekBarChangeListener {
@@ -170,7 +182,15 @@ class MelodyReferenceHolder(
 			name.apply {
 				text = ""
         isClickable = !viewModel.editingMix
-				backgroundResource = R.drawable.orbifold_chord
+				backgroundResource = if(melodyReference == null || melodyReference!!.disabled) {
+          R.drawable.orbifold_chord
+        } else {
+          BeatClockPaletteConsumer.palette?.sections
+            ?.indexOf(BeatClockPaletteConsumer.section)
+            ?.let { sectionIndex ->
+              SectionHolder.sectionColor(sectionIndex)
+            } ?: R.drawable.orbifold_chord
+        }
 				setOnClickListener {
 					viewModel.editingMelody = melody
 				}
@@ -192,6 +212,7 @@ class MelodyReferenceHolder(
       name.apply {
         text = "+"
         backgroundResource = R.drawable.orbifold_chord
+        alpha = 1f
         setOnClickListener {
           val melody = newMelody()
           viewModel.editingMelody = adapter.insert(melody)

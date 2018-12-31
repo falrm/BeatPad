@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.view.palette
+package com.jonlatane.beatpad.view.library
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import com.jonlatane.beatpad.LibraryActivity
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.color
@@ -22,13 +23,13 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
 import java.util.concurrent.atomic.AtomicBoolean
 
-class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
-  val viewModel = PaletteViewModel()
+class LibraryUI : AnkoComponent<LibraryActivity>, AnkoLogger {
+  val viewModel = LibraryViewModel()
   lateinit var layout: RelativeLayout
 
-  override fun createView(ui: AnkoContext<PaletteEditorActivity>) = with(ui) {
+  override fun createView(ui: AnkoContext<LibraryActivity>) = with(ui) {
 
-    layout = relativeLayout {
+    layout = relativeLayout {/*
       if (configuration.portrait) {
         portraitLayout()
       } else {
@@ -68,8 +69,8 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
           .withEndAction { viewModel.melodyView.alpha = 1f }
           .start()
 
-//        viewModel.keyboardView.hide(false)
-//        viewModel.colorboardView.hide(false)
+        viewModel.keyboardView.hide(false)
+        viewModel.colorboardView.hide(false)
 
         // Some tasty un-threadsafe spaghetti for syncing the two RecyclerViews for Harmony and Melody
         val inScrollingStack = AtomicBoolean(false)
@@ -111,11 +112,12 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
             }
           }
         })
-      }
+      }*/
     }
     layout
   }
 
+  /*
   private fun _RelativeLayout.portraitLayout() {
     viewModel.orbifold = orbifoldView {
       id = R.id.orbifold
@@ -299,4 +301,5 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       above(viewModel.keyboardView)
     }
   }
+  */
 }
