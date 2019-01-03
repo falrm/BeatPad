@@ -127,6 +127,10 @@ class MelodyReferenceHolder(
 
   internal fun disableMelodyReference() {
     melodyReference!!.playbackType = Section.PlaybackType.Disabled
+    // Sanitization: Remove duplicates
+    BeatClockPaletteConsumer.section?.melodies?.removeAll {
+      it.melody == melody && it != melodyReference
+    }
   }
 
 	private fun editMode() {

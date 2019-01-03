@@ -56,6 +56,7 @@ class PaletteViewModel {
     get() = harmonyViewModel.harmonyView!!
     set(value) { harmonyViewModel.harmonyView = value }
 
+  var wasOrbifoldShowingBeforeEditingChord: Boolean? = null
   lateinit var orbifold: OrbifoldView
 
   var palette: Palette by observable(initialValue = Palette()) { _, _, new ->
@@ -129,6 +130,10 @@ class PaletteViewModel {
   }
 
   fun onBackPressed(): Boolean = when {
+    orbifold.customChordMode -> {
+      orbifold.customChordMode = false
+      true
+    }
     harmonyViewModel.isEditingChord -> {
       harmonyViewModel.isEditingChord = false
       harmonyViewModel.selectedHarmonyElements = null
@@ -164,6 +169,12 @@ class PaletteViewModel {
     melodyViewModel.beatAdapter.notifyDataSetChanged()
     if(editingMix) { // Trigger an update of the mix state.
       editingMix = editingMix
+    }
+    if(
+      BeatClockPaletteConsumer.section?.melodies?.filter { !it.isDisabled }
+        ?.map { it.melody }?.contains(editingMelody) != true
+    ) {
+      editingMelody = null
     }
     partListAdapter?.notifyDataSetChanged()
   }

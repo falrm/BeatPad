@@ -129,6 +129,10 @@ object PaletteStorage : AnkoLogger {
               ?: melodyReference.also { invalidReferences.add(it) }.melody
           }
           section.melodies.removeAll(invalidReferences)
+          section.melodies.removeAll(
+            section.melodies -
+              section.melodies.groupBy { it.melody.id }.map { it.value.first() }.toMutableSet()
+          )
         }
       }
     }

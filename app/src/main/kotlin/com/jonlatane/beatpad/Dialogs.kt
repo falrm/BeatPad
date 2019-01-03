@@ -24,8 +24,9 @@ import org.jetbrains.anko.nsdManager
 fun showOrbifoldPicker(orbifoldView: OrbifoldView) {
   val builder = AlertDialog.Builder(orbifoldView.context)
   builder.setTitle("Choose an Orbifold")
-  builder.setItems(Orbifold.values().map { it.title }.toTypedArray()) { _, which ->
-    val chosenOrbifold = Orbifold.values()[which]
+  val orbifolds: List<Orbifold> = Orbifold.values().toList() - listOf(Orbifold.custom)
+  builder.setItems(orbifolds.map { it.title }.toTypedArray()) { _, which ->
+    val chosenOrbifold = orbifolds[which]
     orbifoldView.orbifold = chosenOrbifold
   }
   builder.show()

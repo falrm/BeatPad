@@ -5,6 +5,7 @@ import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
@@ -17,7 +18,11 @@ import com.jonlatane.beatpad.model.harmony.chord.Maj7
 import com.jonlatane.beatpad.model.harmony.chordsequence.Chromatic
 import com.jonlatane.beatpad.showOrbifoldPicker
 import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.util.hide
+import com.jonlatane.beatpad.util.isHidden
+import com.jonlatane.beatpad.util.show
 import com.jonlatane.beatpad.view.HideableRelativeLayout
+import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.util.*
@@ -63,6 +68,9 @@ class OrbifoldView @JvmOverloads constructor(
     }
     onOrbifoldChangeListener?.invoke(new)
   }
+  var keyboard: KeyboardView? = null
+  internal val customButton: Button
+  internal val modeButton: Button
   internal var centralChord: TextView
   internal lateinit var centralChordBackground: View
   internal lateinit var centralChordThrobber: View
@@ -72,6 +80,30 @@ class OrbifoldView @JvmOverloads constructor(
   internal lateinit var halfStepBackground: View
   internal var selectedChord: TextView? = null
   internal var sequences: MutableList<SequenceViews> = ArrayList()
+  private var orbifoldBeforeCustomMode: Orbifold? = null
+  private var keyboardWasShowingBeforeCustomMode = false
+  var customChordMode: Boolean = false
+  set(value) {
+    field = value
+    customButton.text = if(value) "Done" else "Custom"
+    if(value) {
+      orbifoldBeforeCustomMode = orbifold
+      keyboardWasShowingBeforeCustomMode = keyboard?.isHidden == false
+      this@OrbifoldView.orbifold = Orbifold.custom
+      keyboard?.show()
+      keyboard?.ioHandler?.onEstablishedChordChanged = { notes ->
+        disableNextTransitionAnimation()
+        chord = Chord(chord.root, notes.map { it - chord.root }.toIntArray())
+      }
+    } else {
+      orbifoldBeforeCustomMode?.let { orbifold = it }
+      orbifoldBeforeCustomMode = null
+      if(!keyboardWasShowingBeforeCustomMode) {
+        keyboard?.hide()
+      }
+      keyboard?.ioHandler?.onEstablishedChordChanged = null
+    }
+  }
 
   internal inner class SequenceViews(val sequence: Orbit) {
     val axis = inflateAxisView().apply { alpha = 0f }
@@ -119,15 +151,25 @@ class OrbifoldView @JvmOverloads constructor(
       this.orbifold = orbifold
       animateTo(SelectionState)
     }
-    val orbifold = this
-    button {
+    //val orbifold = this
+    modeButton = button {
       text = "Mode"
       onClick {
-        showOrbifoldPicker(orbifold)
+        showOrbifoldPicker(this@OrbifoldView)
       }
     }.lparams {
       alignParentBottom()
       alignParentRight()
+      elevation = 1f
+    }
+    customButton = button {
+      text = "Custom"
+      onClick {
+        customChordMode = ! customChordMode
+      }
+    }.lparams {
+      alignParentBottom()
+      alignParentLeft()
       elevation = 1f
     }
 
@@ -269,6 +311,15 @@ class OrbifoldView @JvmOverloads constructor(
 
   fun containsSequence(sequence: Orbit): Boolean {
     return (0..sequences.size - 1).any { sequences[it].sequence === sequence }
+  }
+
+  fun prepareAnimationTo(chord: Chord) {
+    val view: TextView? = sequences.flatMap {
+      listOf(it.sequence.forward(chord) to it.forward, it.sequence.back(chord) to it.back)
+    }.firstOrNull {
+      it.first == chord
+    }?.second
+    selectedChord = view
   }
 
   fun skipTo(state: NavigationState) = state.skipTo(this)

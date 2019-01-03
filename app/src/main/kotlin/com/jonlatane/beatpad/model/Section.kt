@@ -17,7 +17,9 @@ data class Section(
     var melody: Melody<*>,
     var volume: Float,
     var playbackType: PlaybackType = PlaybackType.Indefinite
-  )
+  ) {
+    val isDisabled get() = playbackType == PlaybackType.Disabled
+  }
   companion object {
     fun forList(
       sectionList: List<Section>,

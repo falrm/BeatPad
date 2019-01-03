@@ -12,9 +12,7 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.service.convertPatternIndex
-import com.jonlatane.beatpad.util.color
-import com.jonlatane.beatpad.util.size
-import com.jonlatane.beatpad.util.vibrate
+import com.jonlatane.beatpad.util.*
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.withAlpha
 
@@ -226,18 +224,21 @@ class HarmonyBeatView constructor(
 
   private fun editSelectedChord() {
     var chord: Chord? = null
-    val chordRange = viewModel?.selectedHarmonyElements?.let {
+    val chordRange = viewModel.selectedHarmonyElements?.let {
       chord = harmony!!.changeBefore(it.first)
       val start = harmony!!.floorKey(it.first)
       var end = harmony!!.higherKey(it.first) - 1
       if(end < start) end = harmony!!.length - 1
       start..end
     }
-    viewModel?.paletteViewModel?.orbifold?.let {
+    viewModel.paletteViewModel?.orbifold?.let {
       it.disableNextTransitionAnimation()
       it.chord = chord!!
     }
-    viewModel?.selectedHarmonyElements = chordRange
-    viewModel?.isEditingChord = true
+    viewModel.selectedHarmonyElements = chordRange
+    viewModel.isEditingChord = true
+//    viewModel.paletteViewModel?.wasOrbifoldShowingBeforeEditingChord =
+//      viewModel.paletteViewModel?.orbifold?.isHidden
+    viewModel.paletteViewModel?.orbifold?.show()
   }
 }

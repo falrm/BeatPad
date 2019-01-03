@@ -122,6 +122,10 @@ fun View.animateHeight(height: Int, duration: Long = defaultDuration) {
 
 val View.isHidden: Boolean get() = layoutHeight == 0
 fun View.show(animated: Boolean = true) {
+	if ((this as HideableView).initialHeight == null) {
+		measure(width, height)
+		initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
+	}
 	if (animated) {
 		animateHeight((this as HideableView).initialHeight!!)
 	} else {

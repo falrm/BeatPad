@@ -63,7 +63,7 @@ class LibraryActivity : Activity(), AnkoLogger {
 //        val intent = Intent(this, PlaybackService::class.java)
 //        intent.action = PlaybackService.Companion.Action.STOPFOREGROUND_ACTION
 //        startService(intent)
-//        super.onBackPressed()
+        super.onBackPressed()
 //      }
 //      else -> {
 //        lastBackPress = System.currentTimeMillis()

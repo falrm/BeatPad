@@ -20,6 +20,10 @@ class KeyboardIOHandler(
 ): AnkoLogger {
 	var instrument by observable<Instrument>(MIDIInstrument()) { _, old, _ -> old.stop() }
 	private val currentlyPressed = Collections.synchronizedSet(HashSet<Int>())
+	private val _establishedChord = mutableSetOf<Int>()
+	val establishedChord get() = _establishedChord.toSet()
+  interface EstablishedChordChangedListener: ((Set<Int>) -> Unit)
+  var onEstablishedChordChanged: ((Set<Int>) -> Unit)? = null
 
 	init {
 		KEY_IDS
@@ -81,7 +85,7 @@ class KeyboardIOHandler(
 						else -> throw IllegalStateException()
 					}
 				} else {
-					if (isBlack(tone)) {
+					if (isBlackKey(tone)) {
 						b.backgroundResource = R.drawable.key_standard_black
 					} else {
 						b.backgroundResource = R.drawable.key_standard_white
@@ -92,7 +96,7 @@ class KeyboardIOHandler(
 			verbose("Clearing highlights")
 			for (id in KEY_IDS) {
 				val n = KEY_IDS_INVERSE.get(id)
-				if (isBlack(n)) {
+				if (isBlackKey(n)) {
 					keyboardView.findViewById<View>(id).setBackgroundResource(R.drawable.key_standard_black)
 				} else {
 					keyboardView.findViewById<View>(id).setBackgroundResource(R.drawable.key_standard_white)
@@ -101,14 +105,20 @@ class KeyboardIOHandler(
 		}
 	}
 
-	private fun isBlack(note: Int): Boolean {
-		val noteClass = (1200 + note) % 12
-		return noteClass == 1 || noteClass == 3 || noteClass == 6 || noteClass == 8 || noteClass == 10
+	private fun isBlackKey(note: Int): Boolean {
+		return when(note.mod12) {
+			1, 3, 6, 8, 10 -> true
+			else -> false
+		}
+		//return noteClass == 1 || noteClass == 3 || noteClass == 6 || noteClass == 8 || noteClass == 10
 	}
 
 	private fun liftNote(n: Int) {
 		synchronized(currentlyPressed) {
 			currentlyPressed.remove(n)
+			if(currentlyPressed.isEmpty()) {
+				_establishedChord.clear()
+			}
 		}
 		instrument.stop(n)
 	}
@@ -116,6 +126,9 @@ class KeyboardIOHandler(
 	private fun pressNote(n: Int) {
 		synchronized(currentlyPressed) {
 			currentlyPressed.add(n)
+			if(_establishedChord.add(n.mod12)) {
+        onEstablishedChordChanged?.invoke(establishedChord)
+      }
 		}
 		instrument.play(n, 127)
 	}

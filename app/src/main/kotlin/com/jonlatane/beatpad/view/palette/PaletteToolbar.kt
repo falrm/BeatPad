@@ -94,7 +94,7 @@ class PaletteToolbar(ctx: Context,
   }
 
   val colorsButton = imageButton {
-    imageResource = R.drawable.icons8_unicorn_100
+    imageResource = R.drawable.colorboard_icon_2
     scaleType = ImageView.ScaleType.FIT_CENTER
   }.palletteToolbarStyle().onClick {
     if (viewModel.colorboardView.isHidden)

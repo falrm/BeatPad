@@ -10,10 +10,7 @@ import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.sensors.ShakeDetector
 import com.jonlatane.beatpad.storage.Storage
-import com.jonlatane.beatpad.util.formatted
-import com.jonlatane.beatpad.util.hide
-import com.jonlatane.beatpad.util.isHidden
-import com.jonlatane.beatpad.util.vibrate
+import com.jonlatane.beatpad.util.*
 import com.jonlatane.beatpad.view.palette.PaletteUI
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.setContentView
@@ -109,11 +106,11 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 
   override fun onRestoreInstanceState(savedInstanceState: Bundle) {
     super.onRestoreInstanceState(savedInstanceState)
-    if (savedInstanceState.getBoolean("keyboardHidden", true)) {
-      viewModel.keyboardView.hide(animated = false)
+    if (savedInstanceState.getBoolean("keyboardOpen", false)) {
+      viewModel.keyboardView.show(false)
     }
-    if (savedInstanceState.getBoolean("colorboardHidden", true)) {
-      viewModel.colorboardView.hide(animated = false)
+    if (savedInstanceState.getBoolean("colorboardOpen", false)) {
+      viewModel.colorboardView.show(false)
     }
     savedInstanceState.getString("editingMelodyId")?.let { melodyId: String ->
       try {
@@ -139,8 +136,8 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
     Storage.storePalette(viewModel.palette, this)
-    outState.putBoolean("keyboardHidden", viewModel.keyboardView.isHidden)
-    outState.putBoolean("colorboardHidden", viewModel.colorboardView.isHidden)
+    outState.putBoolean("keyboardOpen", !viewModel.keyboardView.isHidden)
+    outState.putBoolean("colorboardOpen", !viewModel.colorboardView.isHidden)
     outState.putString("editingMelodyId", viewModel.editingMelody?.id.toString())
     outState.putInt("beatWidth", viewModel.melodyElementAdapter.elementWidth)
     outState.putInt("beatHeight", viewModel.melodyElementAdapter.elementHeight)
