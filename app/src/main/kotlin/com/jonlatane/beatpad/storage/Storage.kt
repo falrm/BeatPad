@@ -30,11 +30,11 @@ interface Storage: AnkoLogger {
 			dir2.mkdirs()
 		}
 
-		fun getPalettes(context: Context): List<String> {
+		fun getPalettes(context: Context): List<File> {
 			createDir(paletteDir, context)
 			return File("${context.filesDir}$separator$paletteDir").listFiles()
 				.filter { it.name.endsWith("~") }
-				.map { it.name }
+				//.map { it.name }
 		}
 
 		fun storePalette(palette: Palette, context: Context, filename:String = openPaletteFileName) = try {

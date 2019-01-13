@@ -170,7 +170,7 @@ class MelodyBeatView @JvmOverloads constructor(
         val leftMargin = if (isChange) drawPadding else 0
         val rightMargin = if (nextElement != null) drawPadding else 0
         tones.forEach { tone ->
-          val realTone = tone + melodyOffsetAt(elementPosition)
+          val realTone = tone + melody.offsetUnder(chord)
           val top = height - height * (realTone - AlphaDrawer.BOTTOM) / 88f
           val bottom = height - height * (realTone - AlphaDrawer.BOTTOM + 1) / 88f
           drawRect(

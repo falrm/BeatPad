@@ -108,10 +108,11 @@ class PaletteToolbar(ctx: Context,
         imageResource = R.drawable.icons8_molecule_filled_100
         scaleType = ImageView.ScaleType.FIT_CENTER
       }.palletteToolbarStyle().onClick {
-        if (viewModel.orbifold.isHidden)
-          viewModel.orbifold.show()
-        else
-          viewModel.orbifold.hide()
+        if (viewModel.orbifold.isHidden) {
+          viewModel.showOrbifold()
+        } else {
+          viewModel.hideOrbifold()
+        }
       }
     }
   }

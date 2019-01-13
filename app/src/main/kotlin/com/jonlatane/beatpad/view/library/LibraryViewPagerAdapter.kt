@@ -6,11 +6,13 @@ import android.support.v4.view.ViewPager
 import android.view.View
 import android.view.ViewGroup
 import android.view.LayoutInflater
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.relativeLayout
 
 
 class LibraryViewPagerAdapter(
-  val pager: ViewPager,
+  val viewModel: LibraryViewModel,
   val context: Context
 ): PagerAdapter() {
   enum class ViewType(
@@ -24,11 +26,23 @@ class LibraryViewPagerAdapter(
 //    val inflater = LayoutInflater.from(context)
 //    val layout = inflater.inflate(customPagerEnum.getLayoutResId(), collection, false) as ViewGroup
 //    collection.addView(layout)
-    return blankView()
+    return when(position) {
+      ViewType.PALETTE.ordinal -> {
+        collection.run {
+          addView(
+          recyclerView {
+            adapter = LibraryPaletteAdapter(viewModel, this)
+
+          })/*.apply {
+            layoutParams = layoutParams.apply { width = matchParent; height = matchParent }
+          }*/
+        }
+      }
+      else -> blankView()
+    }
   }
 
-  private fun blankView() = pager.run {
-    relativeLayout()
+  private fun blankView() = viewModel.pager.run {
   }
 
 

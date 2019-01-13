@@ -3,12 +3,11 @@ package com.jonlatane.beatpad.view.harmony
 import BeatClockPaletteConsumer
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.view.ZoomableRecyclerView
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 
-open class HarmonyViewModel {
+open class HarmonyViewModel: SelectedChordAnimation {
   var paletteViewModel: PaletteViewModel? = null
   var harmonyView: HarmonyView? = null
   lateinit var beatAdapter: HarmonyBeatAdapter
@@ -19,13 +18,13 @@ open class HarmonyViewModel {
     notifyHarmonyChanged()
   }
   val harmony: Harmony? get() = BeatClockPaletteConsumer.harmony
-  var isEditingChord: Boolean = false
+  override var isChoosingHarmonyChord: Boolean = false
   set(value) {
     field = value
     if (!value) {
       paletteViewModel?.apply {
         if(wasOrbifoldShowingBeforeEditingChord == false) {
-          orbifold.hide()
+          hideOrbifold()
         }
         wasOrbifoldShowingBeforeEditingChord = null
       }
@@ -33,6 +32,7 @@ open class HarmonyViewModel {
       paletteViewModel?.apply {
         wasOrbifoldShowingBeforeEditingChord = !orbifold.isHidden
       }
+      animateBeatsOfSelectedChord()
     }
 
   }

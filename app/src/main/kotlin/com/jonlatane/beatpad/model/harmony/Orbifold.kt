@@ -69,12 +69,12 @@ enum class Orbifold(val title: String, vararg sequences: Orbit)
     FunctionalAlternatingMajorMinorThirds
   ),
   custom("For Custom Chords",
-    orbit({ Chord(12, it.extension) }, { Chord(1, it.extension) }),
-    orbit({ Chord(11, it.extension) }, { Chord(2, it.extension) }),
-    orbit({ Chord(10, it.extension) }, { Chord(3, it.extension) }),
-    orbit({ Chord(9, it.extension) }, { Chord(4, it.extension) }),
-    orbit({ Chord(8, it.extension) }, { Chord(5, it.extension) }),
-    orbit({ Chord(7, it.extension) }, { Chord(6, it.extension) })
+    //orbit({ Chord(it.root - 1, it.extension) }, { Chord(it.root + 1, it.extension) }),
+    orbit({ Chord(it.root + 2, it.extension) }, { Chord(it.root - 2, it.extension) }),
+    orbit({ Chord(it.root + 3, it.extension) }, { Chord(it.root - 3, it.extension) }),
+    orbit({ Chord(it.root + 4, it.extension) }, { Chord(it.root - 4, it.extension) }),
+    orbit({ Chord(it.root + 5, it.extension) }, { Chord(it.root - 5, it.extension) }),
+    orbit({ Chord(it.root + 6, it.extension) }, { Chord(it.root - 6, it.extension) })
   )
   ;
 

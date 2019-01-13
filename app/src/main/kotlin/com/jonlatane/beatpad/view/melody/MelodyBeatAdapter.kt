@@ -16,7 +16,7 @@ class MelodyBeatAdapter(
   override val recyclerView: _RecyclerView
 ) : RecyclerView.Adapter<MelodyBeatHolder>(), AnkoLogger, BeatAdapter {
   companion object {
-    const val initialBeatWidthDp: Float = 150f
+    const val initialBeatWidthDp: Float = 75f
     const val initialBeatHeightDp: Float = 1000f
     const val minimumBeatWidthDp: Float = 30f
     const val maximumBeatHeightDp: Float = 2500f

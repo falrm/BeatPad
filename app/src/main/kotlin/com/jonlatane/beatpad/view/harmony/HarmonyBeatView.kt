@@ -25,6 +25,7 @@ class HarmonyBeatView constructor(
   val harmony: Harmony? get() = viewModel.harmony
 
   var beatPosition = 0
+  internal var beatSelectionAnimationPosition: Int = 0
 
   inline val elementRange: IntRange? get() = harmony?.let { harmony ->
     (beatPosition * harmony.subdivisionsPerBeat) until
@@ -48,11 +49,11 @@ class HarmonyBeatView constructor(
     editChangeMenu.inflate(R.menu.harmony_element_menu)
     editChangeMenu.setOnDismissListener {
       viewModel?.apply {
-        if(!isEditingChord) selectedHarmonyElements = null
+        if(!isChoosingHarmonyChord) selectedHarmonyElements = null
       }
     }
     editChangeMenu.setOnMenuItemClickListener { item ->
-      viewModel.isEditingChord = false
+      viewModel.isChoosingHarmonyChord = false
       when (item.itemId) {
         R.id.newChordChange -> {
           val position = viewModel.selectedHarmonyElements!!.first
@@ -148,17 +149,20 @@ class HarmonyBeatView constructor(
           to = harmony
         ) == elementPosition
         val isSelected = viewModel?.selectedHarmonyElements?.contains(elementPosition) ?: false
-        val isHighlighted = isPlaying
         val isFaded = !isSelected && viewModel?.selectedHarmonyElements != null
         fun Int.withHighlight() = this.withAlpha(
           when {
-            isHighlighted -> 255
+            isPlaying -> 255
+            isSelected -> when((beatSelectionAnimationPosition + (elementPosition * 5).mod12).mod12) {
+              0, 3, 5, 7, 11 -> 187
+              else -> 255
+            }
             isFaded -> 41
             else -> 187
           }
         ).let {
           when {
-            isHighlighted -> {
+            isPlaying -> {
               Color.colorToHSV(it, hsv)
 //                hsv[1] = 0.1f
               hsv[2] = 0.5f
@@ -177,7 +181,7 @@ class HarmonyBeatView constructor(
             isAugmented -> color(R.color.augmented).withHighlight()
             isMajor -> color(R.color.major).withHighlight()
             // Tint the white beat - inverse
-            else -> color(R.color.colorPrimaryDark).withAlpha(if(isHighlighted || isSelected) 100 else 0)
+            else -> color(R.color.colorPrimaryDark).withAlpha(if(isPlaying || isSelected) 100 else 0)
           }
         }
 
@@ -236,7 +240,7 @@ class HarmonyBeatView constructor(
       it.chord = chord!!
     }
     viewModel.selectedHarmonyElements = chordRange
-    viewModel.isEditingChord = true
+    viewModel.isChoosingHarmonyChord = true
 //    viewModel.paletteViewModel?.wasOrbifoldShowingBeforeEditingChord =
 //      viewModel.paletteViewModel?.orbifold?.isHidden
     viewModel.paletteViewModel?.orbifold?.show()

@@ -1,10 +1,7 @@
 package com.jonlatane.beatpad.view.palette
 
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
@@ -38,7 +35,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       keyboardsLayout()
 
       viewModel.orbifold.onChordChangedListener = { chord ->
-        if(!viewModel.harmonyViewModel.isEditingChord) {
+        if(!viewModel.harmonyViewModel.isChoosingHarmonyChord) {
           viewModel.colorboardView.chord = chord
           viewModel.keyboardView.ioHandler.highlightChord(chord)
           //viewModel.melodyViewModel.verticalAxis?.chord = chord

@@ -1,6 +1,5 @@
 import com.jonlatane.beatpad.model.*
 import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.model.harmony.chord.Maj
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.output.service.let
@@ -59,7 +58,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
       viewModel?.orbifold?.post {
         if (
           section.harmony != null
-          && viewModel?.harmonyViewModel?.isEditingChord != true
+          && viewModel?.harmonyViewModel?.isChoosingHarmonyChord != true
           && chord != viewModel?.orbifold?.chord
         ) {
           viewModel?.orbifold?.disableNextTransitionAnimation()
@@ -126,7 +125,9 @@ object BeatClockPaletteConsumer : AnkoLogger {
     upcomingAttacks.clear()
     // Clean up expired attacks
     activeAttacks.forEach { attack ->
-      val attackCameFromRunningMelody = section?.melodies?.map { it.melody }
+      val attackCameFromRunningMelody = section?.melodies
+        ?.filter { !it.isDisabled }
+        ?.map { it.melody }
         ?.contains(attack.melody) ?: false
       if (!attackCameFromRunningMelody) {
         info("stopping active attack $attack")

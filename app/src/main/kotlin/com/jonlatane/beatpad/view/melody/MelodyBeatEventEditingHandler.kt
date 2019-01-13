@@ -2,6 +2,7 @@ package com.jonlatane.beatpad.view.melody
 
 import android.view.MotionEvent
 import android.view.View
+import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer

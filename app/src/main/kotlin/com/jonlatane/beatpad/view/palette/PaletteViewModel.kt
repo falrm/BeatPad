@@ -2,7 +2,9 @@ package com.jonlatane.beatpad.view.palette
 
 //import com.jonlatane.beatpad.util.syncPositionTo
 import BeatClockPaletteConsumer
+import android.animation.ValueAnimator
 import android.view.View
+import android.view.animation.LinearInterpolator
 import android.widget.TextView
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Palette
@@ -17,7 +19,6 @@ import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
-import org.jetbrains.anko.dip
 import kotlin.properties.Delegates.observable
 
 /**
@@ -130,30 +131,30 @@ class PaletteViewModel {
   }
 
   fun onBackPressed(): Boolean = when {
-    orbifold.customChordMode -> {
+    orbifold.customChordMode                -> {
       orbifold.customChordMode = false
       true
     }
-    harmonyViewModel.isEditingChord -> {
-      harmonyViewModel.isEditingChord = false
+    harmonyViewModel.isChoosingHarmonyChord -> {
+      harmonyViewModel.isChoosingHarmonyChord = false
       harmonyViewModel.selectedHarmonyElements = null
       true
     }
-    editingMelody != null -> {
+    editingMelody != null                   -> {
       editingMelody = null
       true
     }
-    editingMix -> {
+    editingMix                              -> {
       editingMix = false
       true
     }
-    else -> false
+    else                                    -> false
   }
 
 //  fun onBackPressed(): Boolean {
-//    val result = harmonyViewModel.isEditingChord || editingMix || editingMelody != null
-//    if(harmonyViewModel.isEditingChord) {
-//      harmonyViewModel.isEditingChord = false
+//    val result = harmonyViewModel.isChoosingHarmonyChord || editingMix || editingMelody != null
+//    if(harmonyViewModel.isChoosingHarmonyChord) {
+//      harmonyViewModel.isChoosingHarmonyChord = false
 //      harmonyViewModel.selectedHarmonyElements = null
 //    } else if(editingMix) {
 //      editingMix = false
@@ -264,6 +265,23 @@ class PaletteViewModel {
           }.start()
       }
     } ?: partListModeBoring()
+  }
+
+  fun showOrbifold() {
+    orbifold.show()
+  }
+
+  fun hideOrbifold() {
+    val orbifoldHeight = orbifold.height
+    orbifold.hide()
+    if(melodyElementAdapter.elementHeight < partListView.height + orbifoldHeight) {
+      val anim = ValueAnimator.ofInt(melodyElementAdapter.elementHeight, partListView.height + orbifoldHeight)
+      anim.interpolator = LinearInterpolator()
+      anim.addUpdateListener { valueAnimator ->
+        melodyElementAdapter.elementHeight = valueAnimator.animatedValue as Int
+      }
+      anim.start()
+    }
   }
 
   private fun partListModeBoring() {
