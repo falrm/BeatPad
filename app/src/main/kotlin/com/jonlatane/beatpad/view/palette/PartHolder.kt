@@ -12,7 +12,6 @@ import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showInstrumentPicker
-import com.jonlatane.beatpad.util.applyToHolders
 import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.backgroundColor
@@ -53,9 +52,9 @@ class PartHolder(
     melodyReferenceAdapter.boundViewHolders.forEach {
       info("hihi")
 			if (editingVolume && !it.isAddButton) {
-				it.animateEditOn()
+				it.animateMixOn()
 			} else {
-				it.animateEditOff()
+				it.animateMixOff()
 			}
 		}
 	}
@@ -151,7 +150,7 @@ class PartHolder(
         alpha = 0f
         isEnabled = false
       }
-			isIndeterminate = false
+			//isIndeterminate = false
 			progress = (part!!.volume * 127).toInt()
 			onSeekBarChangeListener {
 				onProgressChanged { _, progress, _ ->
@@ -174,7 +173,7 @@ class PartHolder(
 			visibility = View.GONE
 		}
 		volumeSeekBar.apply {
-			isIndeterminate = true
+			//isIndeterminate = true
 			onSeekBarChangeListener {}
 		}
 	}

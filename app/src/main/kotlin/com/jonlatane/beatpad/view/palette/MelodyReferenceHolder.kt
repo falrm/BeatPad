@@ -41,7 +41,7 @@ class MelodyReferenceHolder(
 
 	private val newPatternMenu = PopupMenu(layout.context, layout)
 	private val editPatternMenu = PopupMenu(layout.context, layout)
-  private val isMelodyReferenceEnabled = melodyReference != null && !melodyReference!!.isDisabled
+  private val isMelodyReferenceEnabled: Boolean get()  = melodyReference != null && !melodyReference!!.isDisabled
 
 	init {
 		newPatternMenu.inflate(R.menu.part_melody_new_menu)
@@ -90,27 +90,22 @@ class MelodyReferenceHolder(
     }
 	}
 
-  internal fun animateEditOn() {
+  internal fun animateMixOn() {
     layout.apply {
       name.isClickable = false
-      arrayOf(volume, inclusion).forEach { it: View ->
-        it.alpha = 0f
-        if(isMelodyReferenceEnabled || it == inclusion) {
-          it.isEnabled = true
-        }
-        it.animate().alpha(1f).start()
+      if(isMelodyReferenceEnabled) {
+        volume.isEnabled = true
       }
+      volume.animate().alpha(1f).start()
     }
   }
 
-  internal fun animateEditOff() {
+  internal fun animateMixOff() {
     layout.apply {
-      name.isClickable = false
-      arrayOf(volume, inclusion).forEach {
-        it.animate().alpha(0f).withEndAction {
-          it.isEnabled = false
-        }.start()
-      }
+      name.isClickable = true
+      volume.animate().alpha(0f).withEndAction {
+        volume.isEnabled = false
+      }.start()
     }
   }
 
@@ -134,22 +129,13 @@ class MelodyReferenceHolder(
 
 	private fun editMode() {
 		layout.apply {
-      volume.apply {
-				if(viewModel.editingMix) {
-          isEnabled = true
-          alpha = 1f
-        } else {
-          isEnabled = false
-          alpha = 0f
-        }
-			}
       inclusion.apply {
+        isEnabled = true
         imageResource = if(!isMelodyReferenceEnabled) {
           R.drawable.icons8_mute_100
         } else {
           R.drawable.icons8_speaker_100
         }
-        isEnabled = true
         alpha = 1f
         onClick {
           if(!isMelodyReferenceEnabled) {
@@ -161,9 +147,15 @@ class MelodyReferenceHolder(
         }
       }
       volume.apply {
-
+        if(viewModel.editingMix) {
+          isEnabled = true
+          alpha = 1f
+        } else {
+          isEnabled = false
+          alpha = 0f
+        }
+        progress = ((melodyReference?.volume ?: 0f) * 127).toInt()
         if(!isMelodyReferenceEnabled) {
-//          isIndeterminate = true
           isEnabled = false
           arrayOf(progressDrawable, thumb).forEach {
             it.colorFilter = null
@@ -172,13 +164,11 @@ class MelodyReferenceHolder(
           arrayOf(progressDrawable, thumb).forEach {
             it.setColorFilter( Color.WHITE, PorterDuff.Mode.SRC_IN)
           }
-//          isIndeterminate = false
           isEnabled = true
-          progress = (melodyReference!!.volume * 127).toInt()
           onSeekBarChangeListener {
             onProgressChanged { _, progress, _ ->
               info("Setting melody volume to ${progress.toFloat() / 127f}")
-              melodyReference!!.volume = progress.toFloat() / 127f
+              melodyReference?.volume = progress.toFloat() / 127f
             }
           }
         }

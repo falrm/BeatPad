@@ -41,7 +41,7 @@ class MelodyReferenceView(context: Context) : _RelativeLayout(context) {
 
     volume = seekBar {
       id = View.generateViewId()
-      alpha = 1f
+      alpha = 0f
       max = 127
       val padding = dip(5)
       setPadding(padding,padding,padding,padding)
