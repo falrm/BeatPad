@@ -19,13 +19,15 @@ import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 import kotlin.properties.Delegates.observable
 
 /**
  * The PaletteViewModel still assumes we'll only be editing
  * one Melody at a time.
  */
-class PaletteViewModel {
+class PaletteViewModel: AnkoLogger {
   init {
     //BeatClockPaletteConsumer.viewModel = this
   }
@@ -82,8 +84,12 @@ class PaletteViewModel {
   }
 
   var editingMix by observable(false) { _, _, editingVolume ->
-    partListAdapter?.recyclerView?.viewHolders<PartHolder>()
-      ?.forEach { it.editingVolume = editingVolume }
+    partListAdapter?.boundViewHolders
+      ?.forEach {
+        info("Configuring volume for ${it.partName.text}")
+        partListAdapter?.recyclerView?.post { it.editingVolume = editingVolume }
+      }
+//    partListAdapter?.notifyDataSetChanged()
   }
 
 

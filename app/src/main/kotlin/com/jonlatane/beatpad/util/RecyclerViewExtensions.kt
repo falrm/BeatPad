@@ -16,6 +16,21 @@ fun <HolderType: RecyclerView.ViewHolder>RecyclerView.applyToHolders(
 
 @Suppress("UNCHECKED_CAST")
 @Synchronized
-fun <HolderType: RecyclerView.ViewHolder>RecyclerView.viewHolders(): List<HolderType>
-  = (0 until adapter.itemCount).
-    mapNotNull { findViewHolderForAdapterPosition(it) as? HolderType }
+fun <HolderType : RecyclerView.ViewHolder> RecyclerView.viewHolders(): List<HolderType>
+  = (0 until childCount)
+  .map { getChildAt(it) }
+  .map {
+//    try {
+      getChildViewHolder(it)
+//    } catch(t: Throwable) {
+//      null
+//    }
+  }.map { it as HolderType }
+
+// (0 until adapter.itemCount).
+// mapNotNull { findViewHolderForAdapterPosition(it) as? HolderType }
+
+//  for (int childCount = recyclerView.getChildCount(), i = 0; i < childCount; ++i) {
+//  final ViewHolder holder = recyclerView.getChildViewHolder(recyclerView.getChildAt(i));
+//  ...
+//}

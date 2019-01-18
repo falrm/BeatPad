@@ -8,6 +8,7 @@ import android.widget.PopupMenu
 import android.widget.SeekBar
 import android.widget.TextView
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showInstrumentPicker
@@ -26,27 +27,19 @@ class PartHolder(
 	val viewModel: PaletteViewModel,
 	val layout: ViewGroup,
 	internal val melodyRecycler: _RecyclerView,
-	private val partName: TextView,
+	internal val partName: TextView,
 	private val volumeSeekBar: SeekBar,
 	private val adapter: PartListAdapter,
 	initialPart: Int = 0
 ) : RecyclerView.ViewHolder(layout), AnkoLogger {
-	var partPosition by Delegates.observable(initialPart) { _, _, _ -> onPartPositionChanged() }
-	val part get() = viewModel.palette.parts[partPosition]
+	var partPosition: Int by Delegates.observable(initialPart) { _, _, _ -> onPartPositionChanged() }
+	val part: Part?  get() = viewModel.palette.parts.getOrNull(partPosition)
 	val context get() = melodyRecycler.context
 	private val melodyReferenceAdapter = MelodyReferenceAdapter(viewModel, melodyRecycler, 0)
 	var editingVolume: Boolean by observable(false) { _, _, editingVolume: Boolean ->
 		if(editingVolume && isEditablePart) {
 			volumeSeekBar.animate().alpha(1f)
 			volumeSeekBar.isEnabled = true
-//			volumeSeekBar.apply {
-//				onSeekBarChangeListener {
-//					onProgressChanged { _, progress, _ ->
-//						info("Setting part volume to ${progress.toFloat() / 127f}")
-//						part.volume = progress.toFloat() / 127f
-//					}
-//				}
-//			}
 			partName.isClickable = false
 			partName.isLongClickable = false
 			partName.animate().alpha(0.5f)
@@ -57,15 +50,13 @@ class PartHolder(
 			partName.isLongClickable = true
 			partName.animate().alpha(1f)
 		}
-    melodyRecycler.applyToHolders<MelodyReferenceHolder> {
-      if(editingVolume && !it.isAddButton) {
-        info("animateEditOn")
-        it.animateEditOn()
-      } else {
-        info("animateEditOff")
-        it.animateEditOff()
-      }
-    }
+    melodyReferenceAdapter.boundViewHolders.forEach {
+			if (editingVolume && !it.isAddButton) {
+				it.animateEditOn()
+			} else {
+				it.animateEditOff()
+			}
+		}
 	}
 
 	private val editPartMenu = PopupMenu(partName.context, partName)
@@ -78,19 +69,19 @@ class PartHolder(
 				R.id.editPartInstrument -> editInstrument()
 				R.id.usePartOnColorboard -> {
 					viewModel.colorboardPart = part
-					context.toast("Applied ${part.instrument.instrumentName} to Colorboard!")
+					context.toast("Applied ${part?.instrument?.instrumentName} to Colorboard!")
 				}
 				R.id.usePartOnKeyboard -> {
 					viewModel.keyboardPart = part
-					context.toast("Applied ${part.instrument.instrumentName} to Keyboard!")
+					context.toast("Applied ${part?.instrument?.instrumentName} to Keyboard!")
 				}
 				R.id.usePartOnSplat -> {
 					viewModel.splatPart = part
-					context.toast("Applied ${part.instrument.instrumentName} to Splat!")
+					context.toast("Applied ${part?.instrument?.instrumentName} to Splat!")
 				}
 				R.id.removePart -> showConfirmDialog(
 						context,
-						promptText = "Really delete the ${part.instrument.instrumentName} part?",
+						promptText = "Really delete the ${part?.instrument?.instrumentName} part?",
 						yesText = "Yes, delete part"
 					) {
 						viewModel.palette.parts.removeAt(partPosition)
@@ -105,7 +96,7 @@ class PartHolder(
 	}
 
 	fun editInstrument() {
-		val instrument = part.instrument
+		val instrument = part?.instrument
 		when (instrument) {
 			is MIDIInstrument ->
 				showInstrumentPicker(instrument, layout.context) {
@@ -128,7 +119,7 @@ class PartHolder(
 
 	private fun makeEditablePart(partPosition: Int) {
 		partName.apply {
-			if(text != part.instrument.instrumentName) text = part.instrument.instrumentName
+			text = part!!.instrument.instrumentName
 			setOnClickListener {
 				editPartMenu.show()
 			}
@@ -160,11 +151,11 @@ class PartHolder(
         isEnabled = false
       }
 			isIndeterminate = false
-			progress = (part.volume * 127).toInt()
+			progress = (part!!.volume * 127).toInt()
 			onSeekBarChangeListener {
 				onProgressChanged { _, progress, _ ->
 					info("Setting part volume to ${progress.toFloat() / 127f}")
-					part.volume = progress.toFloat() / 127f
+					part?.volume = progress.toFloat() / 127f
 				}
 			}
 		}
