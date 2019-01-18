@@ -1,6 +1,5 @@
 package com.jonlatane.beatpad.view.palette
 
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.util.SmartAdapter
@@ -24,9 +23,9 @@ class MelodyReferenceAdapter(
 		}
 	}
 
-	override fun onBindViewHolder(holder: MelodyReferenceHolder, patternPosition: Int) {
-		super.onBindViewHolder(holder, partPosition)
-		holder.melodyPosition = patternPosition
+	override fun onBindViewHolder(holder: MelodyReferenceHolder, position: Int) {
+		super.onBindViewHolder(holder, position)
+		holder.melodyPosition = position
 	}
 
 	fun insert(sequence: Melody<*>): Melody<*> {

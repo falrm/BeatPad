@@ -86,8 +86,10 @@ class PaletteViewModel: AnkoLogger {
   var editingMix by observable(false) { _, _, editingVolume ->
     partListAdapter?.boundViewHolders
       ?.forEach {
-        info("Configuring volume for ${it.partName.text}")
-        partListAdapter?.recyclerView?.post { it.editingVolume = editingVolume }
+//        info("Configuring volume for ${it.partName.text}")
+//        partListAdapter?.recyclerView?.post {
+          it.editingVolume = editingVolume
+//        }
       }
 //    partListAdapter?.notifyDataSetChanged()
   }

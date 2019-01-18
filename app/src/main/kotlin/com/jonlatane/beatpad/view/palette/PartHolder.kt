@@ -51,6 +51,7 @@ class PartHolder(
 			partName.animate().alpha(1f)
 		}
     melodyReferenceAdapter.boundViewHolders.forEach {
+      info("hihi")
 			if (editingVolume && !it.isAddButton) {
 				it.animateEditOn()
 			} else {
@@ -135,13 +136,13 @@ class PartHolder(
 		}
 		melodyRecycler.apply {
 			visibility = View.VISIBLE
-			val sequenceListAdapter = MelodyReferenceAdapter(viewModel, this, partPosition)
 			val orientation = LinearLayoutManager.VERTICAL
 			backgroundColor = context.color(R.color.colorPrimaryDark)
 			layoutManager = LinearLayoutManager(context, orientation, false)
 			overScrollMode = View.OVER_SCROLL_NEVER
-			adapter = sequenceListAdapter
 		}
+    melodyReferenceAdapter.partPosition = partPosition
+    melodyReferenceAdapter.notifyDataSetChanged()
 		volumeSeekBar.apply {
       if(viewModel.editingMix) {
         alpha = 1f

@@ -6,7 +6,7 @@ abstract class SmartAdapter<HolderType: RecyclerView.ViewHolder>: RecyclerView.A
   private val _boundViewHolders = mutableSetOf<HolderType>()
   val boundViewHolders: Set<HolderType> = _boundViewHolders
 
-  override fun onBindViewHolder(holder: HolderType, partPosition: Int) {
+  override fun onBindViewHolder(holder: HolderType, position: Int) {
     _boundViewHolders += holder
   }
 

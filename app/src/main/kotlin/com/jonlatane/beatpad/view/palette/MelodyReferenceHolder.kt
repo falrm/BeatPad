@@ -1,6 +1,5 @@
 package com.jonlatane.beatpad.view.palette
 
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -42,6 +41,7 @@ class MelodyReferenceHolder(
 
 	private val newPatternMenu = PopupMenu(layout.context, layout)
 	private val editPatternMenu = PopupMenu(layout.context, layout)
+  private val isMelodyReferenceEnabled = melodyReference != null && !melodyReference!!.isDisabled
 
 	init {
 		newPatternMenu.inflate(R.menu.part_melody_new_menu)
@@ -95,7 +95,9 @@ class MelodyReferenceHolder(
       name.isClickable = false
       arrayOf(volume, inclusion).forEach { it: View ->
         it.alpha = 0f
-        it.isEnabled = true
+        if(isMelodyReferenceEnabled || it == inclusion) {
+          it.isEnabled = true
+        }
         it.animate().alpha(1f).start()
       }
     }
@@ -112,15 +114,12 @@ class MelodyReferenceHolder(
     }
   }
 
-  val Section.MelodyReference.disabled get() = playbackType == Section.PlaybackType.Disabled
-
-
   internal fun enableMelodyReference() {
     if(melodyReference == null) {
       BeatClockPaletteConsumer.section?.melodies?.add(
         Section.MelodyReference(melody!!, 0.5f, Section.PlaybackType.Indefinite)
       )
-    } else if(melodyReference!!.disabled) {
+    } else if(melodyReference!!.isDisabled) {
       melodyReference!!.playbackType = Section.PlaybackType.Indefinite
     }
   }
@@ -145,7 +144,7 @@ class MelodyReferenceHolder(
         }
 			}
       inclusion.apply {
-        imageResource = if(melodyReference == null || melodyReference!!.disabled) {
+        imageResource = if(!isMelodyReferenceEnabled) {
           R.drawable.icons8_mute_100
         } else {
           R.drawable.icons8_speaker_100
@@ -153,7 +152,7 @@ class MelodyReferenceHolder(
         isEnabled = true
         alpha = 1f
         onClick {
-          if(melodyReference == null || melodyReference!!.disabled) {
+          if(!isMelodyReferenceEnabled) {
             enableMelodyReference()
           } else {
             disableMelodyReference()
@@ -163,8 +162,8 @@ class MelodyReferenceHolder(
       }
       volume.apply {
 
-        if(melodyReference == null || melodyReference!!.disabled) {
-          isIndeterminate = true
+        if(!isMelodyReferenceEnabled) {
+//          isIndeterminate = true
           isEnabled = false
           arrayOf(progressDrawable, thumb).forEach {
             it.colorFilter = null
@@ -173,7 +172,8 @@ class MelodyReferenceHolder(
           arrayOf(progressDrawable, thumb).forEach {
             it.setColorFilter( Color.WHITE, PorterDuff.Mode.SRC_IN)
           }
-          isIndeterminate = false
+//          isIndeterminate = false
+          isEnabled = true
           progress = (melodyReference!!.volume * 127).toInt()
           onSeekBarChangeListener {
             onProgressChanged { _, progress, _ ->
@@ -186,7 +186,7 @@ class MelodyReferenceHolder(
 			name.apply {
 				text = ""
         isClickable = !viewModel.editingMix
-				backgroundResource = if(melodyReference == null || melodyReference!!.disabled) {
+				backgroundResource = if(!isMelodyReferenceEnabled) {
           R.drawable.orbifold_chord
         } else {
           BeatClockPaletteConsumer.palette?.sections
@@ -202,7 +202,7 @@ class MelodyReferenceHolder(
 					editPatternMenu.show()
 					true
 				}
-        alpha = if(melodyReference == null || melodyReference!!.disabled) 0.5f else 1f
+        alpha = if(!isMelodyReferenceEnabled) 0.5f else 1f
 			}
 		}
 	}
