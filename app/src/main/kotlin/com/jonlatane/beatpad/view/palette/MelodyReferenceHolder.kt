@@ -92,7 +92,7 @@ class MelodyReferenceHolder(
 
   internal fun animateMixOn() {
     layout.apply {
-      name.isClickable = false
+      name.isEnabled = false
       if(isMelodyReferenceEnabled) {
         volume.isEnabled = true
       }
@@ -102,7 +102,7 @@ class MelodyReferenceHolder(
 
   internal fun animateMixOff() {
     layout.apply {
-      name.isClickable = true
+      name.isEnabled = true
       volume.animate().alpha(0f).withEndAction {
         volume.isEnabled = false
       }.start()
@@ -148,7 +148,7 @@ class MelodyReferenceHolder(
       }
       volume.apply {
         if(viewModel.editingMix) {
-          isEnabled = true
+          isEnabled = isMelodyReferenceEnabled
           alpha = 1f
         } else {
           isEnabled = false
@@ -156,7 +156,6 @@ class MelodyReferenceHolder(
         }
         progress = ((melodyReference?.volume ?: 0f) * 127).toInt()
         if(!isMelodyReferenceEnabled) {
-          isEnabled = false
           arrayOf(progressDrawable, thumb).forEach {
             it.colorFilter = null
           }
@@ -164,7 +163,6 @@ class MelodyReferenceHolder(
           arrayOf(progressDrawable, thumb).forEach {
             it.setColorFilter( Color.WHITE, PorterDuff.Mode.SRC_IN)
           }
-          isEnabled = true
           onSeekBarChangeListener {
             onProgressChanged { _, progress, _ ->
               info("Setting melody volume to ${progress.toFloat() / 127f}")
@@ -175,7 +173,7 @@ class MelodyReferenceHolder(
       }
 			name.apply {
 				text = ""
-        isClickable = !viewModel.editingMix
+        isEnabled = !viewModel.editingMix
 				backgroundResource = if(!isMelodyReferenceEnabled) {
           R.drawable.orbifold_chord
         } else {
