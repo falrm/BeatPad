@@ -80,7 +80,7 @@ class MelodyReferenceHolder(
 	private fun newMelody() = PaletteStorage.baseMelody
 
   val isAddButton: Boolean
-    get() = melodyPosition >= viewModel.palette.parts[partPosition].melodies.size
+    get() = melodyPosition >= viewModel.palette.parts.getOrNull(partPosition)?.melodies?.size ?: -1
 
 	internal fun onPositionChanged() {
     if(isAddButton) {
