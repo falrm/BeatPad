@@ -35,6 +35,7 @@ class PlaybackService : Service(), AnkoLogger {
   }
 
   private lateinit var playbackThread: PlaybackThread
+  val isStopped get() = playbackThread.stopped
 
   override fun onCreate() {
     super.onCreate()
@@ -44,8 +45,8 @@ class PlaybackService : Service(), AnkoLogger {
     AndroidMidi.ONBOARD_DRIVER.start()
   }
 
-  override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-    when (intent.action) {
+  override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    when (intent?.action) {
       Action.STARTFOREGROUND_ACTION -> {
         info("Received Start Foreground Intent ")
         showNotification()
@@ -54,6 +55,9 @@ class PlaybackService : Service(), AnkoLogger {
         info("Clicked Play")
         BeatClockPaletteConsumer.tickPosition = 0
         playbackThread.stopped = false
+        synchronized(PlaybackThread) {
+          (PlaybackThread as java.lang.Object).notify()
+        }
       }
       Action.PAUSE_ACTION -> {
         info("Clicked Stop")

@@ -5,6 +5,9 @@ import android.graphics.Rect
 
 interface AlphaDrawer {
 	val paint: Paint
+	/**
+	 * Represent the bounds for whatever is to be drawn
+	 */
 	val bounds: Rect
 	val renderVertically: Boolean
 	val axisLength: Float

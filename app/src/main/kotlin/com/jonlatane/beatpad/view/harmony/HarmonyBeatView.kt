@@ -1,32 +1,31 @@
 package com.jonlatane.beatpad.view.harmony
 
 import BeatClockPaletteConsumer
+import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.PointF
-import android.graphics.Rect
+import android.graphics.*
 import android.util.SparseArray
+import android.view.MotionEvent
 import android.view.View
 import android.widget.PopupMenu
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.service.convertPatternIndex
-import com.jonlatane.beatpad.util.color
-import com.jonlatane.beatpad.util.size
-import com.jonlatane.beatpad.util.vibrate
+import com.jonlatane.beatpad.util.*
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.withAlpha
 
 
-class HarmonyBeatView @JvmOverloads constructor(
+@SuppressLint("ViewConstructor")
+class HarmonyBeatView constructor(
   context: Context,
-  var viewModel: HarmonyViewModel? = null
+  var viewModel: HarmonyViewModel
 ): View(context) {
-  val harmony: Harmony? get() = viewModel?.harmony
+  val harmony: Harmony? get() = viewModel.harmony
 
   var beatPosition = 0
+  internal var beatSelectionAnimationPosition: Int = 0
 
   inline val elementRange: IntRange? get() = harmony?.let { harmony ->
     (beatPosition * harmony.subdivisionsPerBeat) until
@@ -38,43 +37,71 @@ class HarmonyBeatView @JvmOverloads constructor(
   //val chord: Chord? get() = try { harmony?.changeBefore(elementPosition) } catch(e: NoSuchElementException) { null }
 
   private val editChangeMenu: PopupMenu
+  private val lastTouchDownXY = FloatArray(2)
+  private val lastTouchDownX get() = lastTouchDownXY[0]
+  private val lastTouchDownY get() = lastTouchDownXY[1]
+  private val removeChordMenuItem get() = editChangeMenu.menu.findItem(R.id.removeChordChange)
 
   init {
     isClickable = true
 
     editChangeMenu = PopupMenu(context, this)
     editChangeMenu.inflate(R.menu.harmony_element_menu)
+    editChangeMenu.setOnDismissListener {
+      viewModel?.apply {
+        if(!isChoosingHarmonyChord) selectedHarmonyElements = null
+      }
+    }
     editChangeMenu.setOnMenuItemClickListener { item ->
+      viewModel.isChoosingHarmonyChord = false
       when (item.itemId) {
-      //R.id.newDrawnPattern -> adapter.newToneSequence()
-        R.id.newChordChange -> {context.toast("TODO")}
-        R.id.editChordChange -> {context.toast("TODO")}
-        R.id.removeChordChange -> {context.toast("TODO")}
+        R.id.newChordChange -> {
+          val position = viewModel.selectedHarmonyElements!!.first
+          harmony!!.changes[position] = harmony!!.changeBefore(position)
+          viewModel.harmonyView?.syncScrollingChordText()
+          editSelectedChord()
+        }
+        R.id.editChordChange -> {
+          editSelectedChord()
+        }
+        R.id.removeChordChange -> {
+          val position = viewModel?.selectedHarmonyElements!!.first
+          val key = harmony!!.floorKey(position)!!
+          harmony!!.changes.remove(key)
+          viewModel?.selectedHarmonyElements = null
+          viewModel?.harmonyView?.syncScrollingChordText()
+        }
         else -> context.toast("TODO!")
       }
       true
     }
 
-    setOnClickListener { event ->
-      val chord = getPositionAndElement(event.x)?.second
+    setOnClickListener { _ ->
+      val chord = getPositionAndElement(lastTouchDownXY[0])?.second
       chord?.let {
         viewModel?.paletteViewModel?.orbifold?.disableNextTransitionAnimation()
         viewModel?.paletteViewModel?.orbifold?.chord = it
       }
     }
 
+    setOnTouchListener { _, event ->
+      // save the X,Y coordinates
+      if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+        lastTouchDownXY[0] = event.x
+        lastTouchDownXY[1] = event.y
+      }
+
+      // let the touch event pass on to whoever needs it
+      false
+    }
+
     setOnLongClickListener { _ ->
       vibrate(150)
       harmony?.let { harmony ->
-        /*val isChange = harmony.isChangeAt(elementPosition)
-        viewModel?.selectedChord = chord
-        editChangeMenu.menu.findItem(R.id.newChordChange).isVisible = !isChange
-        editChangeMenu.menu.findItem(R.id.removeChordChange).isVisible = harmony.changes.values.count { it != null } > 1
-        when {
-          harmony.isChangeAt(elementPosition) -> {
-
-          }
-        }*/
+        getPositionAndElement(lastTouchDownX)?.let { (position, _) ->
+          viewModel?.selectedHarmonyElements = position..position
+        }
+        removeChordMenuItem.isVisible = harmony.changes.count() > 1
         editChangeMenu.show()
       }
       true
@@ -85,7 +112,8 @@ class HarmonyBeatView @JvmOverloads constructor(
   private val paint = Paint()
 
   private val overallBounds = Rect()
-  private var bounds = Rect()
+  private val bounds = Rect()
+  private val hsv = FloatArray(3)
   override fun onDraw(canvas: Canvas) {
     super.onDraw(canvas)
     canvas.getClipBounds(overallBounds)
@@ -116,37 +144,47 @@ class HarmonyBeatView @JvmOverloads constructor(
           left = (overallWidth.toFloat() * elementIndex / elementCount).toInt()
           right = (overallWidth.toFloat() * (elementIndex+1) / elementCount).toInt()
         }
-        /*chord = harmony?.let { harmony ->
-          val harmonyPosition = elementPosition.convertPatternIndex(melody, harmony)
-          harmony.changeBefore(harmonyPosition)
-        } ?: viewModel?.orbifold?.chord ?: MelodyBeatView.DEFAULT_CHORD
-        colorGuideAlpha = if (
-          viewModel?.playbackTick?.convertPatternIndex(
-            from = BeatClockPaletteConsumer.ticksPerBeat,
-            to = melody
-          ) == elementPosition
-        ) 255 else 187
-        canvas.drawColorGuide()
-        canvas.drawStepNotes(melody, elementPosition)*/
-        val chord = harmony.changeBefore(elementPosition)
-        paint.color = chord.run {
+        val isPlaying = viewModel?.paletteViewModel?.playbackTick?.convertPatternIndex(
+          from = BeatClockPaletteConsumer.ticksPerBeat,
+          to = harmony
+        ) == elementPosition
+        val isSelected = viewModel?.selectedHarmonyElements?.contains(elementPosition) ?: false
+        val isFaded = !isSelected && viewModel?.selectedHarmonyElements != null
+        fun Int.withHighlight() = this.withAlpha(
           when {
-            isDominant -> color(R.color.dominant)
-            isDiminished -> color(R.color.diminished)
-            isMinor -> color(R.color.minor)
-            isAugmented -> color(R.color.augmented)
-            isMajor -> color(R.color.major)
-            else -> color(android.R.color.white)
+            isPlaying -> 255
+            isSelected -> when((beatSelectionAnimationPosition + (elementPosition * 5).mod12).mod12) {
+              0, 3, 5, 7, 11 -> 187
+              else -> 255
+            }
+            isFaded -> 41
+            else -> 187
+          }
+        ).let {
+          when {
+            isPlaying -> {
+              Color.colorToHSV(it, hsv)
+//                hsv[1] = 0.1f
+              hsv[2] = 0.5f
+              Color.HSVToColor(hsv)
+            }
+            else          -> it
           }
         }
 
-        val paintAlpha = if (
-          viewModel?.paletteViewModel?.playbackTick?.convertPatternIndex(
-            from = BeatClockPaletteConsumer.ticksPerBeat,
-            to = harmony
-          ) == elementPosition
-        ) 255 else 187
-        paint.color = paint.color.withAlpha(paintAlpha)
+        val chord = harmony.changeBefore(elementPosition)
+        paint.color = chord.run {
+          when {
+            isDominant -> color(R.color.dominant).withHighlight()
+            isDiminished -> color(R.color.diminished).withHighlight()
+            isMinor -> color(R.color.minor).withHighlight()
+            isAugmented -> color(R.color.augmented).withHighlight()
+            isMajor -> color(R.color.major).withHighlight()
+            // Tint the white beat - inverse
+            else -> color(R.color.colorPrimaryDark).withAlpha(if(isPlaying || isSelected) 100 else 0)
+          }
+        }
+
         canvas.drawRect(
           bounds.left.toFloat(),
           bounds.top.toFloat(),
@@ -154,12 +192,17 @@ class HarmonyBeatView @JvmOverloads constructor(
           bounds.bottom.toFloat(),
           paint
         )
-        canvas.drawRhythm(elementIndex)
+        canvas.drawRhythm(harmony, elementIndex)
       }
     }
     if(harmony == null) {
-      canvas.drawRhythm(0)
+      canvas.drawRhythm(null, 0)
     }
+    bounds.apply {
+      left = overallBounds.right
+      right = overallBounds.right
+    }
+    canvas.drawRhythm(harmony, harmony?.subdivisionsPerBeat ?: 1)
   }
 
   fun getPositionAndElement(x: Float): Pair<Int, Chord?>? {
@@ -167,18 +210,39 @@ class HarmonyBeatView @JvmOverloads constructor(
       val elementRange: IntRange = elementRange!!
       val elementIndex: Int = (elementRange.size * x / width).toInt()
       val elementPosition = Math.min(beatPosition * harmony.subdivisionsPerBeat + elementIndex, harmony.length - 1)
-      return elementIndex to harmony.changeBefore(elementPosition)
+      return elementPosition to harmony.changeBefore(elementPosition)
     }
   }
 
-  private fun Canvas.drawRhythm(elementIndex: Int) {
+  private fun Canvas.drawRhythm(harmony: Harmony?, elementIndex: Int) {
     paint.color = 0xAA212121.toInt()
+    val halfWidth = if (elementIndex % (harmony?.subdivisionsPerBeat ?: 1) == 0) 5f else 1f
     drawRect(
-      bounds.left.toFloat(),
+      bounds.left.toFloat() - halfWidth,
       bounds.top.toFloat(),
-      bounds.left.toFloat() + if (elementIndex == 0) 10f else 5f,
+      bounds.left.toFloat() + halfWidth,
       bounds.bottom.toFloat(),
       paint
     )
+  }
+
+  private fun editSelectedChord() {
+    var chord: Chord? = null
+    val chordRange = viewModel.selectedHarmonyElements?.let {
+      chord = harmony!!.changeBefore(it.first)
+      val start = harmony!!.floorKey(it.first)
+      var end = harmony!!.higherKey(it.first) - 1
+      if(end < start) end = harmony!!.length - 1
+      start..end
+    }
+    viewModel.paletteViewModel?.orbifold?.let {
+      it.disableNextTransitionAnimation()
+      it.chord = chord!!
+    }
+    viewModel.selectedHarmonyElements = chordRange
+    viewModel.isChoosingHarmonyChord = true
+//    viewModel.paletteViewModel?.wasOrbifoldShowingBeforeEditingChord =
+//      viewModel.paletteViewModel?.orbifold?.isHidden
+    viewModel.paletteViewModel?.orbifold?.show()
   }
 }

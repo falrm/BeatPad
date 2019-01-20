@@ -10,7 +10,7 @@ import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.midi.MidiDevices.name
 import com.jonlatane.beatpad.util.asInt
 import com.jonlatane.beatpad.util.hexString
-import kotlinx.coroutines.experimental.*
+//import kotlinx.coroutines.experimental.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.async
 import java.util.concurrent.ScheduledExecutorService

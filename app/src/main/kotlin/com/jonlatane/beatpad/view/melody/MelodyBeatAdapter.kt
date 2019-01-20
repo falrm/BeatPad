@@ -13,10 +13,10 @@ import org.jetbrains.anko.recyclerview.v7._RecyclerView
 
 class MelodyBeatAdapter(
   val viewModel: MelodyViewModel,
-  val recyclerView: _RecyclerView
-) : RecyclerView.Adapter<MelodyBeatHolder>(), AnkoLogger {
+  override val recyclerView: _RecyclerView
+) : RecyclerView.Adapter<MelodyBeatHolder>(), AnkoLogger, BeatAdapter {
   companion object {
-    const val initialBeatWidthDp: Float = 150f
+    const val initialBeatWidthDp: Float = 75f
     const val initialBeatHeightDp: Float = 1000f
     const val minimumBeatWidthDp: Float = 30f
     const val maximumBeatHeightDp: Float = 2500f
@@ -28,9 +28,10 @@ class MelodyBeatAdapter(
   private val minimumElementHeight get() = viewModel.melodyCenterVerticalScroller.height
   private val maximumElementHeight get() = recyclerView.run { dip(maximumBeatHeightDp) }
 
-  @Volatile
-  var elementWidth = recyclerView.run { dip(initialBeatWidthDp) }
-    @Synchronized set(value) {
+//  @Volatile
+  override var elementWidth: Int = recyclerView.run { dip(initialBeatWidthDp) }
+//    @Synchronized
+    set(value) {
       if(field != value) {
         field = when {
           value < minimumElementWidth -> {
@@ -45,13 +46,14 @@ class MelodyBeatAdapter(
         recyclerView.applyToHolders<MelodyBeatHolder> {
           it.element.layoutWidth = field
         }
-        viewModel.paletteViewModel.harmonyViewModel.beatAdapter.elementWidth = field
       }
+      viewModel.paletteViewModel.harmonyViewModel.beatAdapter.elementWidth = field
     }
 
-  @Volatile
+//  @Volatile
   var elementHeight = recyclerView.run { dip(initialBeatHeightDp) }
-    @Synchronized set(value) {
+//    @Synchronized
+    set(value) {
       field = when {
         value < minimumElementHeight -> {
           minimumElementHeight
@@ -68,11 +70,6 @@ class MelodyBeatAdapter(
       }
       axis.layoutHeight = field
     }
-
-
-  fun invalidate(beatPosition: Int) {
-    recyclerView.layoutManager.findViewByPosition(beatPosition)?.invalidate()
-  }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyBeatHolder {
     return with(recyclerView) {

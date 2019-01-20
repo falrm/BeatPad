@@ -3,14 +3,17 @@ package com.jonlatane.beatpad.view.melody
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.PointF
+import android.text.TextUtils
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.Button
 import android.widget.LinearLayout
+import com.jonlatane.beatpad.util.animateWidth
+import com.jonlatane.beatpad.util.layoutWidth
+import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.NonDelayedHorizontalScrollView
-import org.jetbrains.anko._LinearLayout
-import org.jetbrains.anko.button
+import org.jetbrains.anko.*
 
 /**
  * A [NonDelayedHorizontalScrollView] that tracks if the user is holding it down.
@@ -18,6 +21,9 @@ import org.jetbrains.anko.button
 class MelodyEditingModifiers @JvmOverloads constructor(
 	context: Context
 ) : _LinearLayout(context) {
+  companion object {
+    const val vibrationMs = 10
+  }
 	sealed class Modifier {
 		object None: Modifier()
 		object Editing: Modifier()
@@ -54,8 +60,8 @@ class MelodyEditingModifiers @JvmOverloads constructor(
 			this.layoutParams = layoutParams
 		}
 
-	fun View.animateWeight(height: Float, duration: Long = 300L) {
-		val anim = ValueAnimator.ofFloat(this.layoutWeight, height)
+	fun View.animateWeight(weight: Float, duration: Long = 300L) {
+		val anim = ValueAnimator.ofFloat(this.layoutWeight, weight)
 		anim.interpolator = LinearInterpolator()
 		anim.addUpdateListener { valueAnimator ->
 			val value = valueAnimator.animatedValue as Float
@@ -68,38 +74,76 @@ class MelodyEditingModifiers @JvmOverloads constructor(
 		orientation = HORIZONTAL
 		editButton = button {
 			text = "Edit"
+			singleLine = true
+      allCaps = true
+			ellipsize = TextUtils.TruncateAt.END
 		}.lparams {
+//			width = matchParent
 			weight = 1f
+      width = 0
+      height = matchParent
 		}
 		articulateButton = button {
 			text = "Articulate"
+			singleLine = true
+      allCaps = true
+			ellipsize = TextUtils.TruncateAt.END
 		}.lparams {
+			//width = matchParent
 			weight = 1f
+      width = 0
+      height = matchParent
 		}
 		transposeButton = button {
 			text = "Transpose"
+			singleLine = true
+      allCaps = true
+			ellipsize = TextUtils.TruncateAt.END
 		}.lparams {
+			//width = matchParent
 			weight = 1f
+      width = 0
+      height = matchParent
 		}
 
+
+    var restoredWidths = mutableMapOf<Button, Int>()
 		val activePointers: MutableMap<Button, MutableSet<Int>> = mutableMapOf()
 		arrayOf(editButton, articulateButton, transposeButton).forEach { button ->
+			val otherButtons = listOf(editButton, articulateButton, transposeButton) - button
 			activePointers[button] = mutableSetOf()
-			button.setOnTouchListener( {
-				_, ev ->
+			button.setOnTouchListener { _, ev ->
 				when(ev.actionMasked)  {
 					MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
-						// We have a new pointer. Lets add it to the list of pointers
 						modifier = modifierOf(button)
-						button.animateWeight(20f)
+						otherButtons.forEach {
+							it.isEnabled = false
+							it.layoutWidth = it.measuredWidth
+              restoredWidths[it] = restoredWidths[it] ?: it.measuredWidth
+							it.layoutWeight = 0f
+							it.animateWidth(0)
+						}
+						//button.animateWeight(20f)
+						vibrate(vibrationMs)
 					}
 					MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> {
 						modifier = Modifier.None
-						button.animateWeight(1f)
+            otherButtons.forEach {
+							it.layoutWeight = 0f
+							it.animateWidth(restoredWidths[it]!!, endAction = {
+                if(modifier == Modifier.None) {
+                  it.layoutWeight = 1f
+                  it.layoutWidth = 0
+                  it.isEnabled = true
+                }
+							})
+						}
+						//button.animateWeight(1f)
+						vibrate(vibrationMs)
 					}
 				}
 				true
-			})
+			}
 		}
 	}
 }

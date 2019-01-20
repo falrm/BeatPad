@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.jonlatane.beatpad.util.applyToHolders
 import com.jonlatane.beatpad.util.layoutWidth
+import com.jonlatane.beatpad.view.melody.BeatAdapter
 import com.jonlatane.beatpad.view.melody.MelodyBeatAdapter.Companion.initialBeatWidthDp
 import com.jonlatane.beatpad.view.melody.MelodyBeatAdapter.Companion.minimumBeatWidthDp
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
@@ -14,13 +15,14 @@ import org.jetbrains.anko.recyclerview.v7._RecyclerView
 
 class HarmonyBeatAdapter(
 	val viewModel: PaletteViewModel,
-	val recyclerView: _RecyclerView
-) : RecyclerView.Adapter<HarmonyBeatHolder>(), AnkoLogger {
+	override val recyclerView: _RecyclerView
+) : RecyclerView.Adapter<HarmonyBeatHolder>(), AnkoLogger, BeatAdapter {
   private val minimumElementWidth: Int = recyclerView.run { dip(minimumBeatWidthDp) }
 
-  @Volatile
-  var elementWidth = recyclerView.run { dip(initialBeatWidthDp) }
-    @Synchronized set(value) {
+//  @Volatile
+  override var elementWidth = recyclerView.run { dip(initialBeatWidthDp) }
+//    @Synchronized
+		set(value) {
 			if (field != value) {
         field = when {
           value > minimumElementWidth -> {
@@ -48,10 +50,6 @@ class HarmonyBeatAdapter(
 			)
 		}
 	}
-
-  fun invalidate(beatPosition: Int) {
-    recyclerView.layoutManager.findViewByPosition(beatPosition)?.invalidate()
-  }
 
 	override fun onBindViewHolder(holder: HarmonyBeatHolder, beatPosition: Int) {
 		holder.element.beatPosition = beatPosition

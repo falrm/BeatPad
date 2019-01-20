@@ -5,6 +5,7 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.widget.SeekBar
 import android.widget.TextView
+import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
@@ -19,21 +20,26 @@ interface PartHolderLayout {
 		var partPatternRecycler: _RecyclerView? = null
 		var seekBar: SeekBar? = null
 		val layout = _ConstraintLayout(context).apply {
+//			clipChildren = false
+//			clipToPadding = false
 			partName = textView {
 				id = R.id.part_name
 				textSize = 20f
 				singleLine = true
 				ellipsize = TextUtils.TruncateAt.MARQUEE
 				marqueeRepeatLimit = -1
+				typeface = MainApplication.chordTypeface
 				isSelected = true
 				gravity = Gravity.CENTER_HORIZONTAL
 				backgroundResource = R.drawable.part_background
-				elevation = 1f
+				elevation = 2f
 			}.lparams(matchParent, wrapContent)
 
 			partPatternRecycler = recyclerView {
 				id = R.id.part_patterns
 				elevation = 1f
+//				clipChildren = false
+//				clipToPadding = false
 			}.lparams(matchParent, 0) as _RecyclerView
 
 			seekBar = seekBar {
@@ -41,6 +47,7 @@ interface PartHolderLayout {
 				elevation = 2f
 				alpha = 0f
 				max = 127
+
 			}.lparams(matchParent, 0)
 
 			applyConstraintSet {

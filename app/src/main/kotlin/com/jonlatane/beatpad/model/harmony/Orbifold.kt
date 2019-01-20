@@ -1,6 +1,8 @@
 package com.jonlatane.beatpad.model.harmony
 
+import com.jonlatane.beatpad.model.harmony.Orbit.Companion.orbit
 import com.jonlatane.beatpad.model.harmony.chordsequence.*
+import com.jonlatane.beatpad.model.harmony.chord.Chord
 
 /**
  * A [Orbifold] is literally just a list of [Orbit]s.
@@ -65,9 +67,19 @@ enum class Orbifold(val title: String, vararg sequences: Orbit)
     DimMinDomMajAug,
     FunctionalTwoFiveOne,
     FunctionalAlternatingMajorMinorThirds
-  );
+  ),
+  custom("For Custom Chords",
+    //orbit({ Chord(it.root - 1, it.extension) }, { Chord(it.root + 1, it.extension) }),
+    orbit({ Chord(it.root + 2, it.extension) }, { Chord(it.root - 2, it.extension) }),
+    orbit({ Chord(it.root + 3, it.extension) }, { Chord(it.root - 3, it.extension) }),
+    orbit({ Chord(it.root + 4, it.extension) }, { Chord(it.root - 4, it.extension) }),
+    orbit({ Chord(it.root + 5, it.extension) }, { Chord(it.root - 5, it.extension) }),
+    orbit({ Chord(it.root + 6, it.extension) }, { Chord(it.root - 6, it.extension) })
+  )
+  ;
 
   companion object {
     internal val ALL_ORBITS: List<Orbit> = Orbifold.values().flatMap { it }
+
   }
 }

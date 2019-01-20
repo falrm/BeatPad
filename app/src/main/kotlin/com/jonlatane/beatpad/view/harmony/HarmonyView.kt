@@ -35,7 +35,7 @@ class HarmonyView(
       maxLines = 1
       singleLine = true
       ellipsize = TextUtils.TruncateAt.END
-      typeface = MainApplication.chordTypeface
+      typeface = MainApplication.chordTypefaceBold
       elevation = 5f
     }.lparams(width = wrapContent, height = wrapContent) {
       topMargin = dip(10)
@@ -47,7 +47,7 @@ class HarmonyView(
     override fun validateInstance(instance: TextView) {
       super.validateInstance(instance)
       instance.apply {
-        info("Clearing textview $text")
+        verbose { "Clearing textview $text" }
         text = ""
         translationX = 0f
         alpha = 1f
@@ -120,7 +120,6 @@ class HarmonyView(
     // Render the harmony if there is one
     val harmony: Harmony? = viewModel.harmonyViewModel.harmony
     if (harmony != null) {
-      val changes = harmony.changes
       val subdivisionsPerBeat = harmony.subdivisionsPerBeat
       val upperBound = (lastBeatPosition + 1) * subdivisionsPerBeat
       val strictLowerBound = subdivisionsPerBeat * firstBeatPosition
@@ -129,7 +128,7 @@ class HarmonyView(
       val visibleChanges: SortedMap<Int, Chord> = harmony.changes
           .headMap(upperBound, true)
           .tailMap(lowerBound)
-      info { "Visible changes for beats [$firstBeatPosition, $lastBeatPosition]/[$lowerBound, $upperBound]: $visibleChanges" }
+      verbose { "Visible changes for beats [$firstBeatPosition, $lastBeatPosition]/[$lowerBound, $upperBound]: $visibleChanges" }
 
 
       val locationOnScreen = intArrayOf(-1, -1)
@@ -144,43 +143,42 @@ class HarmonyView(
           val beatPosition = (position.toFloat() / subdivisionsPerBeat).toInt()
           (recyclerView.layoutManager as LinearLayoutManager)
             .run {
-              findViewByPosition(beatPosition) ?:
-              if(beatPosition < firstBeatPosition)findViewByPosition(firstBeatPosition)
+              findViewByPosition(beatPosition)?.let { it to false } ?:
+              if(beatPosition < firstBeatPosition)findViewByPosition(firstBeatPosition) to true
               else null
-            }?.let { view: View ->
-              view.getLocationOnScreen(locationOnScreen)
-              val beatViewX = locationOnScreen[0]
-              val chordPositionOffset = view.width * (position % subdivisionsPerBeat).toFloat() / subdivisionsPerBeat
-              val chordPositionX = beatViewX + chordPositionOffset
+            }?.let { (beatView: View, isFakeFirstBeat) ->
+              beatView.getLocationOnScreen(locationOnScreen)
+              val chordPositionX = if(isFakeFirstBeat) {
+                0f
+              } else {
+                val beatViewX = locationOnScreen[0]
+                val chordPositionOffset = beatView.width * (position % subdivisionsPerBeat).toFloat() / subdivisionsPerBeat
+                beatViewX + chordPositionOffset
+              }
               recyclerView.getLocationOnScreen(locationOnScreen)
               val recyclerViewX = locationOnScreen[0]
-              val chordTranslationX = Math.max(0f, (chordPositionX - recyclerViewX).toFloat())
+              val chordTranslationX = Math.max(0f, chordPositionX - recyclerViewX)
 
-              info { "Location of view for $text @ (beat $beatPosition) is $chordTranslationX" }
+              verbose { "Location of view for $text @ (beat $beatPosition) is $chordTranslationX" }
               this@textView.translationX = chordTranslationX
               this@textView.text = chord.name
               this@textView.alpha = 1f
               this@textView.layoutParams = this@textView.layoutParams.apply {
-                maxWidth = (view.width * 1.5f).toInt()
+                val length = (harmony.changes.higherKey(position) ?: harmony.length - 1) - position
+                maxWidth = (beatView.width * 0.85f * length.toFloat() / harmony.subdivisionsPerBeat).toInt()
               }
 
               (lastTranslationX to lastView).let { lastTranslationX, lastView ->
-                if(chordTranslationX - lastTranslationX < lastView.width) {
-                  lastView.alpha = (chordTranslationX - lastTranslationX) / lastView.width
+                if(chordTranslationX - lastTranslationX <= lastView.width) {
+                  val newAlpha = ((chordTranslationX - lastTranslationX) / lastView.width)
+                    .takeIf { it.isFinite() } ?: 0f
+                  verbose { "Setting alpha of ${lastView.text} to $newAlpha"}
+                  lastView.alpha = newAlpha
                 }
               }
               lastView = this@textView
               lastTranslationX = chordTranslationX
             }
-          /*val translationX = Math.max(
-            0f,
-            (
-              ((position.toFloat()/harmony.subdivisionsPerBeat - firstBeatPosition) * viewModel.harmonyViewModel.beatAdapter.elementWidth)
-                - horizontalScrollOffset
-              )
-          )
-          info { "Setting translationX of $text to $translationX based on firstBeatPosition=$firstBeatPosition, position=$position, offset=$horizontalScrollOffset" }
-          this.translationX = translationX*/
         }
       }
       val entriesToRemove = chordChangeLabels.filterKeys { !visibleChanges.containsKey(it) }

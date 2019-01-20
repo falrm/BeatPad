@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.palette
 
 import android.view.ViewManager
+import com.jonlatane.beatpad.view.HideableRecyclerView
 import org.jetbrains.anko.custom.ankoView
 
 fun ViewManager.paletteToolbar(
@@ -14,3 +15,9 @@ inline fun ViewManager.paletteToolbar(
 	viewModel: PaletteViewModel,
 	init: PaletteToolbar.() -> Unit
 ) = ankoView({ PaletteToolbar(it, viewModel) }, theme, init)
+
+inline fun ViewManager.partListView(
+	theme: Int = 0,
+	viewModel: PaletteViewModel,
+	init: HideableRecyclerView.() -> Unit
+): PartListView = ankoView({ PartListView(it, viewModel) }, theme, init)

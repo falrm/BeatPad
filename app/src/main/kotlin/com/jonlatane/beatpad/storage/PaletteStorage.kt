@@ -16,8 +16,10 @@ import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.model.harmony.chord.*
 import com.jonlatane.beatpad.model.melody.RationalMelody
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import org.jetbrains.anko.AnkoLogger
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 
 object PaletteStorage : AnkoLogger {
@@ -25,7 +27,7 @@ object PaletteStorage : AnkoLogger {
 
   val basePalette
     get() = Palette(
-      sections = mutableListOf(Section(harmony = baseHarmony)),
+      sections = mutableListOf(Section()),
       parts = mutableListOf(Part())
     )
 
@@ -42,7 +44,7 @@ object PaletteStorage : AnkoLogger {
         changes = TreeMap(
           mapOf(
             0  to Chord(0, Maj),
-            13 to Chord(0, Aug),
+            //13 to Chord(0, Aug),
             16 to Chord(11, min7flat5),
             24 to Chord(4, MajAddFlat9),
             32 to Chord(9, min7),
@@ -87,11 +89,15 @@ object PaletteStorage : AnkoLogger {
         parts.add(Part())
       }
 
+      // Re-initialize MIDI channels for any parts
+      val channel = AtomicInteger(0)
+      parts.forEach { (it.instrument as? MIDIInstrument)?.channel = channel.getAndIncrement().toByte() }
+
       val sections: MutableList<Section> = root["sections"].asIterable()
         .map { mapper.treeToValue<Section>(it) }
         .toMutableList()
       if (sections.isEmpty()) {
-        sections.add(Section(harmony = baseHarmony))
+        sections.add(Section())
       }
 
       val keyboardPart = parts.firstOrNull { it.id == UUID.fromString(mapper.treeToValue(root["keyboardPart"])) }
@@ -100,6 +106,7 @@ object PaletteStorage : AnkoLogger {
         ?: parts[0]
       val splatPart = parts.firstOrNull { it.id == UUID.fromString(mapper.treeToValue(root["splatPart"])) }
         ?: parts[0]
+
 
       return Palette(
         id = mapper.treeToValue(root["id"]),
@@ -114,7 +121,20 @@ object PaletteStorage : AnkoLogger {
         orbifold = Orbifold.valueOf(mapper.treeToValue(root["orbifold"])),
         chord = mapper.treeToValue(root["chord"])
 
-      )
+      ).apply {
+        sections.forEach { section ->
+          val invalidReferences = mutableListOf<Section.MelodyReference>()
+          section.melodies.forEach { melodyReference ->
+            melodyReference.melody = parts.flatMap { it.melodies }.firstOrNull { it.id == melodyReference.melody.id }
+              ?: melodyReference.also { invalidReferences.add(it) }.melody
+          }
+          section.melodies.removeAll(invalidReferences)
+          section.melodies.removeAll(
+            section.melodies -
+              section.melodies.groupBy { it.melody.id }.map { it.value.first() }.toMutableSet()
+          )
+        }
+      }
     }
   }
 }

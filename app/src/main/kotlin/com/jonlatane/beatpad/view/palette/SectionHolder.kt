@@ -8,10 +8,11 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.showConfirmDialog
-import com.jonlatane.beatpad.storage.PaletteStorage
 import org.jetbrains.anko.*
+import java.util.*
 
 class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : RecyclerView.ViewHolder(
   _LinearLayout(parent.context).apply {
@@ -34,6 +35,15 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
     }
   }
 ) {
+  companion object {
+    fun sectionColor(sectionIndex: Int) = arrayOf(
+      R.drawable.orbifold_chord_major,
+      R.drawable.orbifold_chord_minor,
+      R.drawable.orbifold_chord_dominant,
+      R.drawable.orbifold_chord_augmented,
+      R.drawable.orbifold_chord_diminished
+    )[sectionIndex % 5]
+  }
   val adapter: SectionListAdapter get() = viewModel.sectionListAdapter!!
   val section: Section?
     get() = when (adapterPosition) {
@@ -80,7 +90,15 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
             invalidate()
           }
           addHarmony -> {
-            section?.harmony = PaletteStorage.baseHarmony
+            section?.harmony = Harmony(
+              changes = TreeMap(
+                mapOf(
+                  0 to viewModel.orbifold.chord
+                )
+              ),
+              length = 64,
+              subdivisionsPerBeat = 4
+            )
             if (BeatClockPaletteConsumer.section == section) {
               viewModel.harmonyViewModel.notifyHarmonyChanged()
               viewModel.melodyViewModel.beatAdapter.notifyDataSetChanged()
@@ -113,13 +131,7 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
       }
     }
     itemView.backgroundResource = when (section) {
-      BeatClockPaletteConsumer.section -> arrayOf(
-        R.drawable.orbifold_chord_major,
-        R.drawable.orbifold_chord_minor,
-        R.drawable.orbifold_chord_dominant,
-        R.drawable.orbifold_chord_augmented,
-        R.drawable.orbifold_chord_diminished
-      )[adapterPosition % 5]
+      BeatClockPaletteConsumer.section -> sectionColor(adapterPosition)
       else -> R.drawable.orbifold_chord
     }
 

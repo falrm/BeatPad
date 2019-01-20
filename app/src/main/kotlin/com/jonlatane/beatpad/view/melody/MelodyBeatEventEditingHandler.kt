@@ -2,7 +2,9 @@ package com.jonlatane.beatpad.view.melody
 
 import android.view.MotionEvent
 import android.view.View
+import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.melody.RationalMelody
+import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 
 interface MelodyBeatEventEditingHandler : MelodyBeatEventHandlerBase, AlphaDrawer {
@@ -25,6 +27,7 @@ interface MelodyBeatEventEditingHandler : MelodyBeatEventHandlerBase, AlphaDrawe
 						val tones = element.tones
 						val targetTone = tone - melodyOffsetAt(position)
 						if(!tones.remove(targetTone)) tones.add(targetTone)
+						vibrate(MelodyEditingModifiers.vibrationMs)
 					}
 				}
 			}

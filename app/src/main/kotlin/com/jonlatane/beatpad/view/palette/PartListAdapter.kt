@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.util.SmartAdapter
 import com.jonlatane.beatpad.util.applyToHolders
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import kotlin.properties.Delegates.observable
@@ -12,28 +13,27 @@ import kotlin.properties.Delegates.observable
 
 class PartListAdapter(
 	val viewModel: PaletteViewModel,
-	private val recyclerView: _RecyclerView
-) : RecyclerView.Adapter<PartHolder>(), PartHolderLayout {
+	internal val recyclerView: _RecyclerView
+) : SmartAdapter<PartHolder>(), PartHolderLayout {
 	companion object {
 		const val MAX_PARTS = 8
-	}
-	var editingMix by observable(false) { _, _, editingVolume ->
-		recyclerView.applyToHolders<PartHolder> { it.editingVolume = editingVolume }
 	}
 
 	init {
 		viewModel.partListAdapter = this
 	}
 
+
+
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PartHolder {
 		return recyclerView.partHolder(viewModel, this)
 	}
 
 	override fun onBindViewHolder(holder: PartHolder, partPosition: Int) {
+    super.onBindViewHolder(holder, partPosition)
 		holder.partPosition = partPosition
-		holder.editingVolume = editingMix
-	}
-
+		holder.editingVolume = viewModel.editingMix
+  }
 	override fun getItemCount(): Int = when {
 		viewModel.palette.parts.size < MAX_PARTS -> viewModel.palette.parts.size + 1
 		else -> viewModel.palette.parts.size

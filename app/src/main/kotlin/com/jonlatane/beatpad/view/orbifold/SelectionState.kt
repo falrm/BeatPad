@@ -6,6 +6,7 @@ import com.jonlatane.beatpad.util.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import org.jetbrains.anko.verbose
+import kotlin.math.sign
 
 object SelectionState : NavigationState, AnkoLogger {
   fun computeMaxTranslations(width: Int, height: Int): Pair<Float, Float> {
@@ -24,13 +25,23 @@ object SelectionState : NavigationState, AnkoLogger {
     val theta = Math.PI / v.sequences.size
     val (maxTX, maxTY) = computeMaxTranslations(v.width, v.height)// = v.width * 0.4f
 
+    v.centralChord.animate()
+      .translationX(0f)
+      .translationY(0f)
+      .scaleX(CENTRAL_CHORD_SCALE).scaleY(CENTRAL_CHORD_SCALE)
+      .alpha(1f).setDuration(ANIMATION_DURATION).start()
+
     v.halfStepUp.animate()
+      .translationX(0f)
       .translationY(-(v.halfStepUp.scaledHeight + v.centralChord.scaledHeight) / 2f)
       .translationZ(0f)
+      .scaleX(HALF_STEP_SCALE).scaleY(HALF_STEP_SCALE)
       .alpha(1f).setDuration(ANIMATION_DURATION).start()
     v.halfStepDown.animate()
+      .translationX(0f)
       .translationY((v.halfStepDown.scaledHeight + v.centralChord.scaledHeight) / 2f)
       .translationZ(0f)
+      .scaleX(HALF_STEP_SCALE).scaleY(HALF_STEP_SCALE)
       .alpha(1f).setDuration(ANIMATION_DURATION).start()
 
     v.halfStepBackground.animateHeight(
@@ -56,10 +67,17 @@ object SelectionState : NavigationState, AnkoLogger {
     )
     for (i in 0 until v.sequences.size) {
       val sv = v.sequences[i]
+      val minTX = (v.halfStepBackground.width + Math.max(sv.forward.width, sv.back.width))/2
       val forwardAngle = i * theta - (Math.PI - theta) / 2
       val sin = Math.sin(forwardAngle)
       val cos = Math.cos(forwardAngle)
-      val x = (maxTX * cos).toFloat()
+      val x = (maxTX * cos).let {
+        if(it < 0 && it > -minTX || it > 0 && it < minTX) {
+           it.sign * minTX
+        } else {
+          it
+        }
+      }.toFloat()
       val y = (maxTY * sin).toFloat()
       animateChordsToSelectionPhase(v, sv, x, y)
       animateAxisToSelectionPhase(sv, x, y)
@@ -71,6 +89,7 @@ object SelectionState : NavigationState, AnkoLogger {
 
   internal fun skipToSelectionPhase(v: OrbifoldView, sv: OrbifoldView.SequenceViews) {
     val theta = Math.PI / v.sequences.size
+    val minTX = v.halfStepBackground.width + Math.max(sv.forward.width, sv.back.width) / 2
     val (maxTX, maxTY) = computeMaxTranslations(v.width, v.height)// = v.width * 0.4f
     var x = 0f
     var y = 0f
@@ -80,7 +99,13 @@ object SelectionState : NavigationState, AnkoLogger {
         forwardAngle = i * theta - (Math.PI - theta) / 2
         val sin = Math.sin(forwardAngle)
         val cos = Math.cos(forwardAngle)
-        x = (maxTX * cos).toFloat()
+        x = (maxTX * cos).let {
+          if(it < 0 && it > -minTX || it > 0 && it < minTX) {
+            it.sign * minTX
+          } else {
+            it
+          }
+        }.toFloat()
         y = (maxTY * sin).toFloat()
       }
     }
@@ -169,8 +194,10 @@ object SelectionState : NavigationState, AnkoLogger {
     val forwardAlpha = if (v.centralChord.text == sv.forward.text) 0.2f else 1f
     val backAlpha = if (v.centralChord.text == sv.back.text) 0.2f else 1f
     sv.forward.animate()
+      .scaleX(1f).scaleY(1f)
       .translationX(tX).translationY(tY).alpha(forwardAlpha).setDuration(ANIMATION_DURATION).start()
     sv.back.animate()
+      .scaleX(1f).scaleY(1f)
       .translationX(-tX).translationY(tY).alpha(backAlpha).setDuration(ANIMATION_DURATION).start()
   }
 

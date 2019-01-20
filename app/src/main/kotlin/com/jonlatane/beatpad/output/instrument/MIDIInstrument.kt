@@ -16,8 +16,8 @@ import com.jonlatane.beatpad.midi.GM2Effects
 import com.jonlatane.beatpad.model.Instrument
 import kotlin.experimental.or
 
-class MIDIInstrument(
-	var channel: Byte = 0,
+class MIDIInstrument constructor(
+	@Transient var channel: Byte = 0,
 	var instrument: Byte = 0
 ) : Instrument {
 	override var volume: Float = 1f

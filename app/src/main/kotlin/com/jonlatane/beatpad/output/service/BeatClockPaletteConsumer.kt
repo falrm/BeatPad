@@ -1,6 +1,5 @@
 import com.jonlatane.beatpad.model.*
 import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.model.harmony.chord.Maj
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.output.service.let
@@ -52,28 +51,34 @@ object BeatClockPaletteConsumer : AnkoLogger {
   private val activeAttacks = Vector<Attack>(16)
   private val upcomingAttacks = Vector<Attack>(16)
 
-  private fun loadUpcomingAttacks() {
+  private fun loadUpcomingAttacks(palette: Palette, section: Section) {
 
     var currentAttackIndex = 0
     chord = (harmonyChord ?: chord)?.also { chord ->
       viewModel?.orbifold?.post {
         if (
-          section?.harmony != null
+          section.harmony != null
+          && viewModel?.harmonyViewModel?.isChoosingHarmonyChord != true
           && chord != viewModel?.orbifold?.chord
         ) {
           viewModel?.orbifold?.disableNextTransitionAnimation()
+          //viewModel?.orbifold?.prepareAnimationTo(chord)
           viewModel?.orbifold?.chord = chord
         }
       }
     }
     verbose { "Harmony index: $harmonyPosition; Chord: $chord" }
-    palette?.parts?.map { part ->
-      part.melodies/*.filter { it.enabled }*/.forEach { melody ->
+    palette.parts.map { part ->
+      section.melodies.filter {
+        it.playbackType != Section.PlaybackType.Disabled
+          && part.melodies.contains(it.melody)
+      }.forEach { melodyReference ->
+        val melody = melodyReference.melody
         val attack = attackPool.borrow()
 
         if (
           true == (melody as? RationalMelody)
-            ?.populateAttack(part, chord, attack)
+            ?.populateAttack(part, chord, attack, melodyReference.volume)
         ) {
           currentAttackIndex++
           upcomingAttacks += attack
@@ -85,14 +90,13 @@ object BeatClockPaletteConsumer : AnkoLogger {
   }
 
   fun tick() {
-    palette?.let { palette ->
-      val enabledMelodies = palette.parts.flatMap { it.melodies }//.filter { it.enabled }
+    (palette to section).let { palette: Palette, section: Section ->
+      val enabledMelodies = section.melodies.map { it.melody }
       val totalBeats = enabledMelodies
         .map { it.length.toFloat() / it.subdivisionsPerBeat.toFloat() }
         .reduce(::max)
-      loadUpcomingAttacks()
+      loadUpcomingAttacks(palette, section)
       for (attack in upcomingAttacks) {
-        val melody = attack.melody!!
         val instrument = attack.instrument!!
         // Stop current notes from this attack's melody
         for (activeAttack in activeAttacks) {
@@ -106,10 +110,6 @@ object BeatClockPaletteConsumer : AnkoLogger {
 
         verbose { "Executing attack $attack" }
 
-        viewModel?.harmonyView?.post {
-          viewModel?.playbackTick = tickPosition
-        }
-
         attack.chosenTones.forEach { tone ->
           instrument.play(tone, attack.velocity.to127Int)
         }
@@ -120,19 +120,22 @@ object BeatClockPaletteConsumer : AnkoLogger {
       } else {
         tickPosition += 1
       }
-    }
-      ?: info("Tick called with no Palette available")
+    } ?: info("Tick called with no Palette available")
+
     upcomingAttacks.clear()
     // Clean up expired attacks
     activeAttacks.forEach { attack ->
-      val attackCameFromRunningMelody = viewModel?.palette?.parts
-        ?.flatMap { it.melodies }
-        //?.filter { it.enabled }
+      val attackCameFromRunningMelody = section?.melodies
+        ?.filter { !it.isDisabled }
+        ?.map { it.melody }
         ?.contains(attack.melody) ?: false
       if (!attackCameFromRunningMelody) {
+        info("stopping active attack $attack")
         destroyAttack(attack)
       }
     }
+
+    viewModel?.harmonyView?.post { viewModel?.playbackTick = tickPosition }
   }
 
   internal fun clearActiveAttacks() {
@@ -159,7 +162,8 @@ object BeatClockPaletteConsumer : AnkoLogger {
   private fun RationalMelody.populateAttack(
     part: Part,
     chord: Chord?,
-    attack: Attack
+    attack: Attack,
+    volume: Float
   ): Boolean {
     val offset = chord?.let { offsetUnder(it) } ?: 0
     val currentBeat: Double = tickPosition.toDouble() / ticksPerBeat
@@ -186,7 +190,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
             attack.part = part
             attack.instrument = part.instrument
             attack.melody = this
-            attack.velocity = change.velocity
+            attack.velocity = change.velocity * volume
 
             change.tones.forEach { tone ->
               val transposedTone = tone + offset

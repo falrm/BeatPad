@@ -1,18 +1,21 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="240dp"
-    android:layout_height="wrap_content" >
-    <TextView
-        android:id="@+id/title"
-        android:text="Choose Tempo"
-        android:textSize="24sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true" />
-    <NumberPicker
-        android:id="@+id/numberPicker1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/title"
-        android:layout_centerHorizontal="true" />
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp">
+
+  <TextView
+    android:id="@+id/title"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:text="Choose Tempo"
+    android:textSize="24sp"/>
+
+  <NumberPicker
+    android:id="@+id/numberPicker1"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/title"
+    android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

@@ -17,6 +17,11 @@ import android.view.animation.Animation
 import android.widget.TextView
 import org.jetbrains.anko.allCaps
 import org.jetbrains.anko.singleLine
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import com.jonlatane.beatpad.view.melody.BeatAdapter
 
 
 private val defaultDuration get() = 300L
@@ -25,7 +30,7 @@ interface HideableView {
 	var initialHeight: Int?
 }
 
-fun TextView.toolbarStyle() {
+fun TextView.toolbarTextStyle() {
 	singleLine = true
 	ellipsize = TextUtils.TruncateAt.MARQUEE
 	marqueeRepeatLimit = -1
@@ -85,24 +90,23 @@ var View.translationXY: Float
 
 var View.layoutWidth get() = this.layoutParams.width
 	set(value) {
-		val layoutParams = this.layoutParams
-		layoutParams.width = value
-		this.layoutParams = layoutParams
+		layoutParams = layoutParams.apply { width = value }
 	}
 
 var View.layoutHeight get() = this.layoutParams.height
 	set(value) {
-		val layoutParams = this.layoutParams
-		layoutParams.height = value
-		this.layoutParams = layoutParams
+		layoutParams = layoutParams.apply { height = value }
 	}
 
-
-fun View.animateWidth(width: Int, duration: Long = defaultDuration) {
-	val anim = ValueAnimator.ofInt(this.measuredWidth, width)
+fun View.animateWidth(width: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
+	val anim = ValueAnimator.ofInt(measuredWidth, width)
 	anim.addUpdateListener { valueAnimator ->
-		val value = valueAnimator.animatedValue as Int
-		this.layoutWidth = value
+		layoutWidth = valueAnimator.animatedValue as Int
+	}
+	endAction?.let {
+		anim.addListener(object : AnimatorListenerAdapter() {
+			override fun onAnimationEnd(animation: Animator) = it()
+		})
 	}
 	anim.setDuration(duration).start()
 }
@@ -111,14 +115,17 @@ fun View.animateHeight(height: Int, duration: Long = defaultDuration) {
 	val anim = ValueAnimator.ofInt(this.measuredHeight, height)
   anim.interpolator = LinearInterpolator()
 	anim.addUpdateListener { valueAnimator ->
-		val value = valueAnimator.animatedValue as Int
-		this.layoutHeight = value
+		this.layoutHeight = valueAnimator.animatedValue as Int
 	}
 	anim.setDuration(duration).start()
 }
 
 val View.isHidden: Boolean get() = layoutHeight == 0
 fun View.show(animated: Boolean = true) {
+	if ((this as HideableView).initialHeight == null) {
+		measure(width, height)
+		initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
+	}
 	if (animated) {
 		animateHeight((this as HideableView).initialHeight!!)
 	} else {
@@ -139,3 +146,17 @@ fun View.hide(animated: Boolean = true) {
 }
 
 fun View.color(resId: Int) = context.color(resId)
+
+inline val RecyclerView.firstVisibleItemPosition
+  get() = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+
+fun RecyclerView.syncPositionTo(to: RecyclerView) = syncRecyclerViewPositions(this, to)
+
+private fun syncRecyclerViewPositions(from: RecyclerView, to: RecyclerView) {
+	val otherLayoutManager = to.layoutManager as LinearLayoutManager
+	val offset = -from.computeHorizontalScrollOffset() % (to.adapter as BeatAdapter).elementWidth
+	otherLayoutManager.scrollToPositionWithOffset(
+		from.firstVisibleItemPosition,
+		offset
+	)
+}

@@ -23,6 +23,12 @@ object AppObjectMapper : ObjectMapper() {
 
 			addSerializer(Palette::class.java, PaletteStorage.Serializer)
 			addDeserializer(Palette::class.java, PaletteStorage.Deserializer)
+
+			addSerializer(Section.PlaybackType::class.java, PlaybackTypeStorage.Serializer)
+			addDeserializer(Section.PlaybackType::class.java, PlaybackTypeStorage.Deserializer)
+
+			addSerializer(Section.MelodyReference::class.java, MelodyReferenceStorage.Serializer)
+			addDeserializer(Section.MelodyReference::class.java, MelodyReferenceStorage.Deserializer)
 		}
 		registerModule(module)
 		registerKotlinModule()
