@@ -30,11 +30,11 @@ class MelodyReferenceHolder(
   initialMelody: Int = 0
 ) : RecyclerView.ViewHolder(layout), AnkoLogger {
 	private val partPosition: Int get() = adapter.partPosition
-	val part: Part get() = adapter.part
+	val part: Part? get() = adapter.part
 	internal var melodyPosition: Int by Delegates.observable(initialMelody) {
 		_, _, _ -> onPositionChanged()
 	}
-	internal val melody: Melody<*>? get() = part.melodies.getOrNull(melodyPosition)
+	internal val melody: Melody<*>? get() = part?.melodies?.getOrNull(melodyPosition)
   val melodyReference: Section.MelodyReference?
     get() = BeatClockPaletteConsumer.section?.melodies?.firstOrNull { it.melody == melody }
   private val context get() = adapter.recyclerView.context
@@ -64,11 +64,11 @@ class MelodyReferenceHolder(
 					promptText = "Really delete this melody?",
 					yesText = "Yes, delete melody"
 				) {
-					part.melodies.removeAt(melodyPosition)
+					part!!.melodies.removeAt(melodyPosition)
 					adapter.notifyItemRemoved(melodyPosition)
 					adapter.notifyItemRangeChanged(
 						melodyPosition,
-            part.melodies.size - melodyPosition
+            part!!.melodies.size - melodyPosition
 					)
 				}
 				else -> context.toast("TODO!")

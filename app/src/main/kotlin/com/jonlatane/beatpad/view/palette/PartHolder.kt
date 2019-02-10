@@ -13,6 +13,7 @@ import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showInstrumentPicker
 import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.util.vibrate
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.info
@@ -60,38 +61,52 @@ class PartHolder(
 	}
 
 	private val editPartMenu = PopupMenu(partName.context, partName)
+	private val newPartMenu = PopupMenu(partName.context, partName)
 
 	init {
 		editPartMenu.inflate(R.menu.part_edit_menu)
-		editPartMenu.setOnMenuItemClickListener { item ->
-			when (item.itemId) {
-			//R.id.newDrawnPattern -> adapter.newToneSequence()
-				R.id.editPartInstrument -> editInstrument()
-				R.id.usePartOnColorboard -> {
-					viewModel.colorboardPart = part
-					context.toast("Applied ${part?.instrument?.instrumentName} to Colorboard!")
-				}
-				R.id.usePartOnKeyboard -> {
-					viewModel.keyboardPart = part
-					context.toast("Applied ${part?.instrument?.instrumentName} to Keyboard!")
-				}
-				R.id.usePartOnSplat -> {
-					viewModel.splatPart = part
-					context.toast("Applied ${part?.instrument?.instrumentName} to Splat!")
-				}
-				R.id.removePart -> showConfirmDialog(
-						context,
-						promptText = "Really delete the ${part?.instrument?.instrumentName} part?",
-						yesText = "Yes, delete part"
-					) {
-						viewModel.palette.parts.removeAt(partPosition)
-						adapter.notifyItemRemoved(partPosition)
-						adapter.notifyDataSetChanged()
-					}
-				else -> context.toast("TODO!")
-			}
-			true
-		}
+    editPartMenu.setOnMenuItemClickListener { item ->
+      when (item.itemId) {
+        //R.id.newDrawnPattern -> adapter.newToneSequence()
+        R.id.editPartInstrument -> editInstrument()
+        R.id.usePartOnColorboard -> {
+          viewModel.colorboardPart = part
+          context.toast("Applied ${part?.instrument?.instrumentName} to Colorboard!")
+        }
+        R.id.usePartOnKeyboard -> {
+          viewModel.keyboardPart = part
+          context.toast("Applied ${part?.instrument?.instrumentName} to Keyboard!")
+        }
+        R.id.usePartOnSplat -> {
+          viewModel.splatPart = part
+          context.toast("Applied ${part?.instrument?.instrumentName} to Splat!")
+        }
+        R.id.removePart -> showConfirmDialog(
+          context,
+          promptText = "Really delete the ${part?.instrument?.instrumentName} part?",
+          yesText = "Yes, delete part"
+        ) {
+          viewModel.palette.parts.removeAt(partPosition)
+          adapter.notifyItemRemoved(partPosition)
+          adapter.notifyDataSetChanged()
+        }
+        else -> context.toast("TODO!")
+      }
+      true
+    }
+    newPartMenu.inflate(R.menu.part_new_menu)
+    newPartMenu.setOnMenuItemClickListener { item ->
+      when (item.itemId) {
+        //R.id.newDrawnPattern -> adapter.newToneSequence()
+        R.id.newMidiPart -> adapter.addPart()
+        R.id.newMidiDrumPart -> {
+          adapter.addPart()
+        }
+        R.id.newRecordedPart -> context.toast("TODO!")
+        else -> context.toast("TODO!")
+      }
+      true
+    }
 		melodyRecycler.adapter = melodyReferenceAdapter
 	}
 
@@ -121,10 +136,11 @@ class PartHolder(
 		partName.apply {
 			text = part!!.instrument.instrumentName
 			setOnClickListener {
-				editPartMenu.show()
+				vibrate(10)
+				editInstrument()
 			}
 			setOnLongClickListener {
-				editInstrument()
+				editPartMenu.show()
 				true
 			}
 			if(viewModel.editingMix) {
@@ -165,9 +181,13 @@ class PartHolder(
 		partName.apply {
 			text = "+"
 			setOnClickListener {
+				vibrate(10)
 				adapter.addPart()
 			}
-			setOnLongClickListener { true }
+			setOnLongClickListener {
+        newPartMenu.show()
+        true
+      }
 		}
 		melodyRecycler.apply {
 			visibility = View.GONE

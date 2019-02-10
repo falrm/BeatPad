@@ -18,10 +18,7 @@ import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.dip
-import org.jetbrains.anko.warn
-import org.jetbrains.anko.withAlpha
+import org.jetbrains.anko.*
 
 /**
  * BeatViews
@@ -53,7 +50,7 @@ class MelodyBeatView @JvmOverloads constructor(
     get() = if (drawWidth > dip(27f)) dip(5)
     else Math.max(0, drawWidth - dip(22f))
   override val nonRootPadding get() = drawPadding
-  private val harmony: Harmony? get() = viewModel.paletteViewModel.harmonyViewModel.harmony
+  override val harmony: Harmony? get() = viewModel.paletteViewModel.harmonyViewModel.harmony
 
   private val overallBounds = Rect()
   override fun onDraw(canvas: Canvas) {
@@ -106,10 +103,9 @@ class MelodyBeatView @JvmOverloads constructor(
         left = (overallWidth.toFloat() * elementIndex / elementCount).toInt()
         right = (overallWidth.toFloat() * (elementIndex+1) / elementCount).toInt()
       }
-      chord = harmony?.let { harmony ->
-        val harmonyPosition = elementPosition.convertPatternIndex(melody, harmony)
-        harmony.changeBefore(harmonyPosition)
-      } ?: viewModel.paletteViewModel.orbifold.chord ?: DEFAULT_CHORD
+      chord = chordAt(elementPosition)
+        ?: viewModel.paletteViewModel.orbifold.chord
+        ?: DEFAULT_CHORD
       colorGuideAlpha = if (
         viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
           from = BeatClockPaletteConsumer.ticksPerBeat,
@@ -128,8 +124,15 @@ class MelodyBeatView @JvmOverloads constructor(
     if(drawRhythm) drawRhythm(melody, melody.subdivisionsPerBeat)
   }
 
-  //override val chord: Chord get() = super.chord
-  override fun melodyOffsetAt(elementPosition: Int) = viewModel.let { it.openedMelody?.offsetUnder(chord)  } ?: 0
+  override fun melodyOffsetAt(elementPosition: Int): Int
+    = (
+      chordAt(elementPosition)
+        ?: viewModel.paletteViewModel.orbifold.chord
+        ?: DEFAULT_CHORD
+    ).let { chord ->
+    info("Computing edit under $chord")
+      viewModel.let { it.openedMelody?.offsetUnder(chord) } ?: 0
+    }
 
   override fun onTouchEvent(event: MotionEvent): Boolean {
     return when (viewModel.melodyEditingModifiers.modifier) {
@@ -146,7 +149,7 @@ class MelodyBeatView @JvmOverloads constructor(
       val elementRange: IntRange = elementRange!!
       val elementIndex: Int = (elementRange.size * x / width).toInt()
       val elementPosition = Math.min(beatPosition * melody.subdivisionsPerBeat + elementIndex, melody.length - 1)
-      return elementIndex to melody.changes[elementPosition]
+      return elementPosition to melody.changes[elementPosition]
     }
   }
 

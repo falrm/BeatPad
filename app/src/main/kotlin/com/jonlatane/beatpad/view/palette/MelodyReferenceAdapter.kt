@@ -2,6 +2,7 @@ package com.jonlatane.beatpad.view.palette
 
 import android.view.ViewGroup
 import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.util.SmartAdapter
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import kotlin.properties.Delegates
@@ -15,7 +16,7 @@ class MelodyReferenceAdapter(
 	var partPosition by Delegates.observable(initialPart) {
 		_, _, _ -> notifyDataSetChanged()
 	}
-	val part get() = viewModel.palette.parts[partPosition]
+	val part: Part? get() = viewModel.palette.parts.getOrNull(partPosition)
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyReferenceHolder {
 		return recyclerView.run {
@@ -29,9 +30,11 @@ class MelodyReferenceAdapter(
 	}
 
 	fun insert(sequence: Melody<*>): Melody<*> {
-		part.melodies.add(sequence)
-		notifyItemInserted(part.melodies.size - 1)
-		notifyItemChanged(part.melodies.size)
+		part?.let { part ->
+			part.melodies.add(sequence)
+			notifyItemInserted(part.melodies.size - 1)
+			notifyItemChanged(part.melodies.size)
+		}
 		return sequence
 	}
 
