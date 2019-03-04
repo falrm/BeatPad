@@ -8,18 +8,16 @@ import android.widget.PopupMenu
 import android.widget.SeekBar
 import android.widget.TextView
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showInstrumentPicker
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.vibrate
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.info
+import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.sdk25.coroutines.onSeekBarChangeListener
-import org.jetbrains.anko.toast
 import kotlin.properties.Delegates
 import kotlin.properties.Delegates.observable
 
@@ -74,6 +72,8 @@ class PartHolder(
           context.toast("Applied ${part?.instrument?.instrumentName} to Colorboard!")
         }
         R.id.usePartOnKeyboard -> {
+          if((part?.instrument as? MIDIInstrument)?.drumTrack == true)
+            viewModel.keyboardView.ioHandler.highlightChord(null)
           viewModel.keyboardPart = part
           context.toast("Applied ${part?.instrument?.instrumentName} to Keyboard!")
         }
@@ -100,7 +100,12 @@ class PartHolder(
         //R.id.newDrawnPattern -> adapter.newToneSequence()
         R.id.newMidiPart -> adapter.addPart()
         R.id.newMidiDrumPart -> {
-          adapter.addPart()
+          adapter.addPart(Part(
+						MIDIInstrument(
+							channel = 9.toByte(),
+							drumTrack = true
+						)
+					))
         }
         R.id.newRecordedPart -> context.toast("TODO!")
         else -> context.toast("TODO!")
@@ -133,16 +138,24 @@ class PartHolder(
 	}
 
 	private fun makeEditablePart(partPosition: Int) {
+    val drumTrack = (part!!.instrument as? MIDIInstrument)?.drumTrack == true
 		partName.apply {
 			text = part!!.instrument.instrumentName
 			setOnClickListener {
 				vibrate(10)
 				editInstrument()
 			}
+      textColor = if (drumTrack) R.color.colorPrimaryLight else R.color.colorPrimaryDark
 			setOnLongClickListener {
+        arrayOf(R.id.editPartInstrument, R.id.usePartOnColorboard, R.id.usePartOnSplat).forEach {
+          editPartMenu.menu.findItem(it).isEnabled = !drumTrack
+        }
 				editPartMenu.show()
 				true
 			}
+			backgroundResource = if ((part!!.instrument as? MIDIInstrument)?.drumTrack == true)
+				R.drawable.part_background_drum
+			else R.drawable.part_background
 			if(viewModel.editingMix) {
 				alpha = 0.5f
         isClickable = false
@@ -185,6 +198,9 @@ class PartHolder(
 				adapter.addPart()
 			}
 			setOnLongClickListener {
+        newPartMenu.menu.findItem(R.id.newMidiDrumPart).isEnabled = viewModel.palette.parts.none {
+          (it.instrument as? MIDIInstrument)?.drumTrack == true
+        }
         newPartMenu.show()
         true
       }

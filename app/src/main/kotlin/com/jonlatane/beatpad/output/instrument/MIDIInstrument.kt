@@ -18,7 +18,8 @@ import kotlin.experimental.or
 
 class MIDIInstrument constructor(
 	@Transient var channel: Byte = 0,
-	var instrument: Byte = 0
+	var instrument: Byte = 0,
+	var drumTrack: Boolean = false
 ) : Instrument {
 	override var volume: Float = 1f
 		set(value) {
@@ -74,37 +75,39 @@ class MIDIInstrument constructor(
 		@JsonIgnore get() = if(GM2Configuration.msb != null) GM2Effects.all.find {
 			it.patchNumber == instrument.toInt()
 		}?.patchName ?: ""
-		else MIDI_INSTRUMENT_NAMES[instrument.toInt()]
+		else if(drumTrack) "Drums" else MIDI_INSTRUMENT_NAMES[instrument.toInt()]
 
 	private fun selectInstrument(instrument: Byte): MIDIInstrument {
 		this.instrument = instrument
-		// Write Bank MSB Control Change
-		val msb = GM2Configuration.msb
-		if (msb != null) {
+		if(!drumTrack) {
+			// Write Bank MSB Control Change
+			val msb = GM2Configuration.msb
+			if (msb != null) {
+				byte3[0] = (CONTROL_CHANGE or channel)
+				byte3[1] = CONTROL_MSB
+				byte3[2] = msb
+				AndroidMidi.send(byte3)
+			}
+
+			// Write Bank MSB Control Change
+			val lsb = GM2Configuration.msb
+			if (lsb != null) {
+				byte3[0] = (CONTROL_CHANGE or channel)
+				byte3[1] = CONTROL_LSB
+				byte3[2] = lsb
+				AndroidMidi.send(byte3)
+			}
+
+			// Then send as Program Change
+			byte2[0] = (PROGRAM_CHANGE or channel)  // STATUS byte: Change, 0x00 = channel 1
+			byte2[1] = instrument
+			AndroidMidi.send(byte2)
+
 			byte3[0] = (CONTROL_CHANGE or channel)
-			byte3[1] = CONTROL_MSB
-			byte3[2] = msb
+			byte3[1] = CONTROL_VOLUME
+			byte3[2] = (volume * 127).toByte()
 			AndroidMidi.send(byte3)
 		}
-
-		// Write Bank MSB Control Change
-		val lsb = GM2Configuration.msb
-		if (lsb != null) {
-			byte3[0] = (CONTROL_CHANGE or channel)
-			byte3[1] = CONTROL_LSB
-			byte3[2] = lsb
-			AndroidMidi.send(byte3)
-		}
-
-		// Then send as Program Change
-		byte2[0] = (PROGRAM_CHANGE or channel)  // STATUS byte: Change, 0x00 = channel 1
-		byte2[1] = instrument
-		AndroidMidi.send(byte2)
-
-		byte3[0] = (CONTROL_CHANGE or channel)
-		byte3[1] = CONTROL_VOLUME
-		byte3[2] = (volume * 127).toByte()
-		AndroidMidi.send(byte3)
 		return this
 	}
 }

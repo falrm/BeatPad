@@ -15,7 +15,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onSeekBarChangeListener
 import kotlin.properties.Delegates
 import android.graphics.PorterDuff
-
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 
 
 class MelodyReferenceHolder(
@@ -77,7 +77,12 @@ class MelodyReferenceHolder(
 		}
 	}
 
-	private fun newMelody() = PaletteStorage.baseMelody
+	private fun newMelody() = PaletteStorage.baseMelody.also {
+    // Don't try to conform drum parts to harmony
+    if((part?.instrument as? MIDIInstrument)?.drumTrack == true) {
+      it.limitedToNotesInHarmony = false
+    }
+  }
 
   val isAddButton: Boolean
     get() = melodyPosition >= viewModel.palette.parts.getOrNull(partPosition)?.melodies?.size ?: -1

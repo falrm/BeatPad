@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.firstVisibleItemPosition
 import com.jonlatane.beatpad.util.hide
@@ -35,9 +36,11 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       keyboardsLayout()
 
       viewModel.orbifold.onChordChangedListener = { chord ->
+        val keyboardDrumTrack = (viewModel.keyboardPart?.instrument as? MIDIInstrument)?.drumTrack == true
         if(!viewModel.harmonyViewModel.isChoosingHarmonyChord) {
           viewModel.colorboardView.chord = chord
-          viewModel.keyboardView.ioHandler.highlightChord(chord)
+          if(!keyboardDrumTrack)
+            viewModel.keyboardView.ioHandler.highlightChord(chord)
           //viewModel.melodyViewModel.verticalAxis?.chord = chord
           viewModel.splatController?.tones = chord.getTones()
           viewModel.palette.chord = chord
@@ -45,7 +48,8 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
           BeatClockPaletteConsumer.chord = chord
         } else {
           viewModel.colorboardView.chord = chord
-          viewModel.keyboardView.ioHandler.highlightChord(chord)
+          if(!keyboardDrumTrack)
+            viewModel.keyboardView.ioHandler.highlightChord(chord)
           //viewModel.melodyViewModel.verticalAxis?.chord = chord
           viewModel.splatController?.tones = chord.getTones()
           viewModel.harmonyViewModel.editingChord = chord

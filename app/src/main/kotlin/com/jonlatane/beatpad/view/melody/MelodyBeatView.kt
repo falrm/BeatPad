@@ -69,14 +69,9 @@ class MelodyBeatView @JvmOverloads constructor(
       canvas.drawMelody(
         melody,
         drawAlpha = 0xAA,
-        drawColorGuide = true,
+        drawColorGuide = melody.limitedToNotesInHarmony,
         drawRhythm = true
       )
-//      bounds.apply {
-//        left = overallWidth
-//        right = overallWidth
-//      }
-//      canvas.drawRhythm(melody, melody.subdivisionsPerBeat)
     }
 
 

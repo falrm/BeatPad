@@ -9,7 +9,8 @@ import org.jetbrains.anko.recyclerview.v7._RecyclerView
 class LibraryPaletteHolder(
   viewModel: LibraryViewModel,
   recyclerView: _RecyclerView
-): RecyclerView.ViewHolder(LibraryPaletteView(recyclerView)) {
+): RecyclerView.ViewHolder(
+  recyclerView.run { libraryPaletteView().lparams(matchParent, wrapContent) }
+) {
   val view get() = itemView as LibraryPaletteView
-
 }

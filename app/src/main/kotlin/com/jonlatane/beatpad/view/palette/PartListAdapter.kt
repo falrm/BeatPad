@@ -39,17 +39,15 @@ class PartListAdapter(
 		else -> viewModel.palette.parts.size
 	}
 
-	fun addPart() {
-		viewModel.palette.parts.add(
-			Part(
-				GM1Effects.randomInstrument(
-					channel = viewModel.palette.parts.size.toByte(),
-					exceptions = viewModel.palette.parts.mapNotNull {
-						(it.instrument as? MIDIInstrument)?.instrument
-					}.toSet()
-				)
-			)
+	fun addPart(part: Part = Part(
+		GM1Effects.randomInstrument(
+			channel = viewModel.palette.parts.size.toByte(),
+			exceptions = viewModel.palette.parts.mapNotNull {
+				(it.instrument as? MIDIInstrument)?.instrument
+			}.toSet()
 		)
+	)) {
+		viewModel.palette.parts.add(part)
 		if (canAddParts()) {
 			notifyItemInserted(viewModel.palette.parts.size - 1)
 			notifyItemChanged(viewModel.palette.parts.size)

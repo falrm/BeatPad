@@ -6,7 +6,7 @@
 	<color name="colorAccent">#F652F9</color>
 
 	<!-- A Background color for the Orbifold view -->
-	<color name="brown">#5D4037</color>
+	<color name="brown">#8b6b61</color>
 
 	<!-- The colors work as such: Dominant is common to both schemes -->
 	<color name="dominant">#F93730</color>

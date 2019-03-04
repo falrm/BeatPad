@@ -250,6 +250,7 @@ class PaletteViewModel: AnkoLogger {
       val partListLocation = intArrayOf(-1, -1)
       val nameLocation = intArrayOf(-1, -1)
       name.getLocationOnScreen(nameLocation)
+      partListView.animate().alpha(1f)
       partListView.getLocationOnScreen(partListLocation)
       //partListView.animate().alpha(0f).start()
       partListTransitionView.apply {

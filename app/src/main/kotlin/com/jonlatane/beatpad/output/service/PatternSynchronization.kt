@@ -11,16 +11,26 @@ fun Int.convertPatternIndex(
 fun Int.convertPatternIndex(
   from: Int,
   to: Pattern<*>
+): Int  = convertPatternIndex(
+  fromSubdivisionsPerBeat = from,
+  toSubdivisionsPerBeat = to.subdivisionsPerBeat,
+  toLength = to.length
+)
+
+fun Int.convertPatternIndex(
+  fromSubdivisionsPerBeat: Int,
+  toSubdivisionsPerBeat: Int,
+  toLength: Int
 ): Int {
   // In the context of the "from" melody, in, say, sixteenth notes (subdivisionsPerBeat=4),
   // if this is 5, then currentBeat is 1.25.
-  val fromBeat: Double = this.toDouble() / from
+  val fromBeat: Double = this.toDouble() / fromSubdivisionsPerBeat
 
-  val toLength: Double = to.length.toDouble() / to.subdivisionsPerBeat
+  val toLength: Double = toLength.toDouble() / toSubdivisionsPerBeat
   val positionInToPattern: Double = fromBeat % toLength
 
   // This candidate for attack is the closest element index to the current tick
-  val result = floor(positionInToPattern * to.subdivisionsPerBeat).toInt()
+  val result = floor(positionInToPattern * toSubdivisionsPerBeat).toInt()
   return result
 }
 

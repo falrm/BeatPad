@@ -91,7 +91,12 @@ object PaletteStorage : AnkoLogger {
 
       // Re-initialize MIDI channels for any parts
       val channel = AtomicInteger(0)
-      parts.forEach { (it.instrument as? MIDIInstrument)?.channel = channel.getAndIncrement().toByte() }
+      parts.forEach {
+        (it.instrument as? MIDIInstrument)?.let { instrument ->
+          instrument.channel = if(instrument.drumTrack) 9.toByte()
+          else channel.getAndIncrement().toByte()
+        }
+      }
 
       val sections: MutableList<Section> = root["sections"].asIterable()
         .map { mapper.treeToValue<Section>(it) }

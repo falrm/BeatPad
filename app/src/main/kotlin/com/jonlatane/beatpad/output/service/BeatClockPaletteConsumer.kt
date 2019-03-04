@@ -193,9 +193,11 @@ object BeatClockPaletteConsumer : AnkoLogger {
             attack.velocity = change.velocity * volume
 
             change.tones.forEach { tone ->
-              val transposedTone = tone + offset
-              val chosenTone = chord?.closestTone(transposedTone)
-                ?: transposedTone
+              val chosenTone = if(limitedToNotesInHarmony) {
+                val transposedTone = tone + offset
+                chord?.closestTone(transposedTone)
+                  ?: transposedTone
+              } else tone
               attack.chosenTones.add(chosenTone)
             }
 

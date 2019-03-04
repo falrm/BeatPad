@@ -13,10 +13,10 @@ class LibraryPaletteAdapter(
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int)
    = LibraryPaletteHolder(viewModel, recyclerView)
 
-  override fun getItemCount() = Storage.getPalettes(recyclerView.context).size
+  override fun getItemCount() = Storage.getPalettes(recyclerView.context).size + 1
 
   override fun onBindViewHolder(holder: LibraryPaletteHolder, position: Int) {
-    //TODO("not implemented")
+
   }
 
 }
