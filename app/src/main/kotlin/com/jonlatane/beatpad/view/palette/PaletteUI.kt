@@ -126,21 +126,14 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
   }
 
   private fun _RelativeLayout.portraitLayout() {
-    viewModel.orbifold = orbifoldView {
-      id = R.id.orbifold
-    }.lparams {
-      width = matchParent
-      height = dip(210f)
-      alignParentTop()
-    }
 
     viewModel.sectionListView = sectionListView(viewModel = viewModel) {
       id = R.id.chord_list
     }.lparams {
-      below(viewModel.orbifold)
       elevation = 5f
       width = matchParent
       height = wrapContent
+      alignParentTop()
     }
 
     viewModel.harmonyView = harmonyView(viewModel = viewModel) {
@@ -159,10 +152,18 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       height = wrapContent
     }
 
+    viewModel.orbifold = orbifoldView {
+      id = R.id.orbifold
+    }.lparams {
+      below(viewModel.toolbarView)
+      width = matchParent
+      height = dip(210f)
+    }
+
     viewModel.partListView = partListView(viewModel = viewModel) {
       id = R.id.part_list
     }.lparams {
-      below(viewModel.toolbarView)
+      below(viewModel.orbifold)
       width = matchParent
       height = wrapContent
       alignParentBottom()
@@ -173,7 +174,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       textSize = 25f
       background = context.getDrawable(R.drawable.orbifold_chord)
     }.lparams(dip(30), dip(40)) {
-      below(viewModel.toolbarView)
+      below(viewModel.orbifold)
       alignParentLeft()
     }
 
@@ -181,7 +182,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       id = R.id.melody
       alpha = 0f
     }.lparams {
-      below(viewModel.toolbarView)
+      below(viewModel.orbifold)
       width = matchParent
       height = wrapContent
       alignParentBottom()

@@ -32,8 +32,8 @@ android {
 		applicationId "com.jonlatane.beatpad"
 		minSdkVersion 23
 		targetSdkVersion 27
-		versionCode 28
-		versionName "Fine 0.8.1"
+		versionCode 29
+		versionName "Percky 0.8.5"
 		multiDexEnabled true
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 	}

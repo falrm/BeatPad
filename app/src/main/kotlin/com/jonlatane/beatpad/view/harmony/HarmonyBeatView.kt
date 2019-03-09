@@ -78,24 +78,20 @@ class HarmonyBeatView constructor(
 
     setOnClickListener {
       val (position, chord) = getPositionAndElement(lastTouchDownXY[0]) ?: null to null
-      /*chord?.let {
+      chord?.let {
         viewModel.paletteViewModel?.orbifold?.disableNextTransitionAnimation()
         viewModel.paletteViewModel?.orbifold?.chord = it
-      }*/
+      }
       position?.let {
         harmony?.let { harmony ->
-          BeatClockPaletteConsumer.tickPosition = position.convertPatternIndex(
+          val newPlaybackTick = position.convertPatternIndex(
             fromSubdivisionsPerBeat = harmony.subdivisionsPerBeat,
             toSubdivisionsPerBeat = 24,
             toLength = Math.floor(harmony.length.toDouble() / harmony.subdivisionsPerBeat)
               .toInt() * 24
           )
-          /*viewModel.paletteViewModel?.playbackTick = position.convertPatternIndex(
-            fromSubdivisionsPerBeat = harmony.subdivisionsPerBeat,
-            toSubdivisionsPerBeat = 24,
-            toLength = Math.floor(harmony.length.toDouble() / harmony.subdivisionsPerBeat)
-              .toInt() * 24
-          )*/
+          BeatClockPaletteConsumer.tickPosition = newPlaybackTick
+          viewModel.paletteViewModel?.playbackTick = newPlaybackTick
         }
       }
     }
