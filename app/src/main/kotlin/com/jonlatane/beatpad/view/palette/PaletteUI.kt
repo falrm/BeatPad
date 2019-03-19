@@ -60,7 +60,9 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       viewModel.orbifold.onOrbifoldChangeListener = { viewModel.palette.orbifold = it }
       viewModel.orbifold.keyboard = viewModel.keyboardView
 
-      viewModel.orbifold.hide(false)
+      if(configuration.portrait) {
+        viewModel.orbifold.hide(false)
+      }
       viewModel.keyboardView.hide(false)
       viewModel.colorboardView.hide(false)
 

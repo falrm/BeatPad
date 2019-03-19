@@ -53,30 +53,7 @@ class MelodyBeatView @JvmOverloads constructor(
   override val overallBounds = Rect()
   override fun onDraw(canvas: Canvas) {
     super.onDraw(canvas)
-    canvas.getClipBounds(overallBounds)
-//    val overallWidth = overallBounds.right - overallBounds.left
-    bounds.apply {
-      top = overallBounds.top
-      bottom = overallBounds.bottom
-      left = overallBounds.left
-      right = overallBounds.right
-    }
-    canvas.renderSteps()
-    melody?.let { melody ->
-
-      canvas.drawMelody(
-        melody,
-        drawAlpha = 0xAA,
-        drawColorGuide = melody.limitedToNotesInHarmony,
-        drawRhythm = true
-      )
-    }
-
-    BeatClockPaletteConsumer.section?.let { section ->
-      section.melodies.filter { !it.isDisabled }.map { it.melody }.forEach { melody ->
-        canvas.drawMelody(melody, drawAlpha = 66)
-      }
-    }
+    renderMelodyBeat(canvas)
   }
 
 

@@ -1,7 +1,7 @@
 package com.jonlatane.beatpad.view.melody
 
+import BeatClockPaletteConsumer
 import android.graphics.Canvas
-import android.graphics.Paint
 import android.graphics.Rect
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
@@ -10,7 +10,6 @@ import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
-import com.jonlatane.beatpad.view.colorboard.CanvasToneDrawer
 import com.jonlatane.beatpad.view.colorboard.ColorGuide
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
@@ -35,14 +34,13 @@ interface MelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
       canvas.drawMelody(
         melody,
         drawAlpha = 0xAA,
-        drawColorGuide = melody.limitedToNotesInHarmony,
         drawRhythm = true
       )
     }
 
     BeatClockPaletteConsumer.section?.let { section ->
       section.melodies.filter { !it.isDisabled }.map { it.melody }.forEach { melody ->
-        canvas.drawMelody(melody, drawAlpha = 66)
+        canvas.drawMelody(melody, drawAlpha = 66, isBackgroundMelody = true)
       }
     }
   }
@@ -50,8 +48,8 @@ interface MelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
   fun Canvas.drawMelody(
     melody: Melody<*>,
     drawAlpha: Int,
-    drawColorGuide: Boolean = false,
-    drawRhythm: Boolean = false
+    drawRhythm: Boolean = false,
+    isBackgroundMelody: Boolean = false
   ) {
     val elementRange: IntRange = elementRangeFor(melody) /*(beatPosition * melody.subdivisionsPerBeat) until
           Math.min((beatPosition + 1) * melody.subdivisionsPerBeat, melody.length - 1)*/
@@ -65,13 +63,21 @@ interface MelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
       chord = chordAt(elementPosition)
         ?: viewModel.paletteViewModel.orbifold.chord
           ?: MelodyBeatView.DEFAULT_CHORD
-      colorGuideAlpha = if (
+      val isCurrentlyPlayingBeat: Boolean =
         viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
           from = BeatClockPaletteConsumer.ticksPerBeat,
           to = melody
         ) == elementPosition
-      ) 255 else 187
-      if(drawColorGuide) drawColorGuide()
+      colorGuideAlpha = when {
+        isBackgroundMelody -> 0
+        melody.limitedToNotesInHarmony -> when {
+          isCurrentlyPlayingBeat -> 255
+          else -> 187
+        }
+        isCurrentlyPlayingBeat -> 119
+        else -> 0
+      }
+      if(colorGuideAlpha > 0) drawColorGuide()
       drawStepNotes(melody, elementPosition, drawAlpha)
       if(drawRhythm) drawRhythm(melody, elementIndex)
     }

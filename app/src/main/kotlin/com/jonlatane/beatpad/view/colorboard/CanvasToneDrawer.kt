@@ -4,11 +4,17 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
+import android.text.TextUtils
+import android.widget.TextView
+import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.sensors.Orientation
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.view.melody.MelodyBeatView
+import kotlinx.io.pool.DefaultPool
+import org.jetbrains.anko.*
+import java.util.*
 
 interface CanvasToneDrawer : AlphaDrawer {
   val showSteps: Boolean
@@ -58,13 +64,27 @@ interface CanvasToneDrawer : AlphaDrawer {
     var center: Float = 0f
   )
 
+  companion object {
+    private val visiblePitchPool: DefaultPool<VisiblePitch> = object : DefaultPool<VisiblePitch>(16) {
+      override fun produceInstance() = VisiblePitch()
+    }
+
+    private val visiblePitchListPool: DefaultPool<Vector<VisiblePitch>> = object : DefaultPool<Vector<VisiblePitch>>(16) {
+      override fun produceInstance() = Vector<VisiblePitch>(16)
+      override fun validateInstance(instance: Vector<VisiblePitch>) {
+        super.validateInstance(instance)
+        instance.clear()
+      }
+    }
+  }
+
   data class VisiblePitch(
-    var tone: Int,
+    var tone: Int = 0,
     var bounds: RectF = RectF()
   )
 
   val visiblePitches: List<VisiblePitch> get() {
-    val result = mutableListOf<VisiblePitch>()
+    val result = visiblePitchListPool.borrow()
     val orientationRange = highestPitch - lowestPitch + 1 - halfStepsOnScreen
     // This "point" is under the same scale as bottomMostNote; i.e. 0.5f is a "quarter step"
     // (in scrolling distance) past middle C, regardless of the scale level.
@@ -72,7 +92,8 @@ interface CanvasToneDrawer : AlphaDrawer {
     val bottomMostNote: Int = java.lang.Math.floor(bottomMostPoint.toDouble()).toInt()
     val halfStepPhysicalDistance = axisLength / halfStepsOnScreen
     for (toneMaybeNotInChord in (bottomMostNote..(bottomMostNote + halfStepsOnScreen.toInt() + 2))) {
-      result += VisiblePitch(toneMaybeNotInChord).apply {
+      result += visiblePitchPool.borrow().apply {
+        tone = toneMaybeNotInChord
         bounds.apply {
 
           if(renderVertically) {
@@ -96,7 +117,7 @@ interface CanvasToneDrawer : AlphaDrawer {
     return result
   }
 
-  val onScreenNotes: List<OnScreenNote>
+  val onScreenNotes: Iterable<OnScreenNote>
     get() {
       val result = mutableListOf<OnScreenNote>()
       val orientationRange = highestPitch - lowestPitch + 1 - halfStepsOnScreen
