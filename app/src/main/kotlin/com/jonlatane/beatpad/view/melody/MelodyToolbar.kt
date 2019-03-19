@@ -69,6 +69,10 @@ class MelodyToolbar(
 		}
 	}.longSquareButtonStyle()
 
+	private val displayTypeButton = imageButton {
+		imageResource = R.drawable.filled_notehead
+	}.squareButtonStyle()
+
 	private val relativeToButton: Button = button {
 		text = ""
 		gravity = Gravity.LEFT or Gravity.CENTER_VERTICAL

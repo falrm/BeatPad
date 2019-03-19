@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.view.palette
 
+import android.content.res.Configuration
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.RelativeLayout
@@ -59,6 +60,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       viewModel.orbifold.onOrbifoldChangeListener = { viewModel.palette.orbifold = it }
       viewModel.orbifold.keyboard = viewModel.keyboardView
 
+      viewModel.orbifold.hide(false)
       viewModel.keyboardView.hide(false)
       viewModel.colorboardView.hide(false)
 
@@ -152,18 +154,10 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       height = wrapContent
     }
 
-    viewModel.orbifold = orbifoldView {
-      id = R.id.orbifold
-    }.lparams {
-      below(viewModel.toolbarView)
-      width = matchParent
-      height = dip(210f)
-    }
-
     viewModel.partListView = partListView(viewModel = viewModel) {
       id = R.id.part_list
     }.lparams {
-      below(viewModel.orbifold)
+      below(viewModel.toolbarView)
       width = matchParent
       height = wrapContent
       alignParentBottom()
@@ -174,7 +168,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       textSize = 25f
       background = context.getDrawable(R.drawable.orbifold_chord)
     }.lparams(dip(30), dip(40)) {
-      below(viewModel.orbifold)
+      below(viewModel.toolbarView)
       alignParentLeft()
     }
 
@@ -182,7 +176,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       id = R.id.melody
       alpha = 0f
     }.lparams {
-      below(viewModel.orbifold)
+      below(viewModel.toolbarView)
       width = matchParent
       height = wrapContent
       alignParentBottom()
@@ -284,7 +278,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
     }
   }
 
-  private fun _RelativeLayout.keyboardsLayout() {
+  private fun _RelativeLayout.keyboardsLayout() = with(context) {
 
     viewModel.keyboardView = keyboardView {
       id = R.id.keyboard
@@ -307,6 +301,16 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       height = dimen(R.dimen.key_height_white)
       width = matchParent
       above(viewModel.keyboardView)
+    }
+
+    if(configuration.portrait) {
+      viewModel.orbifold = orbifoldView {
+        id = R.id.orbifold
+      }.lparams {
+        above(viewModel.colorboardView)
+        width = matchParent
+        height = dip(210f)
+      }
     }
   }
 }
