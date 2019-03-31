@@ -2,7 +2,6 @@ package com.jonlatane.beatpad.view.melody
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.Rect
 import android.util.AttributeSet
@@ -12,12 +11,10 @@ import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.model.melody.RationalMelody
-import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.util.size
-import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
-import com.jonlatane.beatpad.view.palette.PaletteViewModel
+import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatColorblockRenderer
+import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatRenderer
 import org.jetbrains.anko.*
 
 /**
@@ -30,6 +27,8 @@ class MelodyBeatView @JvmOverloads constructor(
   override val viewModel: MelodyViewModel
 ) : BaseColorboardView(context, attrs, defStyle), MelodyBeatRenderer,
   MelodyBeatEventArticulationHandler, MelodyBeatEventEditingHandler, AnkoLogger {
+  override var colorblockAlpha: Float = 1f
+  override var notationAlpha: Float = 0f
 
   init {
     showSteps = true

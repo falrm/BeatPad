@@ -2,18 +2,11 @@ package com.jonlatane.beatpad.view.colorboard
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Rect
 import android.graphics.RectF
-import android.text.TextUtils
-import android.widget.TextView
-import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.sensors.Orientation
-import com.jonlatane.beatpad.util.color
-import com.jonlatane.beatpad.view.melody.MelodyBeatView
 import kotlinx.io.pool.DefaultPool
-import org.jetbrains.anko.*
 import java.util.*
 
 interface CanvasToneDrawer : AlphaDrawer {

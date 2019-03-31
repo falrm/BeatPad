@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.view.melody
+package com.jonlatane.beatpad.view.melody.renderer
 
 import BeatClockPaletteConsumer
 import android.graphics.Canvas
@@ -11,17 +11,20 @@ import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.colorboard.ColorGuide
+import com.jonlatane.beatpad.view.melody.MelodyBeatEventHandlerBase
+import com.jonlatane.beatpad.view.melody.MelodyBeatView
+import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
 
-interface MelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
+interface MelodyBeatColorblockRenderer: ColorGuide, MelodyBeatEventHandlerBase {
+  val colorblockAlpha: Float
   val viewModel: MelodyViewModel
   val overallBounds: Rect
   override var chord: Chord
 
-  fun MelodyBeatView.renderMelodyBeat(canvas: Canvas) {
+  fun MelodyBeatView.renderColorblockMelodyBeat(canvas: Canvas) {
     canvas.getClipBounds(overallBounds)
-//    val overallWidth = overallBounds.right - overallBounds.left
     bounds.apply {
       top = overallBounds.top
       bottom = overallBounds.bottom
@@ -93,7 +96,7 @@ interface MelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
     val element: Transposable<*>? = melody.changes[elementPosition]
     val nextElement: Transposable<*>? = melody.changes[elementPosition]
     val isChange = element != null
-    paint.color = (if (isChange) 0xAA212121.toInt() else 0xAA424242.toInt()).withAlpha(drawAlpha)
+    paint.color = (if (isChange) 0xAA212121.toInt() else 0xAA424242.toInt()).withAlpha((colorblockAlpha * drawAlpha).toInt())
 
     try {
       val tones: Set<Int> = melody.changeBefore(elementPosition).let {

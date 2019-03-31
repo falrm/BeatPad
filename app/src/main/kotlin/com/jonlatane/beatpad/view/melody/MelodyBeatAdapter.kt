@@ -28,9 +28,8 @@ class MelodyBeatAdapter(
   private val minimumElementHeight get() = viewModel.melodyCenterVerticalScroller.height
   private val maximumElementHeight get() = recyclerView.run { dip(maximumBeatHeightDp) }
 
-//  @Volatile
+
   override var elementWidth: Int = recyclerView.run { dip(initialBeatWidthDp) }
-//    @Synchronized
     set(value) {
       if(field != value) {
         field = when {
@@ -50,9 +49,7 @@ class MelodyBeatAdapter(
       viewModel.paletteViewModel.harmonyViewModel.beatAdapter.elementWidth = field
     }
 
-//  @Volatile
   var elementHeight = recyclerView.run { dip(initialBeatHeightDp) }
-//    @Synchronized
     set(value) {
       field = when {
         value < minimumElementHeight -> {
@@ -69,6 +66,28 @@ class MelodyBeatAdapter(
         it.element.layoutHeight = field
       }
       axis.layoutHeight = field
+    }
+
+  var colorblockAlpha: Float = 1f
+    set(value) {
+      recyclerView.applyToHolders<MelodyBeatHolder> {
+        it.element.apply {
+          colorblockAlpha = value
+          invalidate()
+        }
+      }
+      field = value
+    }
+
+  var notationAlpha: Float = 1f
+    set(value) {
+      recyclerView.applyToHolders<MelodyBeatHolder> {
+        it.element.apply {
+          notationAlpha = value
+          invalidate()
+        }
+      }
+      field = value
     }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyBeatHolder {
