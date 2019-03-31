@@ -71,6 +71,12 @@ class MelodyToolbar(
 
 	private val displayTypeButton = imageButton {
 		imageResource = R.drawable.filled_notehead
+    onClick {
+      melodyViewModel.displayType = when(melodyViewModel.displayType) {
+        MelodyViewModel.DisplayType.COLORBLOCK -> MelodyViewModel.DisplayType.NOTATION
+        else -> MelodyViewModel.DisplayType.COLORBLOCK
+      }
+    }
 	}.squareButtonStyle()
 
 	private val relativeToButton: Button = button {
@@ -179,7 +185,7 @@ class MelodyToolbar(
 		lengthDialog.lengthPicker.value = melodyViewModel.openedMelody?.length ?: 1
 		lengthDialog.subdivisionsPerBeatPicker.value = melodyViewModel.openedMelody?.subdivisionsPerBeat ?: 1
 	}
-	private fun updateMelody() = viewModel.melodyElementAdapter?.notifyDataSetChanged()
+	private fun updateMelody() = viewModel.melodyBeatAdapter?.notifyDataSetChanged()
 
   private fun Melody<*>.transposeInPlace(interval: Int) {
     when(this) {

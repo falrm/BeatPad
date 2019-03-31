@@ -20,7 +20,6 @@ import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.info
 import kotlin.properties.Delegates.observable
 
 /**
@@ -47,7 +46,7 @@ class PaletteViewModel: AnkoLogger {
     set(value) {
       melodyViewModel.melodyView = value
     }
-  var melodyElementAdapter
+  var melodyBeatAdapter
     get() = melodyViewModel.beatAdapter
     set(value) {
       melodyViewModel.beatAdapter = value
@@ -283,11 +282,11 @@ class PaletteViewModel: AnkoLogger {
   fun hideOrbifold() {
     val orbifoldHeight = orbifold.height
     orbifold.hide()
-    if(melodyElementAdapter.elementHeight < partListView.height + orbifoldHeight) {
-      val anim = ValueAnimator.ofInt(melodyElementAdapter.elementHeight, partListView.height + orbifoldHeight)
+    if(melodyBeatAdapter.elementHeight < partListView.height + orbifoldHeight) {
+      val anim = ValueAnimator.ofInt(melodyBeatAdapter.elementHeight, partListView.height + orbifoldHeight)
       anim.interpolator = LinearInterpolator()
       anim.addUpdateListener { valueAnimator ->
-        melodyElementAdapter.elementHeight = valueAnimator.animatedValue as Int
+        melodyBeatAdapter.elementHeight = valueAnimator.animatedValue as Int
       }
       anim.start()
     }

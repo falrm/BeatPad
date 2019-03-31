@@ -126,7 +126,7 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
     }
 
     ui.layout.post {
-      viewModel.melodyElementAdapter.apply {
+      viewModel.melodyBeatAdapter.apply {
         elementWidth = savedInstanceState.getInt("beatWidth", elementWidth)
         elementHeight = savedInstanceState.getInt("beatHeight", elementHeight)
       }
@@ -139,7 +139,7 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
     outState.putBoolean("keyboardOpen", !viewModel.keyboardView.isHidden)
     outState.putBoolean("colorboardOpen", !viewModel.colorboardView.isHidden)
     outState.putString("editingMelodyId", viewModel.editingMelody?.id.toString())
-    outState.putInt("beatWidth", viewModel.melodyElementAdapter.elementWidth)
-    outState.putInt("beatHeight", viewModel.melodyElementAdapter.elementHeight)
+    outState.putInt("beatWidth", viewModel.melodyBeatAdapter.elementWidth)
+    outState.putInt("beatHeight", viewModel.melodyBeatAdapter.elementHeight)
   }
 }

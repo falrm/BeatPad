@@ -27,8 +27,8 @@ class MelodyBeatView @JvmOverloads constructor(
   override val viewModel: MelodyViewModel
 ) : BaseColorboardView(context, attrs, defStyle), MelodyBeatRenderer,
   MelodyBeatEventArticulationHandler, MelodyBeatEventEditingHandler, AnkoLogger {
-  override var colorblockAlpha: Float = 1f
-  override var notationAlpha: Float = 0f
+  override val colorblockAlpha: Float get() = viewModel.beatAdapter.colorblockAlpha
+  override val notationAlpha: Float get() = viewModel.beatAdapter.notationAlpha
 
   init {
     showSteps = true

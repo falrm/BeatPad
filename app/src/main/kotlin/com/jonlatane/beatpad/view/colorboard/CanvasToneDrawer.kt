@@ -18,7 +18,7 @@ interface CanvasToneDrawer : AlphaDrawer {
     paint.color = color(R.color.colorPrimaryDark)
     if (showSteps) {
       val halfStepWidth: Float = axisLength / halfStepsOnScreen
-      var linePosition = onScreenNotes.first().top - 12 * halfStepWidth //TODO gross hack
+      var linePosition = startPoint - 12 * halfStepWidth
       while (linePosition < axisLength) {
         if (renderVertically) {
           drawLine(
@@ -41,13 +41,6 @@ interface CanvasToneDrawer : AlphaDrawer {
       }
     }
   }
-
-  /** Renders the lines for G2, B2, D3, F3, A3 (bass clef) and E4, G4, B4, D5, F5 (treble clef) */
-  fun Canvas.renderGrandStaffLines() {
-    paint.color = color(R.color.colorPrimaryDark)
-    //TODO implement this.
-  }
-
 
   data class OnScreenNote(
     var tone: Int = 0,
@@ -110,13 +103,17 @@ interface CanvasToneDrawer : AlphaDrawer {
     return result
   }
 
+  val orientationRange: Float get() = highestPitch - lowestPitch + 1 - halfStepsOnScreen
+  val bottomMostPoint: Float get() = lowestPitch + (Orientation.normalizedDevicePitch() * orientationRange)
+
+  val bottomMostNote: Int get() = java.lang.Math.floor(bottomMostPoint.toDouble()).toInt()
+  val halfStepPhysicalDistance: Float get() = axisLength / halfStepsOnScreen
+  val startPoint: Float get() = (bottomMostNote - bottomMostPoint) * halfStepPhysicalDistance
   val onScreenNotes: Iterable<OnScreenNote>
     get() {
       val result = mutableListOf<OnScreenNote>()
-      val orientationRange = highestPitch - lowestPitch + 1 - halfStepsOnScreen
       // This "point" is under the same scale as bottomMostNote; i.e. 0.5f is a "quarter step"
       // (in scrolling distance) past middle C, regardless of the scale level.
-      val bottomMostPoint: Float = lowestPitch + (Orientation.normalizedDevicePitch() * orientationRange)
       val bottomMostNote: Int = java.lang.Math.floor(bottomMostPoint.toDouble()).toInt()
       val halfStepPhysicalDistance = axisLength / halfStepsOnScreen
       val startPoint = (bottomMostNote - bottomMostPoint) * halfStepPhysicalDistance
@@ -125,7 +122,7 @@ interface CanvasToneDrawer : AlphaDrawer {
         pressed = false,
         bottom = 0f,
         center = 0f,
-        top = (bottomMostNote - bottomMostPoint) * halfStepPhysicalDistance
+        top = startPoint
       )
       for (toneMaybeNotInChord in (bottomMostNote..(bottomMostNote + halfStepsOnScreen.toInt() + 2))) {
         val toneInChord = chord.closestTone(toneMaybeNotInChord)

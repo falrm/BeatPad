@@ -2,13 +2,15 @@ package com.jonlatane.beatpad.view.melody.renderer
 
 import android.graphics.Canvas
 import com.jonlatane.beatpad.view.melody.MelodyBeatView
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 
-interface MelodyBeatRenderer: MelodyBeatColorblockRenderer, MelodyBeatNotationRenderer {
+interface MelodyBeatRenderer: MelodyBeatColorblockRenderer, MelodyBeatNotationRenderer, AnkoLogger {
   fun MelodyBeatView.renderMelodyBeat(canvas: Canvas) {
-    colorblockAlpha.takeIf { it > 0f }.let {
+    if(colorblockAlpha > 0f) {
       renderColorblockMelodyBeat(canvas)
     }
-    notationAlpha.takeIf { it > 0f }.let {
+    if(notationAlpha > 0f) {
       renderNotationMelodyBeat(canvas)
     }
   }

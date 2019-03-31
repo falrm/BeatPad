@@ -70,24 +70,24 @@ class MelodyBeatAdapter(
 
   var colorblockAlpha: Float = 1f
     set(value) {
+      field = value
+      info("Setting colorblockAlpha = $value")
       recyclerView.applyToHolders<MelodyBeatHolder> {
         it.element.apply {
-          colorblockAlpha = value
           invalidate()
         }
       }
-      field = value
     }
 
   var notationAlpha: Float = 1f
     set(value) {
+      field = value
+      info("Setting notationAlpha = $value")
       recyclerView.applyToHolders<MelodyBeatHolder> {
         it.element.apply {
-          notationAlpha = value
           invalidate()
         }
       }
-      field = value
     }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyBeatHolder {

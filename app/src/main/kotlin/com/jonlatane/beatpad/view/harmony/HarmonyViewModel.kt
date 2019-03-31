@@ -51,7 +51,7 @@ open class HarmonyViewModel: SelectedChordAnimation {
       harmony!!.changes[it.first] = value
     }
     notifyHarmonyChanged()
-    paletteViewModel?.melodyElementAdapter?.notifyDataSetChanged()
+    paletteViewModel?.melodyBeatAdapter?.notifyDataSetChanged()
   }
   fun notifyHarmonyChanged() {
     beatAdapter.notifyDataSetChanged()

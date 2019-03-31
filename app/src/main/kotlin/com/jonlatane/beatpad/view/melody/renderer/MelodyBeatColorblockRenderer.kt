@@ -71,7 +71,7 @@ interface MelodyBeatColorblockRenderer: ColorGuide, MelodyBeatEventHandlerBase {
           from = BeatClockPaletteConsumer.ticksPerBeat,
           to = melody
         ) == elementPosition
-      colorGuideAlpha = when {
+      colorGuideAlpha = (when {
         isBackgroundMelody -> 0
         melody.limitedToNotesInHarmony -> when {
           isCurrentlyPlayingBeat -> 255
@@ -79,7 +79,7 @@ interface MelodyBeatColorblockRenderer: ColorGuide, MelodyBeatEventHandlerBase {
         }
         isCurrentlyPlayingBeat -> 119
         else -> 0
-      }
+      } * colorblockAlpha).toInt()
       if(colorGuideAlpha > 0) drawColorGuide()
       drawStepNotes(melody, elementPosition, drawAlpha)
       if(drawRhythm) drawRhythm(melody, elementIndex)
