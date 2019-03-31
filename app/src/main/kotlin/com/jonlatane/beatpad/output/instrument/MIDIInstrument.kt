@@ -79,9 +79,9 @@ class MIDIInstrument constructor(
 
 	private fun selectInstrument(instrument: Byte): MIDIInstrument {
 		this.instrument = instrument
-		if(!drumTrack) {
+		//if(!drumTrack) {
 			// Write Bank MSB Control Change
-			val msb = GM2Configuration.msb
+			val msb = GM2Configuration.msb ?: if(drumTrack) 120.toByte() else null
 			if (msb != null) {
 				byte3[0] = (CONTROL_CHANGE or channel)
 				byte3[1] = CONTROL_MSB
@@ -90,7 +90,7 @@ class MIDIInstrument constructor(
 			}
 
 			// Write Bank MSB Control Change
-			val lsb = GM2Configuration.msb
+			val lsb = GM2Configuration.lsb ?: if(drumTrack) 0.toByte() else null
 			if (lsb != null) {
 				byte3[0] = (CONTROL_CHANGE or channel)
 				byte3[1] = CONTROL_LSB
@@ -100,14 +100,14 @@ class MIDIInstrument constructor(
 
 			// Then send as Program Change
 			byte2[0] = (PROGRAM_CHANGE or channel)  // STATUS byte: Change, 0x00 = channel 1
-			byte2[1] = instrument
+			byte2[1] = if(drumTrack) 0 else instrument
 			AndroidMidi.send(byte2)
 
 			byte3[0] = (CONTROL_CHANGE or channel)
 			byte3[1] = CONTROL_VOLUME
 			byte3[2] = (volume * 127).toByte()
 			AndroidMidi.send(byte3)
-		}
+		//}
 		return this
 	}
 }
