@@ -3,7 +3,7 @@ package com.jonlatane.beatpad.view.beat
 import android.support.v7.widget.RecyclerView
 import android.view.View
 
-class MelodyBeatHolder<ViewType>
+open class BeatHolder<ViewType>
 (
   val viewModel: BeatViewModel,
   val element: ViewType,

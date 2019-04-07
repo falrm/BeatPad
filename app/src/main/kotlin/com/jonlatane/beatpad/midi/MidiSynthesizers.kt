@@ -27,6 +27,7 @@ object MidiSynthesizers: AnkoLogger {
 			device?.openInputPort(portNumber)?.let { inputPort ->
 				MainApplication.instance.toast("Connected to ${info.name} input!")
 				outputDevices[info] = inputPort
+				MidiDevices.refreshInstruments()
 			}
 		}, MidiDevices.handler)
 	}

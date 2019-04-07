@@ -1,10 +1,12 @@
 package com.jonlatane.beatpad.view.palette
 
+import android.content.res.Configuration
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.RelativeLayout
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.firstVisibleItemPosition
 import com.jonlatane.beatpad.util.hide
@@ -35,9 +37,11 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       keyboardsLayout()
 
       viewModel.orbifold.onChordChangedListener = { chord ->
+        val keyboardDrumTrack = (viewModel.keyboardPart?.instrument as? MIDIInstrument)?.drumTrack == true
         if(!viewModel.harmonyViewModel.isChoosingHarmonyChord) {
           viewModel.colorboardView.chord = chord
-          viewModel.keyboardView.ioHandler.highlightChord(chord)
+          if(!keyboardDrumTrack)
+            viewModel.keyboardView.ioHandler.highlightChord(chord)
           //viewModel.melodyViewModel.verticalAxis?.chord = chord
           viewModel.splatController?.tones = chord.getTones()
           viewModel.palette.chord = chord
@@ -45,7 +49,8 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
           BeatClockPaletteConsumer.chord = chord
         } else {
           viewModel.colorboardView.chord = chord
-          viewModel.keyboardView.ioHandler.highlightChord(chord)
+          if(!keyboardDrumTrack)
+            viewModel.keyboardView.ioHandler.highlightChord(chord)
           //viewModel.melodyViewModel.verticalAxis?.chord = chord
           viewModel.splatController?.tones = chord.getTones()
           viewModel.harmonyViewModel.editingChord = chord
@@ -55,6 +60,9 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       viewModel.orbifold.onOrbifoldChangeListener = { viewModel.palette.orbifold = it }
       viewModel.orbifold.keyboard = viewModel.keyboardView
 
+      if(configuration.portrait) {
+        viewModel.orbifold.hide(false)
+      }
       viewModel.keyboardView.hide(false)
       viewModel.colorboardView.hide(false)
 
@@ -122,21 +130,14 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
   }
 
   private fun _RelativeLayout.portraitLayout() {
-    viewModel.orbifold = orbifoldView {
-      id = R.id.orbifold
-    }.lparams {
-      width = matchParent
-      height = dip(210f)
-      alignParentTop()
-    }
 
     viewModel.sectionListView = sectionListView(viewModel = viewModel) {
       id = R.id.chord_list
     }.lparams {
-      below(viewModel.orbifold)
       elevation = 5f
       width = matchParent
       height = wrapContent
+      alignParentTop()
     }
 
     viewModel.harmonyView = harmonyView(viewModel = viewModel) {
@@ -279,7 +280,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
     }
   }
 
-  private fun _RelativeLayout.keyboardsLayout() {
+  private fun _RelativeLayout.keyboardsLayout() = with(context) {
 
     viewModel.keyboardView = keyboardView {
       id = R.id.keyboard
@@ -302,6 +303,16 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       height = dimen(R.dimen.key_height_white)
       width = matchParent
       above(viewModel.keyboardView)
+    }
+
+    if(configuration.portrait) {
+      viewModel.orbifold = orbifoldView {
+        id = R.id.orbifold
+      }.lparams {
+        above(viewModel.colorboardView)
+        width = matchParent
+        height = dip(210f)
+      }
     }
   }
 }

@@ -6,7 +6,7 @@ import android.widget.TextView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 
-class LibraryPaletteView(recyclerView: _RecyclerView): _RelativeLayout(recyclerView.context) {
+class LibraryPaletteView(ctx: Context): _RelativeLayout(ctx) {
   val title: TextView
   val id: TextView
   val modifiedDate: TextView

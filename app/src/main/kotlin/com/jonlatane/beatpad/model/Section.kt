@@ -1,11 +1,12 @@
 package com.jonlatane.beatpad.model
 
+import com.jonlatane.beatpad.storage.PaletteStorage
 import java.util.*
 
 data class Section(
   val id: UUID = UUID.randomUUID(),
   val name: String = generateNewSectionName(emptyList()),
-  var harmony: Harmony? = null,
+  var harmony: Harmony? = PaletteStorage.blankHarmony,
   val melodies: MutableSet<MelodyReference> = mutableSetOf()
 ) {
   sealed class PlaybackType {

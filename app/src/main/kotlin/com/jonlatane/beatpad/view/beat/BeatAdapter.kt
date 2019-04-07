@@ -18,7 +18,7 @@ class BeatAdapter<ViewModelType, ViewType>
   val recyclerView: _RecyclerView,
   inline val viewGenerator: BeatAdapter<ViewModelType, ViewType>.() -> ViewType,
   inline val lengthGetter: BeatAdapter<ViewModelType, ViewType>.() -> Int?
-) : RecyclerView.Adapter<MelodyBeatHolder<ViewType>>(), AnkoLogger
+) : RecyclerView.Adapter<BeatHolder<ViewType>>(), AnkoLogger
   where ViewType: BeatView,
         ViewType: View,
         ViewModelType: BeatViewModel{
@@ -42,7 +42,7 @@ class BeatAdapter<ViewModelType, ViewType>
           else -> value
         }
         info("Setting width to $field")
-        recyclerView.applyToHolders<MelodyBeatHolder<ViewType>> {
+        recyclerView.applyToHolders<BeatHolder<ViewType>> {
           it.element.layoutWidth = field
         }
         (viewModel as? PaletteViewModel)?.harmonyViewModel?.beatAdapter?.elementWidth = field
@@ -63,7 +63,7 @@ class BeatAdapter<ViewModelType, ViewType>
       }
 
       info("Setting height to $field")
-      recyclerView.applyToHolders<MelodyBeatHolder<ViewType>> {
+      recyclerView.applyToHolders<BeatHolder<ViewType>> {
         it.element.layoutHeight = field
       }
       axis?.layoutHeight = field
@@ -74,9 +74,9 @@ class BeatAdapter<ViewModelType, ViewType>
     recyclerView.layoutManager.findViewByPosition(position)?.invalidate()
   }
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyBeatHolder<ViewType> {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BeatHolder<ViewType> {
     return with(recyclerView) {
-      MelodyBeatHolder(
+      BeatHolder(
         viewModel = viewModel,
         element = viewGenerator().apply {
           viewModel = this@BeatAdapter.viewModel
@@ -89,7 +89,7 @@ class BeatAdapter<ViewModelType, ViewType>
     }
   }
 
-  override fun onBindViewHolder(holder: MelodyBeatHolder<ViewType>, elementPosition: Int) {
+  override fun onBindViewHolder(holder: BeatHolder<ViewType>, elementPosition: Int) {
     holder.element.beatPosition = elementPosition
     holder.element.layoutWidth = elementWidth
     holder.element.layoutHeight = elementHeight

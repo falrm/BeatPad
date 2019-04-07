@@ -1,14 +1,17 @@
 package com.jonlatane.beatpad.view.library
 
 import android.content.Context
+import android.graphics.Color
 import android.support.v4.view.PagerAdapter
 import android.support.v4.view.ViewPager
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.LayoutInflater
-import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.*
+import org.jetbrains.anko.design.floatingActionButton
 import org.jetbrains.anko.recyclerview.v7.recyclerView
-import org.jetbrains.anko.relativeLayout
+import org.jetbrains.anko.support.v4.nestedScrollView
 
 
 class LibraryViewPagerAdapter(
@@ -29,13 +32,24 @@ class LibraryViewPagerAdapter(
     return when(position) {
       ViewType.PALETTE.ordinal -> {
         collection.run {
-          addView(
-          recyclerView {
-            adapter = LibraryPaletteAdapter(viewModel, this)
-
-          })/*.apply {
-            layoutParams = layoutParams.apply { width = matchParent; height = matchParent }
-          }*/
+          nestedScrollView {
+            relativeLayout {
+              recyclerView {
+                adapter = LibraryPaletteAdapter(viewModel, this)
+                //backgroundColor = Color.RED
+              }.lparams(matchParent, matchParent)
+              floatingActionButton {
+                imageResource = android.R.drawable.ic_input_add
+              }.lparams {
+                //setting button to bottom right of the screen
+                margin = dip(10)
+                alignParentBottom()
+                alignParentEnd()
+                alignParentRight()
+                gravity = Gravity.BOTTOM or Gravity.END
+              }
+            }.lparams(matchParent, matchParent)
+          }
         }
       }
       else -> blankView()
@@ -43,11 +57,12 @@ class LibraryViewPagerAdapter(
   }
 
   private fun blankView() = viewModel.pager.run {
+    view()
   }
 
 
   override fun destroyItem(collection: ViewGroup, position: Int, view: Any) {
-    collection.removeView(view as View)
+    (view as? View)?.let { collection.removeView(it) }
   }
 
   override fun getCount() = ViewType.values().size

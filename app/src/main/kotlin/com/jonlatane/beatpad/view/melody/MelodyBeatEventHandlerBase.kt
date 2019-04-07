@@ -28,7 +28,7 @@ interface MelodyBeatEventHandlerBase: AnkoLogger {
     harmony?.let { harmony ->
       val harmonyPosition = elementPosition.convertPatternIndex(melody, harmony)
       val result =harmony.changeBefore(harmonyPosition)
-      info("Chord at $elementPosition is $result")
+      //info("Chord at $elementPosition is $result")
       result
     }
   }

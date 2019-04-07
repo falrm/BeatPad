@@ -8,5 +8,8 @@ class Part(val instrument: Instrument = MIDIInstrument()) {
 	val melodies = mutableListOf<Melody<*>>()
 	var volume: Float
 		get() = instrument.volume
-		set(value) { instrument.volume = value }
+		set(value) {
+			instrument.volume = value
+      (instrument as? MIDIInstrument)?.sendSelectInstrument()
+		}
 }

@@ -6,6 +6,7 @@ import java.util.*
 
 interface Melody<ElementType : Transposable<ElementType>> : Pattern<ElementType> {
   var id: UUID
+  var limitedToNotesInHarmony : Boolean
   var shouldConformWithHarmony: Boolean
   var velocityFactor: Float
   val type get() = "base"

@@ -8,6 +8,7 @@ import android.os.Handler
 import android.support.annotation.RequiresApi
 import com.jonlatane.beatpad.MainApplication
 import android.os.HandlerThread
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import org.jetbrains.anko.*
 
 object MidiDevices : AnkoLogger {
@@ -22,6 +23,12 @@ object MidiDevices : AnkoLogger {
 		val looper = handlerThread.looper
 		Handler(looper)
 	}
+
+	fun refreshInstruments() = BeatClockPaletteConsumer.palette?.parts
+		?.mapNotNull { it.instrument as? MIDIInstrument }
+		?.forEach {
+			it.sendSelectInstrument()
+		} ?: Unit
 
 	@RequiresApi(Build.VERSION_CODES.M)
 	fun initialize(context: Context) {
@@ -63,7 +70,7 @@ object MidiDevices : AnkoLogger {
 			MainApplication.instance.toast("${info.name} doesn't support MIDI input :(")
 		}
 		if (info.outputPortCount > 0) {
-			MidiControllers.setupController(info)
+			//MidiControllers.setupController(info)
 		} else {
 			MainApplication.instance.toast("${info.name} doesn't support MIDI output :(")
 		}

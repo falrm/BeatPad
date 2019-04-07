@@ -8,6 +8,7 @@ data class RecordedMIDIMelody(
   override val changes: NavigableMap<Int, RecordedMIDIMelody.Element> = TreeMap(),
   /** A value of 4 would indicate sixteenth notes in 4/4 time */
   override var subdivisionsPerBeat: Int = 1,
+  override var limitedToNotesInHarmony : Boolean = false,
   override var shouldConformWithHarmony: Boolean = false,
   override var tonic: Int = 0,
   override var length: Int = 1,

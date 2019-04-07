@@ -2,13 +2,12 @@ package com.jonlatane.beatpad.view.colorboard
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Rect
 import android.graphics.RectF
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.sensors.Orientation
-import com.jonlatane.beatpad.util.color
-import com.jonlatane.beatpad.view.melody.MelodyBeatView
+import kotlinx.io.pool.DefaultPool
+import java.util.*
 
 interface CanvasToneDrawer : AlphaDrawer {
   val showSteps: Boolean
@@ -19,7 +18,7 @@ interface CanvasToneDrawer : AlphaDrawer {
     paint.color = color(R.color.colorPrimaryDark)
     if (showSteps) {
       val halfStepWidth: Float = axisLength / halfStepsOnScreen
-      var linePosition = onScreenNotes.first().top - 12 * halfStepWidth //TODO gross hack
+      var linePosition = startPoint - 12 * halfStepWidth
       while (linePosition < axisLength) {
         if (renderVertically) {
           drawLine(
@@ -43,13 +42,6 @@ interface CanvasToneDrawer : AlphaDrawer {
     }
   }
 
-  /** Renders the lines for G2, B2, D3, F3, A3 (bass clef) and E4, G4, B4, D5, F5 (treble clef) */
-  fun Canvas.renderGrandStaffLines() {
-    paint.color = color(R.color.colorPrimaryDark)
-    //TODO implement this.
-  }
-
-
   data class OnScreenNote(
     var tone: Int = 0,
     var pressed: Boolean = false,
@@ -58,13 +50,27 @@ interface CanvasToneDrawer : AlphaDrawer {
     var center: Float = 0f
   )
 
+  companion object {
+    private val visiblePitchPool: DefaultPool<VisiblePitch> = object : DefaultPool<VisiblePitch>(16) {
+      override fun produceInstance() = VisiblePitch()
+    }
+
+    private val visiblePitchListPool: DefaultPool<Vector<VisiblePitch>> = object : DefaultPool<Vector<VisiblePitch>>(16) {
+      override fun produceInstance() = Vector<VisiblePitch>(16)
+      override fun validateInstance(instance: Vector<VisiblePitch>) {
+        super.validateInstance(instance)
+        instance.clear()
+      }
+    }
+  }
+
   data class VisiblePitch(
-    var tone: Int,
+    var tone: Int = 0,
     var bounds: RectF = RectF()
   )
 
   val visiblePitches: List<VisiblePitch> get() {
-    val result = mutableListOf<VisiblePitch>()
+    val result = visiblePitchListPool.borrow()
     val orientationRange = highestPitch - lowestPitch + 1 - halfStepsOnScreen
     // This "point" is under the same scale as bottomMostNote; i.e. 0.5f is a "quarter step"
     // (in scrolling distance) past middle C, regardless of the scale level.
@@ -72,7 +78,8 @@ interface CanvasToneDrawer : AlphaDrawer {
     val bottomMostNote: Int = java.lang.Math.floor(bottomMostPoint.toDouble()).toInt()
     val halfStepPhysicalDistance = axisLength / halfStepsOnScreen
     for (toneMaybeNotInChord in (bottomMostNote..(bottomMostNote + halfStepsOnScreen.toInt() + 2))) {
-      result += VisiblePitch(toneMaybeNotInChord).apply {
+      result += visiblePitchPool.borrow().apply {
+        tone = toneMaybeNotInChord
         bounds.apply {
 
           if(renderVertically) {
@@ -96,13 +103,17 @@ interface CanvasToneDrawer : AlphaDrawer {
     return result
   }
 
-  val onScreenNotes: List<OnScreenNote>
+  val orientationRange: Float get() = highestPitch - lowestPitch + 1 - halfStepsOnScreen
+  val bottomMostPoint: Float get() = lowestPitch + (Orientation.normalizedDevicePitch() * orientationRange)
+
+  val bottomMostNote: Int get() = java.lang.Math.floor(bottomMostPoint.toDouble()).toInt()
+  val halfStepPhysicalDistance: Float get() = axisLength / halfStepsOnScreen
+  val startPoint: Float get() = (bottomMostNote - bottomMostPoint) * halfStepPhysicalDistance
+  val onScreenNotes: Iterable<OnScreenNote>
     get() {
       val result = mutableListOf<OnScreenNote>()
-      val orientationRange = highestPitch - lowestPitch + 1 - halfStepsOnScreen
       // This "point" is under the same scale as bottomMostNote; i.e. 0.5f is a "quarter step"
       // (in scrolling distance) past middle C, regardless of the scale level.
-      val bottomMostPoint: Float = lowestPitch + (Orientation.normalizedDevicePitch() * orientationRange)
       val bottomMostNote: Int = java.lang.Math.floor(bottomMostPoint.toDouble()).toInt()
       val halfStepPhysicalDistance = axisLength / halfStepsOnScreen
       val startPoint = (bottomMostNote - bottomMostPoint) * halfStepPhysicalDistance
@@ -111,7 +122,7 @@ interface CanvasToneDrawer : AlphaDrawer {
         pressed = false,
         bottom = 0f,
         center = 0f,
-        top = (bottomMostNote - bottomMostPoint) * halfStepPhysicalDistance
+        top = startPoint
       )
       for (toneMaybeNotInChord in (bottomMostNote..(bottomMostNote + halfStepsOnScreen.toInt() + 2))) {
         val toneInChord = chord.closestTone(toneMaybeNotInChord)

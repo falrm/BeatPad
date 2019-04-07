@@ -41,6 +41,13 @@ class MelodyToolbar(
 	}
 
 
+	fun <T: View> T.hidden() = this.lparams {
+		width = dip(0)
+		height = dip(48)
+		weight = 0f
+	}
+
+
 	fun <T: View> T.squareButtonStyle() = this.lparams {
 		width = dip(48)
 		height = dip(48)
@@ -68,6 +75,16 @@ class MelodyToolbar(
       }
 		}
 	}.longSquareButtonStyle()
+
+	private val displayTypeButton = imageButton {
+		imageResource = R.drawable.filled_notehead
+    onClick {
+      melodyViewModel.displayType = when(melodyViewModel.displayType) {
+        MelodyViewModel.DisplayType.COLORBLOCK -> MelodyViewModel.DisplayType.NOTATION
+        else -> MelodyViewModel.DisplayType.COLORBLOCK
+      }
+    }
+	}.hidden()//squareButtonStyle()
 
 	private val relativeToButton: Button = button {
 		text = ""
@@ -175,7 +192,7 @@ class MelodyToolbar(
 		lengthDialog.lengthPicker.value = melodyViewModel.openedMelody?.length ?: 1
 		lengthDialog.subdivisionsPerBeatPicker.value = melodyViewModel.openedMelody?.subdivisionsPerBeat ?: 1
 	}
-	private fun updateMelody() = viewModel.melodyElementAdapter?.notifyDataSetChanged()
+	private fun updateMelody() = viewModel.melodyBeatAdapter?.notifyDataSetChanged()
 
   private fun Melody<*>.transposeInPlace(interval: Int) {
     when(this) {

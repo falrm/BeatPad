@@ -1,3 +1,4 @@
+import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.model.*
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
@@ -16,6 +17,10 @@ import kotlin.properties.Delegates.observable
 
 object BeatClockPaletteConsumer : AnkoLogger {
   var palette: Palette? = null
+  set(value) {
+    field = value
+    MidiDevices.refreshInstruments()
+  }
   var viewModel: PaletteViewModel? by observable(null) { _, _, _ ->
 
   }
@@ -23,6 +28,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
   set(value) {
     field = value
     viewModel?.notifySectionChange()
+    MidiDevices.refreshInstruments()
   }
   var chord: Chord? = null
   val harmony: Harmony? get() = section?.harmony
@@ -193,9 +199,11 @@ object BeatClockPaletteConsumer : AnkoLogger {
             attack.velocity = change.velocity * volume
 
             change.tones.forEach { tone ->
-              val transposedTone = tone + offset
-              val chosenTone = chord?.closestTone(transposedTone)
-                ?: transposedTone
+              val chosenTone = if(limitedToNotesInHarmony) {
+                val transposedTone = tone + offset
+                chord?.closestTone(transposedTone)
+                  ?: transposedTone
+              } else tone
               attack.chosenTones.add(chosenTone)
             }
 

@@ -76,7 +76,7 @@ inline fun ViewManager.melodyView(
 					AnkoLogger<MelodyViewModel>().info("Zooming: xDelta=$xDelta, yDelta=$yDelta")
 					when {
 						(xDelta.toInt() != 0 || yDelta.toInt() != 0) -> {
-							viewModel.melodyElementAdapter?.apply {
+							viewModel.melodyBeatAdapter?.apply {
 								elementWidth += xDelta.toInt()
 								elementHeight += (10f * yDelta).toInt()
 								notifyDataSetChanged()
@@ -98,8 +98,8 @@ inline fun ViewManager.melodyView(
 						isItemPrefetchEnabled = false
 					}
 					overScrollMode = View.OVER_SCROLL_NEVER
-					viewModel.melodyElementAdapter = MelodyBeatAdapter(melodyViewModel, this)
-					adapter = viewModel.melodyElementAdapter
+					viewModel.melodyBeatAdapter = MelodyBeatAdapter(melodyViewModel, this)
+					adapter = viewModel.melodyBeatAdapter
 					adapter.registerAdapterDataObserver(
 						object : RecyclerView.AdapterDataObserver() {
 							override fun onItemRangeInserted(start: Int, count: Int) {
