@@ -84,7 +84,7 @@ class MelodyToolbar(
         else -> MelodyViewModel.DisplayType.COLORBLOCK
       }
     }
-	}.hidden()//squareButtonStyle()
+	}.squareButtonStyle()
 
 	private val relativeToButton: Button = button {
 		text = ""
