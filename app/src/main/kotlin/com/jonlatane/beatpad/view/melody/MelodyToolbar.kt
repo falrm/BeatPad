@@ -41,6 +41,13 @@ class MelodyToolbar(
 	}
 
 
+	fun <T: View> T.hidden() = this.lparams {
+		width = dip(0)
+		height = dip(48)
+		weight = 0f
+	}
+
+
 	fun <T: View> T.squareButtonStyle() = this.lparams {
 		width = dip(48)
 		height = dip(48)
@@ -77,7 +84,7 @@ class MelodyToolbar(
         else -> MelodyViewModel.DisplayType.COLORBLOCK
       }
     }
-	}.squareButtonStyle()
+	}.hidden()//squareButtonStyle()
 
 	private val relativeToButton: Button = button {
 		text = ""
