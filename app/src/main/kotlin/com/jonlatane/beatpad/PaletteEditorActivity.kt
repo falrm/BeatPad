@@ -10,7 +10,10 @@ import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.sensors.ShakeDetector
 import com.jonlatane.beatpad.storage.Storage
-import com.jonlatane.beatpad.util.*
+import com.jonlatane.beatpad.util.formatted
+import com.jonlatane.beatpad.util.isHidden
+import com.jonlatane.beatpad.util.show
+import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.palette.PaletteUI
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.setContentView
@@ -18,7 +21,7 @@ import org.jetbrains.anko.toast
 import java.util.*
 
 
-class PaletteEditorActivity : Activity(), AnkoLogger {
+class PaletteEditorActivity : Activity(), Storage, AnkoLogger {
   private lateinit var ui: PaletteUI
   private val viewModel get() = ui.viewModel
   private var lastBackPress: Long? = null
@@ -33,7 +36,7 @@ class PaletteEditorActivity : Activity(), AnkoLogger {
 
 
     val palette = BeatClockPaletteConsumer.palette ?: {
-      val storedPalette = Storage.loadPalette(this)
+      val storedPalette = loadPalette()
       BeatClockPaletteConsumer.palette = storedPalette
       storedPalette
     }()

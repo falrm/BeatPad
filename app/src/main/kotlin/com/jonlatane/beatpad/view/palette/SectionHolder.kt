@@ -116,20 +116,20 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
 
   fun invalidate() {
     deleteSection.isVisible = viewModel.palette.sections.size > 1
-    addHarmony.isVisible = when(section) {
+    addHarmony.isVisible = false /*when(section) {
       null -> false
       else -> when(section!!.harmony) {
         null -> true
         else -> false
       }
-    }
-    removeHarmony.isVisible = when(section) {
+    }*/
+    removeHarmony.isVisible = false /*when(section) {
       null -> false
       else -> when(section!!.harmony) {
         null -> false
         else -> true
       }
-    }
+    }*/
     itemView.backgroundResource = when (section) {
       BeatClockPaletteConsumer.section -> sectionColor(adapterPosition)
       else -> R.drawable.orbifold_chord

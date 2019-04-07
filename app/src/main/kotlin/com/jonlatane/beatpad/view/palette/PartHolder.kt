@@ -185,6 +185,7 @@ class PartHolder(
 				onProgressChanged { _, progress, _ ->
 					info("Setting part volume to ${progress.toFloat() / 127f}")
 					part?.volume = progress.toFloat() / 127f
+          (part?.instrument as? MIDIInstrument)?.sendSelectInstrument()
 				}
 			}
 		}

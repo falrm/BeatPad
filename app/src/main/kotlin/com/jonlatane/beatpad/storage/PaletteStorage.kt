@@ -58,6 +58,19 @@ object PaletteStorage : AnkoLogger {
       )
     }
 
+  val blankHarmony: Harmony
+    get() {
+      return Harmony(
+        changes = TreeMap(
+          mapOf(
+            0  to Chord(0, (0..12).toList().toIntArray())
+          )
+        ),
+        length = 64,
+        subdivisionsPerBeat = 4
+      )
+    }
+
 
   object Serializer : StdSerializer<Palette>(Palette::class.java) {
     override fun serialize(value: Palette, jgen: JsonGenerator, provider: SerializerProvider) {
@@ -138,6 +151,9 @@ object PaletteStorage : AnkoLogger {
             section.melodies -
               section.melodies.groupBy { it.melody.id }.map { it.value.first() }.toMutableSet()
           )
+          if(section.harmony == null) {
+            section.harmony = blankHarmony
+          }
         }
       }
     }

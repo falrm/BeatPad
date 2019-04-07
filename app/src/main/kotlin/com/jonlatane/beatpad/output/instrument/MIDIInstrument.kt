@@ -44,7 +44,7 @@ class MIDIInstrument constructor(
 	}
 
 	override fun play(tone: Int, velocity: Int) {// Construct a note ON message for the middle C at maximum velocity on channel 1:
-		selectInstrument(instrument)
+		//sendSelectInstrument(instrument)
 		byte3[0] = NOTE_ON or channel  // STATUS byte: note On, 0x00 = channel 1
 		byte3[1] = (tone + 60).toByte() // DATA byte: middle C = 60
 		byte3[2] = velocity.toByte()  // DATA byte: maximum velocity = 127
@@ -77,8 +77,8 @@ class MIDIInstrument constructor(
 		}?.patchName ?: ""
 		else if(drumTrack) "Drums" else MIDI_INSTRUMENT_NAMES[instrument.toInt()]
 
-	private fun selectInstrument(instrument: Byte): MIDIInstrument {
-		this.instrument = instrument
+  fun sendSelectInstrument() = sendSelectInstrument(instrument)
+	private fun sendSelectInstrument(instrument: Byte): MIDIInstrument {
 		//if(!drumTrack) {
 			// Write Bank MSB Control Change
 			val msb = GM2Configuration.msb ?: if(drumTrack) 120.toByte() else null

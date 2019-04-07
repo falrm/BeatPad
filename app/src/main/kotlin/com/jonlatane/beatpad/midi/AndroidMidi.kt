@@ -4,6 +4,9 @@ import android.content.pm.PackageManager
 import com.jonlatane.beatpad.MainApplication
 import org.billthefarmer.mididriver.MidiDriver
 
+/**
+ * Singleton interface to native MIDI android devices (via [PackageManager.FEATURE_MIDI]).
+ */
 object AndroidMidi {
 	internal var isPlayingFromExternalDevice = false
 	internal var lastMidiSyncTime: Long? = null

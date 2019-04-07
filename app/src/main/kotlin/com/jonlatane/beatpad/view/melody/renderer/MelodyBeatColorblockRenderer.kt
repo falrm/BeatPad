@@ -126,7 +126,7 @@ interface MelodyBeatColorblockRenderer: ColorGuide, MelodyBeatEventHandlerBase {
   }
 
   fun Canvas.drawRhythm(melody: Melody<*>, elementIndex: Int) {
-    paint.color = 0xAA212121.toInt()
+    paint.color = 0xAA212121.toInt().withAlpha((colorblockAlpha * 255).toInt())
     val halfWidth = if (elementIndex % melody.subdivisionsPerBeat == 0) 5f else 1f
     drawRect(
       bounds.left.toFloat() - halfWidth,

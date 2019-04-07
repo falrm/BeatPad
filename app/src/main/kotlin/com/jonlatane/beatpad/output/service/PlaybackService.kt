@@ -12,6 +12,7 @@ import android.support.v4.app.NotificationCompat
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.midi.AndroidMidi
+import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
@@ -43,6 +44,7 @@ class PlaybackService : Service(), AnkoLogger {
     playbackThread = PlaybackThread()
     playbackThread.start()
     AndroidMidi.ONBOARD_DRIVER.start()
+    MidiDevices.refreshInstruments()
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
