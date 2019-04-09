@@ -79,7 +79,7 @@ class MelodyBeatAdapter(
       }
     }
 
-  var notationAlpha: Float = 1f
+  var notationAlpha: Float = 0f
     set(value) {
       field = value
       info("Setting notationAlpha = $value")
