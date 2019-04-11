@@ -23,6 +23,8 @@ import org.jetbrains.anko.withAlpha
 interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
   val viewModel: MelodyViewModel
   val overallBounds: Rect
+  override val bounds: Rect
+  val renderableToneBounds: Rect
   override var chord: Chord
 
   fun elementRangeFor(melody: Melody<*>) =

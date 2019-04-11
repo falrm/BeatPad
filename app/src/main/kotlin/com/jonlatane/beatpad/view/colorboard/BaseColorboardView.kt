@@ -24,5 +24,6 @@ abstract class BaseColorboardView @JvmOverloads constructor(
 	override val axisLength get() = (if(renderVertically) height else width).toFloat()
 	override var paint = Paint()
 	override var bounds = Rect()
+	override val drawingContext: Context get() = context
 	override fun color(resourceId: Int) = context.color(resourceId)
 }

@@ -1,12 +1,12 @@
 package com.jonlatane.beatpad.view.melody
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.PointF
-import android.graphics.Rect
+import android.graphics.*
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.SparseArray
 import android.view.MotionEvent
+import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
@@ -27,8 +27,11 @@ class MelodyBeatView @JvmOverloads constructor(
   override val viewModel: MelodyViewModel
 ) : BaseColorboardView(context, attrs, defStyle), MelodyBeatRenderer,
   MelodyBeatEventArticulationHandler, MelodyBeatEventEditingHandler, AnkoLogger {
+  override val renderableToneBounds: Rect = Rect()
   override val colorblockAlpha: Float get() = viewModel.beatAdapter.colorblockAlpha
   override val notationAlpha: Float get() = viewModel.beatAdapter.notationAlpha
+  override val filledNotehead: Drawable = context.resources.getDrawable(R.drawable.filled_notehead, null)
+    .constantState.newDrawable().mutate()
 
   init {
     showSteps = true

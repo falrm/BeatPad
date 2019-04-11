@@ -16,7 +16,7 @@ class ChordTest : Test({
 		}
 	}
 
-	describe("#getTones") {
+	describe("#getNotes") {
 		test("Major chords") {
 			assertThat(Chord(0, Maj).getTones(0, 12)).contains(0, 4, 7)
 			assertThat(Chord(6, Maj).getTones(0, 12)).contains(6, 10, 1)

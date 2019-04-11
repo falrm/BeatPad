@@ -23,10 +23,16 @@ class MelodyBeatAdapter(
   }
 
   private val axis get() = viewModel.verticalAxis!!
-  private val minimumElementWidth = recyclerView.run { dip(minimumBeatWidthDp) }
-  private val maximumElementWidth get() = viewModel.melodyCenterVerticalScroller.width / 2
-  private val minimumElementHeight get() = viewModel.melodyCenterVerticalScroller.height
-  private val maximumElementHeight get() = recyclerView.run { dip(maximumBeatHeightDp) }
+  private val minimumElementWidth
+    get() = recyclerView.run { dip(minimumBeatWidthDp) }
+  private val maximumElementWidth
+    get() = viewModel.melodyCenterVerticalScroller.width / 2
+  private val minimumElementHeight
+    get() = if (viewModel.displayType == MelodyViewModel.DisplayType.NOTATION) {
+      recyclerView.run { dip(100) }
+    } else viewModel.melodyCenterVerticalScroller.height
+  private val maximumElementHeight
+    get() = recyclerView.run { dip(maximumBeatHeightDp) }
 
 
   override var elementWidth: Int = recyclerView.run { dip(initialBeatWidthDp) }

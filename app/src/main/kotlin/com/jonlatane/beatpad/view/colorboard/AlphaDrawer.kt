@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.view.colorboard
 
+import android.content.Context
 import android.graphics.Paint
 import android.graphics.Rect
 
@@ -14,6 +15,8 @@ interface AlphaDrawer {
 	val halfStepsOnScreen: Float
 	val highestPitch get() = TOP // Top C on an 88-key piano
 	val lowestPitch get() = BOTTOM // Bottom A, ditto
+	val drawingContext: Context
+	val halfStepWidth: Float get() = axisLength / halfStepsOnScreen
 	fun color(resourceId: Int): Int
 
 	companion object {

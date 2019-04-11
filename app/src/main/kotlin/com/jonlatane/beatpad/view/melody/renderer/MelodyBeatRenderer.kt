@@ -8,14 +8,11 @@ import org.jetbrains.anko.info
 interface MelodyBeatRenderer: MelodyBeatColorblockRenderer, MelodyBeatNotationRenderer, AnkoLogger {
   fun MelodyBeatView.renderMelodyBeat(canvas: Canvas) {
     canvas.getClipBounds(overallBounds)
-    info("Rendering melody")
     if(colorblockAlpha > 0f) {
-      info("Rendering melody for colorblockAlpha=$colorblockAlpha")
       setupBaseBounds()
       renderColorblockMelodyBeat(canvas)
     }
     if(notationAlpha > 0f) {
-      info("Rendering melody for notationAlpha=$notationAlpha")
       setupBaseBounds()
       renderNotationMelodyBeat(canvas)
     }
