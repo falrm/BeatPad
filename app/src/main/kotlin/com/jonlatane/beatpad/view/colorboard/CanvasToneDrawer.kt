@@ -10,6 +10,8 @@ import kotlinx.io.pool.DefaultPool
 import java.util.*
 
 interface CanvasToneDrawer : AlphaDrawer {
+  fun dip(value: Float): Int
+  fun dip(value: Int): Int
   val showSteps: Boolean
   val chord: Chord
 

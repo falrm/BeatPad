@@ -8,6 +8,7 @@ import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 
 interface MelodyBeatEventEditingHandler : MelodyBeatEventHandlerBase, AlphaDrawer {
+
 	fun melodyOffsetAt(elementPosition: Int): Int // non-zero only when melody is not in fixed position mode
 	fun getTone(y: Float): Int
 
@@ -24,10 +25,25 @@ interface MelodyBeatEventEditingHandler : MelodyBeatEventHandlerBase, AlphaDrawe
 					val isChange = element != null
 					val tone = getTone(event.getY(pointerIndex))
 					if(isChange && element is RationalMelody.Element) {
-						val tones = element.tones
-						val targetTone = tone - melodyOffsetAt(position)
-						if(!tones.remove(targetTone)) tones.add(targetTone)
-						vibrate(MelodyEditingModifiers.vibrationMs)
+            val targetTone = tone - melodyOffsetAt(position)
+						when(displayType) {
+							MelodyViewModel.DisplayType.COLORBLOCK -> {
+								val tones = element.tones
+								if(!tones.remove(targetTone)) tones.add(targetTone)
+								vibrate(MelodyEditingModifiers.vibrationMs)
+							}
+							MelodyViewModel.DisplayType.NOTATION   -> {
+                val playbackToneMap: Map<Int, List<Int>> = element.tones.groupBy {
+                  melody!!.playbackToneUnder(it, chordAt(position)!!)
+                }
+                val targetPlaybackTone = melody!!.playbackToneUnder(targetTone, chordAt(position)!!)
+                if(playbackToneMap.containsKey(targetPlaybackTone)) {
+                  element.tones.removeAll(playbackToneMap[targetPlaybackTone].orEmpty())
+                } else {
+                  element.tones.add(targetPlaybackTone - melodyOffsetAt(position))
+                }
+							}
+						}
 					}
 				}
 			}

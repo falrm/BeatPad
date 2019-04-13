@@ -172,7 +172,12 @@ class PaletteViewModel: AnkoLogger {
 //  }
 
   fun notifySectionChange() {
-    harmonyViewModel.notifyHarmonyChanged()
+    harmonyViewModel.apply {
+      notifyHarmonyChanged()
+      editingChord = null
+      selectedHarmonyElements = null
+    }
+
     sectionListAdapter?.notifyDataSetChanged()
     melodyViewModel.beatAdapter.notifyDataSetChanged()
     if(editingMix) { // Trigger an update of the mix state.
@@ -280,16 +285,16 @@ class PaletteViewModel: AnkoLogger {
   }
 
   fun hideOrbifold() {
-    val orbifoldHeight = orbifold.height
+//    val orbifoldHeight = orbifold.height
     orbifold.hide()
-    if(melodyBeatAdapter.elementHeight < partListView.height + orbifoldHeight) {
-      val anim = ValueAnimator.ofInt(melodyBeatAdapter.elementHeight, partListView.height + orbifoldHeight)
-      anim.interpolator = LinearInterpolator()
-      anim.addUpdateListener { valueAnimator ->
-        melodyBeatAdapter.elementHeight = valueAnimator.animatedValue as Int
-      }
-      anim.start()
-    }
+//    if(melodyBeatAdapter.elementHeight < partListView.height + orbifoldHeight) {
+//      val anim = ValueAnimator.ofInt(melodyBeatAdapter.elementHeight, partListView.height + orbifoldHeight)
+//      anim.interpolator = LinearInterpolator()
+//      anim.addUpdateListener { valueAnimator ->
+//        melodyBeatAdapter.elementHeight = valueAnimator.animatedValue as Int
+//      }
+//      anim.start()
+//    }
   }
 
   private fun partListModeBoring() {

@@ -33,7 +33,13 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatEventH
     }
 
     BeatClockPaletteConsumer.section?.let { section ->
-      section.melodies.filter { !it.isDisabled }.map { it.melody }.forEach { melody ->
+      section.melodies.filter { !it.isDisabled }.filter {
+        when(melody?.limitedToNotesInHarmony) {
+          null -> false
+          true -> it.melody.limitedToNotesInHarmony
+          false -> !it.melody.limitedToNotesInHarmony
+        }
+      }.map { it.melody }.forEach { melody ->
         canvas.drawMelody(
           melody,
           stepNoteAlpha = 66,

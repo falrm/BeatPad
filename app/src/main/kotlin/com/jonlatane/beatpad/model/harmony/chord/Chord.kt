@@ -19,7 +19,7 @@ class Chord : Parcelable, Transposable<Chord> {
 		this.extension = (extension + 0).map { it.mod12 }.toSet().let {
 			if(BuildConfig.DEBUG) it.sorted() else it
 		}.toIntArray()
-		this.heptatonics = Heptatonics(setOf(*this.extension.toTypedArray()))
+		this.heptatonics = Heptatonics(this.extension.toSet())
 	}
 
 	private constructor(parcel: Parcel) {

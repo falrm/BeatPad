@@ -8,18 +8,23 @@ import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.service.convertPatternIndex
-import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.colorboard.CanvasToneDrawer
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
+import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.min
 
 
 interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
   val notationAlpha: Float
-  val filledNotehead: Drawable
-  
+  fun createFilledNotehead(): Drawable
+  fun flushNotationDrawableCache()
+  val sharp: Drawable
+  val clefs: List<Clef> get() = listOf(Clef.TREBLE, Clef.BASS)
 
   fun renderNotationMelodyBeat(canvas: Canvas) {
+
     canvas.renderStaffLines()
     melody?.let { melody ->
       canvas.drawNotatedMelody(
@@ -33,7 +38,13 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
 
 
     BeatClockPaletteConsumer.section?.let { section ->
-      section.melodies.filter { !it.isDisabled }.map { it.melody }.forEach { melody ->
+      section.melodies.filter { !it.isDisabled }.filter {
+        when(melody?.limitedToNotesInHarmony) {
+          null -> false
+          true -> it.melody.limitedToNotesInHarmony
+          false -> !it.melody.limitedToNotesInHarmony
+        }
+      }.map { it.melody }.forEach { melody ->
         canvas.drawNotatedMelody(
           melody,
           stepNoteAlpha = 22,
@@ -41,6 +52,7 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
         )
       }
     }
+    flushNotationDrawableCache()
   }
 
 
@@ -103,32 +115,51 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
       } ?: emptySet()
 
       if (tones.isNotEmpty()) {
-        val leftMargin = if (isChange) drawPadding else 0
-        val rightMargin = if (nextElement != null) drawPadding else 0
-        tones.forEach { tone ->
-          val chosenTone = if(melody.limitedToNotesInHarmony) {
-            val transposedTone = tone + melody.offsetUnder(chord)
-            chord.closestTone(transposedTone)
-          } else tone + melody.offsetUnder(chord)
-//          val top = height - height * (chosenTone - AlphaDrawer.BOTTOM) / 88f
-//          val bottom = height - height * (chosenTone - AlphaDrawer.BOTTOM + 1) / 88f
-//          val center = (top + bottom) / 2
-          val chosenNote = Note.naturalOrSharpNoteFor(chosenTone)
-          val center = pointFor(chosenNote)
+        val playbackNotes = tones.map {
+          val playbackTone = melody.playbackToneUnder(it, chord)
+          Note.naturalOrSharpNoteFor(playbackTone)
+        }
+        playbackNotes.forEach { note ->
+          val center = pointFor(note)
 
-          val notehead = filledNotehead.constantState.newDrawable().mutate()
+          val notehead = createFilledNotehead().constantState.newDrawable().mutate()
             .apply { alpha = (drawAlpha * alphaSource).toInt() }
           val boundsWidth = bounds.width()
-          val noteheadWidth = Math.min((letterStepSize * 2).toInt(), boundsWidth)
+          val maxFittableNoteheadWidth = ceil(boundsWidth / 2.3f).toInt()
+          val noteheadWidth = Math.min((letterStepSize * 2).toInt(), maxFittableNoteheadWidth)
           val noteheadHeight = noteheadWidth//(bounds.right - bounds.left)
-          notehead.setBounds(
-            bounds.right - noteheadWidth,
-            center.toInt() - (noteheadHeight / 2),
-            bounds.right,
-            center.toInt() + (noteheadHeight / 2)
-          )
+          val shouldStagger = playbackNotes.any {
+            it.heptatonicValue % 2 == 0
+              && (
+              it.heptatonicValue == note.heptatonicValue + 1
+                || it.heptatonicValue == note.heptatonicValue - 1
+              )
+          }
+          val top = center.toInt() - (noteheadHeight / 2)
+          val bottom = center.toInt() + (noteheadHeight / 2)
+          val (left, right) = if(shouldStagger) {
+            bounds.right - noteheadWidth to bounds.right
+          } else {
+            (bounds.right - 1.6f * noteheadWidth).toInt() to (bounds.right - .6f * noteheadWidth).toInt()
+          }
+          notehead.setBounds(left, top, right, bottom)
           notehead.alpha = (drawAlpha * alphaSource).toInt()
           notehead.draw(this)
+
+          if(note.sign == Note.Sign.Sharp) {
+            val sharp = sharp.constantState.newDrawable().mutate()
+              .apply { alpha = (drawAlpha * alphaSource).toInt() }
+
+            val (sharpLeft, sharpRight) = if(shouldStagger) {
+              (bounds.right - 2.1f * noteheadWidth).toInt() to (bounds.right - 1.6f * noteheadWidth).toInt()
+            } else {
+              (bounds.right - 2.3f * noteheadWidth).toInt() to (bounds.right - 1.8f * noteheadWidth).toInt()
+            }
+            sharp.setBounds(sharpLeft, top, sharpRight, bottom)
+            sharp.alpha = (drawAlpha * alphaSource).toInt()
+            sharp.draw(this)
+          }
+          renderLedgerLines(note, left, right)
         }
       }
     } catch (t: Throwable) {
@@ -137,8 +168,22 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
     }
   }
 
-  fun Canvas.renderLedgerLines(tone: Int) {
-
+  fun Canvas.renderLedgerLines(note: Note, left: Int, right: Int) {
+    if (!clefs.any { it. covers(note) }) {
+      val nearestClef = clefs.minBy {
+        min(
+          abs(note.heptatonicValue - it.heptatonicMax),
+          abs(note.heptatonicValue - it.heptatonicMin)
+        )
+      }!!
+      nearestClef.ledgersTo(note).forEach { ledger ->
+        renderLineAt(
+          pointFor(letter = ledger.letter, octave = ledger.octave),
+          left.toFloat() - dip(3),
+          right.toFloat() + dip(3)
+        )
+      }
+    }
   }
 
   fun Canvas.centerOfTone(tone: Int): Float
@@ -147,7 +192,7 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
   fun Canvas.renderStaffLines() {
     paint.color = color(R.color.colorPrimaryDark).withAlpha((255 * notationAlpha).toInt())
     //val halfStepWidth: Float = axisLength / halfStepsOnScreen
-    listOf(Clef.TREBLE, Clef.BASS).flatMap { it.notes }.forEach{ note ->
+    clefs.flatMap { it.notes }.forEach{ note ->
       renderLineAt(
         pointFor(letter = note.letter, octave = note.octave)
       )
@@ -164,12 +209,18 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
 
   val letterStepSize: Float get() = halfStepWidth * 12f / 7f
 
-  fun Canvas.renderLineAt(pointOnToneAxis: Float)  {
+  fun Canvas.renderLineAt(
+    pointOnToneAxis: Float,
+    left: Float? = null,
+    right: Float? = null
+  )  {
+    val stroke = paint.strokeWidth
+    paint.strokeWidth = 2f
     if (renderVertically) {
       drawLine(
-        bounds.left.toFloat(),
+        left ?: bounds.left.toFloat(),
         pointOnToneAxis,
-        bounds.right.toFloat(),
+        right ?: bounds.right.toFloat(),
         pointOnToneAxis,
         paint
       )
@@ -182,6 +233,7 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
         paint
       )
     }
+    paint.strokeWidth = stroke
   }
 
 

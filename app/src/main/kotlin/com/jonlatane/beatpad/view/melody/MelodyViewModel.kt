@@ -1,11 +1,8 @@
 package com.jonlatane.beatpad.view.melody
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.storage.PaletteStorage
-import com.jonlatane.beatpad.util.layoutWidth
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.NonDelayedRecyclerView
 import com.jonlatane.beatpad.view.NonDelayedScrollView

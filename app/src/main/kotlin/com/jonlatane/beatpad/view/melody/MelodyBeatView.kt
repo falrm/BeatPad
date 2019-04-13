@@ -13,9 +13,10 @@ import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
-import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatColorblockRenderer
 import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatRenderer
+import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.*
+import java.util.*
 
 /**
  * BeatViews
@@ -27,11 +28,30 @@ class MelodyBeatView @JvmOverloads constructor(
   override val viewModel: MelodyViewModel
 ) : BaseColorboardView(context, attrs, defStyle), MelodyBeatRenderer,
   MelodyBeatEventArticulationHandler, MelodyBeatEventEditingHandler, AnkoLogger {
+  override val displayType: MelodyViewModel.DisplayType get() = viewModel.displayType
   override val renderableToneBounds: Rect = Rect()
   override val colorblockAlpha: Float get() = viewModel.beatAdapter.colorblockAlpha
   override val notationAlpha: Float get() = viewModel.beatAdapter.notationAlpha
-  override val filledNotehead: Drawable = context.resources.getDrawable(R.drawable.filled_notehead, null)
+  override fun createFilledNotehead(): Drawable = filledNoteheadPool.borrow()
+  override fun flushNotationDrawableCache() {
+    notationDrawableCache.removeAll {
+      filledNoteheadPool.recycle(it); true
+    }
+  }
+  override val sharp: Drawable = context.resources.getDrawable(R.drawable.sharp, null)
     .constantState.newDrawable().mutate()
+
+  val notationDrawableCache = Vector<Drawable>(10)
+  val filledNoteheadPool = object: DefaultPool<Drawable>(5) {
+    override fun produceInstance(): Drawable {
+      val result = context.resources.getDrawable(R.drawable.filled_notehead, null)
+        .constantState.newDrawable().mutate()
+      notationDrawableCache.add(result)
+      return result
+    }
+
+  }
+
 
   init {
     showSteps = true

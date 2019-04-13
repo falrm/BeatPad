@@ -18,6 +18,7 @@ interface MelodyBeatEventHandlerBase: AnkoLogger {
    * For a touch X value (time laid along the x-axis), returns the
    * element position (within the melody) and the element data there.
    */
+  val displayType: MelodyViewModel.DisplayType
   fun getPositionAndElement(x: Float): Pair<Int, Transposable<*>?>?
   val beatPosition: Int
   val downPointers: SparseArray<PointF>

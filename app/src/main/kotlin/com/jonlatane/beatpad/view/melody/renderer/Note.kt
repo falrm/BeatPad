@@ -35,6 +35,7 @@ data class Note private constructor(
     DoubleFlat("bb", -2)
   }
   val stringValue: String get() = "${letter.name}${sign.stringValue}$octave"
+  val heptatonicValue get() = 8 * octave + letter.letterOffset
 
   companion object {
     fun naturalOrSharpNoteFor(tone: Int): Note = notesFor[tone]!!.let {

@@ -11,8 +11,6 @@ import com.jonlatane.beatpad.model.harmony.chord.*
  * [.MINOR], [.PERFECT], [.AUGMENTED], or [.DIMINISHED].
 
  * The method getColorString()
-
- * Created by jonlatane on 5/6/17.
  */
 class Heptatonics(private val colors: Set<Int>) {
 	val isMinor get() = !isMajor && colors.contains(3)
@@ -89,102 +87,124 @@ class Heptatonics(private val colors: Set<Int>) {
 	}
 
 	val colorString: String by lazy {
-		var colorString = ""
-		// Artifically pad for readability.  degreeColors[2] is the second scale degree of the chord.
-		val degreeColors = intArrayOf(0, 0, second, third, fourth, fifth, sixth, seventh)
-		val namedColors = booleanArrayOf(false, false, false, false, false, false, false, false)
-		// Check for 13 chords first
-		if (degreeColors[6] == MAJOR && degreeColors[7] != NONEXISTENT) {
-			if (degreeColors[7] != MINOR) {
-				colorString += "M"
-			}
-			colorString += "13"
-			namedColors[6] = true
-			namedColors[7] = namedColors[6]
-			if (degreeColors[2] == MAJOR) {
-				namedColors[2] = true
-			}
-			// Cm13 is understood to have an 11, but not CM13.
-			if (degreeColors[3] == MINOR) {
-				namedColors[4] = true
-			}
-			// Then 11 chords
-		} else if (degreeColors[4] == PERFECT && degreeColors[7] != NONEXISTENT) {
-			if (degreeColors[7] != MINOR) {
-				colorString += "M"
-			}
-			colorString += "11"
-			namedColors[4] = true
-			namedColors[7] = namedColors[4]
-			if (degreeColors[2] == MAJOR) {
-				namedColors[2] = true
-			}
-			// Then 9 chords
-		} else if (degreeColors[2] == MAJOR && degreeColors[7] != NONEXISTENT) {
-			if (degreeColors[7] != MINOR) {
-				colorString += "M"
-			}
-			colorString += "9"
-			namedColors[2] = true
-			namedColors[7] = namedColors[2]
-			// Finally 7 chords
-		} else if (degreeColors[7] == MAJOR) {
-			colorString += "M7"
-			namedColors[7] = true
-		} else if (degreeColors[7] == MINOR) {
-			colorString += "7"
-			namedColors[7] = true
-			// And 6 chords
-		} else if (degreeColors[6] == MAJOR) {
-			colorString += "6"
-			namedColors[6] = true
-		}
-		// Name the fifth
-		if (degreeColors[5] == DIMINISHED) {
-			colorString += "(b5)"
-		} else if (degreeColors[5] == AUGMENTED) {
-			colorString += "(#5)"
-		}
-		// Name the fourth
-		namedColors[5] = true
-		if (degreeColors[4] == DIMINISHED) {
-			colorString += "(b11)"
-		} else if (degreeColors[4] == AUGMENTED) {
-			colorString += "(#11)"
-		} else if (degreeColors[4] == PERFECT && !namedColors[4] && degreeColors[3] != NONEXISTENT) {
-			colorString += "(11)"
-		}
-		namedColors[4] = true
-		// Name the sixth/thirteenth
-		if (degreeColors[6] == AUGMENTED) {
-			colorString += "(#13)"
-		} else if (degreeColors[6] == MINOR) {
-			colorString += "(b13)"
-		} else if (degreeColors[6] == MAJOR && !namedColors[6]) {
-			colorString += "(6)"
-		}
-		// Name the ninth
-		if (degreeColors[2] == AUGMENTED) {
-			colorString += "(#9)"
-		} else if (degreeColors[2] == MINOR) {
-			colorString += "(b9)"
-		} else if (degreeColors[2] == MAJOR && !namedColors[2]) {
-			colorString += "(9)"
-		}
-		// Name minor chords
-		if (degreeColors[3] == MINOR) {
-			colorString = "m" + colorString
-		}
-		// Name sus chords
-		if (degreeColors[3] == NONEXISTENT) {
-			if (degreeColors[4] == PERFECT) {
-				colorString = "sus" + colorString
-			} else if (degreeColors[2] == MAJOR) {
-				colorString = "sus2" + colorString
-			} else {
-				colorString = "5" + colorString
-			}
-		}
-		colorString
+    when {
+      colors.size == 12 -> " Chrom."
+      colors.size >= 10 -> " Chrom. (no ${(0..11).filter { !colors.contains(it) }
+        .joinToString(",") {
+          when (it) {
+            1    -> "b2"
+            2    -> "2"
+            3    -> "b3"
+            4    -> "3"
+            5    -> "4"
+            6    -> "b5"
+            7    -> "5"
+            8    -> "b6"
+            9    -> "6"
+            10   -> "b7"
+            11   -> "M7"
+            else -> TODO()
+          }
+        }})"
+      else              -> {
+        var colorString = ""
+        // Artifically pad for readability.  degreeColors[2] is the second scale degree of the chord.
+        val degreeColors = intArrayOf(0, 0, second, third, fourth, fifth, sixth, seventh)
+        val namedColors = booleanArrayOf(false, false, false, false, false, false, false, false)
+        // Check for 13 chords first
+        if (degreeColors[6] == MAJOR && degreeColors[7] != NONEXISTENT) {
+          if (degreeColors[7] != MINOR) {
+            colorString += "M"
+          }
+          colorString += "13"
+          namedColors[6] = true
+          namedColors[7] = namedColors[6]
+          if (degreeColors[2] == MAJOR) {
+            namedColors[2] = true
+          }
+          // Cm13 is understood to have an 11, but not CM13.
+          if (degreeColors[3] == MINOR) {
+            namedColors[4] = true
+          }
+          // Then 11 chords
+        } else if (degreeColors[4] == PERFECT && degreeColors[7] != NONEXISTENT) {
+          if (degreeColors[7] != MINOR) {
+            colorString += "M"
+          }
+          colorString += "11"
+          namedColors[4] = true
+          namedColors[7] = namedColors[4]
+          if (degreeColors[2] == MAJOR) {
+            namedColors[2] = true
+          }
+          // Then 9 chords
+        } else if (degreeColors[2] == MAJOR && degreeColors[7] != NONEXISTENT) {
+          if (degreeColors[7] != MINOR) {
+            colorString += "M"
+          }
+          colorString += "9"
+          namedColors[2] = true
+          namedColors[7] = namedColors[2]
+          // Finally 7 chords
+        } else if (degreeColors[7] == MAJOR) {
+          colorString += "M7"
+          namedColors[7] = true
+        } else if (degreeColors[7] == MINOR) {
+          colorString += "7"
+          namedColors[7] = true
+          // And 6 chords
+        } else if (degreeColors[6] == MAJOR) {
+          colorString += "6"
+          namedColors[6] = true
+        }
+        // Name the fifth
+        if (degreeColors[5] == DIMINISHED) {
+          colorString += "(b5)"
+        } else if (degreeColors[5] == AUGMENTED) {
+          colorString += "(#5)"
+        }
+        // Name the fourth
+        namedColors[5] = true
+        if (degreeColors[4] == DIMINISHED) {
+          colorString += "(b11)"
+        } else if (degreeColors[4] == AUGMENTED) {
+          colorString += "(#11)"
+        } else if (degreeColors[4] == PERFECT && !namedColors[4] && degreeColors[3] != NONEXISTENT) {
+          colorString += "(11)"
+        }
+        namedColors[4] = true
+        // Name the sixth/thirteenth
+        if (degreeColors[6] == AUGMENTED) {
+          colorString += "(#13)"
+        } else if (degreeColors[6] == MINOR) {
+          colorString += "(b13)"
+        } else if (degreeColors[6] == MAJOR && !namedColors[6]) {
+          colorString += "(6)"
+        }
+        // Name the ninth
+        if (degreeColors[2] == AUGMENTED) {
+          colorString += "(#9)"
+        } else if (degreeColors[2] == MINOR) {
+          colorString += "(b9)"
+        } else if (degreeColors[2] == MAJOR && !namedColors[2]) {
+          colorString += "(9)"
+        }
+        // Name minor chords
+        if (degreeColors[3] == MINOR) {
+          colorString = "m" + colorString
+        }
+        // Name sus chords
+        if (degreeColors[3] == NONEXISTENT) {
+          if (degreeColors[4] == PERFECT) {
+            colorString = "sus" + colorString
+          } else if (degreeColors[2] == MAJOR) {
+            colorString = "sus2" + colorString
+          } else {
+            colorString = "5" + colorString
+          }
+        }
+        colorString
+      }
+    }
 	}
 }

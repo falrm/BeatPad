@@ -14,6 +14,7 @@ import com.jonlatane.beatpad.util.formatted
 import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.util.show
 import com.jonlatane.beatpad.util.vibrate
+import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.palette.PaletteUI
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.setContentView
@@ -109,6 +110,12 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger {
 
   override fun onRestoreInstanceState(savedInstanceState: Bundle) {
     super.onRestoreInstanceState(savedInstanceState)
+    viewModel.melodyViewModel.displayType = MelodyViewModel.DisplayType.valueOf(
+      savedInstanceState.getString(
+        "melodyDisplayType",
+        MelodyViewModel.DisplayType.COLORBLOCK.name
+      )
+    )
     if (savedInstanceState.getBoolean("keyboardOpen", false)) {
       viewModel.keyboardView.show(false)
     }
@@ -139,6 +146,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger {
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
     Storage.storePalette(viewModel.palette, this)
+    outState.putString("melodyDisplayType", viewModel.melodyViewModel.displayType.name)
     outState.putBoolean("keyboardOpen", !viewModel.keyboardView.isHidden)
     outState.putBoolean("colorboardOpen", !viewModel.colorboardView.isHidden)
     outState.putString("editingMelodyId", viewModel.editingMelody?.id.toString())

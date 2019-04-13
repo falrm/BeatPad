@@ -56,6 +56,9 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
       it.inflate(R.menu.section_menu)
       it.setOnMenuItemClickListener { item ->
         when (item) {
+          renameSection -> {
+
+          }
           deleteSection -> {
             if(viewModel.palette.sections.size <= 1) {
               parent.context.toast("Cannot delete the final section!")
@@ -110,6 +113,7 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
       }
     }
   }
+  private val renameSection: MenuItem get() = menu.menu.findItem(R.id.renameSection)
   private val deleteSection: MenuItem get() = menu.menu.findItem(R.id.deleteSection)
   private val addHarmony: MenuItem get() = menu.menu.findItem(R.id.addHarmonyToSection)
   private val removeHarmony: MenuItem get() = menu.menu.findItem(R.id.removeHarmonyFromSection)

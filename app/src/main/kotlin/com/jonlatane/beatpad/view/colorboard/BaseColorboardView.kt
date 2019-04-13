@@ -9,6 +9,7 @@ import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.harmony.chord.Maj7
 import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.dip
 
 abstract class BaseColorboardView @JvmOverloads constructor(
 	context: Context,
@@ -26,4 +27,6 @@ abstract class BaseColorboardView @JvmOverloads constructor(
 	override var bounds = Rect()
 	override val drawingContext: Context get() = context
 	override fun color(resourceId: Int) = context.color(resourceId)
+	override fun dip(value: Float): Int = context.dip(value)
+	override fun dip(value: Int): Int = context.dip(value)
 }

@@ -64,7 +64,11 @@ class MelodyReferenceHolder(
 					promptText = "Really delete this melody?",
 					yesText = "Yes, delete melody"
 				) {
-					part!!.melodies.removeAt(melodyPosition)
+					val melody = part!!.melodies.removeAt(melodyPosition)
+          viewModel.palette.sections.forEach { section ->
+            val removedReferences = section.melodies.filter { it.melody == melody }
+            section.melodies.removeAll(removedReferences)
+          }
 					adapter.notifyItemRemoved(melodyPosition)
 					adapter.notifyItemRangeChanged(
 						melodyPosition,
