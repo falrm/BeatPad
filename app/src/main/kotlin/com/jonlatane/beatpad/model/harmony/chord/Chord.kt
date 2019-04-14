@@ -136,8 +136,8 @@ class Chord : Parcelable, Transposable<Chord> {
 	fun closestTone(tone: Int): Int {
 		for(i in 0..11) {
 			when {
+        containsTone(tone  - i) -> return tone - i
 				containsTone(tone + i) -> return tone + i
-				containsTone(tone  - i) -> return tone - i
 			}
 		}
 		return root
