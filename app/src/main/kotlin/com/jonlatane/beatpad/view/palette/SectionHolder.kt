@@ -11,6 +11,7 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.showConfirmDialog
+import com.jonlatane.beatpad.showRenameDialog
 import org.jetbrains.anko.*
 import java.util.*
 
@@ -52,12 +53,17 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
     }
   val sectionName: TextView by lazy { itemView.findViewById<TextView>(R.id.section_name) }
   val menu: PopupMenu by lazy {
-    PopupMenu(parent.context, sectionName).also {
-      it.inflate(R.menu.section_menu)
-      it.setOnMenuItemClickListener { item ->
+    PopupMenu(parent.context, sectionName).also { popupMenu ->
+      popupMenu.inflate(R.menu.section_menu)
+      popupMenu.setOnMenuItemClickListener { item ->
         when (item) {
           renameSection -> {
-
+            section?.let { section ->
+              itemView.context.showRenameDialog(section.name, "Section") {
+                section.name = it
+                invalidate()
+              }
+            }
           }
           deleteSection -> {
             if(viewModel.palette.sections.size <= 1) {

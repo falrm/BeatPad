@@ -5,10 +5,12 @@ import android.content.DialogInterface
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.support.v7.app.AlertDialog
+import android.text.InputFilter
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.EditText
 import android.widget.TextView
 import com.jonlatane.beatpad.ConductorActivity.Companion.SERVICE_NAME
 import com.jonlatane.beatpad.ConductorActivity.Companion.SERVICE_TYPE
@@ -17,9 +19,36 @@ import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
-import org.jetbrains.anko.contentView
-import org.jetbrains.anko.nsdManager
+import org.jetbrains.anko.*
+import android.text.Spanned
 
+fun Context.showRenameDialog(
+  currentName: String,
+  entityType: String,
+  onChosen: (String) -> Unit
+) {
+  alert("Renaming \"$currentName\"", "Rename $entityType") {
+    var name: EditText? = null
+    customView {
+      linearLayout {
+        name = editText {
+          text.clear()
+          text.append(currentName)
+          filters = arrayOf(
+            InputFilter.LengthFilter(50)
+          )
+        }.lparams(matchParent, wrapContent) {
+          marginStart = dip(20)
+          marginEnd = dip(20)
+        }
+      }
+    }
+    positiveButton("Rename $entityType") {
+      onChosen(name!!.text.toString())
+    }
+    negativeButton("Cancel") { }
+  }.show()
+}
 
 fun showOrbifoldPicker(orbifoldView: OrbifoldView) {
   val builder = AlertDialog.Builder(orbifoldView.context)

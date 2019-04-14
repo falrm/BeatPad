@@ -5,7 +5,7 @@ import java.util.*
 
 data class Section(
   val id: UUID = UUID.randomUUID(),
-  val name: String = generateNewSectionName(emptyList()),
+  var name: String = generateNewSectionName(emptyList()),
   var harmony: Harmony? = PaletteStorage.blankHarmony,
   val melodies: MutableSet<MelodyReference> = mutableSetOf()
 ) {
