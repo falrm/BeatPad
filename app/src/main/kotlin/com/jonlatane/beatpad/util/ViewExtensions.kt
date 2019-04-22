@@ -28,6 +28,25 @@ private val defaultDuration get() = 300L
 
 interface HideableView {
 	var initialHeight: Int?
+	var initialWidth: Int?
+
+  fun show(
+    animated: Boolean = true,
+    animation: ViewHideAnimation = ViewHideAnimation.HIDE_VERTICAL
+  ) {
+    animation.apply {
+      (this@HideableView as View).show(animated)
+    }
+  }
+
+  fun hide(
+    animated: Boolean = true,
+    animation: ViewHideAnimation = ViewHideAnimation.HIDE_VERTICAL
+  ) {
+    animation.apply {
+      (this@HideableView as View).hide(animated)
+    }
+  }
 }
 
 fun TextView.toolbarTextStyle() {
@@ -120,43 +139,65 @@ fun View.animateHeight(height: Int, duration: Long = defaultDuration) {
 	anim.setDuration(duration).start()
 }
 
-val View.isHidden: Boolean get() = layoutHeight == 0
-fun View.show(animated: Boolean = true) {
-	if ((this as HideableView).initialHeight == null) {
-		measure(width, height)
-		initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
-	}
-	if (animated) {
-		animateHeight((this as HideableView).initialHeight!!)
-	} else {
-		layoutHeight = (this as HideableView).initialHeight!!
-	}
-}
+enum class ViewHideAnimation {
+  HIDE_VERTICAL {
+    override fun View.show(animated: Boolean) {
+      if ((this as HideableView).initialHeight == null) {
+        measure(width, height)
+        initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
+      }
+      if (animated) {
+        animateHeight((this as HideableView).initialHeight!!)
+      } else {
+        layoutHeight = (this as HideableView).initialHeight!!
+      }
+    }
 
-fun View.hide(animated: Boolean = true) {
-	if ((this as HideableView).initialHeight == null) {
-		measure(width, height)
-		initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
-	}
-	if (animated) {
-		animateHeight(0)
-	} else {
-		layoutHeight = 0
-	}
+    override fun View.hide(animated: Boolean) {
+      if ((this as HideableView).initialHeight == null) {
+        measure(width, height)
+        initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
+      }
+      if (animated) {
+        animateHeight(0)
+      } else {
+        layoutHeight = 0
+      }
+    }
+  },
+  HIDE_HORIZONTAL {
+    override fun View.show(animated: Boolean) {
+      if ((this as HideableView).initialWidth == null) {
+        measure(width, height)
+        initialHeight = if (measuredWidth > 0) measuredWidth else layoutWidth
+      }
+      if (animated) {
+        animateWidth((this as HideableView).initialWidth!!)
+      } else {
+        layoutWidth = (this as HideableView).initialWidth!!
+      }
+    }
+
+    override fun View.hide(animated: Boolean) {
+      if ((this as HideableView).initialWidth == null) {
+        measure(width, height)
+        initialWidth = if (measuredWidth > 0) measuredWidth else layoutWidth
+      }
+      if (animated) {
+        animateWidth(0)
+      } else {
+        layoutWidth = 0
+      }
+    }
+  };
+
+  abstract fun View.show(animated: Boolean = true)
+
+  abstract fun View.hide(animated: Boolean = true)
 }
+val View.isHidden: Boolean get() = layoutHeight == 0 || layoutWidth == 0
 
 fun View.color(resId: Int) = context.color(resId)
 
 inline val RecyclerView.firstVisibleItemPosition
   get() = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-
-fun RecyclerView.syncPositionTo(to: RecyclerView) = syncRecyclerViewPositions(this, to)
-
-private fun syncRecyclerViewPositions(from: RecyclerView, to: RecyclerView) {
-	val otherLayoutManager = to.layoutManager as LinearLayoutManager
-	val offset = -from.computeHorizontalScrollOffset() % (to.adapter as BeatAdapter).elementWidth
-	otherLayoutManager.scrollToPositionWithOffset(
-		from.firstVisibleItemPosition,
-		offset
-	)
-}

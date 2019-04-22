@@ -3,6 +3,7 @@ package com.jonlatane.beatpad.view.palette
 //import com.jonlatane.beatpad.util.syncPositionTo
 import BeatClockPaletteConsumer
 import android.animation.ValueAnimator
+import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.TextView
@@ -110,6 +111,7 @@ class PaletteViewModel: AnkoLogger {
   }
 
   lateinit var sectionListView: View
+  lateinit var sectionListRecycler: RecyclerView
   var partListAdapter: PartListAdapter? = null
   var sectionListAdapter: SectionListAdapter? = null
   lateinit var partListView: PartListView

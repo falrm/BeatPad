@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
@@ -12,20 +13,37 @@ import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showRenameDialog
+import com.jonlatane.beatpad.util.layoutWidth
 import org.jetbrains.anko.*
+import org.w3c.dom.Text
 import java.util.*
 
-class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : RecyclerView.ViewHolder(
+class SectionHolder(
+  parent: ViewGroup,
+  val viewModel: PaletteViewModel
+) : RecyclerView.ViewHolder(
   _LinearLayout(parent.context).apply {
     isClickable = true
     isLongClickable = true
-    textView {
-      id = R.id.section_name
-      textSize = 25f
-      layoutParams = ViewGroup.LayoutParams(wrapContent, wrapContent)
-      minimumWidth = context.dip(90)
-      gravity = Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL
-      typeface = MainApplication.chordTypeface
+    relativeLayout {
+      val sectionName = textView {
+        id = R.id.section_name
+        textSize = 25f
+        minimumWidth = context.dip(90)
+        gravity = Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL
+        typeface = MainApplication.chordTypeface
+      }.lparams(wrapContent, wrapContent) {
+        alignParentLeft()
+        centerVertically()
+      }
+      imageView {
+        id = R.id.section_drag_handle
+        imageResource = R.drawable.hamburger_drag_drop
+      }.lparams(dip(35), dip(35f)) {
+        marginStart = dip(5)
+        rightOf(sectionName)
+        centerVertically()
+      }
     }.lparams(wrapContent, wrapContent) {
       setMargins(
         dip(10),
@@ -45,6 +63,8 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
       R.drawable.orbifold_chord_diminished
     )[sectionIndex % 5]
   }
+  val nameTextView: TextView get() = itemView.findViewById(R.id.section_name)
+  val dragHandle: ImageView get() = itemView.findViewById(R.id.section_drag_handle)
   val adapter: SectionListAdapter get() = viewModel.sectionListAdapter!!
   val section: Section?
     get() = when (adapterPosition) {
@@ -168,6 +188,7 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
         true
       }
     }
+    dragHandle.layoutWidth = dragHandle.dip(35)
   }
 
   private fun makeAddButton() {
@@ -184,5 +205,6 @@ class SectionHolder(parent: ViewGroup, val viewModel: PaletteViewModel) : Recycl
         true
       }
     }
+    dragHandle.layoutWidth = 0
   }
 }

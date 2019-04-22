@@ -34,5 +34,6 @@
 	<item name="part_patterns" type="id"/>
 	<item name="part_volume" type="id"/>
 	<item name="section_name" type="id"/>
+	<item name="section_drag_handle" type="id"/>
 
 </resources>

@@ -9,6 +9,7 @@ import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.info
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
+import org.jetbrains.anko.verbose
 
 
 class MelodyBeatAdapter(
@@ -16,8 +17,8 @@ class MelodyBeatAdapter(
   override val recyclerView: _RecyclerView
 ) : RecyclerView.Adapter<MelodyBeatHolder>(), AnkoLogger, BeatAdapter {
   companion object {
-    const val initialBeatWidthDp: Float = 75f
-    const val initialBeatHeightDp: Float = 1000f
+    const val initialBeatWidthDp: Float = 125f
+    const val initialBeatHeightDp: Float = 400f
     const val minimumBeatWidthDp: Float = 30f
     const val maximumBeatHeightDp: Float = 2500f
   }
@@ -45,7 +46,7 @@ class MelodyBeatAdapter(
           }
           else -> value
         }
-        info("Setting width to $field")
+        verbose("Setting width to $field")
         recyclerView.applyToHolders<MelodyBeatHolder> {
           it.element.layoutWidth = field
         }
@@ -65,17 +66,16 @@ class MelodyBeatAdapter(
         else -> value
       }
 
-      info("Setting height to $field")
+      verbose("Setting height to $field")
       recyclerView.applyToHolders<MelodyBeatHolder> {
         it.element.layoutHeight = field
       }
       axis.layoutHeight = field
     }
 
-  var colorblockAlpha: Float = 1f
+  var colorblockAlpha: Float = 0f
     set(value) {
       field = value
-      info("Setting colorblockAlpha = $value")
       recyclerView.applyToHolders<MelodyBeatHolder> {
         it.element.apply {
           invalidate()
@@ -83,10 +83,9 @@ class MelodyBeatAdapter(
       }
     }
 
-  var notationAlpha: Float = 0f
+  var notationAlpha: Float = 1f
     set(value) {
       field = value
-      info("Setting notationAlpha = $value")
       recyclerView.applyToHolders<MelodyBeatHolder> {
         it.element.apply {
           invalidate()

@@ -54,7 +54,7 @@ inline fun ViewManager.melodyView(
 				linearLayout {
           melodyViewModel.verticalAxis = melodyToneAxis().lparams {
 						width = dip(30)
-						height = dip(1000f)
+						height = dip(MelodyBeatAdapter.initialBeatHeightDp)
 					}
 				}
 				scrollingEnabled = false

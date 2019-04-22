@@ -30,7 +30,7 @@ class MelodyViewModel(
 	lateinit var beatAdapter: MelodyBeatAdapter
 
 	enum class DisplayType { COLORBLOCK, NOTATION }
-	var displayType = DisplayType.COLORBLOCK
+	var displayType = DisplayType.NOTATION
 	set(value) {
 		field = value
     info("Melody display type: $value")

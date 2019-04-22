@@ -1,26 +1,21 @@
 package com.jonlatane.beatpad.view.orbifold
 
 import android.content.Context
-import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
-import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.harmony.Orbit
 import com.jonlatane.beatpad.model.harmony.Orbifold
+import com.jonlatane.beatpad.model.harmony.Orbit
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.harmony.chord.Maj13
-import com.jonlatane.beatpad.model.harmony.chord.Maj7
 import com.jonlatane.beatpad.model.harmony.chordsequence.Chromatic
 import com.jonlatane.beatpad.showOrbifoldPicker
 import com.jonlatane.beatpad.util.color
-import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.util.isHidden
-import com.jonlatane.beatpad.util.show
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import org.jetbrains.anko.*

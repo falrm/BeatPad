@@ -30,7 +30,6 @@ interface MelodyBeatEventEditingHandler : MelodyBeatEventHandlerBase, AlphaDrawe
 							MelodyViewModel.DisplayType.COLORBLOCK -> {
 								val tones = element.tones
 								if(!tones.remove(targetTone)) tones.add(targetTone)
-								vibrate(MelodyEditingModifiers.vibrationMs)
 							}
 							MelodyViewModel.DisplayType.NOTATION   -> {
                 val playbackToneMap: Map<Int, List<Int>> = element.tones.groupBy {
@@ -44,6 +43,7 @@ interface MelodyBeatEventEditingHandler : MelodyBeatEventHandlerBase, AlphaDrawe
                 }
 							}
 						}
+            vibrate(MelodyEditingModifiers.vibrationMs)
 					}
 				}
 			}

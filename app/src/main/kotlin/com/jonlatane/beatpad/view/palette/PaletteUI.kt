@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.palette
 
-import android.content.res.Configuration
+//import com.jonlatane.beatpad.util.syncPositionTo
+import BeatClockPaletteConsumer
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.RelativeLayout
@@ -9,8 +10,6 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.firstVisibleItemPosition
-import com.jonlatane.beatpad.util.hide
-//import com.jonlatane.beatpad.util.syncPositionTo
 import com.jonlatane.beatpad.view.colorboard.colorboardView
 import com.jonlatane.beatpad.view.harmony.harmonyView
 import com.jonlatane.beatpad.view.keyboard.keyboardView

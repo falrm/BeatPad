@@ -5,4 +5,5 @@ import org.jetbrains.anko._RelativeLayout
 
 open class HideableRelativeLayout(ctx: android.content.Context): _RelativeLayout(ctx), HideableView {
 	override var initialHeight: Int? = null
+	override var initialWidth: Int? = null
 }

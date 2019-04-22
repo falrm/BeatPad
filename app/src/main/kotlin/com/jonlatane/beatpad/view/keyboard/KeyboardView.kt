@@ -19,6 +19,7 @@ class KeyboardView @JvmOverloads constructor(
   defStyle: Int = 0
 ) : HorizontalScrollView(context, attrs, defStyle), HideableView {
   override var initialHeight: Int? = null
+  override var initialWidth: Int? = null
   val margin: Int = context.resources.displayMetrics.densityDpi / 5
   val ioHandler: KeyboardIOHandler
 

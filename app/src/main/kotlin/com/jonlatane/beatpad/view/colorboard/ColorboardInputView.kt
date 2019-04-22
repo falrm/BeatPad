@@ -19,6 +19,7 @@ class ColorboardInputView @JvmOverloads constructor(
 	defStyle: Int = 0
 ) : BaseColorboardView(context, attrs, defStyle), HideableView {
 	override var initialHeight: Int? = null
+	override var initialWidth: Int? = null
 	var instrument by observable<Instrument>(MIDIInstrument()) { _, old, _ -> old.stop() }
 	private val density = context.resources.displayMetrics.density
 	private var activePointers: SparseArray<PointF> = SparseArray()

@@ -10,6 +10,7 @@ open class NonDelayedRecyclerView @JvmOverloads constructor(
 	var scrollingEnabled: Boolean = true
 ): HideableRecyclerView(ctx) {
 	override var initialHeight: Int? = null
+	override var initialWidth: Int? = null
 
 	override fun shouldDelayChildPressedState() = false
 	override fun onTouchEvent(ev: MotionEvent): Boolean {

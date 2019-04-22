@@ -12,7 +12,7 @@ import com.jonlatane.beatpad.sensors.ShakeDetector
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.formatted
 import com.jonlatane.beatpad.util.isHidden
-import com.jonlatane.beatpad.util.show
+//import com.jonlatane.beatpad.util.show
 import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.palette.PaletteUI
