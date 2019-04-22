@@ -8,6 +8,7 @@ import android.widget.RelativeLayout
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.util.HideAnimation
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.firstVisibleItemPosition
 import com.jonlatane.beatpad.view.colorboard.colorboardView
@@ -21,15 +22,20 @@ import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
 import java.util.concurrent.atomic.AtomicBoolean
 
 class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
+  var leftSideWidth: Int = 0
+  var isTablet: Boolean = false
   val viewModel = PaletteViewModel()
   lateinit var layout: RelativeLayout
 
-  override fun createView(ui: AnkoContext<PaletteEditorActivity>) = with(ui) {
+  override fun createView(ui: AnkoContext<PaletteEditorActivity>): RelativeLayout = with(ui) {
 
     layout = relativeLayout {
+      isTablet = ui.configuration.smallestScreenWidthDp > 600
+
       if (configuration.portrait) {
         portraitLayout()
       } else {
+        leftSideWidth = dip(350f)
         landscapeLayout(this@with)
       }
 
@@ -59,9 +65,12 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       viewModel.orbifold.onOrbifoldChangeListener = { viewModel.palette.orbifold = it }
       viewModel.orbifold.keyboard = viewModel.keyboardView
 
-      if(configuration.portrait) {
-        viewModel.orbifold.hide(false)
-      }
+      viewModel.orbifold.hide(
+        animation = if (context.configuration.portrait) {
+          HideAnimation.VERTICAL
+        } else HideAnimation.HORIZONTAL,
+        animated = false
+      )
       viewModel.keyboardView.hide(false)
       viewModel.colorboardView.hide(false)
 
@@ -185,52 +194,36 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
   }
 
   private fun _RelativeLayout.landscapeLayout(ui: AnkoContext<PaletteEditorActivity>) {
-    val leftSideWidth = dip(350f)
 
     viewModel.sectionListView = sectionListView(viewModel = viewModel) {
       id = R.id.chord_list
     }.lparams {
-      width = leftSideWidth
+      width = dip(350f)
       height = wrapContent
       alignParentLeft()
       alignParentTop()
     }
 
-    val isTablet = ui.configuration.smallestScreenWidthDp > 600
 
-    viewModel.orbifold = orbifoldView {
-      id = R.id.orbifold
-    }.lparams {
-      alignParentLeft()
-      below(viewModel.sectionListView)
-      width = leftSideWidth
-      height = if (isTablet) {
-        Math.round(leftSideWidth * 1.5f)
-      } else {
-        matchParent
-      }
-      elevation = 5f
-    }
-
-    if (isTablet) {
-      view {
-        id = R.id.spacer
-        backgroundColor = context.color(R.color.colorPrimaryDark)
-      }.lparams {
-        alignParentLeft()
-        below(viewModel.orbifold)
-        width = leftSideWidth
-        height = matchParent
-        elevation = 5f
-      }
-    }
+//    if (isTablet) {
+//      view {
+//        id = R.id.spacer
+//        backgroundColor = context.color(R.color.colorPrimaryDark)
+//      }.lparams {
+//        alignParentLeft()
+//        below(viewModel.orbifold)
+//        width = leftSideWidth
+//        height = matchParent
+//        elevation = 5f
+//      }
+//    }
 
     viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
       id = R.id.toolbar
     }.lparams {
       width = matchParent
       height = wrapContent
-      rightOf(viewModel.orbifold)
+      rightOf(viewModel.sectionListView)
       alignParentTop()
       alignParentRight()
 
@@ -241,7 +234,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
     }.lparams {
       width = matchParent
       height = wrapContent
-      rightOf(viewModel.orbifold)
+      alignParentLeft()
       below(viewModel.toolbarView)
       alignParentRight()
     }
@@ -252,7 +245,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      rightOf(viewModel.orbifold)
+      alignParentLeft()
       below(viewModel.harmonyView)
       alignParentRight()
     }
@@ -262,7 +255,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       textSize = 25f
       background = context.getDrawable(R.drawable.orbifold_chord)
     }.lparams(0, dip(40)) {
-      rightOf(viewModel.orbifold)
+      alignParentLeft()
       below(viewModel.harmonyView)
     }
 
@@ -273,7 +266,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      rightOf(viewModel.orbifold)
+      alignParentLeft()
       below(viewModel.harmonyView)
       alignParentRight()
     }
@@ -281,12 +274,31 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
 
   private fun _RelativeLayout.keyboardsLayout() = with(context) {
 
+
+    if(configuration.landscape) {
+      viewModel.orbifold = orbifoldView {
+        id = R.id.orbifold
+      }.lparams {
+        alignParentLeft()
+        alignParentBottom()
+
+        width = leftSideWidth
+        height = if (isTablet) {
+          Math.round(leftSideWidth * 1.5f)
+        } else {
+          dip(300)
+        }
+        elevation = 5f
+      }
+    }
+
     viewModel.keyboardView = keyboardView {
       id = R.id.keyboard
       elevation = 10f
       //alpha = 0f
       //translationY = dimen(R.dimen.key_height_white).toFloat()
     }.lparams {
+      if(configuration.landscape) rightOf(viewModel.orbifold)
       height = dimen(R.dimen.key_height_white)
       width = matchParent
       alignParentBottom()
@@ -299,6 +311,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       backgroundColor = color(android.R.color.white)
       //translationY = dimen(R.dimen.key_height_white).toFloat()
     }.lparams {
+      if(configuration.landscape) rightOf(viewModel.orbifold)
       height = dimen(R.dimen.key_height_white)
       width = matchParent
       above(viewModel.keyboardView)

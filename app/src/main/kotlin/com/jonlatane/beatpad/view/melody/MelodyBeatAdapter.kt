@@ -7,7 +7,6 @@ import com.jonlatane.beatpad.util.layoutHeight
 import com.jonlatane.beatpad.util.layoutWidth
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dip
-import org.jetbrains.anko.info
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.verbose
 

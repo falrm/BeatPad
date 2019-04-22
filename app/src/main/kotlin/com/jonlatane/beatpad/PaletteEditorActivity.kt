@@ -122,6 +122,9 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger {
     if (savedInstanceState.getBoolean("colorboardOpen", false)) {
       viewModel.colorboardView.show(false)
     }
+    if (savedInstanceState.getBoolean("orbifoldOpen", false)) {
+      viewModel.orbifold.show(false)
+    }
     savedInstanceState.getString("editingMelodyId")?.let { melodyId: String ->
       try {
         UUID.fromString(melodyId)
@@ -149,6 +152,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger {
     outState.putString("melodyDisplayType", viewModel.melodyViewModel.displayType.name)
     outState.putBoolean("keyboardOpen", !viewModel.keyboardView.isHidden)
     outState.putBoolean("colorboardOpen", !viewModel.colorboardView.isHidden)
+    outState.putBoolean("orbifoldOpen", !viewModel.orbifold.isHidden)
     outState.putString("editingMelodyId", viewModel.editingMelody?.id.toString())
     outState.putInt("beatWidth", viewModel.melodyBeatAdapter.elementWidth)
     outState.putInt("beatHeight", viewModel.melodyBeatAdapter.elementHeight)

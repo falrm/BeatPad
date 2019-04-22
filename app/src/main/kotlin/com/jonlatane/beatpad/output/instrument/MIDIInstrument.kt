@@ -14,6 +14,7 @@ import com.jonlatane.beatpad.midi.MidiConstants.PROGRAM_CHANGE
 import com.jonlatane.beatpad.midi.GM1Effects.MIDI_INSTRUMENT_NAMES
 import com.jonlatane.beatpad.midi.GM2Effects
 import com.jonlatane.beatpad.model.Instrument
+import java.util.*
 import kotlin.experimental.or
 
 class MIDIInstrument constructor(
@@ -30,7 +31,7 @@ class MIDIInstrument constructor(
 			}
 		}
 	override val type get() = "midi"
-	@Transient private val tones = mutableListOf<Int>()
+	@Transient private val tones: MutableList<Int> = Vector<Int>()
 	@Transient private val byte2 = ByteArray(2)
 	@Transient private val byte3 = ByteArray(3)
 

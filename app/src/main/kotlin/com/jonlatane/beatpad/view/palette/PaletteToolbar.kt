@@ -102,20 +102,20 @@ class PaletteToolbar(ctx: Context,
     else
       viewModel.colorboardView.hide()
   }
-  init {
-    if(context.configuration.portrait) {
-      val splatButton = imageButton {
-        imageResource = R.drawable.icons8_molecule_filled_100
-        scaleType = ImageView.ScaleType.FIT_CENTER
-      }.palletteToolbarStyle().onClick {
-        if (viewModel.orbifold.isHidden) {
-          viewModel.showOrbifold()
-        } else {
-          viewModel.hideOrbifold()
-        }
-      }
+  //init {
+    //if(context.configuration.portrait) {
+  val splatButton = imageButton {
+    imageResource = R.drawable.icons8_molecule_filled_100
+    scaleType = ImageView.ScaleType.FIT_CENTER
+  }.palletteToolbarStyle().onClick {
+    if (viewModel.orbifold.isHidden) {
+      viewModel.showOrbifold()
+    } else {
+      viewModel.hideOrbifold()
     }
   }
+    //}
+  //}
 
   val volumeButton = imageButton {
     imageResource = R.drawable.icons8_tune_100

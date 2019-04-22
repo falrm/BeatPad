@@ -1,19 +1,13 @@
 package com.jonlatane.beatpad.util
 
 import android.animation.ValueAnimator
-import android.os.Build
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.*
 import android.view.ViewPropertyAnimator
 import android.view.animation.LinearInterpolator
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import java.util.concurrent.atomic.AtomicInteger
-import android.view.animation.Transformation
-import android.view.animation.Animation
 import android.widget.TextView
 import org.jetbrains.anko.allCaps
 import org.jetbrains.anko.singleLine
@@ -21,7 +15,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import com.jonlatane.beatpad.view.melody.BeatAdapter
+import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 
 
 private val defaultDuration get() = 300L
@@ -32,7 +26,7 @@ interface HideableView {
 
   fun show(
     animated: Boolean = true,
-    animation: ViewHideAnimation = ViewHideAnimation.HIDE_VERTICAL
+    animation: HideAnimation = HideAnimation.VERTICAL
   ) {
     animation.apply {
       (this@HideableView as View).show(animated)
@@ -41,7 +35,7 @@ interface HideableView {
 
   fun hide(
     animated: Boolean = true,
-    animation: ViewHideAnimation = ViewHideAnimation.HIDE_VERTICAL
+    animation: HideAnimation = HideAnimation.VERTICAL
   ) {
     animation.apply {
       (this@HideableView as View).hide(animated)
@@ -139,13 +133,10 @@ fun View.animateHeight(height: Int, duration: Long = defaultDuration) {
 	anim.setDuration(duration).start()
 }
 
-enum class ViewHideAnimation {
-  HIDE_VERTICAL {
+enum class HideAnimation: AnkoLogger {
+  VERTICAL {
     override fun View.show(animated: Boolean) {
-      if ((this as HideableView).initialHeight == null) {
-        measure(width, height)
-        initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
-      }
+      setupHiding()
       if (animated) {
         animateHeight((this as HideableView).initialHeight!!)
       } else {
@@ -154,10 +145,7 @@ enum class ViewHideAnimation {
     }
 
     override fun View.hide(animated: Boolean) {
-      if ((this as HideableView).initialHeight == null) {
-        measure(width, height)
-        initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
-      }
+      setupHiding()
       if (animated) {
         animateHeight(0)
       } else {
@@ -165,12 +153,9 @@ enum class ViewHideAnimation {
       }
     }
   },
-  HIDE_HORIZONTAL {
+  HORIZONTAL {
     override fun View.show(animated: Boolean) {
-      if ((this as HideableView).initialWidth == null) {
-        measure(width, height)
-        initialHeight = if (measuredWidth > 0) measuredWidth else layoutWidth
-      }
+      setupHiding()
       if (animated) {
         animateWidth((this as HideableView).initialWidth!!)
       } else {
@@ -179,10 +164,7 @@ enum class ViewHideAnimation {
     }
 
     override fun View.hide(animated: Boolean) {
-      if ((this as HideableView).initialWidth == null) {
-        measure(width, height)
-        initialWidth = if (measuredWidth > 0) measuredWidth else layoutWidth
-      }
+      setupHiding()
       if (animated) {
         animateWidth(0)
       } else {
@@ -194,6 +176,18 @@ enum class ViewHideAnimation {
   abstract fun View.show(animated: Boolean = true)
 
   abstract fun View.hide(animated: Boolean = true)
+
+  fun View.setupHiding() {
+    if ((this as HideableView).initialWidth == null || (this as HideableView).initialHeight == null) {
+      measure(width, height)
+      initialWidth = if (measuredWidth > 0) measuredWidth else layoutWidth
+      initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
+
+      if(this is OrbifoldView) {
+        info("HideAnimation Orbifold initialWidth=$initialWidth")
+      }
+    }
+  }
 }
 val View.isHidden: Boolean get() = layoutHeight == 0 || layoutWidth == 0
 
