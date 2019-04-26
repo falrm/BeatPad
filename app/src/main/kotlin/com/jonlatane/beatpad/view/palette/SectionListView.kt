@@ -13,11 +13,12 @@ import org.jetbrains.anko.recyclerview.v7._RecyclerView
 fun ViewManager.sectionListView(
 	theme: Int = 0,
 	viewModel: PaletteViewModel
-) = sectionListView(theme, viewModel, {})
+) = sectionListView(theme, viewModel) {}
 
 inline fun ViewManager.sectionListView(
 	theme: Int = 0,
 	viewModel: PaletteViewModel,
+  orientation: Int = LinearLayoutManager.HORIZONTAL,
 	init: _RecyclerView.() -> Unit
 ) = ankoView({
 	_RecyclerView(it).apply {
@@ -25,7 +26,7 @@ inline fun ViewManager.sectionListView(
 		viewModel.sectionListAdapter = SectionListAdapter(viewModel)
 
 		backgroundColor = context.color(R.color.colorPrimaryDark)
-		layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
+		layoutManager = LinearLayoutManager(context, orientation, false).apply {
 			isItemPrefetchEnabled = false
 		}
 		overScrollMode = View.OVER_SCROLL_NEVER

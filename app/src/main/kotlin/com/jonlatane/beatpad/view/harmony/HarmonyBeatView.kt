@@ -253,8 +253,6 @@ class HarmonyBeatView constructor(
     }
     viewModel.selectedHarmonyElements = chordRange
     viewModel.isChoosingHarmonyChord = true
-//    viewModel.paletteViewModel?.wasOrbifoldShowingBeforeEditingChord =
-//      viewModel.paletteViewModel?.orbifold?.isHidden
-    viewModel.paletteViewModel?.orbifold?.show()
+    viewModel.paletteViewModel?.showOrbifold()
   }
 }

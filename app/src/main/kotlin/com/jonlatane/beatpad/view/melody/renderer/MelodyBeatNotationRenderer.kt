@@ -129,11 +129,16 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
           val noteheadWidth = Math.min((letterStepSize * 2).toInt(), maxFittableNoteheadWidth)
           val noteheadHeight = noteheadWidth//(bounds.right - bounds.left)
           val shouldStagger = playbackNotes.any {
-            it.heptatonicValue % 2 == 0
+            (
+              it.heptatonicValue % 2 == 0
               && (
               it.heptatonicValue == note.heptatonicValue + 1
                 || it.heptatonicValue == note.heptatonicValue - 1
               )
+            ) || (
+              it.heptatonicValue == note.heptatonicValue
+                && it.tone > note.tone
+            )
           }
           val top = center.toInt() - (noteheadHeight / 2)
           val bottom = center.toInt() + (noteheadHeight / 2)

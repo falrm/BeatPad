@@ -1,6 +1,9 @@
 package com.jonlatane.beatpad.view.palette
 
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
+import android.text.TextUtils
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.ViewGroup
@@ -19,6 +22,7 @@ import org.w3c.dom.Text
 import java.util.*
 
 class SectionHolder(
+  orientation: Int,
   parent: ViewGroup,
   val viewModel: PaletteViewModel
 ) : RecyclerView.ViewHolder(
@@ -26,25 +30,58 @@ class SectionHolder(
     isClickable = true
     isLongClickable = true
     relativeLayout {
-      val sectionName = textView {
-        id = R.id.section_name
-        textSize = 25f
-        minimumWidth = context.dip(90)
-        gravity = Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL
-        typeface = MainApplication.chordTypeface
-      }.lparams(wrapContent, wrapContent) {
-        alignParentLeft()
-        centerVertically()
+      when (orientation) {
+        LinearLayoutManager.HORIZONTAL -> {
+          val sectionName = textView {
+            id = R.id.section_name
+            textSize = 25f
+            minimumWidth = context.dip(90)
+            gravity = Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL
+            typeface = MainApplication.chordTypeface
+          }.lparams(wrapContent, wrapContent) {
+            alignParentLeft()
+            centerVertically()
+          }
+          imageView {
+            id = R.id.section_drag_handle
+            imageResource = R.drawable.hamburger_drag_drop
+          }.lparams(dip(35), dip(35f)) {
+            marginStart = dip(5)
+            rightOf(sectionName)
+            centerVertically()
+          }
+        }
+        else                           -> {
+          val dragger = imageView {
+            id = R.id.section_drag_handle
+            imageResource = R.drawable.hamburger_drag_drop
+          }.lparams(dip(35), dip(35f)) {
+            marginStart = dip(5)
+            alignParentRight()
+            alignParentTop()
+          }
+          textView {
+            id = R.id.section_name
+            textSize = 25f
+            singleLine = true
+            ellipsize = TextUtils.TruncateAt.MARQUEE
+            marqueeRepeatLimit = -1
+            isSelected = true
+            typeface = MainApplication.chordTypeface
+          }.lparams(matchParent, wrapContent) {
+            alignParentLeft()
+            leftOf(dragger)
+            centerVertically()
+          }
+        }
       }
-      imageView {
-        id = R.id.section_drag_handle
-        imageResource = R.drawable.hamburger_drag_drop
-      }.lparams(dip(35), dip(35f)) {
-        marginStart = dip(5)
-        rightOf(sectionName)
-        centerVertically()
-      }
-    }.lparams(wrapContent, wrapContent) {
+    }.lparams(
+      width = when (orientation) {
+        LinearLayoutManager.HORIZONTAL -> wrapContent
+        else                           -> matchParent
+      },
+      height = wrapContent
+    ) {
       setMargins(
         dip(10),
         dip(2),

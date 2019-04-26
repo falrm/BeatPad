@@ -2,6 +2,7 @@ package com.jonlatane.beatpad.view.palette
 
 //import com.jonlatane.beatpad.util.syncPositionTo
 import BeatClockPaletteConsumer
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.RelativeLayout
@@ -65,12 +66,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       viewModel.orbifold.onOrbifoldChangeListener = { viewModel.palette.orbifold = it }
       viewModel.orbifold.keyboard = viewModel.keyboardView
 
-      viewModel.orbifold.hide(
-        animation = if (context.configuration.portrait) {
-          HideAnimation.VERTICAL
-        } else HideAnimation.HORIZONTAL,
-        animated = false
-      )
+      viewModel.hideOrbifold(false)
       viewModel.keyboardView.hide(false)
       viewModel.colorboardView.hide(false)
 
@@ -195,11 +191,11 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
 
   private fun _RelativeLayout.landscapeLayout(ui: AnkoContext<PaletteEditorActivity>) {
 
-    viewModel.sectionListView = sectionListView(viewModel = viewModel) {
+    viewModel.sectionListView = sectionListView(viewModel = viewModel, orientation = LinearLayoutManager.VERTICAL) {
       id = R.id.chord_list
     }.lparams {
-      width = dip(350f)
-      height = wrapContent
+      width = dip(200f)
+      height = matchParent
       alignParentLeft()
       alignParentTop()
     }
@@ -234,7 +230,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
     }.lparams {
       width = matchParent
       height = wrapContent
-      alignParentLeft()
+      rightOf(viewModel.sectionListView)
       below(viewModel.toolbarView)
       alignParentRight()
     }
@@ -245,7 +241,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      alignParentLeft()
+      rightOf(viewModel.sectionListView)
       below(viewModel.harmonyView)
       alignParentRight()
     }
@@ -255,7 +251,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       textSize = 25f
       background = context.getDrawable(R.drawable.orbifold_chord)
     }.lparams(0, dip(40)) {
-      alignParentLeft()
+      rightOf(viewModel.sectionListView)
       below(viewModel.harmonyView)
     }
 
@@ -266,15 +262,13 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      alignParentLeft()
+      rightOf(viewModel.sectionListView)
       below(viewModel.harmonyView)
       alignParentRight()
     }
   }
 
   private fun _RelativeLayout.keyboardsLayout() = with(context) {
-
-
     if(configuration.landscape) {
       viewModel.orbifold = orbifoldView {
         id = R.id.orbifold

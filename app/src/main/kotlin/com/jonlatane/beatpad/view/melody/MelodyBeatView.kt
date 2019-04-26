@@ -41,8 +41,8 @@ class MelodyBeatView @JvmOverloads constructor(
   override val sharp: Drawable = context.resources.getDrawable(R.drawable.sharp, null)
     .constantState.newDrawable().mutate()
 
-  val notationDrawableCache = Vector<Drawable>(10)
-  val filledNoteheadPool = object: DefaultPool<Drawable>(5) {
+  val notationDrawableCache = Vector<Drawable>(15)
+  val filledNoteheadPool = object: DefaultPool<Drawable>(15) {
     override fun produceInstance(): Drawable {
       val result = context.resources.getDrawable(R.drawable.filled_notehead, null)
         .constantState.newDrawable().mutate()

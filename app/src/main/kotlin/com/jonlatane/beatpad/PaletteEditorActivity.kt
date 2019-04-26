@@ -10,15 +10,14 @@ import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.sensors.ShakeDetector
 import com.jonlatane.beatpad.storage.Storage
+import com.jonlatane.beatpad.util.HideAnimation
 import com.jonlatane.beatpad.util.formatted
 import com.jonlatane.beatpad.util.isHidden
 //import com.jonlatane.beatpad.util.show
 import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.palette.PaletteUI
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.setContentView
-import org.jetbrains.anko.toast
+import org.jetbrains.anko.*
 import java.util.*
 
 
@@ -123,7 +122,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger {
       viewModel.colorboardView.show(false)
     }
     if (savedInstanceState.getBoolean("orbifoldOpen", false)) {
-      viewModel.orbifold.show(false)
+      viewModel.showOrbifold(false)
     }
     savedInstanceState.getString("editingMelodyId")?.let { melodyId: String ->
       try {

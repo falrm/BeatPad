@@ -28,8 +28,8 @@ interface PartHolderLayout {
 				singleLine = true
 				ellipsize = TextUtils.TruncateAt.MARQUEE
 				marqueeRepeatLimit = -1
-				typeface = MainApplication.chordTypeface
 				isSelected = true
+				typeface = MainApplication.chordTypeface
 				gravity = Gravity.CENTER_HORIZONTAL
 				backgroundResource = R.drawable.part_background
 				elevation = 2f

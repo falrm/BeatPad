@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.palette
 
 import android.support.v4.view.MotionEventCompat
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.MotionEvent
@@ -13,6 +14,9 @@ class SectionListAdapter(
 	val viewModel: PaletteViewModel
 ) : RecyclerView.Adapter<SectionHolder>() {
   val recyclerView: RecyclerView get() = viewModel.sectionListRecycler
+  val orientation: Int get() = (recyclerView.layoutManager as? LinearLayoutManager)?.orientation
+    ?: LinearLayoutManager.HORIZONTAL
+
   val itemTouchHelper = ItemTouchHelper(object: ItemTouchHelper.Callback() {
     init {
     }
@@ -20,7 +24,10 @@ class SectionListAdapter(
       recyclerView: RecyclerView?,
       viewHolder: RecyclerView.ViewHolder
     ): Int {
-      val dragFlags = ItemTouchHelper.START or ItemTouchHelper.END
+      val dragFlags = when(orientation) {
+        LinearLayoutManager.HORIZONTAL -> ItemTouchHelper.START or ItemTouchHelper.END
+        else -> ItemTouchHelper.UP or ItemTouchHelper.DOWN
+      }
       return makeMovementFlags(dragFlags, 0)
     }
 
@@ -53,7 +60,7 @@ class SectionListAdapter(
     override fun isLongPressDragEnabled(): Boolean = true
   }).also { it.attachToRecyclerView(recyclerView) }
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SectionHolder {
-		return SectionHolder(parent, viewModel)
+		return SectionHolder(orientation, parent, viewModel)
 	}
 
 	override fun onBindViewHolder(holder: SectionHolder, position: Int) {

@@ -10,6 +10,7 @@ import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.*
 import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
 import com.jonlatane.beatpad.view.harmony.HarmonyView
@@ -122,6 +123,10 @@ class PaletteViewModel: AnkoLogger {
   var keyboardPart by observable<Part?>(null) { _, _, new ->
     if (new != null) keyboardView.ioHandler.instrument = new.instrument
     palette.keyboardPart = new
+    val keyboardDrumTrack = (new?.instrument as? MIDIInstrument)?.drumTrack == true
+    if(keyboardDrumTrack) {
+      keyboardView.ioHandler.highlightChord(null)
+    }
   }
   var colorboardPart: Part? by observable<Part?>(null) { _, _, new ->
     if (new != null) colorboardView.instrument = new.instrument
@@ -282,19 +287,22 @@ class PaletteViewModel: AnkoLogger {
     } ?: partListModeBoring()
   }
 
-  fun showOrbifold() {
+  fun showOrbifold(animated: Boolean = true) {
     orbifold.show(
       animation = if (orbifold.context.configuration.portrait) {
         HideAnimation.VERTICAL
-      } else HideAnimation.HORIZONTAL
+      } else HideAnimation.HORIZONTAL,
+      animated = animated
     )
+
   }
 
-  fun hideOrbifold() {
+  fun hideOrbifold(animated: Boolean = true) {
     orbifold.hide(
       animation = if (orbifold.context.configuration.portrait) {
         HideAnimation.VERTICAL
-      } else HideAnimation.HORIZONTAL
+      } else HideAnimation.HORIZONTAL,
+      animated = animated
     )
   }
 
