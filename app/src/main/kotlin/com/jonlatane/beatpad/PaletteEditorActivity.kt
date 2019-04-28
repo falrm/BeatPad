@@ -9,6 +9,7 @@ import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.sensors.ShakeDetector
+import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.HideAnimation
 import com.jonlatane.beatpad.util.formatted
@@ -85,7 +86,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger {
           this@PaletteEditorActivity,
           "Erase everything to start from scratch?"
         ) {
-          val newPalette = Palette()
+          val newPalette = PaletteStorage.basePalette
           BeatClockPaletteConsumer.palette = newPalette
           viewModel.palette = newPalette
         }

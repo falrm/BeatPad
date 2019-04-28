@@ -28,7 +28,12 @@ object PaletteStorage : AnkoLogger {
   val basePalette
     get() = Palette(
       sections = mutableListOf(Section()),
-      parts = mutableListOf(Part())
+      parts = mutableListOf(
+        Part().also {
+          (it.instrument as MIDIInstrument).drumTrack = true
+        },
+        Part()
+      )
     )
 
   val baseMelody

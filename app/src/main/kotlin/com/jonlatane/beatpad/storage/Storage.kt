@@ -92,7 +92,7 @@ interface Storage: AnkoLogger {
 			outputStreamWriter.write(json)
 			outputStreamWriter.close()
 		} catch (e: IOException) {
-			error("File send failed: " + e.toString())
+			error("File send failed", e)
 		}
 
 		fun loadGM1InstrumentRecents(context: Context): List<Int> = try {

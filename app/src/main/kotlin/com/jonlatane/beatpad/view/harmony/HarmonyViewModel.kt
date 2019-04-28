@@ -21,23 +21,15 @@ open class HarmonyViewModel: SelectedChordAnimation {
   override var isChoosingHarmonyChord: Boolean = false
   set(value) {
     field = value
-    if (!value) {
-      paletteViewModel?.apply {
-        if(wasOrbifoldShowingBeforeEditingChord == false) {
-          hideOrbifold()
-        }
-        wasOrbifoldShowingBeforeEditingChord = null
-      }
-    } else {
+    if (value) {
+      val wasOrbifoldVisible = paletteViewModel?.orbifold?.isHidden == false
       paletteViewModel?.backStack?.push {
         if (isChoosingHarmonyChord) {
           isChoosingHarmonyChord = false
+          if(!wasOrbifoldVisible) paletteViewModel?.hideOrbifold()
           selectedHarmonyElements = null
           true
         } else false
-      }
-      paletteViewModel?.apply {
-        wasOrbifoldShowingBeforeEditingChord = !orbifold.isHidden
       }
       animateBeatsOfSelectedChord()
     }

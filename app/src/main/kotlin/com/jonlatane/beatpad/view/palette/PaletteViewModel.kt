@@ -61,7 +61,6 @@ class PaletteViewModel: AnkoLogger {
     get() = harmonyViewModel.harmonyView!!
     set(value) { harmonyViewModel.harmonyView = value }
 
-  var wasOrbifoldShowingBeforeEditingChord: Boolean? = null
   lateinit var orbifold: OrbifoldView
 
   var palette: Palette by observable(initialValue = Palette()) { _, _, new ->
