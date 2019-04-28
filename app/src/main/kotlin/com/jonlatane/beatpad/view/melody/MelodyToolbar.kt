@@ -12,6 +12,7 @@ import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.mod12
@@ -183,9 +184,9 @@ class MelodyToolbar(
 	fun updateButtonText() {
 		relativeToButton.apply {
       melodyViewModel.openedMelody?.let { melody ->
-        val drumPart = melodyViewModel.paletteViewModel.palette.parts.find {
+        val drumPart = (melodyViewModel.paletteViewModel.palette.parts.find {
           it.melodies.contains(melody)
-        }?.isDrumPart ?: false
+        }?.instrument as? MIDIInstrument)?.drumTrack ?: false
         text = when {
           drumPart -> "Drum Part"
           !melody.shouldConformWithHarmony -> "Fixed Position"
