@@ -76,26 +76,33 @@ class OrbifoldView @JvmOverloads constructor(
   internal var selectedChord: TextView? = null
   internal var sequences: MutableList<SequenceViews> = ArrayList()
   private var orbifoldBeforeCustomMode: Orbifold? = null
-  private var keyboardWasShowingBeforeCustomMode = false
   var customChordMode: Boolean = false
   set(value) {
     field = value
     customButton.text = if(value) "Done" else "Custom"
     if(value) {
       orbifoldBeforeCustomMode = orbifold
-      keyboardWasShowingBeforeCustomMode = keyboard?.isHidden == false
+      val keyboardWasShowingBeforeCustomMode = keyboard?.isHidden == false
       this@OrbifoldView.orbifold = Orbifold.custom
-      keyboard?.show()
+      if(keyboard?.isHidden == true) {
+        keyboard?.show()
+      }
       keyboard?.ioHandler?.onEstablishedChordChanged = { notes ->
         disableNextTransitionAnimation()
         chord = Chord(chord.root, notes.map { it - chord.root }.toIntArray())
       }
+      BeatClockPaletteConsumer.viewModel?.backStack?.push {
+        if (customChordMode) {
+          customChordMode = false
+          if(!keyboardWasShowingBeforeCustomMode) {
+            keyboard?.hide()
+          }
+          true
+        } else false
+      }
     } else {
       orbifoldBeforeCustomMode?.let { orbifold = it }
       orbifoldBeforeCustomMode = null
-      if(!keyboardWasShowingBeforeCustomMode) {
-        keyboard?.hide()
-      }
       keyboard?.ioHandler?.onEstablishedChordChanged = null
     }
   }

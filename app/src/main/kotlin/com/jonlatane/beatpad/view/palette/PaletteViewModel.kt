@@ -22,6 +22,7 @@ import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.configuration
 import org.jetbrains.anko.portrait
+import java.util.*
 import kotlin.properties.Delegates.observable
 
 /**
@@ -84,15 +85,17 @@ class PaletteViewModel: AnkoLogger {
     }
   }
 
-  var editingMix by observable(false) { _, _, editingVolume ->
+  var editingMix: Boolean by observable(false) { _, _, editingVolume ->
     partListAdapter?.boundViewHolders
-      ?.forEach {
-//        info("Configuring volume for ${it.partName.text}")
-//        partListAdapter?.recyclerView?.post {
-          it.editingVolume = editingVolume
-//        }
+      ?.forEach { it.editingVolume = editingVolume }
+    if (editingVolume) {
+      backStack.push {
+        if (editingMix) {
+          editingMix = false
+          true
+        } else false
       }
-//    partListAdapter?.notifyDataSetChanged()
+    }
   }
 
 
@@ -104,6 +107,12 @@ class PaletteViewModel: AnkoLogger {
       harmonyViewModel.beatAdapter
         .syncPositionTo(melodyViewModel.melodyCenterHorizontalScroller)
 
+      backStack.push {
+        if(editingMelody != null) {
+          editingMelody = null
+          true
+        } else false
+      }
       // Fancy animation of the thing if possible
        editMelodyMode()
     } else {
@@ -144,23 +153,14 @@ class PaletteViewModel: AnkoLogger {
     palette.splatPart = new
   }
 
+  val backStack: Deque<() -> Boolean> = LinkedList<() -> Boolean>()
   fun onBackPressed(): Boolean = when {
-    orbifold.customChordMode                -> {
-      orbifold.customChordMode = false
-      true
-    }
-    harmonyViewModel.isChoosingHarmonyChord -> {
-      harmonyViewModel.isChoosingHarmonyChord = false
-      harmonyViewModel.selectedHarmonyElements = null
-      true
-    }
-    editingMelody != null                   -> {
-      editingMelody = null
-      true
-    }
-    editingMix                              -> {
-      editingMix = false
-      true
+    backStack.isNotEmpty() -> {
+      var result = false
+      while(backStack.isNotEmpty() && !result) {
+        result = backStack.removeFirst()()
+      }
+      result
     }
     else                                    -> false
   }
@@ -288,6 +288,14 @@ class PaletteViewModel: AnkoLogger {
   }
 
   fun showOrbifold(animated: Boolean = true) {
+    if(orbifold.isHidden) {
+      backStack.push {
+        if (!orbifold.isHidden) {
+          orbifold.hide()
+          true
+        } else false
+      }
+    }
     orbifold.show(
       animation = if (orbifold.context.configuration.portrait) {
         HideAnimation.VERTICAL

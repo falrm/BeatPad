@@ -29,13 +29,20 @@ open class HarmonyViewModel: SelectedChordAnimation {
         wasOrbifoldShowingBeforeEditingChord = null
       }
     } else {
+      paletteViewModel?.backStack?.push {
+        if (isChoosingHarmonyChord) {
+          isChoosingHarmonyChord = false
+          selectedHarmonyElements = null
+          true
+        } else false
+      }
       paletteViewModel?.apply {
         wasOrbifoldShowingBeforeEditingChord = !orbifold.isHidden
       }
       animateBeatsOfSelectedChord()
     }
-
   }
+
   var selectedHarmonyElements: IntRange? = null
   set(value) {
     field = value

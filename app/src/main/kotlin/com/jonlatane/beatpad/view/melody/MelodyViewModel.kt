@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.melody
 
 import android.animation.ValueAnimator
+import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.view.HideableRelativeLayout
@@ -8,6 +9,7 @@ import com.jonlatane.beatpad.view.NonDelayedRecyclerView
 import com.jonlatane.beatpad.view.NonDelayedScrollView
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.info
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.properties.Delegates.observable
@@ -57,6 +59,10 @@ class MelodyViewModel(
 		}
 		fadeInAnim.setDuration(500).start()
 		fadeOutAnim.setDuration(500).start()
+		melodyToolbar.displayTypeButton.imageResource = when(displayType) {
+			DisplayType.COLORBLOCK -> R.drawable.filled_notehead
+			else -> R.drawable.colorboard_icon_vertical
+		}
 	}
 
 	internal fun redraw() {

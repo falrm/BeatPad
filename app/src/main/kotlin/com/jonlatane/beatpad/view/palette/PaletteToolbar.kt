@@ -4,18 +4,18 @@ import BeatClockPaletteConsumer
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
-import android.widget.LinearLayout
-import android.widget.NumberPicker
+import android.view.View
+import android.widget.*
 import com.jonlatane.beatpad.MainApplication
+import com.jonlatane.beatpad.MainApplication.Companion.chordTypefaceBold
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.service.PlaybackService
-import com.jonlatane.beatpad.util.*
+import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.view.tempo.TempoTracking
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
-import android.view.View
-import android.widget.ImageView
 
 
 class PaletteToolbar(ctx: Context,
@@ -34,9 +34,7 @@ class PaletteToolbar(ctx: Context,
 //    }
   }
 
-  fun <T: View> T.palletteToolbarStyle() = this.lparams {
-    width = matchParent
-    height = dip(48)
+  fun <T: View> T.palletteToolbarStyle(): T = this.lparams(matchParent, dip(48)) {
     weight = 1f
   }
 
@@ -63,12 +61,27 @@ class PaletteToolbar(ctx: Context,
     }
   }.palletteToolbarStyle()
 
-  val tempoTapper = button {
-    text = ""
-    setCompoundDrawables(metronomeImage, null, null, null)
-    toolbarTextStyle()
-    onLongClick(returnValue = true) {
-      showTempoPicker()
+  lateinit var tempoText: TextView private set
+  lateinit var tempoTapper: ImageButton private set
+  val tempoArea = relativeLayout {
+    tempoTapper = imageButton {
+      imageResource = R.drawable.noun_metronome_415494_000000
+      imageAlpha = 127
+      scaleType = ImageView.ScaleType.FIT_CENTER
+      onLongClick(returnValue = true) {
+        showTempoPicker()
+      }
+    }.lparams(matchParent, dip(48))
+    tempoText = textView {
+      textSize = 18f
+      textColor = 0xFF000000.toInt()
+      typeface = chordTypefaceBold
+      //textColor = android.R.color.black
+    }.lparams(wrapContent, wrapContent) {
+      alignParentTop()
+      alignParentRight()
+      topMargin = dip(5)
+      rightMargin = dip(7)
     }
   }.palletteToolbarStyle()
 
@@ -87,23 +100,36 @@ class PaletteToolbar(ctx: Context,
     imageResource = R.drawable.icons8_piano_100
     scaleType = ImageView.ScaleType.FIT_CENTER
   }.palletteToolbarStyle().onClick {
-    if (viewModel.keyboardView.isHidden)
+    if (viewModel.keyboardView.isHidden) {
+      viewModel.backStack.push {
+        if(!viewModel.keyboardView.isHidden) {
+          viewModel.keyboardView.hide()
+          true
+        } else false
+      }
       viewModel.keyboardView.show()
-    else
+    } else {
       viewModel.keyboardView.hide()
+    }
   }
 
   val colorsButton = imageButton {
     imageResource = R.drawable.colorboard_icon_2
     scaleType = ImageView.ScaleType.FIT_CENTER
   }.palletteToolbarStyle().onClick {
-    if (viewModel.colorboardView.isHidden)
+    if (viewModel.colorboardView.isHidden) {
+      viewModel.backStack.push {
+        if(!viewModel.colorboardView.isHidden) {
+          viewModel.colorboardView.hide()
+          true
+        } else false
+      }
       viewModel.colorboardView.show()
-    else
+    } else {
       viewModel.colorboardView.hide()
+    }
   }
-  //init {
-    //if(context.configuration.portrait) {
+
   val splatButton = imageButton {
     imageResource = R.drawable.icons8_molecule_filled_100
     scaleType = ImageView.ScaleType.FIT_CENTER
@@ -114,8 +140,6 @@ class PaletteToolbar(ctx: Context,
       viewModel.hideOrbifold()
     }
   }
-    //}
-  //}
 
   val volumeButton = imageButton {
     imageResource = R.drawable.icons8_tune_100
@@ -148,6 +172,6 @@ class PaletteToolbar(ctx: Context,
   }
 
   fun updateTempoButton() {
-    tempoTapper.text = "${BeatClockPaletteConsumer.palette!!.bpm.toInt()}"
+    tempoText.text = "${BeatClockPaletteConsumer.palette!!.bpm.toInt()}"
   }
 }

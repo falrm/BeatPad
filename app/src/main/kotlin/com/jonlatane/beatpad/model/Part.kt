@@ -12,4 +12,5 @@ class Part(val instrument: Instrument = MIDIInstrument()) {
 			instrument.volume = value
       (instrument as? MIDIInstrument)?.sendSelectInstrument()
 		}
+  val isDrumPart: Boolean get() = (instrument as? MIDIInstrument)?.drumTrack ?: false
 }

@@ -76,8 +76,9 @@ class MelodyToolbar(
 		}
 	}.longSquareButtonStyle()
 
-	private val displayTypeButton = imageButton {
-		imageResource = R.drawable.filled_notehead
+	val displayTypeButton = imageButton {
+		imageResource = R.drawable.colorboard_icon_vertical
+		scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
       melodyViewModel.displayType = when(melodyViewModel.displayType) {
         MelodyViewModel.DisplayType.COLORBLOCK -> MelodyViewModel.DisplayType.NOTATION
@@ -180,12 +181,19 @@ class MelodyToolbar(
 
 	@SuppressLint("SetTextI18n")
 	fun updateButtonText() {
-		relativeToButton.text = melodyViewModel.openedMelody?.let {
-			when {
-				!it.shouldConformWithHarmony -> "Fixed Position"
-				else -> "Relative to ${Chord.mod12Names[it.tonic.mod12]}"
-			}
-		} ?: "oops"
+		relativeToButton.apply {
+      melodyViewModel.openedMelody?.let { melody ->
+        val drumPart = melodyViewModel.paletteViewModel.palette.parts.find {
+          it.melodies.contains(melody)
+        }?.isDrumPart ?: false
+        text = when {
+          drumPart -> "Drum Part"
+          !melody.shouldConformWithHarmony -> "Fixed Position"
+          else -> "Relative to ${Chord.mod12Names[melody.tonic.mod12]}"
+        }
+        isEnabled = !drumPart
+      }
+    }
 
 
 		lengthButton.text = "${melodyViewModel.openedMelody?.length}/${melodyViewModel.openedMelody?.subdivisionsPerBeat}"
