@@ -8,11 +8,10 @@ import android.widget.PopupMenu
 import android.widget.SeekBar
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showConfirmDialog
-import com.jonlatane.beatpad.showInstrumentPicker
+import com.jonlatane.beatpad.showInstrumentPicker2
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.vibrate
 import org.jetbrains.anko.*
@@ -119,9 +118,7 @@ class PartHolder(
 		val instrument = part?.instrument
 		when (instrument) {
 			is MIDIInstrument ->
-				showInstrumentPicker(instrument, layout.context) {
-					adapter.notifyItemChanged(partPosition)
-				}
+			showInstrumentPicker2(instrument, layout.context)
 		}
 	}
 

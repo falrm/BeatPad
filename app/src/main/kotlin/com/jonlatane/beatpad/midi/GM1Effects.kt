@@ -7,6 +7,7 @@ import org.billthefarmer.mididriver.GeneralMidiConstants
 import java.util.*
 
 object GM1Effects {
+	val MIDI_INSTRUMENT_RANGE = (0..127)
 	val MIDI_INSTRUMENT_NAMES: List<String> by lazy {
 		val instrumentNames = arrayOfNulls<String>(128)
 		val declaredFields = GeneralMidiConstants::class.java.declaredFields
@@ -29,7 +30,7 @@ object GM1Effects {
 		channel: Byte = 0,
 		exceptions: Set<Byte> = emptySet()
 	): MIDIInstrument {
-		val options = ((0..127).map {it.toByte()} - exceptions)
+		val options = (MIDI_INSTRUMENT_RANGE.map {it.toByte()} - exceptions)
 		val instrument = options[Random().nextInt(options.size - 1)]
 		return MIDIInstrument(channel, instrument)
 	}

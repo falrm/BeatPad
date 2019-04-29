@@ -1,3 +1,4 @@
+import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.model.*
 import com.jonlatane.beatpad.model.harmony.chord.Chord
@@ -6,6 +7,7 @@ import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.output.service.let
 import com.jonlatane.beatpad.util.to127Int
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
+import com.jonlatane.beatpad.view.palette.SectionHolder
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
@@ -30,6 +32,11 @@ object BeatClockPaletteConsumer : AnkoLogger {
     viewModel?.notifySectionChange()
     MidiDevices.refreshInstruments()
   }
+  val currenctSectionColor: Int get() = palette?.sections
+    ?.indexOf(BeatClockPaletteConsumer.section)
+    ?.let { sectionIndex ->
+      SectionHolder.sectionColor(sectionIndex)
+    } ?: R.drawable.orbifold_chord
   var chord: Chord? = null
   val harmony: Harmony? get() = section?.harmony
   private val harmonyPosition: Int?

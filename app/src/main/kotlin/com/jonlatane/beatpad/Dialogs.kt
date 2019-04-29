@@ -1,26 +1,38 @@
 package com.jonlatane.beatpad
 
+import BeatClockPaletteConsumer.currenctSectionColor
 import android.content.Context
 import android.content.DialogInterface
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.RecyclerView
 import android.text.InputFilter
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.EditText
+import android.widget.LinearLayout.VERTICAL
 import android.widget.TextView
 import com.jonlatane.beatpad.ConductorActivity.Companion.SERVICE_NAME
 import com.jonlatane.beatpad.ConductorActivity.Companion.SERVICE_TYPE
 import com.jonlatane.beatpad.midi.GM1Effects
+import com.jonlatane.beatpad.midi.GM1Effects.MIDI_INSTRUMENT_RANGE
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.storage.Storage
+import com.jonlatane.beatpad.util.InstaRecycler
+import com.jonlatane.beatpad.view.nonDelayedRecyclerView
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import org.jetbrains.anko.*
-import android.text.Spanned
+import org.jetbrains.anko.sdk25.coroutines.onClick
+import android.text.Editable
+import android.text.TextWatcher
+import com.jonlatane.beatpad.MainApplication.Companion.chordTypeface
+import com.jonlatane.beatpad.MainApplication.Companion.chordTypefaceBold
+import com.jonlatane.beatpad.view.palette.SectionHolder
+
 
 fun Context.showRenameDialog(
   currentName: String,
@@ -61,6 +73,98 @@ fun showOrbifoldPicker(orbifoldView: OrbifoldView) {
   builder.show()
 }
 
+
+fun showInstrumentPicker2(
+  instrument: MIDIInstrument,
+  context: Context
+) = with(context) {
+  alert {
+    var search: EditText? = null
+    customView {
+      linearLayout {
+        orientation = VERTICAL
+        textView {
+          textSize = 20f
+          typeface = chordTypefaceBold
+          text = "Choose Instrument"
+          padding = dip(20f)
+        }
+        lateinit var adapter: RecyclerView.Adapter<*>
+        search = editText {
+          hint = "Search instruments"
+          text.clear()
+          text.append("")
+          typeface = chordTypeface
+          filters = arrayOf(
+            InputFilter.LengthFilter(50)
+          )
+          addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {}
+            override fun beforeTextChanged(s: CharSequence, start: Int,
+                                           count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence, start: Int,
+                                       before: Int, count: Int) {
+              adapter.notifyDataSetChanged()
+            }
+          })
+        }.lparams(matchParent, wrapContent) {
+          marginStart = dip(20)
+          marginEnd = dip(20)
+        }
+
+
+        val recents: List<Int> = Storage.loadGM1InstrumentRecents(context)
+
+        // Virtual data set
+        lateinit var dataSet: List<Int>
+        fun sortByRecent() {
+          dataSet = recents + MIDI_INSTRUMENT_RANGE.filter { !recents.contains(it) }
+          // Move selected instrument to top by default
+          dataSet = listOf(instrument.instrument.toInt()) + dataSet.filter { it != instrument.instrument.toInt() }
+        }
+        fun sortByGM1() {
+          dataSet = MIDI_INSTRUMENT_RANGE.toList()
+        }
+        sortByRecent()
+        fun filteredDataSet(): List<Int> = (search as? EditText)
+          ?.takeIf { it.text.toString().isNotBlank() }
+          ?.let { search ->
+            val searchText = search.text.toString()
+            dataSet.filter {
+              it == instrument.instrument.toInt() ||
+              GM1Effects.MIDI_INSTRUMENT_NAMES[it].toLowerCase().contains(searchText.toLowerCase())
+            }
+          } ?: dataSet
+        val recycler = InstaRecycler.instaRecycler(
+          context,
+          factory = { nonDelayedRecyclerView() },
+          itemCount = { filteredDataSet().count() },
+          binder = { position ->
+            findViewById<TextView>(InstaRecycler.example_id).apply {
+              text = GM1Effects.MIDI_INSTRUMENT_NAMES[filteredDataSet()[position]]
+              backgroundColor  = when(instrument.instrument.toInt()) {
+                filteredDataSet()[position] -> currenctSectionColor
+                else -> 0x00FFFFFF
+              }
+              isClickable = true
+              onClick {
+                val selection = filteredDataSet()[position]
+                Storage.storeGM1InstrumentSelection(selection, context)
+                instrument.instrument = selection.toByte()
+                instrument.sendSelectInstrument()
+                adapter.notifyDataSetChanged()
+                BeatClockPaletteConsumer.viewModel?.partListAdapter?.notifyDataSetChanged()
+              }
+            }
+          }
+        ).lparams(matchParent, wrapContent)
+        adapter = recycler.adapter
+      }
+    }
+  }.show()
+}
+
 fun showInstrumentPicker(
   instrument: MIDIInstrument,
   context: Context,
@@ -76,9 +180,10 @@ fun showInstrumentPicker(
     GM1Effects.MIDI_INSTRUMENT_NAMES.toTypedArray()
   }
   builder.setItems(items) { _, which ->
-    val selection = if (sortRecents) recents[which] else which
+    val selection: Int = if (sortRecents) recents[which] else which
     Storage.storeGM1InstrumentSelection(selection, context)
     instrument.instrument = selection.toByte()
+    instrument.sendSelectInstrument()
     (context as? OldBaseActivity)?.updateMenuOptions()
     onChosen()
   }

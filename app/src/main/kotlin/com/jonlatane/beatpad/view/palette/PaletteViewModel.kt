@@ -11,6 +11,7 @@ import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.*
 import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
 import com.jonlatane.beatpad.view.harmony.HarmonyView
@@ -115,6 +116,7 @@ class PaletteViewModel: AnkoLogger {
       // Fancy animation of the thing if possible
        editMelodyMode()
     } else {
+      Storage.storePalette(palette, melodyView.context)
       partListMode(old)
     }
   }

@@ -186,11 +186,7 @@ class MelodyReferenceHolder(
 				backgroundResource = if(!isMelodyReferenceEnabled) {
           R.drawable.orbifold_chord
         } else {
-          BeatClockPaletteConsumer.palette?.sections
-            ?.indexOf(BeatClockPaletteConsumer.section)
-            ?.let { sectionIndex ->
-              SectionHolder.sectionColor(sectionIndex)
-            } ?: R.drawable.orbifold_chord
+          BeatClockPaletteConsumer.currenctSectionColor
         }
 				setOnClickListener {
 					viewModel.editingMelody = melody

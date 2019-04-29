@@ -85,10 +85,10 @@ class InstrumentActivity : OldBaseActivity(), AnkoLogger {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.color_instrument -> (colorboard.instrument as? MIDIInstrument)?.let {
-                showInstrumentPicker(it, this)
+                showInstrumentPicker2(it, this)
             }
             R.id.keyboard_instrument -> (keyboardInstrument as? MIDIInstrument)?.let {
-                showInstrumentPicker(it, this)
+                showInstrumentPicker2(it, this)
             }
             R.id.choose_conductor -> showConductorPicker(this)
         }
