@@ -2,7 +2,6 @@ package com.jonlatane.beatpad.view.palette
 
 import android.graphics.Color
 import android.support.v7.widget.RecyclerView
-import android.view.View
 import android.widget.PopupMenu
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Melody
@@ -186,7 +185,7 @@ class MelodyReferenceHolder(
 				backgroundResource = if(!isMelodyReferenceEnabled) {
           R.drawable.orbifold_chord
         } else {
-          BeatClockPaletteConsumer.currenctSectionColor
+          BeatClockPaletteConsumer.currentSectionDrawable
         }
 				setOnClickListener {
 					viewModel.editingMelody = melody

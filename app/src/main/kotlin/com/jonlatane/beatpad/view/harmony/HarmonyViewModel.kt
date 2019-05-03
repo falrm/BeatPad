@@ -23,6 +23,7 @@ open class HarmonyViewModel: SelectedChordAnimation {
     field = value
     if (value) {
       val wasOrbifoldVisible = paletteViewModel?.orbifold?.isHidden == false
+      paletteViewModel?.showOrbifold()
       paletteViewModel?.backStack?.push {
         if (isChoosingHarmonyChord) {
           isChoosingHarmonyChord = false

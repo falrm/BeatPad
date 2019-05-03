@@ -165,8 +165,8 @@ class HarmonyBeatView constructor(
         fun Int.withHighlight() = this.withAlpha(
           when {
             isPlaying -> 255
-            isSelected -> when((beatSelectionAnimationPosition + (elementPosition * 5).mod12).mod12) {
-              0, 3, 5, 7, 11 -> 187
+            isSelected -> when((beatSelectionAnimationPosition + (elementPosition * SelectedChordAnimation.steps).mod12).mod12) {
+              0, 3, 5, 7, 11 -> 127
               else -> 255
             }
             isFaded -> 41
@@ -193,7 +193,17 @@ class HarmonyBeatView constructor(
             isAugmented -> color(R.color.augmented).withHighlight()
             isMajor -> color(R.color.major).withHighlight()
             // Tint the white beat - inverse
-            else -> color(R.color.colorPrimaryDark).withAlpha(if(isPlaying || isSelected) 100 else 0)
+            else -> color(R.color.colorPrimaryDark).withAlpha(
+              when {
+                isPlaying -> 100
+                isSelected -> when((beatSelectionAnimationPosition + (elementPosition * SelectedChordAnimation.steps).mod12).mod12) {
+                  0, 3, 5, 7, 11 -> 67
+                  else -> 23
+                }
+                isFaded -> 128
+                else -> 0
+              }
+            )
           }
         }
 
@@ -253,6 +263,5 @@ class HarmonyBeatView constructor(
     }
     viewModel.selectedHarmonyElements = chordRange
     viewModel.isChoosingHarmonyChord = true
-    viewModel.paletteViewModel?.showOrbifold()
   }
 }

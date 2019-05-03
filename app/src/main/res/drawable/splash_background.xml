@@ -5,7 +5,7 @@
   <item
     android:width="200dp"
     android:height="200dp"
-    android:drawable="@mipmap/topologica"
+    android:drawable="@drawable/beatscratch_icon_inset_slight"
     android:gravity="center" />
 
 </layer-list>

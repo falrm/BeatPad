@@ -43,7 +43,7 @@ class PartHolder(
 		} else {
 			volumeSeekBar.animate().alpha(0f)
 			volumeSeekBar.isEnabled = false
-			partName.isClickable = true
+			partName.isClickable = (part?.instrument as? MIDIInstrument)?.drumTrack != true
 			partName.isLongClickable = true
 			partName.animate().alpha(1f)
 		}
@@ -138,11 +138,18 @@ class PartHolder(
     val drumTrack = (part!!.instrument as? MIDIInstrument)?.drumTrack == true
 		partName.apply {
 			text = part!!.instrument.instrumentName
-			setOnClickListener {
-				vibrate(10)
-				editInstrument()
-			}
-      textColor = if (drumTrack) R.color.colorPrimaryLight else R.color.colorPrimaryDark
+      if((part?.instrument as? MIDIInstrument)?.drumTrack != true) {
+        isClickable = true
+        setOnClickListener {
+          vibrate(10)
+          editInstrument()
+        }
+      } else {
+        setOnClickListener { }
+        isClickable = false
+      }
+
+			textColor = if (drumTrack) R.color.colorPrimaryLight else R.color.colorPrimaryDark
 			setOnLongClickListener {
         arrayOf(R.id.editPartInstrument, R.id.usePartOnColorboard, R.id.usePartOnSplat).forEach {
           editPartMenu.menu.findItem(it).isEnabled = !drumTrack

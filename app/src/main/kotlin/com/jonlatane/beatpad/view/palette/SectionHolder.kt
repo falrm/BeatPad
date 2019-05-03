@@ -2,7 +2,6 @@ package com.jonlatane.beatpad.view.palette
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.MenuItem
@@ -18,7 +17,6 @@ import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showRenameDialog
 import com.jonlatane.beatpad.util.layoutWidth
 import org.jetbrains.anko.*
-import org.w3c.dom.Text
 import java.util.*
 
 class SectionHolder(
@@ -92,12 +90,19 @@ class SectionHolder(
   }
 ) {
   companion object {
-    fun sectionColor(sectionIndex: Int) = arrayOf(
+    fun sectionDrawableResource(sectionIndex: Int) = arrayOf(
       R.drawable.orbifold_chord_major,
       R.drawable.orbifold_chord_minor,
       R.drawable.orbifold_chord_dominant,
       R.drawable.orbifold_chord_augmented,
       R.drawable.orbifold_chord_diminished
+    )[sectionIndex % 5]
+    fun sectionColor(sectionIndex: Int) = arrayOf(
+      R.color.major,
+      R.color.minor,
+      R.color.dominant,
+      R.color.augmented,
+      R.color.diminished
     )[sectionIndex % 5]
   }
   val nameTextView: TextView get() = itemView.findViewById(R.id.section_name)
@@ -198,7 +203,7 @@ class SectionHolder(
       }
     }*/
     itemView.backgroundResource = when (section) {
-      BeatClockPaletteConsumer.section -> sectionColor(adapterPosition)
+      BeatClockPaletteConsumer.section -> sectionDrawableResource(adapterPosition)
       else -> R.drawable.orbifold_chord
     }
 

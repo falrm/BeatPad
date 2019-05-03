@@ -1,0 +1,8 @@
+<inset
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:drawable="@drawable/beatscratch_icon_transparent_keys"
+  android:insetBottom="10%"
+  android:insetLeft="0%"
+  android:insetRight="0%"
+  android:insetTop="-15%"
+  />

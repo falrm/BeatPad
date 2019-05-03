@@ -10,6 +10,9 @@ import com.jonlatane.beatpad.util.viewHolders
 import org.jetbrains.anko.AnkoLogger
 
 interface SelectedChordAnimation: AnkoLogger {
+  companion object {
+    const val steps: Int = 67
+  }
   var isChoosingHarmonyChord: Boolean
 
   fun HarmonyViewModel.animateBeatsOfSelectedChord() {
@@ -22,7 +25,7 @@ interface SelectedChordAnimation: AnkoLogger {
           selectedHarmonyElements.last > beatViewRange.first
       }?.map { it.element }
         ?.let { views ->
-          ValueAnimator.ofInt(0, 11).apply {
+          ValueAnimator.ofInt(0, steps).apply {
             addUpdateListener { valueAnimator ->
               animateAtStep(valueAnimator.animatedValue as Int, views)
             }
@@ -34,7 +37,7 @@ interface SelectedChordAnimation: AnkoLogger {
               }
             })
             interpolator = LinearInterpolator()
-            duration = 2400L // 5fps (12 "frames") over 2400MS
+            duration = 4800L // 5fps (12 "frames") over 2400MS
           }.start()
         }
     }

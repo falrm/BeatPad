@@ -26,7 +26,7 @@
     </activity-->
     <activity
       android:name=".SplashActivity"
-      android:label="Topologica"
+      android:label="BeatScratch"
       android:launchMode="singleTask"
       android:theme="@style/SplashTheme">
       <intent-filter>
@@ -37,13 +37,13 @@
 
     <activity
       android:name=".PaletteEditorActivity"
-      android:label="Topologica"
+      android:label="BeatScratch"
       android:launchMode="singleTask">
     </activity>
     <activity
       android:name=".LibraryActivity"
       android:configChanges="orientation|keyboardHidden"
-      android:label="Topologica Library"
+      android:label="BeatScratch Library"
       android:screenOrientation="portrait">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
@@ -53,12 +53,12 @@
     <activity
       android:name=".ConductorActivity"
       android:configChanges="orientation|keyboardHidden"
-      android:label="Topologica: Conduct"
+      android:label="BeatScratch: Conduct"
       android:screenOrientation="portrait"/>
     <activity
       android:name=".InstrumentActivity"
       android:configChanges="orientation|keyboardHidden"
-      android:label="Topologica: Play"
+      android:label="BeatScratch: Play"
       android:screenOrientation="landscape"/>
     <!--activity
       android:name=".SequenceEditorActivity"

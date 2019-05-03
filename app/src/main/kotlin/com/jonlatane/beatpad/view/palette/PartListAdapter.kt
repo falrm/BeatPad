@@ -1,14 +1,11 @@
 package com.jonlatane.beatpad.view.palette
 
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.SmartAdapter
-import com.jonlatane.beatpad.util.applyToHolders
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
-import kotlin.properties.Delegates.observable
 
 
 class PartListAdapter(

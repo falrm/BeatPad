@@ -32,11 +32,16 @@ object BeatClockPaletteConsumer : AnkoLogger {
     viewModel?.notifySectionChange()
     MidiDevices.refreshInstruments()
   }
-  val currenctSectionColor: Int get() = palette?.sections
-    ?.indexOf(BeatClockPaletteConsumer.section)
-    ?.let { sectionIndex ->
-      SectionHolder.sectionColor(sectionIndex)
+  val currentSectionDrawable: Int get() = palette?.sections
+    ?.indexOf(section)?.let { sectionIndex ->
+      SectionHolder.sectionDrawableResource(sectionIndex)
     } ?: R.drawable.orbifold_chord
+
+  val currentSectionColor: Int get() = palette?.sections
+    ?.indexOf(section)?.let { sectionIndex ->
+      SectionHolder.sectionColor(sectionIndex)
+    } ?: R.color.subDominant
+
   var chord: Chord? = null
   val harmony: Harmony? get() = section?.harmony
   private val harmonyPosition: Int?

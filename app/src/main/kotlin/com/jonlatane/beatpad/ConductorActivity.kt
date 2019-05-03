@@ -123,7 +123,7 @@ class ConductorActivity : OldBaseActivity(), AnkoLogger {
     }
 
     companion object {
-        val SERVICE_NAME = "Topologica Conductor"
-        val SERVICE_TYPE = "_topologica._tcp."
+        val SERVICE_NAME = "BeatScratch Conductor"
+        val SERVICE_TYPE = "_beatscratch._tcp."
     }
 }

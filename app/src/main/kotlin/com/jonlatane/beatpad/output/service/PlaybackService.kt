@@ -100,7 +100,7 @@ class PlaybackService : Service(), AnkoLogger {
         it.action = action
       }, 0)
 
-    val icon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher_round)
+    val icon = BitmapFactory.decodeResource(resources, R.drawable.beatscratch_icon)
 
     val channelId =
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -114,9 +114,10 @@ class PlaybackService : Service(), AnkoLogger {
       .setContentTitle("Playback Service")
       .setTicker("Playback Service")
       .setContentText("Background audio playback enabled.")
-      .setSmallIcon(R.mipmap.ic_launcher_round)
+      .setSmallIcon(R.drawable.beatscratch_icon_notification_inset_slight)
       //.setPriority()
-      .setLargeIcon(Bitmap.createScaledBitmap(icon, 128, 128, false))
+//      .setL
+//      .setLargeIcon(Bitmap.createScaledBitmap(icon, 128, 128, false))
       .setContentIntent(pendingIntent)
       .setOngoing(true)
       //.addAction(android.R.drawable.ic_media_play, "Play/Pause", pendingIntent(Action.PLAY_ACTION))
