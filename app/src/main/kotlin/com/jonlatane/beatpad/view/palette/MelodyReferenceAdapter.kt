@@ -13,6 +13,9 @@ class MelodyReferenceAdapter(
 	val recyclerView: _RecyclerView,
 	initialPart: Int = 0
 ) : SmartAdapter<MelodyReferenceHolder>() {
+  init {
+//    setHasStableIds(true)
+  }
 	var partPosition by Delegates.observable(initialPart) {
 		_, _, _ -> notifyDataSetChanged()
 	}
@@ -29,15 +32,17 @@ class MelodyReferenceAdapter(
 		holder.onPositionChanged()
 	}
 
-	fun insert(sequence: Melody<*>): Melody<*> {
+	fun insert(sequence: Melody<*>) {
 		part?.let { part ->
 			part.melodies.add(sequence)
 			notifyItemInserted(part.melodies.size - 1)
-			notifyItemChanged(part.melodies.size)
+			//notifyItemChanged(part.melodies.size)
 		}
-		return sequence
 	}
 
-	override fun getItemCount(): Int = viewModel.palette.parts.getOrNull(partPosition)?.melodies
+	override fun getItemCount(): Int = part?.melodies
 		?.let { it.size + 1 } ?: 0
+
+//  override fun getItemId(position: Int): Long
+//    = part?.melodies?.getOrNull(position)?.id?.mostSignificantBits ?: 0L
 }

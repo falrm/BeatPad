@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.palette
 
 import android.support.constraint.ConstraintSet
+import android.support.v7.widget.SimpleItemAnimator
 import android.text.TextUtils
 import android.view.Gravity
 import android.widget.SeekBar
@@ -38,6 +39,9 @@ interface PartHolderLayout {
 			partPatternRecycler = recyclerView {
 				id = R.id.part_patterns
 				elevation = 1f
+//				(itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        setHasFixedSize(true)
+        //itemAnimator = null
 //				clipChildren = false
 //				clipToPadding = false
 			}.lparams(matchParent, 0) as _RecyclerView
