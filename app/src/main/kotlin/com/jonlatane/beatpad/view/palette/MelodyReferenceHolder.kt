@@ -12,7 +12,6 @@ import com.jonlatane.beatpad.storage.PaletteStorage
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onSeekBarChangeListener
-import kotlin.properties.Delegates
 import android.graphics.PorterDuff
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 
@@ -25,15 +24,11 @@ class MelodyReferenceHolder(
 			width = matchParent
       height = wrapContent
 		}
-	},
-  initialMelody: Int = 0
+	}
 ) : RecyclerView.ViewHolder(layout), AnkoLogger {
 	private val partPosition: Int get() = adapter.partPosition
 	val part: Part? get() = adapter.part
-	internal var melodyPosition: Int by Delegates.observable(initialMelody) {
-		_, _, _ -> onPositionChanged()
-	}
-	internal val melody: Melody<*>? get() = part?.melodies?.getOrNull(melodyPosition)
+	internal val melody: Melody<*>? get() = part?.melodies?.getOrNull(adapterPosition)
   val melodyReference: Section.MelodyReference?
     get() = BeatClockPaletteConsumer.section?.melodies?.firstOrNull { it.melody == melody }
   private val context get() = adapter.recyclerView.context
@@ -46,8 +41,7 @@ class MelodyReferenceHolder(
 		newPatternMenu.inflate(R.menu.part_melody_new_menu)
 		newPatternMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
-				R.id.newDrawnPattern ->
-					viewModel.editingMelody = adapter.insert(newMelody())
+				R.id.newDrawnPattern -> createAndOpenDrawnMelody()
 				R.id.newMidiPattern -> context.toast("TODO!")
 				R.id.newAudioPattern -> context.toast("TODO!")
 				else -> context.toast("Impossible!")
@@ -57,22 +51,22 @@ class MelodyReferenceHolder(
 		editPatternMenu.inflate(R.menu.part_melody_edit_menu)
 		editPatternMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
-				R.id.editPattern -> viewModel.editingMelody = melody
-				R.id.removePattern -> showConfirmDialog(
+				R.id.editMelody   -> viewModel.editingMelody = melody
+				R.id.removeMelody -> showConfirmDialog(
 					context,
 					promptText = "Really delete this melody?",
 					yesText = "Yes, delete melody"
 				) {
-					val melody = part!!.melodies.removeAt(melodyPosition)
+					val melody = part!!.melodies.removeAt(adapterPosition)
           viewModel.palette.sections.forEach { section ->
             val removedReferences = section.melodies.filter { it.melody == melody }
             section.melodies.removeAll(removedReferences)
           }
-					adapter.notifyItemRemoved(melodyPosition)
-					adapter.notifyItemRangeChanged(
-						melodyPosition,
-            part!!.melodies.size - melodyPosition
-					)
+					adapter.notifyItemRemoved(adapterPosition)
+//					adapter.notifyItemRangeChanged(
+//            adapterPosition,
+//            part!!.melodies.size - adapterPosition
+//					)
 				}
 				else -> context.toast("TODO!")
 			}
@@ -80,15 +74,8 @@ class MelodyReferenceHolder(
 		}
 	}
 
-	private fun newMelody() = PaletteStorage.baseMelody.also {
-    // Don't try to conform drum parts to harmony
-    if((part?.instrument as? MIDIInstrument)?.drumTrack == true) {
-      it.limitedToNotesInHarmony = false
-    }
-  }
-
   val isAddButton: Boolean
-    get() = melodyPosition >= viewModel.palette.parts.getOrNull(partPosition)?.melodies?.size ?: -1
+    get() = adapterPosition >= viewModel.palette.parts.getOrNull(partPosition)?.melodies?.size ?: -1
 
 	internal fun onPositionChanged() {
     if(isAddButton) {
@@ -132,6 +119,25 @@ class MelodyReferenceHolder(
     // Sanitization: Remove duplicates
     BeatClockPaletteConsumer.section?.melodies?.removeAll {
       it.melody == melody && it != melodyReference
+    }
+  }
+
+  private fun createAndOpenDrawnMelody() {
+    val newMelody = PaletteStorage.baseMelody.also {
+      // Don't try to conform drum parts to harmony
+      if((part?.instrument as? MIDIInstrument)?.drumTrack == true) {
+        it.limitedToNotesInHarmony = false
+      }
+    }
+    BeatClockPaletteConsumer.section?.melodies?.add(
+      Section.MelodyReference(newMelody, 0.5f, Section.PlaybackType.Indefinite)
+    )
+    adapter.insert(newMelody)
+    doAsync {
+      Thread.sleep(300L)
+      uiThread {
+        viewModel.editingMelody = newMelody
+      }
     }
   }
 
@@ -210,11 +216,7 @@ class MelodyReferenceHolder(
         backgroundResource = R.drawable.orbifold_chord
         alpha = 1f
         setOnClickListener {
-          val melody = newMelody()
-          viewModel.editingMelody = adapter.insert(melody)
-          BeatClockPaletteConsumer.section?.melodies?.add(
-            Section.MelodyReference(melody, 0.5f, Section.PlaybackType.Indefinite)
-          )
+          createAndOpenDrawnMelody()
         }
         setOnLongClickListener {
           newPatternMenu.show()

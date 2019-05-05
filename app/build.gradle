@@ -91,7 +91,7 @@ dependencies {
 	implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4.1"
 
 
-	implementation 'com.github.billthefarmer:mididriver:v1.13'
+	implementation 'com.github.billthefarmer:mididriver:v1.17'
 	implementation 'org.apache.commons:commons-lang3:3.5'
 
 	testImplementation("io.damo.aspen:aspen:2.0.0") {

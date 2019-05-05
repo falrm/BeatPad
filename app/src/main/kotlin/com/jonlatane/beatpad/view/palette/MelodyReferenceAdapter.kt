@@ -26,7 +26,7 @@ class MelodyReferenceAdapter(
 
 	override fun onBindViewHolder(holder: MelodyReferenceHolder, position: Int) {
 		super.onBindViewHolder(holder, position)
-		holder.melodyPosition = position
+		holder.onPositionChanged()
 	}
 
 	fun insert(sequence: Melody<*>): Melody<*> {

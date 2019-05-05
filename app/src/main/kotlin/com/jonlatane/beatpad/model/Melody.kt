@@ -13,8 +13,9 @@ interface Melody<ElementType : Transposable<ElementType>> : Pattern<ElementType>
   var limitedToNotesInHarmony: Boolean
   /**
    * For bass parts, mainly. Indicates this melody should follow the chord
-   * progression. So if this melody is playing a C when you're on a C major,
-   * it should play a D when you're on a D minor.
+   * progression. So if this melody is arpeggiating C, E, G on CM7 and [shouldConformWithHarmony]
+   * is true, it would arpeggiate D, F, A on Dm7. If false, it would arpeggiate the nearest notes
+   * to C, E, G without transposing, so C, F, F (given our "rounding down" rule).
    */
   var shouldConformWithHarmony: Boolean
   var velocityFactor: Float
