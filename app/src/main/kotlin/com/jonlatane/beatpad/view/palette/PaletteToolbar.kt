@@ -4,6 +4,7 @@ import BeatClockPaletteConsumer
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.support.constraint.ConstraintSet.PARENT_ID
 import android.view.View
 import android.widget.*
 import com.jonlatane.beatpad.MainApplication
@@ -11,9 +12,15 @@ import com.jonlatane.beatpad.MainApplication.Companion.chordTypefaceBold
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.util.color
+import org.jetbrains.anko.*
+import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
 import com.jonlatane.beatpad.util.isHidden
+import com.jonlatane.beatpad.view.NumberPickerWithTypeface
+import com.jonlatane.beatpad.view.numberPickerWithTypeface
 import com.jonlatane.beatpad.view.tempo.TempoTracking
 import org.jetbrains.anko.*
+import org.jetbrains.anko.constraint.layout.applyConstraintSet
+import org.jetbrains.anko.constraint.layout.constraintLayout
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
 
@@ -155,20 +162,63 @@ class PaletteToolbar(ctx: Context,
 
 
   private fun showTempoPicker() {
-    val dialog = Dialog(context)
-    dialog.setTitle("Select Tempo")
-    dialog.setContentView(R.layout.dialog_choose_tempo)
-    val picker = dialog.findViewById<NumberPicker>(R.id.numberPicker1)
-    picker.maxValue = 960
-    picker.minValue = 15
-    picker.value = BeatClockPaletteConsumer.palette?.bpm?.toInt()!!
-    picker.wrapSelectorWheel = false
-    picker.setOnValueChangedListener { _, _, _ ->
-      val bpm = picker.value
-      BeatClockPaletteConsumer.palette?.bpm = bpm.toFloat()
-      updateTempoButton()
-    }
-    dialog.show()
+    context.alert {
+      customView {
+        constraintLayout {
+          val title = textView("Choose Tempo") {
+            id = View.generateViewId()
+            typeface = chordTypefaceBold
+            textSize = 18f
+          }
+          val picker = numberPicker {
+            id = View.generateViewId()
+//            textSize = 16f
+            maxValue = 960
+            minValue = 15
+            value = BeatClockPaletteConsumer.palette?.bpm?.toInt()!!
+            wrapSelectorWheel = false
+            setOnValueChangedListener { _, _, _ ->
+              val bpm = value
+              BeatClockPaletteConsumer.palette?.bpm = bpm.toFloat()
+              updateTempoButton()
+            }
+          }
+
+          applyConstraintSet {
+            title {
+              connect(
+                TOP to TOP of PARENT_ID margin dip(15),
+                START to START of PARENT_ID margin dip(15),
+                END to END of PARENT_ID margin dip(15)
+              )
+            }
+            picker {
+              connect(
+                TOP to BOTTOM of title margin dip(15),
+                START to START of PARENT_ID margin dip(15),
+                END to END of PARENT_ID margin dip(15),
+                BOTTOM to BOTTOM  of PARENT_ID margin dip(15)
+              )
+            }
+          }
+        }
+      }
+    }.show()
+
+//    val dialog = Dialog(context)
+//    dialog.setTitle("Select Tempo")
+//    dialog.setContentView(R.layout.dialog_choose_tempo)
+//    val picker = dialog.findViewById<NumberPicker>(R.id.numberPicker1)
+//    picker.maxValue = 960
+//    picker.minValue = 15
+//    picker.value = BeatClockPaletteConsumer.palette?.bpm?.toInt()!!
+//    picker.wrapSelectorWheel = false
+//    picker.setOnValueChangedListener { _, _, _ ->
+//      val bpm = picker.value
+//      BeatClockPaletteConsumer.palette?.bpm = bpm.toFloat()
+//      updateTempoButton()
+//    }
+//    dialog.show()
   }
 
   fun updateTempoButton() {

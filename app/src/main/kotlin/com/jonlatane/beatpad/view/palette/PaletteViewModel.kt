@@ -202,7 +202,7 @@ class PaletteViewModel: AnkoLogger {
 
   private fun editMelodyMode() {
     partListView.viewHolders<PartHolder>().mapNotNull { partHolder ->
-      partHolder.melodyRecycler.viewHolders<MelodyReferenceHolder>()
+      partHolder.layout.melodyReferenceRecycler.viewHolders<MelodyReferenceHolder>()
         .firstOrNull { it.melody == editingMelody }
     }/*.let { listOf<MelodyReferenceHolder?>(null) }*/.firstOrNull()?.let { melodyReferenceHolder ->
       melodyReferenceHolder.enableMelodyReference()
@@ -255,7 +255,7 @@ class PaletteViewModel: AnkoLogger {
 
   private fun partListMode(oldValue: Melody<*>?) {
     partListView.viewHolders<PartHolder>().mapNotNull { partHolder ->
-      partHolder.melodyRecycler.viewHolders<MelodyReferenceHolder>()
+      partHolder.layout.melodyReferenceRecycler.viewHolders<MelodyReferenceHolder>()
         .firstOrNull { !it.isAddButton && it.melody == oldValue }
     }/*let { listOf<MelodyReferenceHolder?>(null) }.*/.firstOrNull()?.let { melodyReferenceHolder ->
       val name = melodyReferenceHolder.layout.name

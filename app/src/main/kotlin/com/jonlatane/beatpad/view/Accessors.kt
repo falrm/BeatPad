@@ -4,6 +4,11 @@ import android.view.ViewManager
 import org.jetbrains.anko.custom.ankoView
 
 
+fun ViewManager.numberPickerWithTypeface(theme: Int = 0)
+	= numberPickerWithTypeface(theme) {}
+inline fun ViewManager.numberPickerWithTypeface(theme: Int = 0, init: NumberPickerWithTypeface.() -> Unit)
+	= ankoView({ NumberPickerWithTypeface(it) }, theme, init)
+
 fun ViewManager.nonDelayedHorizontalScrollView(theme: Int = 0)
 	= nonDelayedHorizontalScrollView(theme) {}
 
@@ -28,6 +33,12 @@ fun ViewManager.noDefaultSpinner(theme: Int = 0)
 inline fun ViewManager.noDefaultSpinner(theme: Int = 0, init: NoDefaultSpinner.() -> Unit)
 	= ankoView({ NoDefaultSpinner(it) }, theme, init)
 
+
+fun ViewManager.hideableRecyclerView(theme: Int = 0)
+  = hideableRecyclerView(theme) {}
+
+inline fun ViewManager.hideableRecyclerView(theme: Int = 0, init: HideableRecyclerView.() -> Unit)
+  = ankoView({ HideableRecyclerView(it) }, theme, init)
 
 fun ViewManager.nonDelayedRecyclerView(theme: Int = 0)
 	= nonDelayedRecyclerView(theme) {}

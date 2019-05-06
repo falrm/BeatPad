@@ -39,7 +39,6 @@ class OrbifoldView @JvmOverloads constructor(
     return this
   }*/
 
-  val enabled = false
   var onChordChangedListener: ((Chord) -> Unit)? by observable<((Chord) -> Unit)?>(null) { _, _, listener ->
     listener?.invoke(chord)
   }
