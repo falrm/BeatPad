@@ -34,7 +34,7 @@ class MelodyReferenceHolder(
   private val context get() = adapter.recyclerView.context
 
 	private val newPatternMenu = PopupMenu(layout.context, layout)
-	private val editPatternMenu = PopupMenu(layout.context, layout)
+	internal val editPatternMenu = PopupMenu(layout.context, layout)
   private val isMelodyReferenceEnabled: Boolean get()  = melodyReference != null && !melodyReference!!.isDisabled
 
 	init {
@@ -57,12 +57,12 @@ class MelodyReferenceHolder(
 					promptText = "Really delete this melody?",
 					yesText = "Yes, delete melody"
 				) {
-					val melody = part!!.melodies.removeAt(adapterPosition)
+					val melody = part!!.melodies.removeAt(this@MelodyReferenceHolder.adapterPosition)
           viewModel.palette.sections.forEach { section ->
             val removedReferences = section.melodies.filter { it.melody == melody }
             section.melodies.removeAll(removedReferences)
           }
-					adapter.notifyItemRemoved(adapterPosition)
+					adapter.notifyItemRemoved(this@MelodyReferenceHolder.adapterPosition)
 //					adapter.notifyItemRangeChanged(
 //            adapterPosition,
 //            part!!.melodies.size - adapterPosition

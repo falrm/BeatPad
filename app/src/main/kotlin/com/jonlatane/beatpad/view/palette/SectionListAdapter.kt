@@ -40,6 +40,7 @@ class SectionListAdapter(
       val fromPosition = viewHolder.adapterPosition
       val toPosition = target.adapterPosition
       if(toPosition >= viewModel.palette.sections.size) return false
+      (viewHolder as? SectionHolder)?.menu?.dismiss()
       if (fromPosition < toPosition) {
         for (i in fromPosition until toPosition) {
           Collections.swap(viewModel.palette.sections, i, i + 1)
@@ -50,6 +51,8 @@ class SectionListAdapter(
         }
       }
       notifyItemMoved(fromPosition, toPosition)
+      notifyItemChanged(fromPosition)
+      notifyItemChanged(toPosition)
       return true
     }
 
@@ -66,13 +69,13 @@ class SectionListAdapter(
 	override fun onBindViewHolder(holder: SectionHolder, position: Int) {
     holder.invalidate()
 		holder.sectionName.requestLayout()
-		holder.dragHandle.setOnTouchListener { view, event ->
-      if (MotionEventCompat.getActionMasked(event) ==
-        MotionEvent.ACTION_DOWN) {
-        itemTouchHelper.startDrag(holder)
-      }
-      false
-    }
+//		holder.dragHandle.setOnTouchListener { view, event ->
+//      if (MotionEventCompat.getActionMasked(event) ==
+//        MotionEvent.ACTION_DOWN) {
+//        itemTouchHelper.startDrag(holder)
+//      }
+//      false
+//    }
 	}
 
   internal fun addSection() {

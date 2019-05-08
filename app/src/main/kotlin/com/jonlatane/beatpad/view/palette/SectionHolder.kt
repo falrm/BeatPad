@@ -20,7 +20,7 @@ import org.jetbrains.anko.*
 import java.util.*
 
 class SectionHolder(
-  orientation: Int,
+  val orientation: Int,
   parent: ViewGroup,
   val viewModel: PaletteViewModel
 ) : RecyclerView.ViewHolder(
@@ -38,26 +38,27 @@ class SectionHolder(
             typeface = MainApplication.chordTypeface
           }.lparams(wrapContent, wrapContent) {
             alignParentLeft()
+            alignParentRight()
             centerVertically()
           }
-          imageView {
+          /*imageView {
             id = R.id.section_drag_handle
-            imageResource = R.drawable.hamburger_drag_drop
+            imageResource = R.drawable.move_horizontal
           }.lparams(dip(35), dip(35f)) {
             marginStart = dip(5)
             rightOf(sectionName)
             centerVertically()
-          }
+          }*/
         }
         else                           -> {
-          val dragger = imageView {
+          /*val dragger = imageView {
             id = R.id.section_drag_handle
-            imageResource = R.drawable.hamburger_drag_drop
+            imageResource = R.drawable.move_vertical
           }.lparams(dip(35), dip(35f)) {
             marginStart = dip(5)
             alignParentRight()
             alignParentTop()
-          }
+          }*/
           textView {
             id = R.id.section_name
             textSize = 25f
@@ -68,7 +69,7 @@ class SectionHolder(
             typeface = MainApplication.chordTypeface
           }.lparams(matchParent, wrapContent) {
             alignParentLeft()
-            leftOf(dragger)
+            alignParentRight()
             centerVertically()
           }
         }
@@ -106,7 +107,7 @@ class SectionHolder(
     )[sectionIndex % 5]
   }
   val nameTextView: TextView get() = itemView.findViewById(R.id.section_name)
-  val dragHandle: ImageView get() = itemView.findViewById(R.id.section_drag_handle)
+  //val dragHandle: ImageView get() = itemView.findViewById(R.id.section_drag_handle)
   val adapter: SectionListAdapter get() = viewModel.sectionListAdapter!!
   val section: Section?
     get() = when (adapterPosition) {
@@ -206,6 +207,7 @@ class SectionHolder(
       BeatClockPaletteConsumer.section -> sectionDrawableResource(adapterPosition)
       else -> R.drawable.orbifold_chord
     }
+    itemView.padding = itemView.dip(3)
 
     if (adapterPosition < viewModel.palette.sections.size) {
       makeEditableSection()
@@ -219,6 +221,8 @@ class SectionHolder(
     val section = viewModel.palette.sections[adapterPosition]
     sectionName.apply {
       text = section.name
+      gravity = if(orientation == LinearLayoutManager.HORIZONTAL) Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL
+       else Gravity.CENTER_VERTICAL or Gravity.START
     }
     itemView.apply {
       setOnClickListener {
@@ -230,12 +234,13 @@ class SectionHolder(
         true
       }
     }
-    dragHandle.layoutWidth = dragHandle.dip(35)
+    //dragHandle.layoutWidth = dragHandle.dip(35)
   }
 
   private fun makeAddButton() {
     sectionName.apply {
       text = "+"
+      gravity = Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL
     }
     itemView.apply {
       setOnClickListener {
@@ -247,6 +252,6 @@ class SectionHolder(
         true
       }
     }
-    dragHandle.layoutWidth = 0
+    //dragHandle.layoutWidth = 0
   }
 }

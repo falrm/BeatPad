@@ -50,8 +50,8 @@ class PartHolder(
 		}
 	}
 
-	private val editPartMenu = PopupMenu(partName.context, partName)
-	private val newPartMenu = PopupMenu(partName.context, partName)
+	internal val editPartMenu = PopupMenu(partName.context, partName)
+	internal val newPartMenu = PopupMenu(partName.context, partName)
 
 	init {
 		editPartMenu.inflate(R.menu.part_edit_menu)

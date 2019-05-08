@@ -37,7 +37,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
         portraitLayout()
       } else {
         leftSideWidth = dip(350f)
-        landscapeLayout(this@with)
+        landscapeLayout()
       }
 
       keyboardsLayout()
@@ -189,7 +189,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
     }
   }
 
-  private fun _RelativeLayout.landscapeLayout(ui: AnkoContext<PaletteEditorActivity>) {
+  private fun _RelativeLayout.landscapeLayout() {
 
     viewModel.sectionListView = sectionListView(viewModel = viewModel, orientation = LinearLayoutManager.VERTICAL) {
       id = R.id.chord_list
@@ -277,11 +277,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
         alignParentBottom()
 
         width = leftSideWidth
-        height = if (isTablet) {
-          Math.round(leftSideWidth * 1.5f)
-        } else {
-          dip(300)
-        }
+        height = dip(300)
         elevation = 5f
       }
     }

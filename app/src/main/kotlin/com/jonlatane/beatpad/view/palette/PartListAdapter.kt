@@ -1,5 +1,7 @@
 package com.jonlatane.beatpad.view.palette
 
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.TextView
@@ -11,6 +13,7 @@ import org.jetbrains.anko.constraint.layout._ConstraintLayout
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
+import java.util.*
 
 
 class PartListAdapter(
@@ -25,6 +28,50 @@ class PartListAdapter(
 		viewModel.partListAdapter = this
 	}
 
+
+	val itemTouchHelper = ItemTouchHelper(object: ItemTouchHelper.Callback() {
+		init {
+		}
+		override fun getMovementFlags(
+			recyclerView: RecyclerView?,
+			viewHolder: RecyclerView.ViewHolder
+		): Int {
+			return makeMovementFlags(ItemTouchHelper.START or ItemTouchHelper.END, 0)
+		}
+
+		override fun onMove(
+			recyclerView: RecyclerView?,
+			viewHolder: RecyclerView.ViewHolder?,
+			target: RecyclerView.ViewHolder?
+		): Boolean {
+			if(viewHolder == null || target == null) return false
+			val fromPosition = viewHolder.adapterPosition
+			val toPosition = target.adapterPosition
+			(viewHolder as? PartHolder)?.editPartMenu?.dismiss()
+			val rightMostPosition = if(canAddParts()) viewModel.palette.parts.size
+				else viewModel.palette.parts.size + 1
+			if(toPosition >= rightMostPosition) return false
+			if (fromPosition < toPosition) {
+				for (i in fromPosition until toPosition) {
+					Collections.swap(viewModel.palette.parts, i, i + 1)
+				}
+			} else {
+				for (i in fromPosition downTo toPosition + 1) {
+					Collections.swap(viewModel.palette.parts, i, i - 1)
+				}
+			}
+			notifyItemMoved(fromPosition, toPosition)
+			notifyItemChanged(fromPosition)
+			notifyItemChanged(toPosition)
+			return true
+		}
+
+		override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) {
+			// TODO("not implemented")
+		}
+
+		override fun isLongPressDragEnabled(): Boolean = true
+	}).also { it.attachToRecyclerView(recyclerView) }
 
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PartHolder {
