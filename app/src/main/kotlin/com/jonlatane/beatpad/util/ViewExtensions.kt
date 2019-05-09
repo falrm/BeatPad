@@ -26,19 +26,21 @@ interface HideableView {
 
   fun show(
     animated: Boolean = true,
-    animation: HideAnimation = HideAnimation.VERTICAL
+    animation: HideAnimation = HideAnimation.VERTICAL,
+    endAction: (() -> Unit)? = null
   ) {
     animation.apply {
-      (this@HideableView as View).show(animated)
+      (this@HideableView as View).show(animated, endAction)
     }
   }
 
   fun hide(
     animated: Boolean = true,
-    animation: HideAnimation = HideAnimation.VERTICAL
+    animation: HideAnimation = HideAnimation.VERTICAL,
+    endAction: (() -> Unit)? = null
   ) {
     animation.apply {
-      (this@HideableView as View).hide(animated)
+      (this@HideableView as View).hide(animated, endAction)
     }
   }
 }
@@ -124,58 +126,67 @@ fun View.animateWidth(width: Int, duration: Long = defaultDuration, endAction: (
 	anim.setDuration(duration).start()
 }
 
-fun View.animateHeight(height: Int, duration: Long = defaultDuration) {
+fun View.animateHeight(height: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
 	val anim = ValueAnimator.ofInt(this.measuredHeight, height)
   anim.interpolator = LinearInterpolator()
 	anim.addUpdateListener { valueAnimator ->
 		this.layoutHeight = valueAnimator.animatedValue as Int
 	}
+  endAction?.let {
+    anim.addListener(object : AnimatorListenerAdapter() {
+      override fun onAnimationEnd(animation: Animator) = it()
+    })
+  }
 	anim.setDuration(duration).start()
 }
 
 enum class HideAnimation: AnkoLogger {
   VERTICAL {
-    override fun View.show(animated: Boolean) {
+    override fun View.show(animated: Boolean, endAction: (() -> Unit)?) {
       setupHiding()
       if (animated) {
-        animateHeight((this as HideableView).initialHeight!!)
+        animateHeight((this as HideableView).initialHeight!!, endAction = endAction)
       } else {
         layoutHeight = (this as HideableView).initialHeight!!
+        endAction?.invoke()
       }
     }
 
-    override fun View.hide(animated: Boolean) {
+    override fun View.hide(animated: Boolean, endAction: (() -> Unit)?) {
       setupHiding()
       if (animated) {
-        animateHeight(0)
+        animateHeight(0, endAction = endAction)
       } else {
         layoutHeight = 0
+        endAction?.invoke()
       }
     }
   },
   HORIZONTAL {
-    override fun View.show(animated: Boolean) {
+    override fun View.show(animated: Boolean, endAction: (() -> Unit)?) {
       setupHiding()
       if (animated) {
-        animateWidth((this as HideableView).initialWidth!!)
+        animateWidth((this as HideableView).initialWidth!!, endAction = endAction)
       } else {
         layoutWidth = (this as HideableView).initialWidth!!
+        endAction?.invoke()
       }
     }
 
-    override fun View.hide(animated: Boolean) {
+    override fun View.hide(animated: Boolean, endAction: (() -> Unit)?) {
       setupHiding()
       if (animated) {
-        animateWidth(0)
+        animateWidth(0, endAction = endAction)
       } else {
         layoutWidth = 0
+        endAction?.invoke()
       }
     }
   };
 
-  abstract fun View.show(animated: Boolean = true)
+  abstract fun View.show(animated: Boolean = true, endAction: (() -> Unit)? = null)
 
-  abstract fun View.hide(animated: Boolean = true)
+  abstract fun View.hide(animated: Boolean = true, endAction: (() -> Unit)? = null)
 
   fun View.setupHiding() {
     if ((this as HideableView).initialWidth == null || (this as HideableView).initialHeight == null) {
@@ -192,6 +203,3 @@ enum class HideAnimation: AnkoLogger {
 val View.isHidden: Boolean get() = layoutHeight == 0 || layoutWidth == 0
 
 fun View.color(resId: Int) = context.color(resId)
-
-inline val RecyclerView.firstVisibleItemPosition
-  get() = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()

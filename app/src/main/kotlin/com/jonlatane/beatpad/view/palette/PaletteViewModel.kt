@@ -297,11 +297,15 @@ class PaletteViewModel: AnkoLogger {
         } else false
       }
     }
+    orbifold.conditionallyAnimateToSelectionState()
     orbifold.show(
       animation = if (orbifold.context.configuration.portrait) {
         HideAnimation.VERTICAL
       } else HideAnimation.HORIZONTAL,
-      animated = animated
+      animated = animated,
+      endAction = {
+        orbifold.conditionallyAnimateToSelectionState()
+      }
     )
 
   }

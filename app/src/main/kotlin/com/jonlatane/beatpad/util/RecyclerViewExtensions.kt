@@ -27,6 +27,10 @@ fun <HolderType : RecyclerView.ViewHolder> RecyclerView.viewHolders(): List<Hold
 //    }
   }.map { it as HolderType }
 
+inline val RecyclerView.firstVisibleItemPosition
+  get() = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+
+
 // (0 until adapter.itemCount).
 // mapNotNull { findViewHolderForAdapterPosition(it) as? HolderType }
 

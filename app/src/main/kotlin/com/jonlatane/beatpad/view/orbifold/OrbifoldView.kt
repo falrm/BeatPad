@@ -42,7 +42,7 @@ class OrbifoldView @JvmOverloads constructor(
       animateTo(InitialState)
     } else {
       updateChordText()
-      post { animateTo(SelectionState) }
+      post { conditionallyAnimateToSelectionState() }
     }
     onChordChangedListener?.invoke(chord)
   }
@@ -79,6 +79,7 @@ class OrbifoldView @JvmOverloads constructor(
       }
     } else {
       //TODO: Make this work with animateTo
+      selectedChord = null
       animateTo(InitialState)
       listOf(customButton, modeButton).forEach {
         it.isEnabled = false
@@ -180,9 +181,7 @@ class OrbifoldView @JvmOverloads constructor(
     post {
       skipTo(InitialState)
       this.orbifold = orbifold
-      //animateTo(SelectionState)
     }
-    //val orbifold = this
     modeButton = button {
       text = "Mode"
       isEnabled = false
@@ -307,10 +306,11 @@ class OrbifoldView @JvmOverloads constructor(
 
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
     super.onSizeChanged(w, h, oldw, oldh)
-    post { if(canEditChords) animateTo(SelectionState) }
+    post { conditionallyAnimateToSelectionState() }
   }
 
   fun onResume() {
+    conditionallyAnimateToSelectionState()
     //animateTo(SelectionState)
   }
 
@@ -318,7 +318,7 @@ class OrbifoldView @JvmOverloads constructor(
     if (!containsSequence(sequence)) {
       sequences.add(index, SequenceViews(sequence))
       updateChordText()
-      post { if(canEditChords) animateTo(SelectionState) }
+      post { conditionallyAnimateToSelectionState() }
     }
   }
 
@@ -332,7 +332,7 @@ class OrbifoldView @JvmOverloads constructor(
         animateViewOut(views.connectForward)
         animateViewOut(views.connectBack)
         sequences.removeAt(index)
-        if(canEditChords) animateTo(SelectionState)
+        conditionallyAnimateToSelectionState()
         break
       }
     }
@@ -359,6 +359,10 @@ class OrbifoldView @JvmOverloads constructor(
 
   fun skipTo(state: NavigationState) = state.skipTo(this)
   fun animateTo(state: NavigationState) = state.animateTo(this)
+  fun conditionallyAnimateToSelectionState() {
+    if(canEditChords) animateTo(SelectionState)
+    else animateTo(InitialState)
+  }
   fun disableNextTransitionAnimation() {
     selectedChord = null
   }

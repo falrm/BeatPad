@@ -58,7 +58,7 @@ object InitialState : NavigationState {
     afterAll(toTargetChord, ANIMATION_DURATION) {
       v.updateChordText()
       v.skipTo(InitialState)
-      v.post { v.animateTo(SelectionState) }
+      v.post { v.conditionallyAnimateToSelectionState() }
     }
   }
 
@@ -80,6 +80,12 @@ object InitialState : NavigationState {
     v.halfStepUp.animate().translationZ(0f)
     v.halfStepDown.animate().translationZ(0f)
     v.halfStepBackground.animateHeight(5)
+    listOf(v.centralChordTouchPoint, v.centralChordThrobber, v.centralChordBackground).forEach {
+      it.animateWidth(
+        width = v.centralChord.scaledWidth,
+        duration = ANIMATION_DURATION
+      )
+    }
     for (sv in v.sequences) {
       if (sv.forward === v.selectedChord || sv.back === v.selectedChord) {
         skipToSelectionPhase(v, sv)
