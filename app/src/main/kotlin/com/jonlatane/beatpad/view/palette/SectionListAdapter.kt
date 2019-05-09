@@ -39,8 +39,9 @@ class SectionListAdapter(
       if(viewHolder == null || target == null) return false
       val fromPosition = viewHolder.adapterPosition
       val toPosition = target.adapterPosition
-      if(toPosition >= viewModel.palette.sections.size) return false
       (viewHolder as? SectionHolder)?.menu?.dismiss()
+      if(toPosition >= viewModel.palette.sections.size || fromPosition >= viewModel.palette.sections.size)
+        return false
       if (fromPosition < toPosition) {
         for (i in fromPosition until toPosition) {
           Collections.swap(viewModel.palette.sections, i, i + 1)
@@ -53,6 +54,12 @@ class SectionListAdapter(
       notifyItemMoved(fromPosition, toPosition)
       notifyItemChanged(fromPosition)
       notifyItemChanged(toPosition)
+      if(
+        listOf(viewHolder, target).mapNotNull { (it as? SectionHolder)?.section }
+          .any { it == BeatClockPaletteConsumer.section }
+      ) {
+        viewModel.partListAdapter?.notifyDataSetChanged()
+      }
       return true
     }
 

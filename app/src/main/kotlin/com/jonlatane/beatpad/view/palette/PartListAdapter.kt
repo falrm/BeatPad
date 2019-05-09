@@ -50,7 +50,7 @@ class PartListAdapter(
 			(viewHolder as? PartHolder)?.editPartMenu?.dismiss()
 			val rightMostPosition = if(canAddParts()) viewModel.palette.parts.size
 				else viewModel.palette.parts.size + 1
-			if(toPosition >= rightMostPosition) return false
+			if(toPosition >= rightMostPosition || fromPosition >= rightMostPosition) return false
 			if (fromPosition < toPosition) {
 				for (i in fromPosition until toPosition) {
 					Collections.swap(viewModel.palette.parts, i, i + 1)

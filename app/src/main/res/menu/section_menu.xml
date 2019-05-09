@@ -4,8 +4,4 @@
           android:id="@+id/renameSection"/>
     <item android:title="Delete Section"
           android:id="@+id/deleteSection"/>
-    <item android:title="Add Harmony"
-        android:id="@+id/addHarmonyToSection"/>
-    <item android:title="Remove Harmony"
-          android:id="@+id/removeHarmonyFromSection"/>
 </menu>

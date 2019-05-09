@@ -41,24 +41,8 @@ class SectionHolder(
             alignParentRight()
             centerVertically()
           }
-          /*imageView {
-            id = R.id.section_drag_handle
-            imageResource = R.drawable.move_horizontal
-          }.lparams(dip(35), dip(35f)) {
-            marginStart = dip(5)
-            rightOf(sectionName)
-            centerVertically()
-          }*/
         }
         else                           -> {
-          /*val dragger = imageView {
-            id = R.id.section_drag_handle
-            imageResource = R.drawable.move_vertical
-          }.lparams(dip(35), dip(35f)) {
-            marginStart = dip(5)
-            alignParentRight()
-            alignParentTop()
-          }*/
           textView {
             id = R.id.section_name
             textSize = 25f
@@ -153,30 +137,6 @@ class SectionHolder(
               }
             }
           }
-          removeHarmony -> {
-            section?.harmony = null
-            if (BeatClockPaletteConsumer.section == section) {
-              viewModel.harmonyViewModel.notifyHarmonyChanged()
-              viewModel.melodyViewModel.beatAdapter.notifyDataSetChanged()
-            }
-            invalidate()
-          }
-          addHarmony -> {
-            section?.harmony = Harmony(
-              changes = TreeMap(
-                mapOf(
-                  0 to viewModel.orbifold.chord
-                )
-              ),
-              length = 64,
-              subdivisionsPerBeat = 4
-            )
-            if (BeatClockPaletteConsumer.section == section) {
-              viewModel.harmonyViewModel.notifyHarmonyChanged()
-              viewModel.melodyViewModel.beatAdapter.notifyDataSetChanged()
-            }
-            invalidate()
-          }
         }
         true
       }
@@ -184,25 +144,9 @@ class SectionHolder(
   }
   private val renameSection: MenuItem get() = menu.menu.findItem(R.id.renameSection)
   private val deleteSection: MenuItem get() = menu.menu.findItem(R.id.deleteSection)
-  private val addHarmony: MenuItem get() = menu.menu.findItem(R.id.addHarmonyToSection)
-  private val removeHarmony: MenuItem get() = menu.menu.findItem(R.id.removeHarmonyFromSection)
 
   fun invalidate() {
     deleteSection.isVisible = viewModel.palette.sections.size > 1
-    addHarmony.isVisible = false /*when(section) {
-      null -> false
-      else -> when(section!!.harmony) {
-        null -> true
-        else -> false
-      }
-    }*/
-    removeHarmony.isVisible = false /*when(section) {
-      null -> false
-      else -> when(section!!.harmony) {
-        null -> false
-        else -> true
-      }
-    }*/
     itemView.backgroundResource = when (section) {
       BeatClockPaletteConsumer.section -> sectionDrawableResource(adapterPosition)
       else -> R.drawable.orbifold_chord
@@ -229,12 +173,10 @@ class SectionHolder(
         BeatClockPaletteConsumer.section = section
       }
       setOnLongClickListener {
-        //vibrate(150)
         menu.show()
         true
       }
     }
-    //dragHandle.layoutWidth = dragHandle.dip(35)
   }
 
   private fun makeAddButton() {
@@ -246,12 +188,7 @@ class SectionHolder(
       setOnClickListener {
         adapter.addSection()
       }
-      setOnLongClickListener {
-        //vibrate(150)
-        adapter.addSection()
-        true
-      }
+      setOnLongClickListener { false }
     }
-    //dragHandle.layoutWidth = 0
   }
 }

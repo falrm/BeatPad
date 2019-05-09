@@ -26,14 +26,14 @@ kotlin {
 }
 
 android {
-	compileSdkVersion 27
+	compileSdkVersion 28
 	buildToolsVersion '28.0.3'
 	defaultConfig {
 		applicationId "com.jonlatane.beatpad"
 		minSdkVersion 23
-		targetSdkVersion 27
-		versionCode 43
-		versionName "0.11.3"
+		targetSdkVersion 28
+		versionCode 44
+		versionName "0.11.4"
 		multiDexEnabled true
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 	}
@@ -59,9 +59,9 @@ repositories {
 
 dependencies {
 	implementation fileTree(include: ['*.jar'], dir: 'libs')
-	implementation "com.android.support:appcompat-v7:$support_version"
-	implementation "com.android.support:design:$support_version"
-	implementation "com.android.support:recyclerview-v7:$support_version"
+//	implementation "com.android.support:appcompat-v7:$support_version"
+//	implementation "com.android.support:design:$support_version"
+//	implementation "com.android.support:recyclerview-v7:$support_version"
 	implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"
 
 	implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

@@ -45,7 +45,7 @@ class MelodyReferenceAdapter(
 			val toPosition = target.adapterPosition
 			(viewHolder as? MelodyReferenceHolder)?.editPatternMenu?.dismiss()
 			return part?.let { part ->
-				if(toPosition >= part.melodies.size) return false
+				if(toPosition >= part.melodies.size || fromPosition >= part.melodies.size) return false
 				if (fromPosition < toPosition) {
 					for (i in fromPosition until toPosition) {
 						Collections.swap(part.melodies, i, i + 1)
