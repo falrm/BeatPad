@@ -9,6 +9,9 @@ import android.os.Build
 import android.os.IBinder
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
+import android.support.v4.app.NotificationCompat.PRIORITY_MAX
+import android.support.v4.media.app.NotificationCompat.MediaStyle
+import android.widget.RemoteViews
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.midi.AndroidMidi
@@ -25,10 +28,12 @@ class PlaybackService : Service(), AnkoLogger {
 
     object Action {
       const val MAIN_ACTION = "main"
-      const val STARTFOREGROUND_ACTION = "start"
-      const val STOPFOREGROUND_ACTION = "stop"
-      const val PAUSE_ACTION = "pause"
+      const val STARTFOREGROUND_ACTION = "startService"
+      const val STOPFOREGROUND_ACTION = "stopService"
       const val PLAY_ACTION = "play"
+      const val PAUSE_ACTION = "pause"
+      const val STOP_ACTION = "stop"
+      const val REWIND_ACTION = "rewind"
     }
 
     var instance: PlaybackService? = null
@@ -53,19 +58,31 @@ class PlaybackService : Service(), AnkoLogger {
         info("Received Start Foreground Intent ")
         showNotification()
       }
-      Action.PLAY_ACTION -> {
+      Action.PLAY_ACTION            -> {
         info("Clicked Play")
-        BeatClockPaletteConsumer.tickPosition = 0
         playbackThread.stopped = false
         synchronized(PlaybackThread) {
           (PlaybackThread as java.lang.Object).notify()
         }
+        showNotification()
       }
-      Action.PAUSE_ACTION -> {
+      Action.REWIND_ACTION            -> {
+        info("Clicked Rewind")
+        BeatClockPaletteConsumer.tickPosition = 0
+      }
+      Action.PAUSE_ACTION           -> {
+        info("Clicked Pause")
+        playbackThread.stopped = true
+        showNotification()
+      }
+      Action.STOP_ACTION            -> {
         info("Clicked Stop")
         playbackThread.stopped = true
+        BeatClockPaletteConsumer.tickPosition = 0
+        BeatClockPaletteConsumer.viewModel?.playbackTick = 0
+        showNotification()
       }
-      Action.STOPFOREGROUND_ACTION -> {
+      Action.STOPFOREGROUND_ACTION  -> {
         info("Received Stop Foreground Intent")
         stopForeground(true)
         stopSelf()
@@ -87,7 +104,7 @@ class PlaybackService : Service(), AnkoLogger {
     return null
   }
 
-  private fun showNotification() {
+  fun showNotification() {
     val pendingIntent = Intent(this, PaletteEditorActivity::class.java).let {
       it.action = Action.MAIN_ACTION
       it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -100,7 +117,7 @@ class PlaybackService : Service(), AnkoLogger {
         it.action = action
       }, 0)
 
-    val icon = BitmapFactory.decodeResource(resources, R.drawable.beatscratch_icon)
+//    val icon = BitmapFactory.decodeResource(resources, R.drawable.beatscratch_icon)
 
     val channelId =
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -110,18 +127,34 @@ class PlaybackService : Service(), AnkoLogger {
         // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
         ""
       }
+
+    val sectionName = BeatClockPaletteConsumer.section?.name ?: "..."
     val notification = NotificationCompat.Builder(this, channelId)
-      .setContentTitle("Playback Service")
-      .setTicker("Playback Service")
-      .setContentText("Background audio playback enabled.")
       .setSmallIcon(R.drawable.beatscratch_icon_notification_inset_slight)
+      .setContentTitle("MIDI Playback")
+      .setTicker("MIDI Playback")
+      .setPriority(PRIORITY_MAX)
+      .setContentText(sectionName)
       //.setPriority()
 //      .setL
 //      .setLargeIcon(Bitmap.createScaledBitmap(icon, 128, 128, false))
       .setContentIntent(pendingIntent)
       .setOngoing(true)
-      //.addAction(android.R.drawable.ic_media_play, "Play/Pause", pendingIntent(Action.PLAY_ACTION))
-      .addAction(android.R.drawable.ic_media_next, "Exit", pendingIntent(Action.STOPFOREGROUND_ACTION))
+      .apply {
+        if(isStopped) {
+          addAction(R.drawable.play_notification, "Play", pendingIntent(Action.PLAY_ACTION))
+        } else {
+          addAction(R.drawable.previous_notification, "Skip back", pendingIntent(Action.REWIND_ACTION))
+        }
+      }
+      .addAction(R.drawable.stop_notification, "Stop", pendingIntent(Action.STOP_ACTION))
+      .addAction(R.drawable.close_notification, "Exit", pendingIntent(Action.STOPFOREGROUND_ACTION))
+      .setStyle(
+        MediaStyle()
+          .setShowActionsInCompactView(0, 1)
+//          .setShowCancelButton(true)
+//          .setCancelButtonIntent(pendingIntent(Action.STOPFOREGROUND_ACTION))
+      )
       .build()
     startForeground(SERVICE_ID, notification)
 
@@ -131,7 +164,7 @@ class PlaybackService : Service(), AnkoLogger {
   private fun createNotificationChannel(): String {
     val channelId = "audio_playback"
     val channelName = "MIDI and Hardware Audio"
-    val chan = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_NONE)
+    val chan = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
     //chan.lightColor = Color.BLUE
     //chan.importance = NotificationManager.IMPORTANCE_NONE
     //chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE

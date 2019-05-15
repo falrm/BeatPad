@@ -103,7 +103,7 @@ object PaletteStorage : AnkoLogger {
       val parts: MutableList<Part> = root["parts"].asIterable()
         .map { mapper.treeToValue<Part>(it) }
         .toMutableList()
-      if (parts.isEmpty()) {
+      if (parts.isEmpty() || parts.all { (it.instrument as? MIDIInstrument)?.drumTrack == true }) {
         parts.add(Part())
       }
 
@@ -126,9 +126,9 @@ object PaletteStorage : AnkoLogger {
       val keyboardPart = parts.firstOrNull { it.id == UUID.fromString(mapper.treeToValue(root["keyboardPart"])) }
         ?: parts[0]
       val colorboardPart = parts.firstOrNull { it.id == UUID.fromString(mapper.treeToValue(root["colorboardPart"])) }
-        ?: parts[0]
+        ?: parts.first { (it.instrument as? MIDIInstrument)?.drumTrack == false } ?: parts[0]
       val splatPart = parts.firstOrNull { it.id == UUID.fromString(mapper.treeToValue(root["splatPart"])) }
-        ?: parts[0]
+        ?: parts.first { (it.instrument as? MIDIInstrument)?.drumTrack == false } ?: parts[0]
 
 
       return Palette(

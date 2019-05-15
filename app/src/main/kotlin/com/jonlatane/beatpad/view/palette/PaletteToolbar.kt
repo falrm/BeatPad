@@ -1,7 +1,6 @@
 package com.jonlatane.beatpad.view.palette
 
 import BeatClockPaletteConsumer
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.support.constraint.ConstraintSet.PARENT_ID
@@ -15,20 +14,21 @@ import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
 import com.jonlatane.beatpad.util.isHidden
-import com.jonlatane.beatpad.view.NumberPickerWithTypeface
-import com.jonlatane.beatpad.view.numberPickerWithTypeface
+import com.jonlatane.beatpad.view.colorboard.ColorboardConfiguration
+import com.jonlatane.beatpad.view.keyboard.KeyboardConfiguration
+import com.jonlatane.beatpad.view.orbifold.OrbifoldConfiguration
+import com.jonlatane.beatpad.view.tempo.TempoConfiguration
 import com.jonlatane.beatpad.view.tempo.TempoTracking
-import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.applyConstraintSet
 import org.jetbrains.anko.constraint.layout.constraintLayout
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
 
 
-class PaletteToolbar(ctx: Context,
-                     val viewModel: PaletteViewModel) : _LinearLayout(ctx), AnkoLogger {
-
-
+class PaletteToolbar(
+  override val configurationContext: Context,
+  override val viewModel: PaletteViewModel
+) : _LinearLayout(configurationContext), AnkoLogger, TempoConfiguration, OrbifoldConfiguration, ColorboardConfiguration, KeyboardConfiguration {
   private val metronomeImage = context.resources.getDrawable(R.drawable.noun_metronome_415494_000000, null).apply {
     setBounds(0, 0, 60, 60)
   }
@@ -52,8 +52,8 @@ class PaletteToolbar(ctx: Context,
     onClick {
       imageResource = R.drawable.icons8_skip_to_start_filled_100
       val startIntent = Intent(MainApplication.instance, PlaybackService::class.java)
-      startIntent.action = PlaybackService.Companion.Action.PLAY_ACTION
-      BeatClockPaletteConsumer.tickPosition = 0
+      startIntent.action = if(PlaybackService.instance?.isStopped != false) PlaybackService.Companion.Action.PLAY_ACTION
+      else PlaybackService.Companion.Action.REWIND_ACTION
       MainApplication.instance.startService(startIntent)
     }
   }.palletteToolbarStyle()
@@ -63,7 +63,7 @@ class PaletteToolbar(ctx: Context,
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
       val startIntent = Intent(MainApplication.instance, PlaybackService::class.java)
-      startIntent.action = PlaybackService.Companion.Action.PAUSE_ACTION
+      startIntent.action = PlaybackService.Companion.Action.STOP_ACTION
       MainApplication.instance.startService(startIntent)
     }
   }.palletteToolbarStyle()
@@ -76,7 +76,7 @@ class PaletteToolbar(ctx: Context,
       imageAlpha = 127
       scaleType = ImageView.ScaleType.FIT_CENTER
       onLongClick(returnValue = true) {
-        showTempoPicker()
+        tempoConfigurationAlert.show()
       }
     }.lparams(matchParent, dip(48))
     tempoText = textView {
@@ -98,7 +98,7 @@ class PaletteToolbar(ctx: Context,
       val bpm = Math.round(tempo)
       if (bpm > 20) {
         BeatClockPaletteConsumer.palette?.bpm = bpm.toFloat()
-        updateTempoButton()
+        updateTempoDisplay()
       }
     }
   }
@@ -106,122 +106,74 @@ class PaletteToolbar(ctx: Context,
   val keysButton = imageButton {
     imageResource = R.drawable.icons8_piano_100
     scaleType = ImageView.ScaleType.FIT_CENTER
-  }.palletteToolbarStyle().onClick {
-    if (viewModel.keyboardView.isHidden) {
-      viewModel.backStack.push {
-        if(!viewModel.keyboardView.isHidden) {
-          viewModel.keyboardView.hide()
-          true
-        } else false
+    onClick {
+      if (viewModel.keyboardView.isHidden) {
+        viewModel.backStack.push {
+          if(!viewModel.keyboardView.isHidden) {
+            viewModel.keyboardView.hide()
+            true
+          } else false
+        }
+        viewModel.keyboardView.show()
+      } else {
+        viewModel.keyboardView.hide()
       }
-      viewModel.keyboardView.show()
-    } else {
-      viewModel.keyboardView.hide()
     }
-  }
+    onLongClick(returnValue = true) {
+      keyboardConfigurationAlert.show()
+    }
+  }.palletteToolbarStyle()
 
   val colorsButton = imageButton {
     imageResource = R.drawable.colorboard_icon_2
     scaleType = ImageView.ScaleType.FIT_CENTER
-  }.palletteToolbarStyle().onClick {
-    if (viewModel.colorboardView.isHidden) {
-      viewModel.backStack.push {
-        if(!viewModel.colorboardView.isHidden) {
-          viewModel.colorboardView.hide()
-          true
-        } else false
+    onClick {
+      if (viewModel.colorboardView.isHidden) {
+        viewModel.backStack.push {
+          if(!viewModel.colorboardView.isHidden) {
+            viewModel.colorboardView.hide()
+            true
+          } else false
+        }
+        viewModel.colorboardView.show()
+      } else {
+        viewModel.colorboardView.hide()
       }
-      viewModel.colorboardView.show()
-    } else {
-      viewModel.colorboardView.hide()
     }
-  }
+    onLongClick(returnValue = true) {
+      colorboardConfigurationAlert.show()
+    }
+  }.palletteToolbarStyle()
 
-  val splatButton = imageButton {
+  val orbifoldButton = imageButton {
     imageResource = R.drawable.icons8_molecule_filled_100
     scaleType = ImageView.ScaleType.FIT_CENTER
-  }.palletteToolbarStyle().onClick {
-    if (viewModel.orbifold.isHidden) {
-      viewModel.showOrbifold()
-    } else {
-      viewModel.hideOrbifold()
+    onClick {
+      if (viewModel.orbifold.isHidden) {
+        viewModel.showOrbifold()
+      } else {
+        viewModel.hideOrbifold()
+      }
     }
-  }
+    onLongClick(returnValue = true) {
+      orbifoldConfigurationAlert.show()
+    }
+  }.palletteToolbarStyle()
 
   val volumeButton = imageButton {
     imageResource = R.drawable.icons8_tune_100
     scaleType = ImageView.ScaleType.FIT_CENTER
-  }.palletteToolbarStyle().onClick {
-    viewModel.editingMix = !viewModel.editingMix
-    if(viewModel.editingMix) {
-      post {
-        viewModel.editingMelody = null
-      }
-    }
-  }
-
-
-  private fun showTempoPicker() {
-    context.alert {
-      customView {
-        constraintLayout {
-          val title = textView("Choose Tempo") {
-            id = View.generateViewId()
-            typeface = chordTypefaceBold
-            textSize = 18f
-          }
-          val picker = numberPicker {
-            id = View.generateViewId()
-//            textSize = 16f
-            maxValue = 960
-            minValue = 15
-            value = BeatClockPaletteConsumer.palette?.bpm?.toInt()!!
-            wrapSelectorWheel = false
-            setOnValueChangedListener { _, _, _ ->
-              val bpm = value
-              BeatClockPaletteConsumer.palette?.bpm = bpm.toFloat()
-              updateTempoButton()
-            }
-          }
-
-          applyConstraintSet {
-            title {
-              connect(
-                TOP to TOP of PARENT_ID margin dip(15),
-                START to START of PARENT_ID margin dip(15),
-                END to END of PARENT_ID margin dip(15)
-              )
-            }
-            picker {
-              connect(
-                TOP to BOTTOM of title margin dip(15),
-                START to START of PARENT_ID margin dip(15),
-                END to END of PARENT_ID margin dip(15),
-                BOTTOM to BOTTOM  of PARENT_ID margin dip(15)
-              )
-            }
-          }
+    onClick {
+      viewModel.editingMix = !viewModel.editingMix
+      if(viewModel.editingMix) {
+        post {
+          viewModel.editingMelody = null
         }
       }
-    }.show()
+    }
+  }.palletteToolbarStyle()
 
-//    val dialog = Dialog(context)
-//    dialog.setTitle("Select Tempo")
-//    dialog.setContentView(R.layout.dialog_choose_tempo)
-//    val picker = dialog.findViewById<NumberPicker>(R.id.numberPicker1)
-//    picker.maxValue = 960
-//    picker.minValue = 15
-//    picker.value = BeatClockPaletteConsumer.palette?.bpm?.toInt()!!
-//    picker.wrapSelectorWheel = false
-//    picker.setOnValueChangedListener { _, _, _ ->
-//      val bpm = picker.value
-//      BeatClockPaletteConsumer.palette?.bpm = bpm.toFloat()
-//      updateTempoButton()
-//    }
-//    dialog.show()
-  }
-
-  fun updateTempoButton() {
+  override fun updateTempoDisplay() {
     tempoText.text = "${BeatClockPaletteConsumer.palette!!.bpm.toInt()}"
   }
 }

@@ -1,0 +1,8 @@
+<inset
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:drawable="@drawable/play_button"
+  android:insetBottom="45%"
+  android:insetLeft="45%"
+  android:insetRight="45%"
+  android:insetTop="45%"
+  />

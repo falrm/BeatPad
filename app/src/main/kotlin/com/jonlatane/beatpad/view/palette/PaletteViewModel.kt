@@ -11,6 +11,7 @@ import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.*
 import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
@@ -77,7 +78,7 @@ class PaletteViewModel: AnkoLogger {
     splatPart = new.splatPart ?: new.parts[0]
     orbifold.orbifold = new.orbifold
     orbifold.chord = new.chord
-    toolbarView.updateTempoButton()
+    toolbarView.updateTempoDisplay()
     partListAdapter?.notifyDataSetChanged()
     sectionListAdapter?.notifyDataSetChanged()
     if(!new.sections.contains(BeatClockPaletteConsumer.section)) {
@@ -116,7 +117,9 @@ class PaletteViewModel: AnkoLogger {
       // Fancy animation of the thing if possible
        editMelodyMode()
     } else {
-      Storage.storePalette(palette, melodyView.context)
+      if(old != new) {
+        Storage.storePalette(palette, melodyView.context)
+      }
       partListMode(old)
     }
   }
@@ -136,6 +139,8 @@ class PaletteViewModel: AnkoLogger {
     val keyboardDrumTrack = (new?.instrument as? MIDIInstrument)?.drumTrack == true
     if(keyboardDrumTrack) {
       keyboardView.ioHandler.highlightChord(null)
+    } else {
+      keyboardView.ioHandler.highlightChord(orbifold.chord)
     }
   }
   var colorboardPart: Part? by observable<Part?>(null) { _, _, new ->
@@ -198,6 +203,7 @@ class PaletteViewModel: AnkoLogger {
       editingMelody = null
     }
     partListAdapter?.notifyDataSetChanged()
+    PlaybackService.instance?.showNotification()
   }
 
   private fun editMelodyMode() {

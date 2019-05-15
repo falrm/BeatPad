@@ -3,6 +3,7 @@ import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.model.*
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
+import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.output.service.let
 import com.jonlatane.beatpad.util.to127Int
@@ -10,6 +11,7 @@ import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import com.jonlatane.beatpad.view.palette.SectionHolder
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.info
 import org.jetbrains.anko.verbose
 import java.lang.Math.max
