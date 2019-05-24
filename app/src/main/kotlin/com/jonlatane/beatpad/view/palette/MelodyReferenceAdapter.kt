@@ -80,9 +80,13 @@ class MelodyReferenceAdapter(
 		holder.onPositionChanged()
 	}
 
-	fun insert(sequence: Melody<*>) {
+	fun insert(melody: Melody<*>) {
 		part?.let { part ->
-			part.melodies.add(sequence)
+			while(viewModel.palette.parts.flatMap { it.melodies }.any { it.id == melody.id }) {
+				melody.relatedMelodies.add(melody.id)
+				melody.id = UUID.randomUUID()
+			}
+			part.melodies.add(melody)
 			notifyItemInserted(part.melodies.size - 1)
 			//notifyItemChanged(part.melodies.size)
 		}

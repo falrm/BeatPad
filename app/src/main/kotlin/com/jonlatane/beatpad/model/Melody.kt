@@ -6,6 +6,7 @@ import java.util.*
 
 interface Melody<ElementType : Transposable<ElementType>> : Pattern<ElementType> {
   var id: UUID
+  var relatedMelodies: MutableSet<UUID>
   /**
    * For drum parts, mainly. Also solos you really don't want modified. Indicates
    * the playback mechanism shouldn't "round" to the nearest in-chord note.

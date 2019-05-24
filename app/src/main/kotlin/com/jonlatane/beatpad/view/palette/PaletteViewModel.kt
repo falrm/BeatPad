@@ -2,6 +2,7 @@ package com.jonlatane.beatpad.view.palette
 
 //import com.jonlatane.beatpad.util.syncPositionTo
 import BeatClockPaletteConsumer
+import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
@@ -31,10 +32,13 @@ import kotlin.properties.Delegates.observable
  * The PaletteViewModel still assumes we'll only be editing
  * one Melody at a time.
  */
-class PaletteViewModel: AnkoLogger {
+class PaletteViewModel(
+  override val storageContext: Context
+) : AnkoLogger, Storage {
   init {
     //BeatClockPaletteConsumer.viewModel = this
   }
+
 
   var playbackTick by observable<Int?>(null) { _, old, new ->
     arrayOf(old, new).filterNotNull().map { tickPosition ->
@@ -118,7 +122,7 @@ class PaletteViewModel: AnkoLogger {
        editMelodyMode()
     } else {
       if(old != new) {
-        Storage.storePalette(palette, melodyView.context)
+        melodyView.context.storePalette(palette)
       }
       partListMode(old)
     }

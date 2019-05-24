@@ -1,7 +1,6 @@
 package com.jonlatane.beatpad
 
 import BeatClockPaletteConsumer
-import BeatClockPaletteConsumer.currentSectionColor
 import BeatClockPaletteConsumer.currentSectionDrawable
 import android.content.Context
 import android.content.DialogInterface
@@ -27,7 +26,7 @@ import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.midi.GM1Effects.MIDI_INSTRUMENT_RANGE
 import com.jonlatane.beatpad.model.harmony.Orbifold
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.storage.Storage
+import com.jonlatane.beatpad.storage.InstrumentSelectionStorage
 import com.jonlatane.beatpad.util.InstaRecycler
 import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.nonDelayedRecyclerView
@@ -116,7 +115,7 @@ fun showInstrumentPicker2(
         }
 
 
-        val recents: List<Int> = Storage.loadGM1InstrumentRecents(context)
+        val recents: List<Int> = InstrumentSelectionStorage.loadGM1InstrumentRecents(context)
 
         // Virtual data set
         lateinit var dataSet: List<Int>
@@ -154,7 +153,7 @@ fun showInstrumentPicker2(
               onClick {
                 vibrate(10)
                 val selection = filteredDataSet()[position]
-                Storage.storeGM1InstrumentSelection(selection, context)
+                InstrumentSelectionStorage.storeGM1InstrumentSelection(selection, context)
                 instrument.instrument = selection.toByte()
                 instrument.sendSelectInstrument()
                 adapter.notifyDataSetChanged()
@@ -175,7 +174,7 @@ fun showInstrumentPicker(
   sortRecents: Boolean = true,
   onChosen: () -> Unit = {}
 ) {
-  val recents = Storage.loadGM1InstrumentRecents(context)
+  val recents = InstrumentSelectionStorage.loadGM1InstrumentRecents(context)
   val builder = AlertDialog.Builder(context)
   builder.setTitle("Choose an instrument")
   val items = if (sortRecents) {
@@ -185,7 +184,7 @@ fun showInstrumentPicker(
   }
   builder.setItems(items) { _, which ->
     val selection: Int = if (sortRecents) recents[which] else which
-    Storage.storeGM1InstrumentSelection(selection, context)
+    InstrumentSelectionStorage.storeGM1InstrumentSelection(selection, context)
     instrument.instrument = selection.toByte()
     instrument.sendSelectInstrument()
     (context as? OldBaseActivity)?.updateMenuOptions()

@@ -22,14 +22,14 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
 import java.util.concurrent.atomic.AtomicBoolean
 
-class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
+class PaletteUI constructor(
+  val viewModel: PaletteViewModel
+) : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
   var leftSideWidth: Int = 0
   var isTablet: Boolean = false
-  val viewModel = PaletteViewModel()
   lateinit var layout: RelativeLayout
 
   override fun createView(ui: AnkoContext<PaletteEditorActivity>): RelativeLayout = with(ui) {
-
     layout = relativeLayout {
       isTablet = ui.configuration.smallestScreenWidthDp > 600
 

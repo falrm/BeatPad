@@ -1,19 +1,25 @@
 package com.jonlatane.beatpad.view.palette
 
+import BeatClockPaletteConsumer
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.support.v7.widget.RecyclerView
 import android.widget.PopupMenu
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.storage.PaletteStorage
+import com.jonlatane.beatpad.storage.Storage
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onSeekBarChangeListener
-import android.graphics.PorterDuff
-import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import java.net.URI
 
 
 class MelodyReferenceHolder(
@@ -25,26 +31,31 @@ class MelodyReferenceHolder(
       height = wrapContent
 		}
 	}
-) : RecyclerView.ViewHolder(layout), AnkoLogger {
-	private val partPosition: Int get() = adapter.partPosition
+) : RecyclerView.ViewHolder(layout), AnkoLogger, Storage {
+  override val storageContext: Context get() = context
+  private val partPosition: Int get() = adapter.partPosition
 	val part: Part? get() = adapter.part
 	internal val melody: Melody<*>? get() = part?.melodies?.getOrNull(adapterPosition)
-  val melodyReference: Section.MelodyReference?
+  private val melodyReference: Section.MelodyReference?
     get() = BeatClockPaletteConsumer.section?.melodies?.firstOrNull { it.melody == melody }
   private val context get() = adapter.recyclerView.context
 
-	private val newPatternMenu = PopupMenu(layout.context, layout)
+	private val newMelodyMenu = PopupMenu(layout.context, layout)
 	internal val editPatternMenu = PopupMenu(layout.context, layout)
   private val isMelodyReferenceEnabled: Boolean get()  = melodyReference != null && !melodyReference!!.isDisabled
+  private val pasteMelody get() = newMelodyMenu.menu.findItem(R.id.pasteMelody)
 
 	init {
-		newPatternMenu.inflate(R.menu.part_melody_new_menu)
-		newPatternMenu.setOnMenuItemClickListener { item ->
+		newMelodyMenu.inflate(R.menu.part_melody_new_menu)
+		newMelodyMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
-				R.id.newDrawnPattern -> createAndOpenDrawnMelody()
-				R.id.newMidiPattern -> context.toast("TODO!")
-				R.id.newAudioPattern -> context.toast("TODO!")
-				else -> context.toast("Impossible!")
+				R.id.composeMidiMelody -> createAndOpenDrawnMelody()
+				R.id.recordMidiMelody  -> context.toast("TODO!")
+        R.id.pasteMelody -> {
+          getClipboardMelody()?.let { createAndOpenDrawnMelody(it) }
+            ?: context.toast("Failed to read Melody from clipboard.")
+        }
+				else                   -> context.toast("Impossible!")
 			}
 			true
 		}
@@ -68,7 +79,8 @@ class MelodyReferenceHolder(
 //            part!!.melodies.size - adapterPosition
 //					)
 				}
-				else -> context.toast("TODO!")
+        R.id.copyMelody   -> copyMelody()
+				else              -> context.toast("TODO!")
 			}
 			true
 		}
@@ -122,13 +134,14 @@ class MelodyReferenceHolder(
     }
   }
 
-  private fun createAndOpenDrawnMelody() {
-    val newMelody = PaletteStorage.baseMelody.also {
+  private fun createAndOpenDrawnMelody(
+    newMelody: Melody<*> = PaletteStorage.baseMelody.also {
       // Don't try to conform drum parts to harmony
       if((part?.instrument as? MIDIInstrument)?.drumTrack == true) {
         it.limitedToNotesInHarmony = false
       }
     }
+  ) {
     BeatClockPaletteConsumer.section?.melodies?.add(
       Section.MelodyReference(newMelody, 0.5f, Section.PlaybackType.Indefinite)
     )
@@ -219,10 +232,34 @@ class MelodyReferenceHolder(
           createAndOpenDrawnMelody()
         }
         setOnLongClickListener {
-          newPatternMenu.show()
+          showNewMelodyMenu()
           true
         }
       }
     }
+  }
+
+  private fun showNewMelodyMenu() {
+    pasteMelody.isEnabled = getClipboardMelody() != null
+    newMelodyMenu.show()
+  }
+
+  private fun getClipboardMelody(): Melody<*>? = try {
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboard.primaryClip?.getItemAt(0)?.text?.let { URI(it.toString()) }
+      ?.let { uri ->
+        uri.toEntity("melody", "v1", Melody::class)
+      }
+  } catch(t: Throwable) {
+    error("Failed to deserialize melody", t)
+    null
+  }
+
+  fun copyMelody() {
+    val text = melody?.toURI()?.toString() ?: ""
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText("BeatScratch Melody", text)
+    clipboard.primaryClip = clip
+    context.toast("Copied BeatScratch Melody data to clipboard!")
   }
 }

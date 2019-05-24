@@ -15,7 +15,8 @@ data class RationalMelody(
   override var shouldConformWithHarmony: Boolean = false,
   override var tonic: Int = 0,
   override var length: Int = 1,
-  override var id: UUID = UUID.randomUUID()
+  override var id: UUID = UUID.randomUUID(),
+  override var relatedMelodies: MutableSet<UUID> = mutableSetOf()
 ) : Melody<RationalMelody.Element> {
   data class Element(
     var tones: MutableSet<Int> = mutableSetOf(),

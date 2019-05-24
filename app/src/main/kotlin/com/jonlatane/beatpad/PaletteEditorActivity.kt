@@ -2,6 +2,7 @@ package com.jonlatane.beatpad
 
 import BeatClockPaletteConsumer
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
@@ -18,18 +19,20 @@ import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.palette.PaletteUI
+import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
 import java.util.*
 
 
 class PaletteEditorActivity : Activity(), Storage, AnkoLogger {
+  override val storageContext: Context get() = this
   private lateinit var ui: PaletteUI
   private val viewModel get() = ui.viewModel
   private var lastBackPress: Long? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    ui = PaletteUI().also {
+    ui = PaletteUI(viewModel = PaletteViewModel(storageContext)).also {
       it.setContentView(this)
     }
 
@@ -148,7 +151,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger {
 
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
-    Storage.storePalette(viewModel.palette, this)
+    storePalette(viewModel.palette)
     outState.putString("melodyDisplayType", viewModel.melodyViewModel.displayType.name)
     outState.putBoolean("keyboardOpen", !viewModel.keyboardView.isHidden)
     outState.putBoolean("colorboardOpen", !viewModel.colorboardView.isHidden)

@@ -1,19 +1,26 @@
 package com.jonlatane.beatpad.storage
 
 import android.content.Context
-import android.util.Log
-import com.jonlatane.beatpad.midi.GM1Effects
+import android.util.Base64
+import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Palette
+import com.jonlatane.beatpad.storage.AppObjectMapper.reader
 import com.jonlatane.beatpad.storage.AppObjectMapper.writer
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.error
 import org.jetbrains.anko.info
-import org.jetbrains.anko.verbose
 import java.io.*
 import java.io.File.separator
+import java.net.URI
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
+import kotlin.reflect.KClass
 
 interface Storage: AnkoLogger {
+	val storageContext: Context
+
 	fun Context.loadPalette(filename:String = openPaletteFileName) = loadPalette(this, filename)
 	fun Context.storePalette(palette: Palette, filename:String = openPaletteFileName)
 	  = storePalette(palette, this, filename)
@@ -23,12 +30,6 @@ interface Storage: AnkoLogger {
 		private const val melodyDir = "melodies"
 		private const val harmonyDir = "harmonies"
 		private const val openPaletteFileName = "palette.json"
-
-		private fun createDir(name: String, context: Context) {
-			val dir = context.filesDir
-			val dir2 = File(dir, name)
-			dir2.mkdirs()
-		}
 
 		fun getPalettes(context: Context): List<File> {
 			createDir(paletteDir, context)
@@ -81,30 +82,36 @@ interface Storage: AnkoLogger {
 			}
 		}
 
-		fun storeGM1InstrumentSelection(instrument: Int, context: Context) = try {
-			val currentChoices = loadGM1InstrumentRecents(context)
-			val newVersion = (currentChoices - instrument).toMutableList().apply {
-				add(0, instrument)
-			}
-			val outputStreamWriter = OutputStreamWriter(context.openFileOutput("gm1_choices.json", Context.MODE_PRIVATE))
-			val json = stringify(newVersion)
-			info("Stored GM1 instrument choices: $json")
-			outputStreamWriter.write(json)
-			outputStreamWriter.close()
-		} catch (e: IOException) {
-			error("File send failed", e)
-		}
-
-		fun loadGM1InstrumentRecents(context: Context): List<Int> = try {
-			val json: String = InputStreamReader(context.openFileInput("gm1_choices.json")).use { it.readText() }
-			info("Loaded GM1 instrument choices: $json")
-			val data = AppObjectMapper.readValue(json, IntArray::class.java).toList()
-			data
-		} catch (t: Throwable) {
-			//error("Failed to load stored palette", t)
-			GM1Effects.MIDI_INSTRUMENT_NAMES.indices.toList()
-		}
-
 		fun stringify(o: Any) = writer.writeValueAsString(o)
+
+		private fun createDir(name: String, context: Context) {
+			val dir = context.filesDir
+			val dir2 = File(dir, name)
+			dir2.mkdirs()
+		}
+	}
+	fun Palette.toURI(): URI = toURI("palette")
+	fun Harmony.toURI(): URI = toURI("harmony")
+	fun Melody<*>.toURI(): URI = toURI("melody")
+
+	fun <T: Any> URI.toEntity(entity: String, entityVersion: String, klass: KClass<out T>) : T? {
+		if(scheme != "beatscratch" || host != entity || path != "/$entityVersion") return null
+		val bytes = Base64.decode(query, Base64.NO_WRAP)
+		return ZipInputStream(ByteArrayInputStream(bytes)).use { zipInputStream ->
+			zipInputStream.nextEntry
+			AppObjectMapper.readValue(zipInputStream, klass.java)
+		}
+	}
+
+	fun Any.toURI(entity: String, entityVersion: String = "v1"): URI {
+		val bytes = ByteArrayOutputStream().use { bytes ->
+			ZipOutputStream(bytes).use { out ->
+				out.putNextEntry(ZipEntry("object.json"))
+				writer.writeValue(out, this)
+			}
+			bytes.toByteArray()
+		}
+		val encodedString = Base64.encodeToString(bytes, Base64.NO_WRAP)
+		return URI("beatscratch://$entity/$entityVersion?$encodedString")
 	}
 }

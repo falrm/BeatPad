@@ -10,6 +10,7 @@ import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.MainApplication.Companion.chordTypefaceBold
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.service.PlaybackService
+import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
@@ -23,12 +24,17 @@ import org.jetbrains.anko.constraint.layout.applyConstraintSet
 import org.jetbrains.anko.constraint.layout.constraintLayout
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
+import android.R.attr.label
+import android.content.ClipData
+import android.content.ClipboardManager
+import com.jonlatane.beatpad.util.layoutWidth
 
 
 class PaletteToolbar(
   override val configurationContext: Context,
   override val viewModel: PaletteViewModel
-) : _LinearLayout(configurationContext), AnkoLogger, TempoConfiguration, OrbifoldConfiguration, ColorboardConfiguration, KeyboardConfiguration {
+) : _LinearLayout(configurationContext), AnkoLogger, TempoConfiguration, OrbifoldConfiguration, ColorboardConfiguration, KeyboardConfiguration, Storage {
+  override val storageContext: Context get() = configurationContext
   private val metronomeImage = context.resources.getDrawable(R.drawable.noun_metronome_415494_000000, null).apply {
     setBounds(0, 0, 60, 60)
   }
@@ -172,6 +178,20 @@ class PaletteToolbar(
       }
     }
   }.palletteToolbarStyle()
+
+
+//  val shareButton = imageButton {
+//    imageResource = R.drawable.ic_share_black_24dp
+//    scaleType = ImageView.ScaleType.FIT_CENTER
+//    onClick {
+//      val text = BeatClockPaletteConsumer.palette?.toURI()?.toString() ?: ""
+//      val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+//      val clip = ClipData.newPlainText("BeatScratch Palette", text)
+//      clipboard.primaryClip = clip
+//
+//      context.toast("Copied BeatScratch Palette data to clipboard!")
+//    }
+//  }.palletteToolbarStyle()
 
   override fun updateTempoDisplay() {
     tempoText.text = "${BeatClockPaletteConsumer.palette!!.bpm.toInt()}"
