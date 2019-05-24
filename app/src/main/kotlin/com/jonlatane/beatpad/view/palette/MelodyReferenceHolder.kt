@@ -49,10 +49,10 @@ class MelodyReferenceHolder(
 		newMelodyMenu.inflate(R.menu.part_melody_new_menu)
 		newMelodyMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
-				R.id.composeMidiMelody -> createAndOpenDrawnMelody()
+				R.id.composeMidiMelody -> adapter.createAndOpenDrawnMelody()
 				R.id.recordMidiMelody  -> context.toast("TODO!")
         R.id.pasteMelody -> {
-          getClipboardMelody()?.let { createAndOpenDrawnMelody(it) }
+          getClipboardMelody()?.let { adapter.createAndOpenDrawnMelody(it) }
             ?: context.toast("Failed to read Melody from clipboard.")
         }
 				else                   -> context.toast("Impossible!")
@@ -134,26 +134,6 @@ class MelodyReferenceHolder(
     }
   }
 
-  private fun createAndOpenDrawnMelody(
-    newMelody: Melody<*> = PaletteStorage.baseMelody.also {
-      // Don't try to conform drum parts to harmony
-      if((part?.instrument as? MIDIInstrument)?.drumTrack == true) {
-        it.limitedToNotesInHarmony = false
-      }
-    }
-  ) {
-    BeatClockPaletteConsumer.section?.melodies?.add(
-      Section.MelodyReference(newMelody, 0.5f, Section.PlaybackType.Indefinite)
-    )
-    adapter.insert(newMelody)
-    doAsync {
-      Thread.sleep(300L)
-      uiThread {
-        viewModel.editingMelody = newMelody
-      }
-    }
-  }
-
 	private fun editMode() {
 		layout.apply {
       inclusion.apply {
@@ -229,7 +209,7 @@ class MelodyReferenceHolder(
         backgroundResource = R.drawable.orbifold_chord
         alpha = 1f
         setOnClickListener {
-          createAndOpenDrawnMelody()
+          adapter.createAndOpenDrawnMelody()
         }
         setOnLongClickListener {
           showNewMelodyMenu()

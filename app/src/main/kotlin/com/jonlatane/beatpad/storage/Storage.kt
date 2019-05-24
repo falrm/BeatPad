@@ -95,7 +95,13 @@ interface Storage: AnkoLogger {
 	fun Melody<*>.toURI(): URI = toURI("melody")
 
 	fun <T: Any> URI.toEntity(entity: String, entityVersion: String, klass: KClass<out T>) : T? {
-		if(scheme != "beatscratch" || host != entity || path != "/$entityVersion") return null
+		// Validate the schema
+		when(scheme) {
+			"beatscratch" ->{ if (host != entity || path != "/$entityVersion") return null }
+			"https" -> { if(host != "beatscratch.io" || path != "/$entity/$entityVersion") return null }
+			else -> return null
+		}
+		// Attempt to
 		val bytes = Base64.decode(query, Base64.NO_WRAP)
 		return ZipInputStream(ByteArrayInputStream(bytes)).use { zipInputStream ->
 			zipInputStream.nextEntry
@@ -112,6 +118,6 @@ interface Storage: AnkoLogger {
 			bytes.toByteArray()
 		}
 		val encodedString = Base64.encodeToString(bytes, Base64.NO_WRAP)
-		return URI("beatscratch://$entity/$entityVersion?$encodedString")
+		return URI("https://beatscratch.io/$entity/$entityVersion?$encodedString")
 	}
 }

@@ -36,6 +36,9 @@ object PaletteStorage : AnkoLogger {
       )
     )
 
+  /**
+   * *Generates* a new base melody of 4 empty bars in 16th notes.
+   */
   val baseMelody
     get() = RationalMelody(
       changes = TreeMap((0..63).map { it to RationalMelody.Element() }.toMap()),

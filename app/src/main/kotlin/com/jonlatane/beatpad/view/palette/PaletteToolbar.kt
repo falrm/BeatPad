@@ -3,31 +3,26 @@ package com.jonlatane.beatpad.view.palette
 import BeatClockPaletteConsumer
 import android.content.Context
 import android.content.Intent
-import android.support.constraint.ConstraintSet.PARENT_ID
 import android.view.View
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.MainApplication.Companion.chordTypefaceBold
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.color
-import org.jetbrains.anko.*
-import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
 import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.view.colorboard.ColorboardConfiguration
 import com.jonlatane.beatpad.view.keyboard.KeyboardConfiguration
 import com.jonlatane.beatpad.view.orbifold.OrbifoldConfiguration
 import com.jonlatane.beatpad.view.tempo.TempoConfiguration
 import com.jonlatane.beatpad.view.tempo.TempoTracking
-import org.jetbrains.anko.constraint.layout.applyConstraintSet
-import org.jetbrains.anko.constraint.layout.constraintLayout
+import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
-import android.R.attr.label
-import android.content.ClipData
-import android.content.ClipboardManager
-import com.jonlatane.beatpad.util.layoutWidth
 
 
 class PaletteToolbar(

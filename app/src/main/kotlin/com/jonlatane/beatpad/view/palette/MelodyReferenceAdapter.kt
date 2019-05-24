@@ -6,8 +6,13 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.ViewGroup
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Part
+import com.jonlatane.beatpad.model.Section
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.util.SmartAdapter
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
+import org.jetbrains.anko.uiThread
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -80,7 +85,7 @@ class MelodyReferenceAdapter(
 		holder.onPositionChanged()
 	}
 
-	fun insert(melody: Melody<*>) {
+	private fun insert(melody: Melody<*>) {
 		part?.let { part ->
 			while(viewModel.palette.parts.flatMap { it.melodies }.any { it.id == melody.id }) {
 				melody.relatedMelodies.add(melody.id)
@@ -89,6 +94,26 @@ class MelodyReferenceAdapter(
 			part.melodies.add(melody)
 			notifyItemInserted(part.melodies.size - 1)
 			//notifyItemChanged(part.melodies.size)
+		}
+	}
+
+	fun createAndOpenDrawnMelody(
+		newMelody: Melody<*> = PaletteStorage.baseMelody.also {
+			// Don't try to conform drum parts to harmony
+			if((part?.instrument as? MIDIInstrument)?.drumTrack == true) {
+				it.limitedToNotesInHarmony = false
+			}
+		}
+	) {
+		BeatClockPaletteConsumer.section?.melodies?.add(
+			Section.MelodyReference(newMelody, 0.5f, Section.PlaybackType.Indefinite)
+		)
+		insert(newMelody)
+		doAsync {
+			Thread.sleep(300L)
+			uiThread {
+				viewModel.editingMelody = newMelody
+			}
 		}
 	}
 

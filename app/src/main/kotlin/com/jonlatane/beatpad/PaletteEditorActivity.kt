@@ -2,32 +2,44 @@ package com.jonlatane.beatpad
 
 import BeatClockPaletteConsumer
 import android.app.Activity
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.support.constraint.ConstraintSet
+import android.view.View
 import android.view.WindowManager
+import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Palette
+import com.jonlatane.beatpad.model.Part
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.sensors.ShakeDetector
 import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.storage.Storage
-import com.jonlatane.beatpad.util.HideAnimation
-import com.jonlatane.beatpad.util.formatted
-import com.jonlatane.beatpad.util.isHidden
+import com.jonlatane.beatpad.util.*
 //import com.jonlatane.beatpad.util.show
-import com.jonlatane.beatpad.util.vibrate
+import com.jonlatane.beatpad.view.InstrumentConfiguration
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.palette.PaletteUI
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
+import com.jonlatane.beatpad.view.palette.PartHolder
+import com.jonlatane.beatpad.view.palette.partListView
 import org.jetbrains.anko.*
+import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder
+import org.jetbrains.anko.constraint.layout.applyConstraintSet
+import org.jetbrains.anko.constraint.layout.constraintLayout
+import java.net.URI
 import java.util.*
 
 
-class PaletteEditorActivity : Activity(), Storage, AnkoLogger {
+class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfiguration {
+  override val configurationContext: Context get() = this
   override val storageContext: Context get() = this
   private lateinit var ui: PaletteUI
-  private val viewModel get() = ui.viewModel
+  override val viewModel get() = ui.viewModel
   private var lastBackPress: Long? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,6 +107,13 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger {
         }
       }
     }
+
+
+    // Open melody from intent
+    MainApplication.intentMelody?.let { intentMelody ->
+      MainApplication.intentMelody = null
+      openMelodyAlert(intentMelody)
+    }
   }
 
   override fun onPause() {
@@ -159,5 +178,63 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger {
     outState.putString("editingMelodyId", viewModel.editingMelody?.id.toString())
     outState.putInt("beatWidth", viewModel.melodyBeatAdapter.elementWidth)
     outState.putInt("beatHeight", viewModel.melodyBeatAdapter.elementHeight)
+  }
+
+
+  fun openMelodyAlert(melody: Melody<*>) {
+    lateinit var alert: DialogInterface
+    val alertBuilder = configurationContext.alert {
+      customView {
+        constraintLayout {
+          val title = textView("Insert Melody") {
+            id = View.generateViewId()
+            typeface = MainApplication.chordTypefaceBold
+            textSize = 18f
+          }
+          val recycler = instrumentPartPicker(
+            viewModel.palette.parts,
+            getSelectedPart = { Part() }, // Won't match any parts
+            setSelectedPart = { selectedPart ->
+              viewModel.partListView.viewHolders<PartHolder>().find {
+                it.part == selectedPart
+              }?.let {
+                it.melodyReferenceAdapter.createAndOpenDrawnMelody(melody)
+              } ?: {
+                while(viewModel.palette.parts.flatMap { it.melodies }.any { it.id == melody.id }) {
+                  melody.relatedMelodies.add(melody.id)
+                  melody.id = UUID.randomUUID()
+                }
+                selectedPart.melodies.add(melody)
+                viewModel.palette.parts.indexOfFirst { it == selectedPart }
+                  .takeIf { it >= 0 }?.let {index ->
+                  viewModel.partListAdapter?.notifyItemChanged(index)
+                }
+
+              }()
+              alert.cancel()
+            }
+          ).lparams(matchParent, wrapContent)
+
+          applyConstraintSet {
+            title {
+              connect(
+                ConstraintSetBuilder.Side.TOP to ConstraintSetBuilder.Side.TOP of ConstraintSet.PARENT_ID margin dip(15),
+                ConstraintSetBuilder.Side.START to ConstraintSetBuilder.Side.START of ConstraintSet.PARENT_ID margin dip(15),
+                ConstraintSetBuilder.Side.END to ConstraintSetBuilder.Side.END of ConstraintSet.PARENT_ID margin dip(15)
+              )
+            }
+            recycler {
+              connect(
+                ConstraintSetBuilder.Side.TOP to ConstraintSetBuilder.Side.BOTTOM of title margin dip(15),
+                ConstraintSetBuilder.Side.START to ConstraintSetBuilder.Side.START of ConstraintSet.PARENT_ID margin dip(15),
+                ConstraintSetBuilder.Side.END to ConstraintSetBuilder.Side.END of ConstraintSet.PARENT_ID margin dip(15),
+                ConstraintSetBuilder.Side.BOTTOM to ConstraintSetBuilder.Side.BOTTOM of ConstraintSet.PARENT_ID margin dip(15)
+              )
+            }
+          }
+        }
+      }
+    }
+    alert = alertBuilder.show()
   }
 }
