@@ -60,7 +60,7 @@ class MelodyViewModel(
 		fadeInAnim.setDuration(500).start()
 		fadeOutAnim.setDuration(500).start()
 		melodyToolbar.displayTypeButton.imageResource = when(displayType) {
-			DisplayType.COLORBLOCK -> R.drawable.filled_notehead
+			DisplayType.COLORBLOCK -> R.drawable.notehead_filled
 			else -> R.drawable.colorboard_icon_vertical
 		}
 	}

@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.melody.renderer
 
 import BeatClockPaletteConsumer
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import com.jonlatane.beatpad.R
@@ -9,8 +10,10 @@ import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.view.colorboard.CanvasToneDrawer
+import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
+import java.util.*
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.min
@@ -18,9 +21,24 @@ import kotlin.math.min
 
 interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
   val notationAlpha: Float
-  fun createFilledNotehead(): Drawable
   fun flushNotationDrawableCache()
-  val sharp: Drawable
+  val sharpPool: DrawablePool
+  val filledNoteheadPool: DrawablePool
+
+  class DrawablePool(val drawableResource: Int, val context: Context): DefaultPool<Drawable>(15) {
+    val notationDrawableCache = Vector<Drawable>(15)
+    override fun produceInstance(): Drawable {
+      val result = context.resources.getDrawable(drawableResource, null)
+        ?.constantState?.newDrawable()?.mutate()
+      notationDrawableCache.add(result)
+      return result!!
+    }
+    fun flushNotationDrawableCache() {
+      notationDrawableCache.removeAll {
+        recycle(it); true
+      }
+    }
+  }
   val clefs: List<Clef> get() = listOf(Clef.TREBLE, Clef.BASS)
 
   fun renderNotationMelodyBeat(canvas: Canvas) {
@@ -122,7 +140,7 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
         playbackNotes.forEach { note ->
           val center = pointFor(note)
 
-          val notehead = createFilledNotehead().constantState.newDrawable().mutate()
+          val notehead = filledNoteheadPool.borrow()
             .apply { alpha = (drawAlpha * alphaSource).toInt() }
           val boundsWidth = bounds.width()
           val maxFittableNoteheadWidth = ceil(boundsWidth / 2.3f).toInt()
@@ -152,8 +170,7 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
           notehead.draw(this)
 
           if(note.sign == Note.Sign.Sharp) {
-            val sharp = sharp.constantState.newDrawable().mutate()
-              .apply { alpha = (drawAlpha * alphaSource).toInt() }
+            val sharp = sharpPool.borrow().apply { alpha = (drawAlpha * alphaSource).toInt() }
 
             val (sharpLeft, sharpRight) = if(shouldStagger) {
               (bounds.right - 2.1f * noteheadWidth).toInt() to (bounds.right - 1.6f * noteheadWidth).toInt()

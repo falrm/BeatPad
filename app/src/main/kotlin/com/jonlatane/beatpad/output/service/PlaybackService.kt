@@ -14,6 +14,7 @@ import android.support.v4.media.app.NotificationCompat.MediaStyle
 import android.widget.RemoteViews
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.SplashActivity
 import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
@@ -105,9 +106,9 @@ class PlaybackService : Service(), AnkoLogger {
   }
 
   fun showNotification() {
-    val pendingIntent = Intent(this, PaletteEditorActivity::class.java).let {
-      it.action = Action.MAIN_ACTION
-      it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    val pendingIntent = Intent(this, SplashActivity::class.java).let {
+      //it.action = Action.MAIN_ACTION
+      //it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
       PendingIntent.getActivity(this, 0, it, 0)
     }
 

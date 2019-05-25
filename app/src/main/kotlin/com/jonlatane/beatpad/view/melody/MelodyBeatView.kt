@@ -13,6 +13,8 @@ import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
+import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatNotationRenderer
+import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatNotationRenderer.DrawablePool
 import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatRenderer
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.*
@@ -28,30 +30,16 @@ class MelodyBeatView @JvmOverloads constructor(
   override val viewModel: MelodyViewModel
 ) : BaseColorboardView(context, attrs, defStyle), MelodyBeatRenderer,
   MelodyBeatEventArticulationHandler, MelodyBeatEventEditingHandler, AnkoLogger {
+
   override val displayType: MelodyViewModel.DisplayType get() = viewModel.displayType
   override val renderableToneBounds: Rect = Rect()
   override val colorblockAlpha: Float get() = viewModel.beatAdapter.colorblockAlpha
   override val notationAlpha: Float get() = viewModel.beatAdapter.notationAlpha
-  override fun createFilledNotehead(): Drawable = filledNoteheadPool.borrow()
+  override val filledNoteheadPool = DrawablePool(R.drawable.notehead_filled, context)
+  override val sharpPool = DrawablePool(R.drawable.sharp, context)
   override fun flushNotationDrawableCache() {
-    notationDrawableCache.removeAll {
-      filledNoteheadPool.recycle(it); true
-    }
+    listOf(filledNoteheadPool, sharpPool).forEach { it.flushNotationDrawableCache() }
   }
-  override val sharp: Drawable = context.resources.getDrawable(R.drawable.sharp, null)
-    .constantState.newDrawable().mutate()
-
-  val notationDrawableCache = Vector<Drawable>(15)
-  val filledNoteheadPool = object: DefaultPool<Drawable>(15) {
-    override fun produceInstance(): Drawable {
-      val result = context.resources.getDrawable(R.drawable.filled_notehead, null)
-        .constantState.newDrawable().mutate()
-      notationDrawableCache.add(result)
-      return result
-    }
-
-  }
-
 
   init {
     showSteps = true
