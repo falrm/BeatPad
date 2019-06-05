@@ -16,7 +16,7 @@ interface ColorGuide : CanvasToneDrawer {
 	val nonRootPadding: Int get() = MainApplication.instance.dip(13)
 	val drawnColorGuideAlpha: Int // In case you want to scale by the View's alpha :)
 
-  fun Canvas.drawColorGuide() {
+  fun Canvas.drawColorGuide(): Unit = paint.preserveColor {
     val halfStepPhysicalDistance = axisLength / halfStepsOnScreen
     for((tone, toneBounds) in visiblePitches) {
       val toneInChord = chord.closestTone(tone)

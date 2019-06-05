@@ -3,6 +3,8 @@ package com.jonlatane.beatpad.view.colorboard
 import android.content.Context
 import android.graphics.Paint
 import android.graphics.Rect
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KMutableProperty1
 
 interface AlphaDrawer {
 	val paint: Paint
@@ -18,6 +20,13 @@ interface AlphaDrawer {
 	val drawingContext: Context
 	val halfStepWidth: Float get() = axisLength / halfStepsOnScreen
 	fun color(resourceId: Int): Int
+
+	fun <T> Paint.preserveColor(block: () -> T): T {
+		val initialColor = color
+		val result = block()
+		color = initialColor
+		return result
+	}
 
 	companion object {
 		const val BOTTOM = -39

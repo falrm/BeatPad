@@ -57,9 +57,9 @@ interface CanvasToneDrawer : AlphaDrawer {
       override fun produceInstance() = VisiblePitch()
     }
 
-    private val visiblePitchListPool: DefaultPool<Vector<VisiblePitch>> = object : DefaultPool<Vector<VisiblePitch>>(16) {
-      override fun produceInstance() = Vector<VisiblePitch>(16)
-      override fun validateInstance(instance: Vector<VisiblePitch>) {
+    private val visiblePitchListPool: DefaultPool<MutableList<VisiblePitch>> = object : DefaultPool<MutableList<VisiblePitch>>(16) {
+      override fun produceInstance() = Collections.synchronizedList(mutableListOf<VisiblePitch>())
+      override fun validateInstance(instance: MutableList<VisiblePitch>) {
         super.validateInstance(instance)
         instance.clear()
       }

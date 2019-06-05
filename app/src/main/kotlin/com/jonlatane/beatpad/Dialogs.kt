@@ -155,6 +155,7 @@ fun showInstrumentPicker2(
                 val selection = filteredDataSet()[position]
                 InstrumentSelectionStorage.storeGM1InstrumentSelection(selection, context)
                 instrument.instrument = selection.toByte()
+                instrument.drumTrack = false
                 instrument.sendSelectInstrument()
                 adapter.notifyDataSetChanged()
                 BeatClockPaletteConsumer.viewModel?.partListAdapter?.notifyDataSetChanged()

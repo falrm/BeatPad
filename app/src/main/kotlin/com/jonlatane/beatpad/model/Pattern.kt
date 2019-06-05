@@ -28,7 +28,7 @@ interface Pattern<T : Transposable<T>> : Transposable<Pattern<T>> {
   fun floorKey(position: Int) = changes.floorKey(position) ?: changes.lastKey()
   fun lowerKey(position:Int) = changes.lowerKey(position) ?: changes.lastKey()
 
-  fun changeBefore(position: Int) = changes[floorKey(position)]!!
+  fun changeBefore(position: Int): T = changes[floorKey(position)] ?: changes.firstEntry().value
   fun isChangeAt(position: Int) = changes.containsKey(position)
   fun isSustainAt(position: Int) = !isChangeAt(position)
 }

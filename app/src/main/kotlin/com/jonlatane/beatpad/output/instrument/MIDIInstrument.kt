@@ -31,7 +31,7 @@ class MIDIInstrument constructor(
 			}
 		}
 	override val type get() = "midi"
-	@Transient private val tones: MutableList<Int> = Vector<Int>()
+	@Transient private val tones: MutableList<Int> = Collections.synchronizedList(mutableListOf<Int>())
 	@Transient private val byte2 = ByteArray(2)
 	@Transient private val byte3 = ByteArray(3)
 

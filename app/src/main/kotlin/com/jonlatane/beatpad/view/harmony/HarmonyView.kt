@@ -5,6 +5,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
@@ -23,6 +24,7 @@ import java.util.*
 class HarmonyView(
   context: Context,
   val viewModel: PaletteViewModel,
+  recyclerLayoutParams: RelativeLayout.LayoutParams.() -> Unit = {},
   init: HideableRelativeLayout.() -> Unit = {}
 ) : HideableRelativeLayout(context), AnkoLogger {
   companion object {
@@ -108,6 +110,7 @@ class HarmonyView(
         marginStart = dip(30)
         alignParentRight()
         alignParentTop()
+        recyclerLayoutParams()
       }
     }
   }

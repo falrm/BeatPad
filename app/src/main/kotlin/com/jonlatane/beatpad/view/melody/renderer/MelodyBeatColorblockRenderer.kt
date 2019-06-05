@@ -22,6 +22,7 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatEventH
   override var chord: Chord
 
   fun MelodyBeatView.renderColorblockMelodyBeat(canvas: Canvas) {
+    paint.strokeWidth = 0f
     canvas.renderSteps()
     melody?.let { melody ->
       canvas.drawMelody(

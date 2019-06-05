@@ -37,9 +37,7 @@ class MelodyBeatView @JvmOverloads constructor(
   override val notationAlpha: Float get() = viewModel.beatAdapter.notationAlpha
   override val filledNoteheadPool = DrawablePool(R.drawable.notehead_filled, context)
   override val sharpPool = DrawablePool(R.drawable.sharp, context)
-  override fun flushNotationDrawableCache() {
-    listOf(filledNoteheadPool, sharpPool).forEach { it.flushNotationDrawableCache() }
-  }
+  override val xNoteheadPool: DrawablePool = DrawablePool(R.drawable.notehead_x, context)
 
   init {
     showSteps = true

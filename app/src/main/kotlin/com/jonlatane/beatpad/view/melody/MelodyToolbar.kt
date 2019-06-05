@@ -198,8 +198,7 @@ class MelodyToolbar(
 
 
 		lengthButton.text = "${melodyViewModel.openedMelody?.length}/${melodyViewModel.openedMelody?.subdivisionsPerBeat}"
-		lengthDialog.lengthPicker.value = melodyViewModel.openedMelody?.length ?: 1
-		lengthDialog.subdivisionsPerBeatPicker.value = melodyViewModel.openedMelody?.subdivisionsPerBeat ?: 1
+		lengthDialog.melody = melodyViewModel.openedMelody
 	}
 	private fun updateMelody() = viewModel.melodyBeatAdapter?.notifyDataSetChanged()
 

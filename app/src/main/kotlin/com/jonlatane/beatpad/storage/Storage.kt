@@ -7,9 +7,7 @@ import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.storage.AppObjectMapper.reader
 import com.jonlatane.beatpad.storage.AppObjectMapper.writer
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.error
-import org.jetbrains.anko.info
+import org.jetbrains.anko.*
 import java.io.*
 import java.io.File.separator
 import java.net.URI
@@ -21,9 +19,35 @@ import kotlin.reflect.KClass
 interface Storage: AnkoLogger {
 	val storageContext: Context
 
-	fun Context.loadPalette(filename:String = openPaletteFileName) = loadPalette(this, filename)
-	fun Context.storePalette(palette: Palette, filename:String = openPaletteFileName)
-	  = storePalette(palette, this, filename)
+	fun Context.loadPalette(filename:String = openPaletteFileName): Palette = try {
+		loadPalette(this, File("$filesDir$separator$paletteDir$separator$filename"))
+	} catch(t: Throwable) {
+		toast("Failed to load data, attempting to load backup...")
+		try {
+			loadPalette(this, File("$filesDir$separator$paletteDir$separator${filename}_old"))
+		} catch(t: Throwable) {
+			error("Failed to load any palette data, starting from scratch...", t)
+			toast("Failed to load data from backup, starting from scratch...")
+			PaletteStorage.basePalette
+		}
+	}
+
+	fun Context.storePalette(palette: Palette, filename:String = openPaletteFileName) = doAsync {
+		val tmpFile = File("$filesDir$separator$paletteDir${separator}tmp_palette.json")
+		val destFile = File("$filesDir$separator$paletteDir$separator$filename")
+		val oldFile = File("$filesDir$separator$paletteDir$separator${filename}_old")
+
+		try { tmpFile.delete() } catch(_: Throwable) {}
+		try { oldFile.delete() } catch(_: Throwable) {}
+		storePalette(palette, this.weakRef.get()!!, tmpFile)
+		try {
+			loadPalette("tmp_palette.json")
+			try { destFile.renameTo(oldFile) || TODO("Rename returned false") } catch(t: Throwable) { warn(t) }
+			try { tmpFile.renameTo(destFile) || TODO("Rename returned false") } catch(t: Throwable) { error(t) }
+		} catch(t: Throwable) {
+			error(t)
+		}
+	}
 
   companion object: AnkoLogger {
 		private const val paletteDir = "palettes"
@@ -38,12 +62,10 @@ interface Storage: AnkoLogger {
 				//.map { it.name }
 		}
 
-		fun storePalette(palette: Palette, context: Context, filename:String = openPaletteFileName) = try {
+		private fun storePalette(palette: Palette, context: Context, file: File) = try {
 			createDir(paletteDir, context)
-      FileOutputStream(
-        File("${context.filesDir}$separator$paletteDir$separator$filename").apply { createNewFile() }
-      ).use { fileOutputStream ->
-			//context.openFileOutput("$paletteDir$separator$filename", Context.MODE_PRIVATE).use { fileOutputStream ->
+			FileOutputStream(file.apply { createNewFile() }).use { fileOutputStream ->
+				//context.openFileOutput("$paletteDir$separator$filename", Context.MODE_PRIVATE).use { fileOutputStream ->
 				writer.writeValue(fileOutputStream, palette)
 			}
 			info {
@@ -53,33 +75,16 @@ interface Storage: AnkoLogger {
 			error("File send failed: ", e)
 		}
 
-		fun loadPalette(context: Context, filename:String = openPaletteFileName): Palette = try {
+		private fun loadPalette(context: Context, file:File): Palette {
 			createDir(paletteDir, context)
-      val palette = FileInputStream(
-        File("${context.filesDir}$separator$paletteDir$separator$filename")
-      ).use { fileInputStream ->
-      //val palette = context.openFileInput("$paletteDir$separator$filename").use { fileInputStream ->
+			val palette = FileInputStream(file).use { fileInputStream ->
+				//val palette = context.openFileInput("$paletteDir$separator$filename").use { fileInputStream ->
 				AppObjectMapper.readValue(fileInputStream, Palette::class.java)
 			}
 			info {
 				"Loaded palette: ${stringify(palette)}"
 			}
-			palette
-		} catch (t: Throwable) {
-			error("Failed to load stored palette", t)
-			//temporary: fallback to not the palettes directory
-			try {
-				val palette = context.openFileInput(filename).use { fileInputStream ->
-					AppObjectMapper.readValue(fileInputStream, Palette::class.java)
-				}
-				info {
-					"Loaded palette: ${stringify(palette)}"
-				}
-				palette
-			} catch (t: Throwable) {
-				error("Failed to load stored palette", t)
-				PaletteStorage.basePalette
-			}
+			return palette
 		}
 
 		fun stringify(o: Any) = writer.writeValueAsString(o)

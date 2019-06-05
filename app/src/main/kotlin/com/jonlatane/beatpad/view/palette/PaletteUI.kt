@@ -225,7 +225,10 @@ class PaletteUI constructor(
 
     }
 
-    viewModel.harmonyView = harmonyView(viewModel = viewModel) {
+    viewModel.harmonyView = harmonyView(
+      viewModel = viewModel,
+      recyclerLayoutParams = { bottomMargin = dip(10) }
+    ) {
       id = R.id.harmony
     }.lparams {
       width = matchParent
