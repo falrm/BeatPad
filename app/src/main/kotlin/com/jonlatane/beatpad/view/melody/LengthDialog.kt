@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.NumberPicker
 import android.widget.RelativeLayout
+import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.model.Melody
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -42,25 +43,39 @@ class LengthDialog(context: Context) {
           }.lparams(wrapContent, wrapContent)
 
           textView {
+            text = "subdivisions"
+            gravity = Gravity.CENTER
+            typeface = MainApplication.chordTypeface
+          }.lparams(wrapContent, matchParent)
+
+          textView {
             text = "/"
             gravity = Gravity.CENTER
+            textSize *= 1.5f
+            typeface = MainApplication.chordTypefaceBold
           }.lparams(wrapContent, matchParent)
 
           subdivisionsPerBeatPicker = numberPicker {
             value = 1
             minValue = 1
-            this.displayedValues = arrayOf("2")
+            //this.displayedValues = arrayOf("2")
             maxValue = 24
             wrapSelectorWheel = false
           }.lparams(wrapContent, wrapContent)
+          textView {
+            text = "per beat"
+            gravity = Gravity.CENTER
+            typeface = MainApplication.chordTypeface
+          }.lparams(wrapContent, matchParent)
         }.lparams(wrapContent, wrapContent) {
           centerHorizontally()
         }
         button {
           text = "OK"
           id = View.generateViewId()
+          typeface = MainApplication.chordTypefaceBold
           onClick {
-
+            context.toast("This feature isn't available yet!")
           }
         }.lparams(wrapContent, wrapContent) {
           below(numberPickers)

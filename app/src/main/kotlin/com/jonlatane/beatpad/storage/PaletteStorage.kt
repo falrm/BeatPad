@@ -25,19 +25,24 @@ import java.util.concurrent.atomic.AtomicInteger
 object PaletteStorage : AnkoLogger {
   const val paletteModelVersion = 5
 
-  val basePalette
-    get() = Palette(
-      sections = mutableListOf(Section()),
-      parts = mutableListOf(
-        Part().also {
-          (it.instrument as MIDIInstrument).drumTrack = true
-        },
-        Part()
+  /**
+   * Generates and returns a new [Palette] with a drum [Part] and a tonal [Part].
+   */
+  val basePalette: Palette
+    get() {
+      val drumPart = Part(instrument = MIDIInstrument(channel = 9, drumTrack = true))
+      val tonalPart = Part()
+      return Palette(
+        sections = mutableListOf(Section()),
+        parts = mutableListOf(drumPart, tonalPart),
+        keyboardPart = drumPart,
+        colorboardPart = tonalPart,
+        splatPart = tonalPart
       )
-    )
+    }
 
   /**
-   * *Generates* a new base melody of 4 empty bars in 16th notes.
+   * Generates and returns a new base melody of 4 empty bars in 16th notes.
    */
   val baseMelody
     get() = RationalMelody(
