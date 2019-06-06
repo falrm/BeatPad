@@ -52,7 +52,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
 
 
     val palette = BeatClockPaletteConsumer.palette ?: {
-      val storedPalette = loadPalette()
+      val storedPalette = loadPalette() ?: PaletteStorage.basePalette
       BeatClockPaletteConsumer.palette = storedPalette
       storedPalette
     }()

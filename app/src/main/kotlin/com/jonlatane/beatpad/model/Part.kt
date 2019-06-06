@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import java.util.*
 
@@ -12,5 +13,5 @@ class Part(val instrument: Instrument = MIDIInstrument()) {
 			instrument.volume = value
       (instrument as? MIDIInstrument)?.sendSelectInstrument()
 		}
-	val drumTrack: Boolean get() = (instrument as? MIDIInstrument)?.drumTrack == true
+	val drumTrack: Boolean @JsonIgnore get() = (instrument as? MIDIInstrument)?.drumTrack == true
 }
