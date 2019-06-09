@@ -39,8 +39,8 @@ inline fun ViewManager.melodyView(
 				onHeldDownChanged = { heldDown ->
 					//if (heldDown) holdToEdit?.animate()?.alpha(0f)?.translationY(100f)
 					//else holdToEdit?.animate()?.alpha(1f)?.translationY(0f)
-          melodyViewModel.melodyCenterHorizontalScroller.scrollingEnabled = !heldDown
-          melodyViewModel.melodyCenterVerticalScroller.scrollingEnabled = !heldDown
+          melodyViewModel.melodyRecyclerView.scrollingEnabled = !heldDown
+          melodyViewModel.melodyVerticalScrollView.scrollingEnabled = !heldDown
 				}
 			}.lparams {
 				alignParentBottom()
@@ -66,7 +66,7 @@ inline fun ViewManager.melodyView(
 				above(melodyViewModel.melodyEditingModifiers)
 				alignParentLeft()
 			}
-      melodyViewModel.melodyCenterVerticalScroller = zoomableScrollView {
+      melodyViewModel.melodyVerticalScrollView = zoomableScrollView {
 				id = R.id.center_v_scroller
 				onScrollChange { _, _, scrollY, _, _ ->
           melodyViewModel.melodyLeftScroller.scrollY = scrollY
@@ -87,7 +87,9 @@ inline fun ViewManager.melodyView(
 					}
 				}
 
-        melodyViewModel.melodyCenterHorizontalScroller = nonDelayedRecyclerView {
+				zoomFinishedHandler = melodyViewModel::onZoomFinished
+
+        melodyViewModel.melodyRecyclerView = nonDelayedRecyclerView {
 					id = R.id.center_h_scroller
 					isFocusableInTouchMode = true
 				}.lparams {

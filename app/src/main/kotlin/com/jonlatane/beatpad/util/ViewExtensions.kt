@@ -15,10 +15,11 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 
 
-private val defaultDuration get() = 300L
+val defaultDuration get() = 300L
 
 interface HideableView {
 	var initialHeight: Int?
@@ -51,6 +52,7 @@ fun TextView.toolbarTextStyle() {
 	marqueeRepeatLimit = -1
 	isSelected = true
 	allCaps = true
+  typeface = MainApplication.chordTypefaceBold
 }
 
 var nextViewId: Int = 10001

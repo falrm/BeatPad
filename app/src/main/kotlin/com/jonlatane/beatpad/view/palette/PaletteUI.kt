@@ -9,8 +9,6 @@ import android.widget.RelativeLayout
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.util.HideAnimation
-import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.firstVisibleItemPosition
 import com.jonlatane.beatpad.view.colorboard.colorboardView
 import com.jonlatane.beatpad.view.harmony.harmonyView
@@ -90,7 +88,7 @@ class PaletteUI constructor(
 
         // Some tasty un-threadsafe spaghetti for syncing the two RecyclerViews for Harmony and Melody
         val inScrollingStack = AtomicBoolean(false)
-        val melodyRecycler = viewModel.melodyViewModel.melodyCenterHorizontalScroller
+        val melodyRecycler = viewModel.melodyViewModel.melodyRecyclerView
         val harmonyRecycler = viewModel.harmonyViewModel.harmonyElementRecycler!!
         melodyRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

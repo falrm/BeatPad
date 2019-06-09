@@ -1,14 +1,22 @@
 package com.jonlatane.beatpad.view.melody
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import com.jonlatane.beatpad.util.applyToHolders
+import com.jonlatane.beatpad.util.defaultDuration
 import com.jonlatane.beatpad.util.layoutHeight
 import com.jonlatane.beatpad.util.layoutWidth
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.verbose
+import kotlin.math.round
 
 
 class MelodyBeatAdapter(
@@ -26,7 +34,7 @@ class MelodyBeatAdapter(
   private val minimumElementWidth
     get() = recyclerView.run { dip(minimumBeatWidthDp) }
   private val maximumElementWidth
-    get() = viewModel.melodyCenterVerticalScroller.width / 2
+    get() = viewModel.melodyVerticalScrollView.width / 2
   private val minimumElementHeight
     get() = recyclerView.run { dip(100) }
   private val maximumElementHeight
@@ -49,28 +57,97 @@ class MelodyBeatAdapter(
         recyclerView.applyToHolders<MelodyBeatHolder> {
           it.element.layoutWidth = field
         }
+        if(
+          useGridLayoutManager
+          && (recyclerView.layoutManager as? GridLayoutManager)?.spanCount
+          != recommendedSpanCount
+        ) {
+          recyclerView.layoutManager = recommendedGridLayoutManager()
+        }
       }
       viewModel.paletteViewModel.harmonyViewModel.beatAdapter.elementWidth = field
     }
 
   var elementHeight = recyclerView.run { dip(initialBeatHeightDp) }
     set(value) {
-      field = when {
-        value < minimumElementHeight -> {
-          minimumElementHeight
+      if(field != value) {
+        field = when {
+          value < minimumElementHeight -> {
+            minimumElementHeight
+          }
+          value > maximumElementHeight -> {
+            maximumElementHeight
+          }
+          else                         -> value
         }
-        value > maximumElementHeight -> {
-          maximumElementHeight
-        }
-        else -> value
-      }
 
-      verbose("Setting height to $field")
-      recyclerView.applyToHolders<MelodyBeatHolder> {
-        it.element.layoutHeight = field
+        verbose("Setting height to $field")
+        recyclerView.applyToHolders<MelodyBeatHolder> {
+          it.element.layoutHeight = field
+        }
+        axis.layoutHeight = field
+
+        if(
+          !useGridLayoutManager
+          && recyclerView.layoutManager is GridLayoutManager
+        ) {
+          recyclerView.layoutManager = linearLayoutManager
+        } else if(
+          useGridLayoutManager
+          && (recyclerView.layoutManager as? GridLayoutManager)?.spanCount
+              != recommendedSpanCount
+        ) {
+          recyclerView.layoutManager = recommendedGridLayoutManager()
+        }
       }
-      axis.layoutHeight = field
     }
+  val recommendedSpanCount: Int
+    get() = round(viewModel.melodyVerticalScrollView.width.toFloat() / elementWidth).toInt()
+  val useGridLayoutManager: Boolean
+    get() = elementHeight <= (viewModel.melodyVerticalScrollView.height * 2f / 3f).toInt()
+  val linearLayoutManager = LinearLayoutManager(
+    recyclerView.context,
+    RecyclerView.HORIZONTAL,
+    false
+  ).apply {
+    isItemPrefetchEnabled = false
+  }
+  private fun recommendedGridLayoutManager() = GridLayoutManager(
+    recyclerView.context,
+    recommendedSpanCount,
+    RecyclerView.VERTICAL,
+    false
+  ).apply {
+    //isItemPrefetchEnabled = false
+  }
+
+  fun animateElementHeight(height: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
+      val anim = ValueAnimator.ofInt(this.elementHeight, height)
+      anim.interpolator = LinearInterpolator()
+      anim.addUpdateListener { valueAnimator ->
+        this.elementHeight = valueAnimator.animatedValue as Int
+      }
+      endAction?.let {
+        anim.addListener(object : AnimatorListenerAdapter() {
+          override fun onAnimationEnd(animation: Animator) = it()
+        })
+      }
+      anim.setDuration(duration).start()
+    }
+
+  fun animateElementWidth(width: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
+    val anim = ValueAnimator.ofInt(this.elementWidth, width)
+    anim.interpolator = LinearInterpolator()
+    anim.addUpdateListener { valueAnimator ->
+      this.elementWidth = valueAnimator.animatedValue as Int
+    }
+    endAction?.let {
+      anim.addListener(object : AnimatorListenerAdapter() {
+        override fun onAnimationEnd(animation: Animator) = it()
+      })
+    }
+    anim.setDuration(duration).start()
+  }
 
   var colorblockAlpha: Float = 0f
     set(value) {

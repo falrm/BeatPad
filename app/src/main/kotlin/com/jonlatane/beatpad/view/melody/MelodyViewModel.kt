@@ -12,6 +12,7 @@ import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.info
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.round
 import kotlin.properties.Delegates.observable
 
 class MelodyViewModel(
@@ -27,8 +28,8 @@ class MelodyViewModel(
 	lateinit var melodyView: HideableRelativeLayout
 	lateinit var melodyLeftScroller: NonDelayedScrollView
 	lateinit var melodyEditingModifiers: MelodyEditingModifiers
-	lateinit var melodyCenterVerticalScroller: NonDelayedScrollView
-	lateinit var melodyCenterHorizontalScroller: NonDelayedRecyclerView
+	lateinit var melodyVerticalScrollView: NonDelayedScrollView
+	lateinit var melodyRecyclerView: NonDelayedRecyclerView
 	lateinit var beatAdapter: MelodyBeatAdapter
 
 	enum class DisplayType { COLORBLOCK, NOTATION }
@@ -62,6 +63,26 @@ class MelodyViewModel(
 		melodyToolbar.displayTypeButton.imageResource = when(displayType) {
 			DisplayType.COLORBLOCK -> R.drawable.notehead_filled
 			else -> R.drawable.colorboard_icon_vertical
+		}
+	}
+
+	/**
+	 * Exposed for access by [HarmonyView]
+	 */
+	fun onZoomFinished() = with(beatAdapter) {
+		val targetWidth = if(useGridLayoutManager) {
+			round(melodyVerticalScrollView.width.toFloat() / recommendedSpanCount).toInt()
+		} else elementWidth
+		animateElementWidth(targetWidth)
+
+		// Align height for notation against target width
+		if(displayType == DisplayType.NOTATION) {
+			val targetHeight = when {
+				elementHeight > 5 * targetWidth -> 5 * targetWidth
+				elementHeight < 0.5f * targetWidth -> (0.5f * targetWidth).toInt()
+				else -> elementHeight
+			}
+			animateElementHeight(targetHeight)
 		}
 	}
 

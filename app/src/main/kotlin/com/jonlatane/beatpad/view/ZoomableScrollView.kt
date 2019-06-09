@@ -12,12 +12,13 @@ import android.text.method.Touch.onTouchEvent
 
 class ZoomableScrollView @JvmOverloads constructor(
 	context: Context,
-	scrollingEnabled: Boolean = true
-) : NonDelayedScrollView(context, scrollingEnabled) {
+	scrollingEnabled: Boolean = true,
 	/**
 	 * Parameters: xDelta, yDelta
 	 */
-	var zoomHandler: ((Float, Float) -> Boolean)? = null
+	var zoomHandler: ((Float, Float) -> Boolean) = { _, _ -> false },
+	var zoomFinishedHandler: () -> Unit = {}
+) : NonDelayedScrollView(context, scrollingEnabled) {
 
 	private var isScaling = false
 	private val scaleDetector = ScaleGestureDetector(
@@ -29,12 +30,13 @@ class ZoomableScrollView @JvmOverloads constructor(
 			}
 			override fun onScaleEnd(detector: ScaleGestureDetector?) {
 				isScaling = false
+				zoomFinishedHandler()
 			}
 			override fun onScale(detector: ScaleGestureDetector): Boolean {
 				val (xDelta, yDelta) = detector.run {
 					currentSpanX - previousSpanX to currentSpanY - previousSpanY
 				}
-				return zoomHandler?.invoke(xDelta, yDelta) ?: false
+				return zoomHandler(xDelta, yDelta)
 			}
 		}
 	).apply {

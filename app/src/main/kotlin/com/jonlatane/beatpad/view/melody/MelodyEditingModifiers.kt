@@ -9,6 +9,7 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.Button
 import android.widget.LinearLayout
+import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.util.animateWidth
 import com.jonlatane.beatpad.util.layoutWidth
 import com.jonlatane.beatpad.util.vibrate
@@ -77,6 +78,7 @@ class MelodyEditingModifiers @JvmOverloads constructor(
 			singleLine = true
       allCaps = true
 			ellipsize = TextUtils.TruncateAt.END
+			typeface = MainApplication.chordTypefaceBold
 		}.lparams {
 //			width = matchParent
 			weight = 1f
@@ -88,6 +90,7 @@ class MelodyEditingModifiers @JvmOverloads constructor(
 			singleLine = true
       allCaps = true
 			ellipsize = TextUtils.TruncateAt.END
+			typeface = MainApplication.chordTypefaceBold
 		}.lparams {
 			//width = matchParent
 			weight = 1f
@@ -99,6 +102,7 @@ class MelodyEditingModifiers @JvmOverloads constructor(
 			singleLine = true
       allCaps = true
 			ellipsize = TextUtils.TruncateAt.END
+			typeface = MainApplication.chordTypefaceBold
 		}.lparams {
 			//width = matchParent
 			weight = 1f

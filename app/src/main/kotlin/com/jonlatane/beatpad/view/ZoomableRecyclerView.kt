@@ -7,12 +7,13 @@ import android.view.ScaleGestureDetector
 
 class ZoomableRecyclerView @JvmOverloads constructor(
 	context: Context,
-	scrollingEnabled: Boolean = true
-) : NonDelayedRecyclerView(context, scrollingEnabled) {
+	scrollingEnabled: Boolean = true,
 	/**
 	 * Parameters: xDelta, yDelta
 	 */
-	var zoomHandler: ((Float, Float) -> Boolean)? = null
+	var zoomHandler: ((Float, Float) -> Boolean) = { _, _ -> false },
+	var zoomFinishedHandler: () -> Unit = {}
+) : NonDelayedRecyclerView(context, scrollingEnabled) {
 
 	private var isScaling = false
 	private val scaleDetector = ScaleGestureDetector(
@@ -29,7 +30,7 @@ class ZoomableRecyclerView @JvmOverloads constructor(
 				val (xDelta, yDelta) = detector.run {
 					currentSpanX - previousSpanX to currentSpanY - previousSpanY
 				}
-				return zoomHandler?.invoke(xDelta, yDelta) ?: false
+				return zoomHandler(xDelta, yDelta)
 			}
 		}
 	).apply {

@@ -110,7 +110,7 @@ class PaletteViewModel(
       colorboardView.hide()
       keyboardView.hide()
       harmonyViewModel.beatAdapter
-        .syncPositionTo(melodyViewModel.melodyCenterHorizontalScroller)
+        .syncPositionTo(melodyViewModel.melodyRecyclerView)
 
       backStack.push {
         if(editingMelody != null) {

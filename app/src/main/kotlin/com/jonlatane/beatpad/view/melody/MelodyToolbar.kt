@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.PopupMenu
+import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
@@ -67,6 +68,7 @@ class MelodyToolbar(
 
 	private val lengthButton: Button = button {
 		text = "0/0"
+		typeface = MainApplication.chordTypefaceBold
 		onClick {
 			//context.toast("TODO")
       try {
