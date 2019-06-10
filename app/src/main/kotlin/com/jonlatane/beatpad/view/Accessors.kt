@@ -21,12 +21,6 @@ fun ViewManager.nonDelayedScrollView(theme: Int = 0)
 inline fun ViewManager.nonDelayedScrollView(theme: Int = 0, init: NonDelayedScrollView.() -> Unit)
 	= ankoView({ NonDelayedScrollView(it) }, theme, init)
 
-fun ViewManager.zoomableScrollView(theme: Int = 0)
-	= zoomableScrollView(theme) {}
-
-inline fun ViewManager.zoomableScrollView(theme: Int = 0, init: ZoomableScrollView.() -> Unit)
-	= ankoView({ ZoomableScrollView(it) }, theme, init)
-
 fun ViewManager.noDefaultSpinner(theme: Int = 0)
 	= noDefaultSpinner(theme) {}
 
@@ -47,7 +41,7 @@ inline fun ViewManager.nonDelayedRecyclerView(theme: Int = 0, init: NonDelayedRe
 	= ankoView({ NonDelayedRecyclerView(it) }, theme, init)
 
 fun ViewManager.zoomableRecyclerView(theme: Int = 0)
-	= nonDelayedScrollView(theme) {}
+	= zoomableRecyclerView(theme) {}
 
 inline fun ViewManager.zoomableRecyclerView(theme: Int = 0, init: ZoomableRecyclerView.() -> Unit)
 	= ankoView({ ZoomableRecyclerView(it) }, theme, init)

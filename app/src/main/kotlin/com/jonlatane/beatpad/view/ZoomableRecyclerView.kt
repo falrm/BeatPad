@@ -25,6 +25,7 @@ class ZoomableRecyclerView @JvmOverloads constructor(
 			}
 			override fun onScaleEnd(detector: ScaleGestureDetector?) {
 				isScaling = false
+				zoomFinishedHandler()
 			}
 			override fun onScale(detector: ScaleGestureDetector): Boolean {
 				val (xDelta, yDelta) = detector.run {

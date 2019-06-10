@@ -13,10 +13,7 @@ import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
 import java.util.*
-import kotlin.math.abs
-import kotlin.math.ceil
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.math.*
 
 
 interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
@@ -47,7 +44,13 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
 
   fun renderNotationMelodyBeat(canvas: Canvas) {
     paint.color = color(android.R.color.black).withAlpha((255 * notationAlpha).toInt())
-    paint.strokeWidth = bounds.width() * 0.008f
+    paint.strokeWidth = (bounds.width() * 0.008f).let {
+      val minValue = 1f
+      when {
+        it > minValue -> round(it)
+        else -> minValue
+      }
+    }
     canvas.renderStaffLines()
     melody?.let { melody ->
       canvas.drawNotatedMelody(

@@ -6,11 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewManager
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.view.HideableRelativeLayout
-import com.jonlatane.beatpad.view.nonDelayedRecyclerView
-import com.jonlatane.beatpad.view.nonDelayedScrollView
+import com.jonlatane.beatpad.view.*
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
-import com.jonlatane.beatpad.view.zoomableScrollView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.sdk25.coroutines.onScrollChange
@@ -66,36 +63,33 @@ inline fun ViewManager.melodyView(
 				above(melodyViewModel.melodyEditingModifiers)
 				alignParentLeft()
 			}
-      melodyViewModel.melodyVerticalScrollView = zoomableScrollView {
+      melodyViewModel.melodyVerticalScrollView = nonDelayedScrollView {
 				id = R.id.center_v_scroller
 				onScrollChange { _, _, scrollY, _, _ ->
           melodyViewModel.melodyLeftScroller.scrollY = scrollY
 				}
 
-				zoomHandler = { xDelta, yDelta ->
-					AnkoLogger<MelodyViewModel>().info("Zooming: xDelta=$xDelta, yDelta=$yDelta")
-					when {
-						(xDelta.toInt() != 0 || yDelta.toInt() != 0) -> {
-							viewModel.melodyBeatAdapter?.apply {
-								elementWidth += xDelta.toInt()
-								elementHeight += (10f * yDelta).toInt()
-								notifyDataSetChanged()
-							}
-							true
-						}
-						else -> false
-					}
-				}
-
-				zoomFinishedHandler = melodyViewModel::onZoomFinished
-
-        melodyViewModel.melodyRecyclerView = nonDelayedRecyclerView {
+        melodyViewModel.melodyRecyclerView = zoomableRecyclerView {
 					id = R.id.center_h_scroller
 					isFocusableInTouchMode = true
-				}.lparams {
-					height = wrapContent
-					width = matchParent
-				}.apply {
+
+
+					zoomHandler = { xDelta, yDelta ->
+						AnkoLogger<MelodyViewModel>().info("Zooming: xDelta=$xDelta, yDelta=$yDelta")
+						when {
+							(xDelta.toInt() != 0 || yDelta.toInt() != 0) -> {
+								viewModel.melodyBeatAdapter?.apply {
+									elementWidth += xDelta.toInt()
+									elementHeight += (10f * yDelta).toInt()
+									notifyDataSetChanged()
+								}
+								true
+							}
+							else -> false
+						}
+					}
+
+					zoomFinishedHandler = melodyViewModel::onZoomFinished
 					layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
 						isItemPrefetchEnabled = false
 					}
@@ -112,6 +106,9 @@ inline fun ViewManager.melodyView(
 								//updateEmptyViewVisibility(this@recyclerView)
 							}
 						})
+				}.lparams {
+					height = wrapContent
+					width = matchParent
 				}
 			}.lparams {
 				width = ViewGroup.LayoutParams.MATCH_PARENT

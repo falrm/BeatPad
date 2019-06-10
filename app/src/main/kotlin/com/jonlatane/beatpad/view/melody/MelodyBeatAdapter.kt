@@ -92,12 +92,14 @@ class MelodyBeatAdapter(
           && recyclerView.layoutManager is GridLayoutManager
         ) {
           recyclerView.layoutManager = linearLayoutManager
+          viewModel.melodyVerticalScrollView.scrollingEnabled = true
         } else if(
           useGridLayoutManager
           && (recyclerView.layoutManager as? GridLayoutManager)?.spanCount
               != recommendedSpanCount
         ) {
           recyclerView.layoutManager = recommendedGridLayoutManager()
+          viewModel.melodyVerticalScrollView.scrollingEnabled = false
         }
       }
     }
