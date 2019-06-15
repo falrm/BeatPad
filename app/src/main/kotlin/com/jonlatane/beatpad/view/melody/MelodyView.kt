@@ -11,33 +11,34 @@ import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.sdk25.coroutines.onScrollChange
+import org.jetbrains.anko.sdk25.coroutines.onTouch
 
 
 inline fun ViewManager.melodyView(
 	theme: Int = 0,
 	viewModel: PaletteViewModel,
-
-	//ui: AnkoContext<Any>,
 	init: HideableRelativeLayout.() -> Unit
 )
-	= //with(ui) {
+	= with(viewModel.melodyViewModel) {
 	ankoView({
-		val melodyViewModel = viewModel.melodyViewModel
-		melodyViewModel.melodyView = HideableRelativeLayout(it).apply {
-			melodyViewModel.melodyToolbar = melodyToolbar(viewModel) {
-				id = R.id.melody_toolbar
-			}.lparams {
-				width = matchParent
-				height = wrapContent
+		melodyView = HideableRelativeLayout(it).apply {
+			melodyReferenceToolbar = melodyReferenceToolbar(viewModel) {
+				id = R.id.melody_reference_toolbar
+			}.lparams(matchParent, wrapContent) {
 				alignParentTop()
 			}
-			melodyViewModel.melodyEditingModifiers = melodyEditingModifiers {
+			melodyEditingToolbar = melodyEditingToolbar(viewModel) {
+				id = R.id.melody_editing_toolbar
+			}.lparams(matchParent, wrapContent) {
+				below(melodyReferenceToolbar)
+			}
+			melodyEditingModifiers = melodyEditingModifiers {
 				id = R.id.bottom_scroller
 				onHeldDownChanged = { heldDown ->
 					//if (heldDown) holdToEdit?.animate()?.alpha(0f)?.translationY(100f)
 					//else holdToEdit?.animate()?.alpha(1f)?.translationY(0f)
-          melodyViewModel.melodyRecyclerView.scrollingEnabled = !heldDown
-          melodyViewModel.melodyVerticalScrollView.scrollingEnabled = !heldDown
+					melodyRecyclerView.scrollingEnabled = !heldDown
+					melodyVerticalScrollView.scrollingEnabled = !heldDown
 				}
 			}.lparams {
 				alignParentBottom()
@@ -46,10 +47,10 @@ inline fun ViewManager.melodyView(
 				height = dimen(R.dimen.subdivision_controller_size)
 				leftMargin = dip(30)
 			}
-      melodyViewModel.melodyLeftScroller = nonDelayedScrollView {
+			melodyLeftScroller = nonDelayedScrollView {
 				id = R.id.left_scroller
 				linearLayout {
-          melodyViewModel.verticalAxis = melodyToneAxis().lparams {
+					verticalAxis = melodyToneAxis().lparams {
 						width = dip(30)
 						height = dip(MelodyBeatAdapter.initialBeatHeightDp)
 					}
@@ -59,23 +60,23 @@ inline fun ViewManager.melodyView(
 			}.lparams {
 				width = dip(30)
 				height = ViewGroup.LayoutParams.MATCH_PARENT
-				below(melodyViewModel.melodyToolbar)
-				above(melodyViewModel.melodyEditingModifiers)
+				below(melodyEditingToolbar)
+				above(melodyEditingModifiers)
 				alignParentLeft()
 			}
-      melodyViewModel.melodyVerticalScrollView = nonDelayedScrollView {
+			melodyVerticalScrollView = nonDelayedScrollView {
 				id = R.id.center_v_scroller
 				onScrollChange { _, _, scrollY, _, _ ->
-          melodyViewModel.melodyLeftScroller.scrollY = scrollY
+					melodyLeftScroller.scrollY = scrollY
 				}
 
-        melodyViewModel.melodyRecyclerView = zoomableRecyclerView {
+				melodyRecyclerView = zoomableRecyclerView {
 					id = R.id.center_h_scroller
 					isFocusableInTouchMode = true
 
 
 					zoomHandler = { xDelta, yDelta ->
-						AnkoLogger<MelodyViewModel>().info("Zooming: xDelta=$xDelta, yDelta=$yDelta")
+						AnkoLogger<MelodyViewModel>().verbose("Zooming: xDelta=$xDelta, yDelta=$yDelta")
 						when {
 							(xDelta.toInt() != 0 || yDelta.toInt() != 0) -> {
 								viewModel.melodyBeatAdapter?.apply {
@@ -85,16 +86,16 @@ inline fun ViewManager.melodyView(
 								}
 								true
 							}
-							else -> false
+							else                                         -> false
 						}
 					}
 
-					zoomFinishedHandler = melodyViewModel::onZoomFinished
+					zoomFinishedHandler = ::onZoomFinished
 					layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
 						isItemPrefetchEnabled = false
 					}
 					overScrollMode = View.OVER_SCROLL_NEVER
-					viewModel.melodyBeatAdapter = MelodyBeatAdapter(melodyViewModel, this)
+					viewModel.melodyBeatAdapter = MelodyBeatAdapter(this@with, this)
 					adapter = viewModel.melodyBeatAdapter
 					adapter.registerAdapterDataObserver(
 						object : RecyclerView.AdapterDataObserver() {
@@ -114,13 +115,20 @@ inline fun ViewManager.melodyView(
 				width = ViewGroup.LayoutParams.MATCH_PARENT
 				height = ViewGroup.LayoutParams.MATCH_PARENT
 				alignParentRight()
-				above(melodyViewModel.melodyEditingModifiers)
-				rightOf(melodyViewModel.melodyLeftScroller)
-				below(melodyViewModel.melodyToolbar)
+				above(melodyEditingModifiers)
+				rightOf(melodyLeftScroller)
+				below(melodyEditingToolbar)
 			}
 
+			onTouch(returnValue = true) { _, _ -> Unit }
+
+			post {
+				melodyEditingToolbar.hide(false)
+				melodyEditingModifiers.hide(false)
+			}
 		}
 		viewModel.melodyView
 	}, theme, init)
+}
 //}
 

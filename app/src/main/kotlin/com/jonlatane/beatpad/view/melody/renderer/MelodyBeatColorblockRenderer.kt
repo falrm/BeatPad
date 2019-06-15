@@ -25,11 +25,12 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatEventH
     paint.strokeWidth = 0f
     canvas.renderSteps()
     melody?.let { melody ->
+      val alphaMultiplier = if(viewModel.isMelodyReferenceEnabled) 1f else 2f/3
       canvas.drawMelody(
         melody,
-        stepNoteAlpha = (0xAA * colorblockAlpha).toInt(),
+        stepNoteAlpha = (0xAA * colorblockAlpha * alphaMultiplier).toInt(),
         drawRhythm = true,
-        alphaSource = colorblockAlpha
+        alphaSource = colorblockAlpha * alphaMultiplier
       )
     }
 
@@ -49,5 +50,46 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatEventH
         )
       }
     }
+  }
+
+  fun Canvas.drawMelody(
+    melody: Melody<*>,
+    stepNoteAlpha: Int,
+    drawRhythm: Boolean = false,
+    drawColorGuide: Boolean = true,
+    forceDrawColorGuideForCurrentBeat: Boolean = false,
+    alphaSource: Float
+  ) {
+    iterateSubdivisions(melody) { elementIndex, elementPosition ->
+      val isCurrentlyPlayingBeat: Boolean =
+        viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
+          from = BeatClockPaletteConsumer.ticksPerBeat,
+          to = melody
+        ) == elementPosition
+      colorGuideAlpha = (when {
+        !drawColorGuide -> when {
+          forceDrawColorGuideForCurrentBeat && isCurrentlyPlayingBeat -> 119
+          else -> 0
+        }
+        melody.limitedToNotesInHarmony -> when {
+          isCurrentlyPlayingBeat -> 255
+          else -> 187
+        }
+        isCurrentlyPlayingBeat         -> 119
+        else                           -> 0
+      } * alphaSource).toInt()
+      if(colorGuideAlpha > 0) {
+        drawColorGuide()
+      }
+      drawStepNotes(melody, elementPosition, stepNoteAlpha, alphaSource)
+      if(drawRhythm) drawRhythm(melody, elementPosition, alphaSource)
+    }
+
+    val overallWidth = overallBounds.right - overallBounds.left
+    bounds.apply {
+      left = overallWidth
+      right = overallWidth
+    }
+    if(drawRhythm) drawRhythm(melody, melody.subdivisionsPerBeat, alphaSource)
   }
 }

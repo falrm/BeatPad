@@ -14,9 +14,9 @@ data class Section(
     object Indefinite: PlaybackType()
     class Repeat(val repetitions: Int): PlaybackType()
   }
-  class MelodyReference(
+  class MelodyReference constructor(
     var melody: Melody<*>,
-    var volume: Float,
+    var volume: Float =  0.5f,
     var playbackType: PlaybackType = PlaybackType.Indefinite,
     /**
      * Indicates the [Melody] should be played back (and displayed) with its notes transposed

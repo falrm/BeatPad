@@ -109,10 +109,15 @@ interface Storage: AnkoLogger {
 		// Validate the schema
 		when(scheme) {
 			"beatscratch" ->{ if (host != entity || path != "/$entityVersion") return null }
-			"https" -> { if(host != "beatscratch.io" || path != "/$entity/$entityVersion") return null }
+			"https" -> {
+				if(
+					!listOf("beatscratch.io", "api.beatscratch.io").contains(host)
+					|| path != "/$entity/$entityVersion"
+				) return null
+			}
 			else -> return null
 		}
-		// Attempt to
+		// Read the entity
 		val bytes = Base64.decode(query, Base64.NO_WRAP)
 		return ZipInputStream(ByteArrayInputStream(bytes)).use { zipInputStream ->
 			zipInputStream.nextEntry
@@ -129,6 +134,6 @@ interface Storage: AnkoLogger {
 			bytes.toByteArray()
 		}
 		val encodedString = Base64.encodeToString(bytes, Base64.NO_WRAP)
-		return URI("https://beatscratch.io/$entity/$entityVersion?$encodedString")
+		return URI("https://api.beatscratch.io/$entity/$entityVersion?$encodedString")
 	}
 }

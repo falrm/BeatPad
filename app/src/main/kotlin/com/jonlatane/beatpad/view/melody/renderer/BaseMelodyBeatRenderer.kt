@@ -27,59 +27,25 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
   val renderableToneBounds: Rect
   override var chord: Chord
 
+  /**
+   * Returns the range of indexes for the melody in this beat. i.e., for [beatPosition] = 3
+   * of a melody in 4/2
+   */
   fun elementRangeFor(melody: Melody<*>) =
     (beatPosition * melody.subdivisionsPerBeat) until
-      Math.min((beatPosition + 1) * melody.subdivisionsPerBeat, melody.length)
+      (beatPosition + 1) * melody.subdivisionsPerBeat
 
-
-  fun Canvas.drawMelody(
-    melody: Melody<*>,
-    stepNoteAlpha: Int,
-    drawRhythm: Boolean = false,
-    drawColorGuide: Boolean = true,
-    forceDrawColorGuideForCurrentBeat: Boolean = false,
-    alphaSource: Float
-  ) {
-    iterateSubdivisions(melody) { elementIndex, elementPosition ->
-      val isCurrentlyPlayingBeat: Boolean =
-        viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
-          from = BeatClockPaletteConsumer.ticksPerBeat,
-          to = melody
-        ) == elementPosition
-      colorGuideAlpha = (when {
-        !drawColorGuide -> when {
-          forceDrawColorGuideForCurrentBeat && isCurrentlyPlayingBeat -> 119
-          else -> 0
-        }
-        melody.limitedToNotesInHarmony -> when {
-          isCurrentlyPlayingBeat -> 255
-          else -> 187
-        }
-        isCurrentlyPlayingBeat         -> 119
-        else                           -> 0
-      } * alphaSource).toInt()
-      if(colorGuideAlpha > 0) {
-        drawColorGuide()
-      }
-      drawStepNotes(melody, elementPosition, stepNoteAlpha, alphaSource)
-      if(drawRhythm) drawRhythm(melody, elementIndex, alphaSource)
-    }
-
-    val overallWidth = overallBounds.right - overallBounds.left
-    bounds.apply {
-      left = overallWidth
-      right = overallWidth
-    }
-    if(drawRhythm) drawRhythm(melody, melody.subdivisionsPerBeat, alphaSource)
-  }
-
-
+  /**
+   * The base method used to render a beat. Given the melody and our music-drawing view's
+   * [beatPosition], subdivides the rendering area into slices based on [Melody.subdivisionsPerBeat]
+   * and applies them to [bounds] (limiting memory swapping), and executes [stuff] with the arguments
+   *
+   */
   fun Canvas.iterateSubdivisions(
     melody: Melody<*>,
     stuff: (Int, Int) -> Unit //elementIndex, elementPosition
   ) {
-    val elementRange: IntRange = elementRangeFor(melody) /*(beatPosition * melody.subdivisionsPerBeat) until
-          Math.min((beatPosition + 1) * melody.subdivisionsPerBeat, melody.length - 1)*/
+    val elementRange: IntRange = elementRangeFor(melody)
     val elementCount = elementRange.size
     val overallWidth = overallBounds.right - overallBounds.left
     for((elementIndex, elementPosition) in elementRange.withIndex()) {
@@ -132,16 +98,30 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
     }
   }
 
-  fun Canvas.drawRhythm(melody: Melody<*>, elementIndex: Int, alphaSource: Float) {
-    paint.color = 0xAA212121.toInt().withAlpha((alphaSource * 255).toInt())
-    val halfWidth = if (elementIndex % melody.subdivisionsPerBeat == 0) 5f else 1f
-    drawRect(
-      bounds.left.toFloat() - halfWidth,
-      bounds.top.toFloat(),
-      bounds.left.toFloat() + halfWidth,
-      bounds.bottom.toFloat(),
-      paint
-    )
+  fun Canvas.drawRhythm(
+    melody: Melody<*>,
+    elementPosition: Int,
+    alphaSource: Float
+  ) = drawHorizontalLineInBounds(
+    strokeWidth = if (elementPosition % melody.subdivisionsPerBeat == 0) 5f else 1f
+  )
+
+
+  fun Canvas.drawHorizontalLineInBounds(
+    leftSide: Boolean = true,
+    alphaSource: Float = 1f,
+    strokeWidth: Float = 1f,
+    startY: Float = bounds.top.toFloat(),
+    stopY: Float = bounds.bottom.toFloat()
+  ) {
+    val oldStrokeWidth = paint.strokeWidth
+    val oldColor = paint.color
+    paint.color = 0xFF000000.toInt().withAlpha((alphaSource * 255).toInt())
+    paint.strokeWidth = strokeWidth
+    val x = if(leftSide) bounds.left.toFloat() else bounds.right.toFloat()
+    drawLine(x, startY, x, stopY, paint)
+    paint.strokeWidth = oldStrokeWidth
+    paint.color = oldColor
   }
 
   fun invalidateDrawingLayer(): Unit

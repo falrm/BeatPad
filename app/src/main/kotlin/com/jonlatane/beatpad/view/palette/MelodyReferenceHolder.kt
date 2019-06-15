@@ -116,32 +116,18 @@ class MelodyReferenceHolder(
     }
   }
 
-  internal fun enableMelodyReference() {
-    if(melodyReference == null) {
-      BeatClockPaletteConsumer.section?.melodies?.add(
-        Section.MelodyReference(melody!!, 0.5f, Section.PlaybackType.Indefinite)
-      )
-    } else if(melodyReference!!.isDisabled) {
-      melodyReference!!.playbackType = Section.PlaybackType.Indefinite
-    }
-  }
+  internal fun enableMelodyReference() = viewModel.melodyViewModel.enableMelodyReference(melody!!, melodyReference)
 
-  internal fun disableMelodyReference() {
-    melodyReference!!.playbackType = Section.PlaybackType.Disabled
-    // Sanitization: Remove duplicates
-    BeatClockPaletteConsumer.section?.melodies?.removeAll {
-      it.melody == melody && it != melodyReference
-    }
-  }
+  internal fun disableMelodyReference() = viewModel.melodyViewModel.disableMelodyReference(melody!!, melodyReference!!)
 
 	private fun editMode() {
 		layout.apply {
       inclusion.apply {
         isEnabled = true
-        imageResource = if(!isMelodyReferenceEnabled) {
-          R.drawable.icons8_mute_100
-        } else {
-          R.drawable.icons8_speaker_100
+        imageResource = when {
+          !isMelodyReferenceEnabled                                        -> R.drawable.repeat_off
+          melodyReference?.playbackType is Section.PlaybackType.Indefinite -> R.drawable.repeat
+          else                                                             -> R.drawable.repeat_one
         }
         alpha = 1f
         onClick {

@@ -197,14 +197,9 @@ class PaletteViewModel(
 
     sectionListAdapter?.notifyDataSetChanged()
     melodyViewModel.beatAdapter.notifyDataSetChanged()
+    melodyViewModel.melodyReferenceToolbar.updateButtonText()
     if(editingMix) { // Trigger an update of the mix state.
       editingMix = editingMix
-    }
-    if(
-      BeatClockPaletteConsumer.section?.melodies?.filter { !it.isDisabled }
-        ?.map { it.melody }?.contains(editingMelody) != true
-    ) {
-      editingMelody = null
     }
     partListAdapter?.notifyDataSetChanged()
     PlaybackService.instance?.showNotification()
@@ -215,8 +210,8 @@ class PaletteViewModel(
       partHolder.layout.melodyReferenceRecycler.viewHolders<MelodyReferenceHolder>()
         .firstOrNull { it.melody == editingMelody }
     }/*.let { listOf<MelodyReferenceHolder?>(null) }*/.firstOrNull()?.let { melodyReferenceHolder ->
-      melodyReferenceHolder.enableMelodyReference()
-      melodyReferenceHolder.onPositionChanged()
+//      melodyReferenceHolder.enableMelodyReference()
+//      melodyReferenceHolder.onPositionChanged()
       val name = melodyReferenceHolder.layout.name
       val partListLocation = intArrayOf(-1, -1)
       val nameLocation = intArrayOf(-1, -1)
@@ -275,6 +270,7 @@ class PaletteViewModel(
       partListView.animate().alpha(1f)
       partListView.getLocationOnScreen(partListLocation)
       //partListView.animate().alpha(0f).start()
+      melodyReferenceHolder.onPositionChanged()
       partListTransitionView.apply {
         translationX = 0f
         translationY = 0f

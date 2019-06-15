@@ -1,8 +1,7 @@
-package com.jonlatane.beatpad.view.melody
+package com.jonlatane.beatpad.view.melody.toolbar
 
 import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.PointF
 import android.text.TextUtils
 import android.view.MotionEvent
 import android.view.View
@@ -13,6 +12,7 @@ import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.util.animateWidth
 import com.jonlatane.beatpad.util.layoutWidth
 import com.jonlatane.beatpad.util.vibrate
+import com.jonlatane.beatpad.view.HideableLinearLayout
 import com.jonlatane.beatpad.view.NonDelayedHorizontalScrollView
 import org.jetbrains.anko.*
 
@@ -21,7 +21,7 @@ import org.jetbrains.anko.*
  */
 class MelodyEditingModifiers @JvmOverloads constructor(
 	context: Context
-) : _LinearLayout(context) {
+) : HideableLinearLayout(context) {
   companion object {
     const val vibrationMs = 10
   }
@@ -35,14 +35,13 @@ class MelodyEditingModifiers @JvmOverloads constructor(
 	  private set(value) {
 		  if(field != value) {
 			  when {
-				  field == Modifier.None -> { onHeldDownChanged?.invoke(true) }
-				  value == Modifier.None -> { onHeldDownChanged?.invoke(false) }
+				  field == Modifier.None -> { onHeldDownChanged(true) }
+				  value == Modifier.None -> { onHeldDownChanged(false) }
 			  }
 		  }
 		  field = value
 	  }
-	val isHeldDown get() = modifier == Modifier.None
-	var onHeldDownChanged: ((Boolean) -> Unit)? = null
+	var onHeldDownChanged: ((Boolean) -> Unit) = {}
 	private val editButton: Button
 	private val articulateButton: Button
 	private val transposeButton: Button

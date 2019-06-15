@@ -52,14 +52,28 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
       }
     }
     canvas.renderStaffLines()
+
     melody?.let { melody ->
+      val alphaMultiplier = if(viewModel.isMelodyReferenceEnabled) 1f else 2f/3
       canvas.drawNotatedMelody(
         melody,
-        drawAlpha = notationAlpha,
+        drawAlpha = notationAlpha * alphaMultiplier,
         drawRhythm = false,
         drawColorGuide = false,
         forceDrawColorGuideForCurrentBeat = true
       )
+    }
+
+    viewModel.harmony?.meter?.let { meter ->
+      //TODO make this reflect all the possibilities of [Harmony.Meter]
+      if((beatPosition + 1) % meter.defaultBeatsPerMeasure == 0) {
+        canvas.drawHorizontalLineInBounds(
+          leftSide = false,
+          strokeWidth = paint.strokeWidth * 2,
+          startY = canvas.pointFor(clefs.flatMap { it.notes }.maxBy { it.heptatonicValue }!!),
+          stopY = canvas.pointFor(clefs.flatMap { it.notes }.minBy { it.heptatonicValue }!!)
+        )
+      }
     }
 
 
@@ -115,7 +129,7 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
         drawColorGuide()
       }
       drawNotatedStepNotes(melody, elementPosition, drawAlpha, stemsUp)
-      if(drawRhythm) drawRhythm(melody, elementIndex, drawAlpha)
+      if(drawRhythm) drawRhythm(melody, elementPosition, drawAlpha)
     }
 
     val overallWidth = overallBounds.right - overallBounds.left

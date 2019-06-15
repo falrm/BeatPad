@@ -89,6 +89,9 @@ class SectionHolder(
       R.color.augmented,
       R.color.diminished
     )[sectionIndex % 5]
+    fun sectionColor(section: Section?) = sectionColor(
+      section?.let { BeatClockPaletteConsumer.palette?.sections?.indexOf(section) } ?: 0
+    )
   }
   val nameTextView: TextView get() = itemView.findViewById(R.id.section_name)
   //val dragHandle: ImageView get() = itemView.findViewById(R.id.section_drag_handle)

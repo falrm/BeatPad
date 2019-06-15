@@ -1,9 +1,8 @@
-package com.jonlatane.beatpad.view.melody
+package com.jonlatane.beatpad.view.melody.toolbar
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
-import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.PopupMenu
@@ -15,7 +14,6 @@ import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.service.convertPatternIndex
-import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.mod12
 import com.jonlatane.beatpad.util.mod12Nearest
 import com.jonlatane.beatpad.util.toolbarTextStyle
@@ -24,47 +22,10 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
 
-class MelodyToolbar(
-	context: Context,
-	val viewModel: PaletteViewModel
-): _LinearLayout(context), AnkoLogger {
-	init {
-		orientation = HORIZONTAL
-		backgroundColor = context.color(R.color.colorPrimaryDark)
-	}
-
-	val melodyViewModel get() = viewModel.melodyViewModel
-
-
-	fun <T: View> T.flexStyle() = this.lparams {
-		width = matchParent
-		height = dip(48)
-		weight = 1f
-	}
-
-
-	fun <T: View> T.hidden() = this.lparams {
-		width = dip(0)
-		height = dip(48)
-		weight = 0f
-	}
-
-
-	fun <T: View> T.squareButtonStyle() = this.lparams {
-		width = dip(48)
-		height = dip(48)
-		weight = 0f
-	}
-
-
-	fun <T: View> T.longSquareButtonStyle() = this.lparams {
-		width = dip(96)
-		height = dip(48)
-		weight = 0f
-	}
-
-
-	private val lengthDialog = LengthDialog(context)
+class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
+	: Toolbar(context, viewModel), AnkoLogger
+{
+	private val lengthDialog = LengthDialog(context, melodyViewModel)
 
 	private val lengthButton: Button = button {
 		text = "0/0"
@@ -78,17 +39,6 @@ class MelodyToolbar(
       }
 		}
 	}.longSquareButtonStyle()
-
-	val displayTypeButton = imageButton {
-		imageResource = R.drawable.colorboard_icon_vertical
-		scaleType = ImageView.ScaleType.FIT_CENTER
-    onClick {
-      melodyViewModel.displayType = when(melodyViewModel.displayType) {
-        MelodyViewModel.DisplayType.COLORBLOCK -> MelodyViewModel.DisplayType.NOTATION
-        else -> MelodyViewModel.DisplayType.COLORBLOCK
-      }
-    }
-	}.squareButtonStyle()
 
 	private val relativeToButton: Button = button {
 		text = ""
@@ -200,9 +150,9 @@ class MelodyToolbar(
 
 
 		lengthButton.text = "${melodyViewModel.openedMelody?.length}/${melodyViewModel.openedMelody?.subdivisionsPerBeat}"
-		lengthDialog.melody = melodyViewModel.openedMelody
+		lengthDialog.updateText()
 	}
-	private fun updateMelody() = viewModel.melodyBeatAdapter?.notifyDataSetChanged()
+	private fun updateMelody() = viewModel.melodyBeatAdapter.notifyDataSetChanged()
 
   private fun Melody<*>.transposeInPlace(interval: Int) {
     when(this) {

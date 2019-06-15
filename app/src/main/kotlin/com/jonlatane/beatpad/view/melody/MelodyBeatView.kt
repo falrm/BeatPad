@@ -2,7 +2,6 @@ package com.jonlatane.beatpad.view.melody
 
 import android.content.Context
 import android.graphics.*
-import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.SparseArray
 import android.view.MotionEvent
@@ -13,12 +12,10 @@ import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
-import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatNotationRenderer
 import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatNotationRenderer.DrawablePool
 import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatRenderer
-import kotlinx.io.pool.DefaultPool
+import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingModifiers
 import org.jetbrains.anko.*
-import java.util.*
 
 /**
  * BeatViews
@@ -50,13 +47,14 @@ class MelodyBeatView @JvmOverloads constructor(
   //override var initialHeight: Int? = null
   override val renderVertically = true
   override val halfStepsOnScreen = 88f
+
   inline val elementRange: IntRange? get() = melody?.let { elementRangeFor(it) }
   val drawWidth get() = elementRange?.let { (width.toFloat() / it.size).toInt() } ?: 0
   override val drawPadding: Int
     get() = if (drawWidth > dip(27f)) dip(5)
     else Math.max(0, drawWidth - dip(22f))
   override val nonRootPadding get() = drawPadding
-  override val harmony: Harmony? get() = viewModel.paletteViewModel.harmonyViewModel.harmony
+  override val harmony: Harmony? get() = viewModel.harmony
 
   override val overallBounds = Rect()
   override fun onDraw(canvas: Canvas) {
@@ -77,11 +75,11 @@ class MelodyBeatView @JvmOverloads constructor(
 
   override fun onTouchEvent(event: MotionEvent): Boolean {
     return when (viewModel.melodyEditingModifiers.modifier) {
-      MelodyEditingModifiers.Modifier.None -> false
-      MelodyEditingModifiers.Modifier.Editing -> onTouchEditEvent(event)
+      MelodyEditingModifiers.Modifier.None         -> false
+      MelodyEditingModifiers.Modifier.Editing      -> onTouchEditEvent(event)
       MelodyEditingModifiers.Modifier.Articulating -> true//onTouchArticulateEvent(event)
-      MelodyEditingModifiers.Modifier.Transposing -> true
-      else -> false
+      MelodyEditingModifiers.Modifier.Transposing  -> true
+      else                                         -> false
     }
   }
 

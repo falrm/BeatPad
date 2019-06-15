@@ -1,3 +1,4 @@
+import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.model.*
@@ -6,6 +7,7 @@ import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.output.service.let
+import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.to127Int
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import com.jonlatane.beatpad.view.palette.SectionHolder
@@ -41,7 +43,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
 
   val currentSectionColor: Int get() = palette?.sections
     ?.indexOf(section)?.let { sectionIndex ->
-      SectionHolder.sectionColor(sectionIndex)
+      MainApplication.instance.color(SectionHolder.sectionColor(sectionIndex))
     } ?: R.color.subDominant
 
   var chord: Chord? = null

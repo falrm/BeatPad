@@ -132,12 +132,20 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
 
   override fun onRestoreInstanceState(savedInstanceState: Bundle) {
     super.onRestoreInstanceState(savedInstanceState)
-    viewModel.melodyViewModel.displayType = MelodyViewModel.DisplayType.valueOf(
-      savedInstanceState.getString(
-        "melodyDisplayType",
-        MelodyViewModel.DisplayType.COLORBLOCK.name
+    with(viewModel.melodyViewModel) {
+      displayType = MelodyViewModel.DisplayType.valueOf(
+        savedInstanceState.getString(
+          "melodyDisplayType",
+          MelodyViewModel.DisplayType.COLORBLOCK.name
+        )
       )
-    )
+      layoutType = MelodyViewModel.LayoutType.valueOf(
+        savedInstanceState.getString(
+          "melodyLayoutType",
+          MelodyViewModel.LayoutType.GRID.name
+        )
+      )
+    }
     if (savedInstanceState.getBoolean("keyboardOpen", false)) {
       viewModel.keyboardView.show(false)
     }
@@ -172,6 +180,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
     super.onSaveInstanceState(outState)
     storePalette(viewModel.palette)
     outState.putString("melodyDisplayType", viewModel.melodyViewModel.displayType.name)
+    outState.putString("melodyLayoutType", viewModel.melodyViewModel.layoutType.name)
     outState.putBoolean("keyboardOpen", !viewModel.keyboardView.isHidden)
     outState.putBoolean("colorboardOpen", !viewModel.colorboardView.isHidden)
     outState.putBoolean("orbifoldOpen", !viewModel.orbifold.isHidden)
@@ -181,6 +190,9 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
   }
 
 
+  /**
+   * For handling
+   */
   fun openMelodyAlert(melody: Melody<*>) {
     lateinit var alert: DialogInterface
     val alertBuilder = configurationContext.alert {

@@ -14,8 +14,8 @@ import kotlin.NoSuchElementException
  */
 interface Pattern<T : Transposable<T>> : Transposable<Pattern<T>> {
   val changes: NavigableMap<Int, T>
-  val subdivisionsPerBeat: Int
-  val length: Int
+  var subdivisionsPerBeat: Int
+  var length: Int
   var tonic: Int
 
   fun beat(beatPosition: Int): NavigableMap<Int, T> = changes.subMap(

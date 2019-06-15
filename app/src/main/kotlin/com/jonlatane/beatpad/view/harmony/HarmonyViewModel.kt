@@ -50,6 +50,9 @@ open class HarmonyViewModel: SelectedChordAnimation {
     harmony!!.changeBefore(it.first)
   }
   set(value) {
+    if(value == null) {
+      selectedHarmonyElements = null
+    }
     selectedHarmonyElements?.let {
       harmony!!.changes[it.first] = value
     }

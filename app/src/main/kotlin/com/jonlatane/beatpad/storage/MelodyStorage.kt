@@ -23,6 +23,7 @@ object MelodyStorage : AnkoLogger {
 			val serializer = BeanSerializerFactory.instance.findBeanSerializer(provider,
 				javaType,
 				beanDesc)
+			// Serialize normally, but also add in a "type" field
 			serializer.unwrappingSerializer(null).serialize(value, jgen, provider)
 			jgen.writeObjectField("type", value.type)
 			jgen.writeEndObject()
@@ -32,8 +33,8 @@ object MelodyStorage : AnkoLogger {
 		override fun deserialize(jp: JsonParser, context: DeserializationContext): Melody<*> {
 			val mapper = jp.codec as ObjectMapper
 			val root = mapper.readTree<ObjectNode>(jp)
-			/*send you own condition*/
 			val type = root.get("type").asText()
+			// Remove the "type" field so ObjectMapper won't freak out
 			root.remove("type")
 			return when(type) {
 				"rational" -> mapper.readValue(root.toString(), RationalMelody::class.java)
