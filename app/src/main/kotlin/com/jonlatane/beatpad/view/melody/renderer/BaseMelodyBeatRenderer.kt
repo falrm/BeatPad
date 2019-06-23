@@ -1,13 +1,11 @@
 package com.jonlatane.beatpad.view.melody.renderer
 
-import BeatClockPaletteConsumer
 import android.graphics.Canvas
 import android.graphics.Rect
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
-import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.colorboard.ColorGuide
@@ -43,7 +41,7 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
    */
   fun Canvas.iterateSubdivisions(
     melody: Melody<*>,
-    stuff: (Int, Int) -> Unit //elementIndex, elementPosition
+    stuff: (Int) -> Unit // elementPosition
   ) {
     val elementRange: IntRange = elementRangeFor(melody)
     val elementCount = elementRange.size
@@ -56,7 +54,7 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
       chord = chordAt(elementPosition)
         ?: viewModel.paletteViewModel.orbifold.chord
           ?: MelodyBeatView.DEFAULT_CHORD
-      stuff(elementIndex, elementPosition)
+      stuff(elementPosition)
     }
   }
 

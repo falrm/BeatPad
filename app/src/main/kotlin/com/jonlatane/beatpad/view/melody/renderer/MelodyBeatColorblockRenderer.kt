@@ -60,7 +60,7 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatEventH
     forceDrawColorGuideForCurrentBeat: Boolean = false,
     alphaSource: Float
   ) {
-    iterateSubdivisions(melody) { elementIndex, elementPosition ->
+    iterateSubdivisions(melody) { elementPosition ->
       val isCurrentlyPlayingBeat: Boolean =
         viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
           from = BeatClockPaletteConsumer.ticksPerBeat,

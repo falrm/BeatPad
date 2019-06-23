@@ -107,7 +107,7 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
     forceDrawColorGuideForCurrentBeat: Boolean = false,
     stemsUp: Boolean = true
   ) {
-    iterateSubdivisions(melody) { elementIndex, elementPosition ->
+    iterateSubdivisions(melody) { elementPosition ->
       val isCurrentlyPlayingBeat: Boolean =
         viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
           from = BeatClockPaletteConsumer.ticksPerBeat,
@@ -149,8 +149,8 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
     alphaSource: Float,
     stemsUp: Boolean = true
   ) {
-    val element: Transposable<*>? = melody.changes[elementPosition]
-    val nextElement: Transposable<*>? = melody.changes[elementPosition]
+    val element: Transposable<*>? = melody.changes[elementPosition % melody.length]
+    val nextElement: Transposable<*>? = melody.changes[elementPosition % melody.length]
     val isChange = element != null
     //paint.color = (if (isChange) 0xAA212121.toInt() else 0xAA424242.toInt()).withAlpha((alphaSource * drawAlpha).toInt())
 

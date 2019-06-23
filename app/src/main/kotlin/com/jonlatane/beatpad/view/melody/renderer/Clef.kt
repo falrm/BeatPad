@@ -19,6 +19,13 @@ enum class Clef(
     note(D, 3),
     note(B, 2),
     note(G, 2)
+  )),
+  TENOR_TREBLE(setOf(
+    note(F, 4),
+    note(D, 4),
+    note(B, 3),
+    note(G, 3),
+    note(E, 3)
   ));
   val heptatonicMax = notes.maxBy { it.heptatonicValue }!!.heptatonicValue
   val heptatonicMin = notes.minBy { it.heptatonicValue }!!.heptatonicValue

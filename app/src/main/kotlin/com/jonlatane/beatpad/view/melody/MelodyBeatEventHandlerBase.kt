@@ -6,6 +6,8 @@ import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.output.service.convertPatternIndex
+import com.jonlatane.beatpad.util.vibrate
+import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingModifiers
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import java.util.*
@@ -32,5 +34,10 @@ interface MelodyBeatEventHandlerBase: AnkoLogger {
       //info("Chord at $elementPosition is $result")
       result
     }
+  }
+
+  fun rejectionVibrate() {
+
+    vibrate(MelodyEditingModifiers.vibrationMs)
   }
 }
