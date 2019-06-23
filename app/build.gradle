@@ -79,6 +79,9 @@ dependencies {
 	implementation "org.jetbrains.anko:anko-appcompat-v7-coroutines:$anko_version"
 	implementation "org.jetbrains.anko:anko-constraint-layout:$anko_version"
 	implementation "org.jetbrains.anko:anko-design:$anko_version"
+	implementation 'commons-codec:commons-codec:1.10'
+
+
 
 	implementation("org.jetbrains.kotlinx:kotlinx-io-jvm:$kotlinx_io_version") {
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-common'

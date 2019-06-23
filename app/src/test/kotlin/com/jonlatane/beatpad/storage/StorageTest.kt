@@ -1,17 +1,17 @@
 package com.jonlatane.beatpad.storage
 
-import com.jonlatane.beatpad.model.Palette
-import com.jonlatane.beatpad.model.harmony.chord.*
-import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
-import io.damo.aspen.*
-import org.assertj.core.api.Assertions.*
+import com.jonlatane.beatpad.model.Melody
+import io.damo.aspen.Test
+import org.assertj.core.api.Assertions.assertThat
 
 class StorageTest : Test({
-	val palette = PaletteStorage.basePalette
-	test("Storage") {
-//		val data = PaletteStorage.stringify(palette)
-//		println(data)
-//		val newPalette = PaletteStorage.parse(data)
-//		println(PaletteStorage.stringify(newPalette))
+	with(Storage) {
+		test("Melody URI Storage") {
+			val data = PaletteStorage.baseMelody.toURI()
+			val actual: Melody<*> = data.toEntity("melody", "v1", Melody::class)!!
+			val expected = PaletteStorage.baseMelody
+			assertThat(actual.length == expected.length)
+			assertThat(actual.subdivisionsPerBeat == expected.subdivisionsPerBeat)
+		}
 	}
 })

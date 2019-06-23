@@ -1,12 +1,14 @@
 package com.jonlatane.beatpad.storage
 
+
 import android.content.Context
-import android.util.Base64
+import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.storage.AppObjectMapper.reader
 import com.jonlatane.beatpad.storage.AppObjectMapper.writer
+import org.apache.commons.codec.binary.Base64
 import org.jetbrains.anko.*
 import java.io.*
 import java.io.File.separator
@@ -55,11 +57,13 @@ interface Storage: AnkoLogger {
 		}
 	}
 
-  companion object: AnkoLogger {
+  companion object: Storage, AnkoLogger {
+		override val storageContext get() = MainApplication.instance
 		private const val paletteDir = "palettes"
 		private const val melodyDir = "melodies"
 		private const val harmonyDir = "harmonies"
 		private const val openPaletteFileName = "palette.json"
+		val base64 = Base64(Int.MAX_VALUE, byteArrayOf(), true)
 
 		fun getPalettes(context: Context): List<File> {
 			createDir(paletteDir, context)
@@ -105,6 +109,10 @@ interface Storage: AnkoLogger {
 	fun Harmony.toURI(): URI = toURI("harmony")
 	fun Melody<*>.toURI(): URI = toURI("melody")
 
+	/**
+	 * @return [null] if the schema isn't a valid BeatScratch schema; otherwise will either
+	 * successfully decode the entity or throw an exception.
+	 */
 	fun <T: Any> URI.toEntity(entity: String, entityVersion: String, klass: KClass<out T>) : T? {
 		// Validate the schema
 		when(scheme) {
@@ -118,7 +126,7 @@ interface Storage: AnkoLogger {
 			else -> return null
 		}
 		// Read the entity
-		val bytes = Base64.decode(query, Base64.NO_WRAP)
+		val bytes = base64.decode(query)
 		return ZipInputStream(ByteArrayInputStream(bytes)).use { zipInputStream ->
 			zipInputStream.nextEntry
 			AppObjectMapper.readValue(zipInputStream, klass.java)
@@ -133,7 +141,7 @@ interface Storage: AnkoLogger {
 			}
 			bytes.toByteArray()
 		}
-		val encodedString = Base64.encodeToString(bytes, Base64.NO_WRAP)
+		val encodedString = base64.encodeAsString(bytes)
 		return URI("https://api.beatscratch.io/$entity/$entityVersion?$encodedString")
 	}
 }
