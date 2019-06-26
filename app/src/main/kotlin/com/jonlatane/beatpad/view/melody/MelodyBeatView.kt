@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.view.melody
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
@@ -20,12 +21,11 @@ import org.jetbrains.anko.*
 /**
  * BeatViews
  */
-class MelodyBeatView @JvmOverloads constructor(
+@SuppressLint("ViewConstructor")
+class MelodyBeatView constructor(
   context: Context,
-  attrs: AttributeSet? = null,
-  defStyle: Int = 0,
   override val viewModel: MelodyViewModel
-) : BaseColorboardView(context, attrs, defStyle), MelodyBeatRenderer,
+) : BaseColorboardView(context), MelodyBeatRenderer,
   MelodyBeatEventArticulationHandler, MelodyBeatEventEditingHandler, AnkoLogger {
 
   override val displayType: MelodyViewModel.DisplayType get() = viewModel.displayType
@@ -34,6 +34,8 @@ class MelodyBeatView @JvmOverloads constructor(
   override val notationAlpha: Float get() = viewModel.beatAdapter.notationAlpha
   override val filledNoteheadPool = DrawablePool(R.drawable.notehead_filled, context)
   override val sharpPool = DrawablePool(R.drawable.sharp, context)
+  override val flatPool = DrawablePool(R.drawable.flat, context)
+  override val naturalPool = DrawablePool(R.drawable.natural_sign, context)
   override val xNoteheadPool: DrawablePool = DrawablePool(R.drawable.notehead_x, context)
 
   init {
@@ -54,7 +56,6 @@ class MelodyBeatView @JvmOverloads constructor(
     get() = if (drawWidth > dip(27f)) dip(5)
     else Math.max(0, drawWidth - dip(22f))
   override val nonRootPadding get() = drawPadding
-  override val harmony: Harmony? get() = viewModel.harmony
 
   override val overallBounds = Rect()
   override fun onDraw(canvas: Canvas) {

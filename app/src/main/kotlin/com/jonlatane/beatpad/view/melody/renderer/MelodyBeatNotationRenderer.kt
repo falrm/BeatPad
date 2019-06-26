@@ -4,6 +4,7 @@ import BeatClockPaletteConsumer
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
+import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.melody.RationalMelody
@@ -16,31 +17,8 @@ import java.util.*
 import kotlin.math.*
 
 
-interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
+interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, CanvasToneDrawer {
   val notationAlpha: Float
-  fun flushNotationDrawableCache() {
-    listOf(filledNoteheadPool, sharpPool, xNoteheadPool)
-      .forEach { it.flushNotationDrawableCache() }
-  }
-  val sharpPool: DrawablePool
-  val filledNoteheadPool: DrawablePool
-  val xNoteheadPool: DrawablePool
-
-  class DrawablePool(val drawableResource: Int, val context: Context): DefaultPool<Drawable>(15) {
-    val notationDrawableCache = Collections.synchronizedList(mutableListOf<Drawable>())
-    override fun produceInstance(): Drawable {
-      val result = context.resources.getDrawable(drawableResource, null)
-        ?.constantState?.newDrawable()?.mutate()
-      notationDrawableCache.add(result)
-      return result!!
-    }
-    fun flushNotationDrawableCache() {
-      notationDrawableCache.removeAll {
-        recycle(it); true
-      }
-    }
-  }
-  val clefs: List<Clef> get() = listOf(Clef.TREBLE, Clef.BASS)
 
   fun renderNotationMelodyBeat(canvas: Canvas) {
     paint.color = color(android.R.color.black).withAlpha((255 * notationAlpha).toInt())
@@ -48,13 +26,13 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
       val minValue = 1f
       when {
         it > minValue -> round(it)
-        else -> minValue
+        else          -> minValue
       }
     }
     canvas.renderStaffLines()
 
     melody?.let { melody ->
-      val alphaMultiplier = if(viewModel.isMelodyReferenceEnabled) 1f else 2f/3
+      val alphaMultiplier = if (viewModel.isMelodyReferenceEnabled) 1f else 2f / 3
       canvas.drawNotatedMelody(
         melody,
         drawAlpha = notationAlpha * alphaMultiplier,
@@ -64,39 +42,76 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
       )
     }
 
-    viewModel.harmony?.meter?.let { meter ->
-      //TODO make this reflect all the possibilities of [Harmony.Meter]
-      if((beatPosition + 1) % meter.defaultBeatsPerMeasure == 0) {
-        canvas.drawHorizontalLineInBounds(
-          leftSide = false,
-          strokeWidth = paint.strokeWidth * 2,
-          startY = canvas.pointFor(clefs.flatMap { it.notes }.maxBy { it.heptatonicValue }!!),
-          stopY = canvas.pointFor(clefs.flatMap { it.notes }.minBy { it.heptatonicValue }!!)
-        )
-      }
+    if(isFinalBeat) {
+      canvas.drawHorizontalLineInBounds(
+        leftSide = false,
+        strokeWidth = paint.strokeWidth * 2,
+        startY = canvas.pointFor(clefs.flatMap { it.notes }.maxBy { it.heptatonicValue }!!),
+        stopY = canvas.pointFor(clefs.flatMap { it.notes }.minBy { it.heptatonicValue }!!)
+      )
     }
 
-
     paint.color = color(android.R.color.black).withAlpha((255 * notationAlpha / 3f).toInt())
-    BeatClockPaletteConsumer.section?.let { section ->
-      section.melodies.filter { !it.isDisabled }.filter {
-        if(it.melody == melody) false else
-        when(melody?.limitedToNotesInHarmony) {
-          null -> false
-          true -> it.melody.limitedToNotesInHarmony
-          false -> !it.melody.limitedToNotesInHarmony
-        }
-      }.map { it.melody }.forEach { melody ->
-        canvas.drawNotatedMelody(
-          melody,
-          drawAlpha = notationAlpha / 3f,
-          drawColorGuide = false,
-          stemsUp = false
-        )
-      }
+    sectionMelodiesOfPartType.filter { it != melody }.forEach { melody ->
+      canvas.drawNotatedMelody(
+        melody,
+        drawAlpha = notationAlpha / 3f,
+        drawColorGuide = false,
+        stemsUp = false
+      )
     }
     flushNotationDrawableCache()
   }
+
+  override val harmony: Harmony get() = viewModel.harmony!!
+  val meter: Harmony.Meter get() = harmony.meter
+  val isFinalBeat: Boolean get() = viewModel.harmony?.meter?.let { meter ->
+      //TODO make this reflect all the possibilities of [Harmony.Meter]
+      (beatPosition + 1) % meter.defaultBeatsPerMeasure == 0
+    } ?: false
+
+  fun flushNotationDrawableCache() {
+    listOf(filledNoteheadPool, sharpPool, xNoteheadPool)
+      .forEach { it.flushNotationDrawableCache() }
+  }
+
+  val sharpPool: DrawablePool
+  val flatPool: DrawablePool
+  val naturalPool: DrawablePool
+  val filledNoteheadPool: DrawablePool
+  val xNoteheadPool: DrawablePool
+
+  class DrawablePool(val drawableResource: Int, val context: Context) : DefaultPool<Drawable>(15) {
+    val notationDrawableCache = Collections.synchronizedList(mutableListOf<Drawable>())
+    override fun produceInstance(): Drawable {
+      val result = context.resources.getDrawable(drawableResource, null)
+        ?.constantState?.newDrawable()?.mutate()
+      notationDrawableCache.add(result)
+      return result!!
+    }
+
+    fun flushNotationDrawableCache() {
+      notationDrawableCache.removeAll {
+        recycle(it); true
+      }
+    }
+  }
+
+  val clefs: List<Clef> get() = listOf(Clef.TREBLE, Clef.BASS)
+
+  val sectionMelodies
+    get() = BeatClockPaletteConsumer.section?.let { section ->
+      section.melodies.filter { !it.isDisabled }
+    }?.map { it.melody } ?: emptyList()
+
+  val sectionMelodiesOfPartType
+    get() = sectionMelodies.filter {
+      when (melody?.limitedToNotesInHarmony) {
+        null  -> false
+        true  -> it.limitedToNotesInHarmony
+        false -> !it.limitedToNotesInHarmony
+      }
+    }
 
 
   fun Canvas.drawNotatedMelody(
@@ -107,29 +122,33 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
     forceDrawColorGuideForCurrentBeat: Boolean = false,
     stemsUp: Boolean = true
   ) {
+    val maxSubdivisonsPerBeat = (sectionMelodiesOfPartType + melody)
+      .map { it.subdivisionsPerBeat }.max()!!
+    val maxBoundsWidth = (overallBounds.right - overallBounds.left) / maxSubdivisonsPerBeat
     iterateSubdivisions(melody) { elementPosition ->
+      bounds.right = bounds.left + maxBoundsWidth
       val isCurrentlyPlayingBeat: Boolean =
         viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
           from = BeatClockPaletteConsumer.ticksPerBeat,
           to = melody
         ) == elementPosition
       colorGuideAlpha = (when {
-        !drawColorGuide -> when {
+        !drawColorGuide                -> when {
           forceDrawColorGuideForCurrentBeat && isCurrentlyPlayingBeat -> 119
-          else -> 0
+          else                                                        -> 0
         }
         melody.limitedToNotesInHarmony -> when {
           isCurrentlyPlayingBeat -> 255
-          else -> 187
+          else                   -> 187
         }
         isCurrentlyPlayingBeat         -> 119
         else                           -> 0
       } * drawAlpha).toInt()
-      if(colorGuideAlpha > 0) {
+      if (colorGuideAlpha > 0) {
         drawColorGuide()
       }
-      drawNotatedStepNotes(melody, elementPosition, drawAlpha, stemsUp)
-      if(drawRhythm) drawRhythm(melody, elementPosition, drawAlpha)
+      drawNoteheadsLedgersAndStems(melody, harmony, elementPosition, drawAlpha, stemsUp)
+      if (drawRhythm) drawRhythm(melody, elementPosition, drawAlpha)
     }
 
     val overallWidth = overallBounds.right - overallBounds.left
@@ -137,13 +156,44 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
       left = overallWidth
       right = overallWidth
     }
-    if(drawRhythm) drawRhythm(melody, melody.subdivisionsPerBeat, drawAlpha)
+    if (drawRhythm) drawRhythm(melody, melody.subdivisionsPerBeat, drawAlpha)
+  }
+
+  fun previousSignOf(
+    melody: Melody<*>,
+    harmony: Harmony,
+    note: Note,
+    melodyPosition: Int
+  ): Note.Sign? {
+    val currentBeatPosition = melodyPosition.toFloat() / melody.subdivisionsPerBeat
+    val lastDownbeat = (0..Int.MAX_VALUE).first {
+      it <= currentBeatPosition && it + harmony.meter.defaultBeatsPerMeasure > currentBeatPosition
+    }
+    var result: Note.Sign? = null
+    melody.changes.navigableKeySet()
+      .subSet(lastDownbeat * melody.subdivisionsPerBeat, melodyPosition)
+      .reversed()
+      .any { changeIndex ->
+        val change = melody.changes[changeIndex]
+        val tones: Set<Int> = change.let {
+          (it as? RationalMelody.Element)?.tones
+        } ?: emptySet()
+        val playbackNotes = tones.map {
+          val playbackTone = melody.playbackToneUnder(it, chord)
+          Note.naturalOrSharpNoteFor(playbackTone)
+        }
+        playbackNotes.firstOrNull { it.heptatonicValue == note.heptatonicValue }?.also {
+          result = it.sign
+        } != null
+      }
+    return result
   }
 
 
 
-  fun Canvas.drawNotatedStepNotes(
+  fun Canvas.drawNoteheadsLedgersAndStems(
     melody: Melody<*>,
+    harmony: Harmony,
     elementPosition: Int,
     //drawAlpha: Int = 0xFF,
     alphaSource: Float,
@@ -155,7 +205,7 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
     //paint.color = (if (isChange) 0xAA212121.toInt() else 0xAA424242.toInt()).withAlpha((alphaSource * drawAlpha).toInt())
 
     try {
-      val tones: Set<Int> = melody.changeBefore(elementPosition).let {
+      val tones: Set<Int> = melody.changeBefore(elementPosition % melody.length).let {
         (it as? RationalMelody.Element)?.tones
       } ?: emptySet()
 
@@ -181,26 +231,26 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
 
           val notehead = when {
             melody.limitedToNotesInHarmony -> filledNoteheadPool.borrow()
-            else -> xNoteheadPool.borrow()
+            else                           -> xNoteheadPool.borrow()
           }.apply { alpha = (255 * alphaSource).toInt() }
           val shouldStagger = playbackNotes.any {
             (
               it.heptatonicValue % 2 == 0
-              && (
-              it.heptatonicValue == note.heptatonicValue + 1
-                || it.heptatonicValue == note.heptatonicValue - 1
-              )
-            ) || (
+                && (
+                it.heptatonicValue == note.heptatonicValue + 1
+                  || it.heptatonicValue == note.heptatonicValue - 1
+                )
+              ) || (
               it.heptatonicValue == note.heptatonicValue
                 && it.tone > note.tone
-            )
+              )
           }
           hadStaggeredNotes = hadStaggeredNotes || shouldStagger
-          if(minCenter == center) minWasStaggered = shouldStagger
-          if(maxCenter == center) maxWasStaggered = shouldStagger
+          if (minCenter == center) minWasStaggered = shouldStagger
+          if (maxCenter == center) maxWasStaggered = shouldStagger
           val top = center.toInt() - (noteheadHeight / 2)
           val bottom = center.toInt() + (noteheadHeight / 2)
-          val (left, right) = if(shouldStagger) {
+          val (left, right) = if (shouldStagger) {
             bounds.right - noteheadWidth to bounds.right
           } else {
             (bounds.right - 1.9f * noteheadWidth).toInt() to (bounds.right - 0.9f * noteheadWidth).toInt()
@@ -210,12 +260,23 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
           notehead.draw(this)
 
           // Draw signs (currently only sharp)
-          when(note.sign) {
-            Note.Sign.Sharp -> sharpPool.borrow().apply { alpha = (255 * alphaSource).toInt() }
-            Note.Sign.Flat -> null
-            else -> null
+          when (note.sign) {
+            Note.Sign.Sharp -> when(previousSignOf(melody, harmony, note, elementPosition)) {
+              Note.Sign.Sharp -> null
+              else -> sharpPool.borrow().apply { alpha = (255 * alphaSource).toInt() }
+            }
+            Note.Sign.Flat  -> when(previousSignOf(melody, harmony, note, elementPosition)) {
+              Note.Sign.Flat -> null
+              else -> flatPool.borrow().apply { alpha = (255 * alphaSource).toInt() }
+            }
+            Note.Sign.Natural -> when(previousSignOf(melody, harmony, note, elementPosition)) {
+              Note.Sign.Natural -> null
+              null -> null
+              else -> naturalPool.borrow().apply { alpha = (255 * alphaSource).toInt() }
+            }
+            else            -> null
           }?.let { drawable ->
-            val (sharpLeft, sharpRight) = if(shouldStagger) {
+            val (sharpLeft, sharpRight) = if (shouldStagger) {
               (bounds.right - 1.6f * noteheadWidth).toInt() to (bounds.right - 1.1f * noteheadWidth).toInt()
             } else {
               (bounds.right - 2.5f * noteheadWidth).toInt() to (bounds.right - 2.0f * noteheadWidth).toInt()
@@ -228,15 +289,15 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
         }
 
         // Draw the stem
-        if(stemsUp) {
+        if (stemsUp) {
           val stemX = bounds.right - 0.95f * noteheadWidth
-          val startY = maxCenter + noteheadHeight * (if(maxWasStaggered) .2f else -.2f)
+          val startY = maxCenter + noteheadHeight * (if (maxWasStaggered) .2f else -.2f)
           val stopY = minCenter - 3 * noteheadHeight
           drawLine(stemX, startY, stemX, stopY, paint)
         } else {
-          val stemX = if(hadStaggeredNotes) bounds.right - 0.95f * noteheadWidth
-                                       else bounds.right - 1.85f * noteheadWidth
-          val startY = minCenter + noteheadHeight * (if(minWasStaggered) -.2f else .2f)
+          val stemX = if (hadStaggeredNotes) bounds.right - 0.95f * noteheadWidth
+          else bounds.right - 1.85f * noteheadWidth
+          val startY = minCenter + noteheadHeight * (if (minWasStaggered) -.2f else .2f)
           val stopY = maxCenter + 3 * noteheadHeight
           drawLine(stemX, startY, stemX, stopY, paint)
         }
@@ -248,7 +309,7 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
   }
 
   fun Canvas.renderLedgerLines(note: Note, left: Int, right: Int) {
-    if (!clefs.any { it. covers(note) }) {
+    if (!clefs.any { it.covers(note) }) {
       val nearestClef = clefs.minBy {
         min(
           abs(note.heptatonicValue - it.heptatonicMax),
@@ -265,19 +326,18 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
     }
   }
 
-  fun Canvas.centerOfTone(tone: Int): Float
-    = startPoint - (bottomMostNote + tone - 9.5f) * halfStepWidth
+  fun Canvas.centerOfTone(tone: Int): Float = startPoint - (bottomMostNote + tone - 9.5f) * halfStepWidth
 
   fun Canvas.renderStaffLines() {
     //val halfStepWidth: Float = axisLength / halfStepsOnScreen
-    clefs.flatMap { it.notes }.forEach{ note ->
+    clefs.flatMap { it.notes }.forEach { note ->
       renderLineAt(
         pointFor(letter = note.letter, octave = note.octave)
       )
     }
   }
-  fun Canvas.pointFor(note: Note): Float
-    = pointFor(note.letter, note.octave)
+
+  fun Canvas.pointFor(note: Note): Float = pointFor(note.letter, note.octave)
 
   fun Canvas.pointFor(letter: Note.Letter, octave: Int): Float {
     val middleC = centerOfTone(0)
@@ -291,7 +351,7 @@ interface MelodyBeatNotationRenderer: BaseMelodyBeatRenderer, CanvasToneDrawer {
     pointOnToneAxis: Float,
     left: Float? = null,
     right: Float? = null
-  )  {
+  ) {
     if (renderVertically) {
       drawLine(
         left ?: bounds.left.toFloat(),

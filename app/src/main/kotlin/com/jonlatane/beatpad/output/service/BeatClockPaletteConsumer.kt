@@ -4,7 +4,6 @@ import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.model.*
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
-import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.output.service.let
 import com.jonlatane.beatpad.util.color
@@ -13,7 +12,6 @@ import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import com.jonlatane.beatpad.view.palette.SectionHolder
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.info
 import org.jetbrains.anko.verbose
 import java.lang.Math.max
@@ -21,6 +19,10 @@ import java.util.*
 import kotlin.math.floor
 import kotlin.properties.Delegates.observable
 
+/**
+ * A platform-agnostic model for a playback thread that plays back [Section],
+ * [Melody] and [Harmony] data as the end-user would expect.
+ */
 object BeatClockPaletteConsumer : AnkoLogger {
   var palette: Palette? = null
   set(value) {
@@ -46,7 +48,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
       MainApplication.instance.color(SectionHolder.sectionColor(sectionIndex))
     } ?: R.color.subDominant
 
-  var chord: Chord? = null
+  private var chord: Chord? = null
   val harmony: Harmony? get() = section?.harmony
   private val harmonyPosition: Int?
     get() = harmony?.let { tickPosition.convertPatternIndex(ticksPerBeat, it) }
@@ -55,8 +57,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
       harmony.changeBefore(harmonyPosition)
     }
   var tickPosition: Int = 0 // Always relative to ticksPerBeat
-  var ticksPerBeat = 24 // Mutable so you can use, say, 36, to play beats against
-  // input dotted-quarters
+  const val ticksPerBeat = 24 // MIDI standard is pretty clear about this
 
   private data class Attack(
     var part: Part? = null,
@@ -96,17 +97,9 @@ object BeatClockPaletteConsumer : AnkoLogger {
           && part.melodies.contains(it.melody)
       }.forEach { melodyReference ->
         val melody = melodyReference.melody
-        val attack = attackPool.borrow()
-
-        if (
-          true == (melody as? RationalMelody)
-            ?.populateAttack(part, chord, attack, melodyReference.volume)
-        ) {
-          currentAttackIndex++
-          upcomingAttacks += attack
-        } else {
-          attackPool.recycle(attack)
-        }
+        upcomingAttacks += (melody as? RationalMelody)
+          ?.attacksForCurrentTickPosition(part, chord, melodyReference.volume)
+          ?: emptyList()
       }
     }
   }
@@ -178,53 +171,65 @@ object BeatClockPaletteConsumer : AnkoLogger {
   //private fun Melody<*>.
 
   /**
-   * [currentBeat] could be, for instance, 1.2.
-   * That would be be at subdivision 5 (index 4) at 4 subdivisions per beat.
+   * Based on the current [tickPosition], populates the passed [Attack] object.
+   * Returns true if the attack should be played.
    */
-  private fun RationalMelody.populateAttack(
+  private fun RationalMelody.attacksForCurrentTickPosition(
     part: Part,
     chord: Chord?,
-    attack: Attack,
     volume: Float
-  ): Boolean {
-    val offset = chord?.let { offsetUnder(it) } ?: 0
+  ): List<Attack> {
     val currentBeat: Double = tickPosition.toDouble() / ticksPerBeat
     val melodyLength: Double = length.toDouble() / subdivisionsPerBeat
     val positionInMelody: Double = currentBeat % melodyLength
 
     // This candidate for attack is the closest element index to the current tick
-    val indexCandidate = floor(positionInMelody * subdivisionsPerBeat).toInt()
-    val realIndexPosition = indexCandidate.toDouble() / subdivisionsPerBeat
+    val indexCandidates = floor(positionInMelody * subdivisionsPerBeat).toInt().let {
+      listOf(it, it + 1)
+    }
+    val indexHits = indexCandidates.filter { indexCandidate ->
 
-    // Now, is the previous or next tick closer to this element index's real value?
-    fun distance(tickOffset: Double): Double = Math.abs(
-      positionInMelody + (tickOffset / ticksPerBeat) - realIndexPosition
-    )
+      val realIndexPosition = indexCandidate.toDouble() / subdivisionsPerBeat
 
-    val thisTickDistance = distance(0.0)
-    val nextTickDistance = distance(1.0)
-    val previousTickDistance = distance(-1.0)
-    return when {
-      thisTickDistance < nextTickDistance && thisTickDistance < previousTickDistance -> {
-        when {
-          isChangeAt(indexCandidate) -> {
-            val change = changeBefore(indexCandidate)
-            attack.part = part
-            attack.instrument = part.instrument
-            attack.melody = this
-            attack.velocity = change.velocity * volume
+      // Now, is the previous or next tick closer to this element index's real value?
+      fun distance(tickOffset: Double): Double = Math.abs(
+        positionInMelody + (tickOffset / ticksPerBeat) - realIndexPosition
+      )
 
-            change.tones.forEach { tone ->
-              val playbackTone = playbackToneUnder(tone, chord!!)
-              attack.chosenTones.add(playbackTone)
-            }
+      val thisTickDistance = distance(0.0)
+      val nextTickDistance = distance(1.0)
+      val previousTickDistance = distance(-1.0)
+      thisTickDistance <= nextTickDistance && thisTickDistance < previousTickDistance
+    }
 
-            true
+    return indexHits.mapNotNull {
+      val attack = attackPool.borrow()
+      when {
+        isChangeAt(it) -> {
+          val change = changeBefore(it)
+          attack.part = part
+          attack.instrument = part.instrument
+          attack.melody = this
+          attack.velocity = change.velocity * volume
+
+          change.tones.forEach { tone ->
+            val playbackTone = playbackToneUnder(tone, chord!!)
+            attack.chosenTones.add(playbackTone)
           }
-          else -> false
+
+          if(subdivisionsPerBeat == 5) {
+            info("Emitting attack for /5 melody: tickPosition=$tickPosition, indexHit=$it")
+          }
+
+          attack
+        }
+        else ->  {
+          if(subdivisionsPerBeat == 5) {
+            info("NOT Emitting attack for /5 melody: tickPosition=$tickPosition, indexHit=$it (no change)")
+          }
+          null
         }
       }
-      else -> false
     }
   }
 }

@@ -25,7 +25,7 @@ interface MelodyBeatEventHandlerBase: AnkoLogger {
   val beatPosition: Int
   val downPointers: SparseArray<PointF>
 	val melody: Melody<*>?
-  val harmony: Harmony?
+  val harmony: Harmony
   val changes: NavigableMap<Int, out Transposable<*>>? get() = melody?.changes
   fun chordAt(elementPosition: Int) = melody?.let { melody ->
     harmony?.let { harmony ->

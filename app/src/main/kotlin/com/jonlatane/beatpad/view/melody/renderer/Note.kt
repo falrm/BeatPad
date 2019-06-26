@@ -1,7 +1,5 @@
 package com.jonlatane.beatpad.view.melody.renderer
 
-import kotlinx.io.pool.DefaultPool
-
 /**
  * Naming convention for notes, with C4 = 0 (i.e., Roland style, not Yamaha).
  * The note below C4 is B3 (i.e., we count our octaves by Cs, not As).

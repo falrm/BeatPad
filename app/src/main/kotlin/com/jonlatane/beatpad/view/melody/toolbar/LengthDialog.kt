@@ -44,8 +44,8 @@ class LengthDialog(context: Context, val melodyViewModel: MelodyViewModel) {
             minValue = 1
             maxValue = 20000
             wrapSelectorWheel = false
-            onValueChanged { picker, oldVal, newVal ->
-
+            onValueChanged { _, _, _ ->
+              applyChange()
             }
           }.lparams(wrapContent, wrapContent)
 
@@ -68,6 +68,9 @@ class LengthDialog(context: Context, val melodyViewModel: MelodyViewModel) {
             //this.displayedValues = arrayOf("2")
             maxValue = 24
             wrapSelectorWheel = false
+            onValueChanged { _, _, _ ->
+              applyChange()
+            }
           }.lparams(wrapContent, wrapContent)
           textView {
             text = "per beat"
@@ -95,27 +98,19 @@ class LengthDialog(context: Context, val melodyViewModel: MelodyViewModel) {
           centerHorizontally()
           below(numberPickers)
         }
-        button {
-          text = "OK"
-          id = View.generateViewId()
-          typeface = MainApplication.chordTypefaceBold
-          onClick {
-            this@button.requestFocus()
-            val targetSubdivisionsPerBeat = subdivisionsPerBeatPicker.value
-            val targetLength = lengthPicker.value
-            melody?.apply {
-              if(length != targetLength || subdivisionsPerBeat != targetSubdivisionsPerBeat) {
-                length = targetLength
-                subdivisionsPerBeat = targetSubdivisionsPerBeat
-                melodyViewModel.updateToolbarsAndMelody()
-              }
-            }
-          }
-        }.lparams(wrapContent, wrapContent) {
-          below(beatTotal)
-          centerHorizontally()
-        }
       }//.lparams(wrapContent, wrapContent)
+    }
+  }
+
+  fun applyChange() {
+    val targetSubdivisionsPerBeat = subdivisionsPerBeatPicker.value
+    val targetLength = lengthPicker.value
+    melody?.apply {
+      if(length != targetLength || subdivisionsPerBeat != targetSubdivisionsPerBeat) {
+        length = targetLength
+        subdivisionsPerBeat = targetSubdivisionsPerBeat
+        melodyViewModel.updateToolbarsAndMelody()
+      }
     }
   }
 }

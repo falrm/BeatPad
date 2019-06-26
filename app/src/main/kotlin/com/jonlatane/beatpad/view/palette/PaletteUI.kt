@@ -50,7 +50,7 @@ class PaletteUI constructor(
           viewModel.splatController?.tones = chord.getTones()
           viewModel.palette.chord = chord
           viewModel.melodyViewModel.redraw()
-          BeatClockPaletteConsumer.chord = chord
+          //BeatClockPaletteConsumer.chord = chord
         } else {
           viewModel.colorboardView.chord = chord
           if(!keyboardDrumTrack)
