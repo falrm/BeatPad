@@ -1,11 +1,13 @@
 package com.jonlatane.beatpad.view.melody
 
 import android.animation.ValueAnimator
+import android.support.v7.widget.RecyclerView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.storage.PaletteStorage
+import com.jonlatane.beatpad.util.applyToHolders
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.NonDelayedRecyclerView
 import com.jonlatane.beatpad.view.NonDelayedScrollView
@@ -47,7 +49,7 @@ class MelodyViewModel(
 	lateinit var melodyRecyclerView: NonDelayedRecyclerView
 	lateinit var beatAdapter: MelodyBeatAdapter
 	fun updateToolbarsAndMelody() {
-		beatAdapter.notifyDataSetChanged()
+		updateMelodyDisplay()
 		melodyReferenceToolbar.updateButtonText()
 		melodyEditingToolbar.updateButtonText()
 	}
@@ -170,5 +172,10 @@ class MelodyViewModel(
 		if(melody == openedMelody) {
 			updateToolbarsAndMelody()
 		}
+	}
+
+	fun updateMelodyDisplay() {
+		melodyRecyclerView
+			.applyToHolders<RecyclerView.ViewHolder> { it.itemView.invalidate() }
 	}
 }

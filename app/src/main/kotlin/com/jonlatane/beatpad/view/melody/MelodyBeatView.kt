@@ -3,6 +3,7 @@ package com.jonlatane.beatpad.view.melody
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
+import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.util.SparseArray
 import android.view.MotionEvent
@@ -11,6 +12,7 @@ import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.util.applyToHolders
 import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatNotationRenderer.DrawablePool
@@ -96,6 +98,9 @@ class MelodyBeatView constructor(
   override fun getTone(y: Float): Int {
     return Math.round(lowestPitch + 88 * (height - y) / height)
   }
+
+
+  override fun updateMelodyDisplay() = viewModel.updateMelodyDisplay()
 
   override fun invalidateDrawingLayer() = invalidate()
 

@@ -167,6 +167,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, CanvasToneDrawer 
   ): Note.Sign? {
     val currentBeatPosition = melodyPosition.toFloat() / melody.subdivisionsPerBeat
     val lastDownbeat = (0..Int.MAX_VALUE).first {
+      it % harmony.meter.defaultBeatsPerMeasure == 0 &&
       it <= currentBeatPosition && it + harmony.meter.defaultBeatsPerMeasure > currentBeatPosition
     }
     var result: Note.Sign? = null

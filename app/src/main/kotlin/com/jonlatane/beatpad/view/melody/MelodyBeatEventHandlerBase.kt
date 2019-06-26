@@ -36,6 +36,8 @@ interface MelodyBeatEventHandlerBase: AnkoLogger {
     }
   }
 
+  fun updateMelodyDisplay()
+
   fun rejectionVibrate() {
 
     vibrate(MelodyEditingModifiers.vibrationMs)

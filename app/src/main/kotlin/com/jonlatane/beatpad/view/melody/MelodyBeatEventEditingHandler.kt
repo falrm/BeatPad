@@ -43,6 +43,7 @@ interface MelodyBeatEventEditingHandler : MelodyBeatEventHandlerBase, AlphaDrawe
                 }
 							}
 						}
+						updateMelodyDisplay()
             vibrate(MelodyEditingModifiers.vibrationMs)
 					}
 				}
@@ -50,7 +51,6 @@ interface MelodyBeatEventEditingHandler : MelodyBeatEventHandlerBase, AlphaDrawe
 			MotionEvent.ACTION_MOVE -> {}
 			MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> {}
 		}
-		(this as? View)?.invalidate()
 		return true
 	}
 }
