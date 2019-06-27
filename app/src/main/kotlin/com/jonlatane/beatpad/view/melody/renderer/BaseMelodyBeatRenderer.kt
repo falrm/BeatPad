@@ -64,8 +64,8 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
     drawAlpha: Int = 0xAA,
     alphaSource: Float
   ) {
-    val element: Transposable<*>? = melody.changes[elementPosition]
-    val nextElement: Transposable<*>? = melody.changes[elementPosition]
+    val element: Transposable<*>? = melody.changes[elementPosition % melody.length]
+    val nextElement: Transposable<*>? = melody.changes[elementPosition % melody.length]
     val isChange = element != null
     paint.color = (if (isChange) 0xAA212121.toInt() else 0xAA424242.toInt()).withAlpha((alphaSource * drawAlpha).toInt())
 

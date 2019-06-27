@@ -26,8 +26,8 @@ fun Int.convertPatternIndex(
   // if this is 5, then currentBeat is 1.25.
   val fromBeat: Double = this.toDouble() / fromSubdivisionsPerBeat
 
-  val toLength: Double = toLength.toDouble() / toSubdivisionsPerBeat
-  val positionInToPattern: Double = fromBeat % toLength
+  val toLengthBeats: Double = toLength.toDouble() / toSubdivisionsPerBeat
+  val positionInToPattern: Double = fromBeat % toLengthBeats
 
   // This candidate for attack is the closest element index to the current tick
   val result = floor(positionInToPattern * toSubdivisionsPerBeat).toInt()

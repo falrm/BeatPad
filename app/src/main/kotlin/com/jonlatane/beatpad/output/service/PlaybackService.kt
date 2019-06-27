@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.IBinder
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
+import android.support.v4.app.NotificationCompat.PRIORITY_DEFAULT
 import android.support.v4.app.NotificationCompat.PRIORITY_MAX
 import android.support.v4.media.app.NotificationCompat.MediaStyle
 import android.widget.RemoteViews
@@ -134,7 +135,8 @@ class PlaybackService : Service(), AnkoLogger {
       .setSmallIcon(R.drawable.beatscratch_icon_notification_inset_slight)
       .setContentTitle("MIDI Playback")
       .setTicker("MIDI Playback")
-      .setPriority(PRIORITY_MAX)
+      .setPriority(PRIORITY_DEFAULT)
+      .setVibrate(null)
       .setContentText(sectionName)
       //.setPriority()
 //      .setL
@@ -165,7 +167,9 @@ class PlaybackService : Service(), AnkoLogger {
   private fun createNotificationChannel(): String {
     val channelId = "audio_playback"
     val channelName = "MIDI and Hardware Audio"
-    val chan = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
+    val chan = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
+    chan.setSound(null, null)
+    chan.enableVibration(false)
     //chan.lightColor = Color.BLUE
     //chan.importance = NotificationManager.IMPORTANCE_NONE
     //chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
