@@ -89,7 +89,7 @@ class MelodyBeatView constructor(
       val elementRange: IntRange = elementRange!!
       val elementIndex: Int = (elementRange.size * x / width).toInt()
       val elementPosition = Math.min(beatPosition * melody.subdivisionsPerBeat + elementIndex, melody.length - 1)
-      return elementPosition to melody.changes[elementPosition]
+      return elementPosition to melody.changes[elementPosition % melody.length]
     }
   }
 
