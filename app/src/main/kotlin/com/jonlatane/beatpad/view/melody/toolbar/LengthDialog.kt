@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.view.melody.toolbar
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
 import android.view.View
@@ -21,10 +22,14 @@ class LengthDialog(context: Context, val melodyViewModel: MelodyViewModel) {
   private lateinit var lengthPicker: NumberPicker
   lateinit var subdivisionsPerBeatPicker: NumberPicker
   private lateinit var beatCount: TextView
+  private lateinit var beatsText: TextView
 
   fun updateText() {
-    lengthPicker.value = melody?.length ?: 1
-    subdivisionsPerBeatPicker.value = melody?.subdivisionsPerBeat ?: 1
+    melody?.apply {
+      lengthPicker.value = length
+      subdivisionsPerBeatPicker.value = subdivisionsPerBeat
+      updateBeatCount(subdivisionsPerBeat, length)
+    }
   }
 
   fun show() {
@@ -89,12 +94,13 @@ class LengthDialog(context: Context, val melodyViewModel: MelodyViewModel) {
             typeface = MainApplication.chordTypefaceBold
           }.lparams(wrapContent, matchParent)
 
-          textView {
+          beatsText = textView {
             text = "beats"
             gravity = Gravity.CENTER
             typeface = MainApplication.chordTypeface
           }.lparams(wrapContent, matchParent)
         }.lparams(wrapContent, wrapContent) {
+          marginStart = dip(10)
           centerHorizontally()
           below(numberPickers)
         }
@@ -102,6 +108,7 @@ class LengthDialog(context: Context, val melodyViewModel: MelodyViewModel) {
     }
   }
 
+  @SuppressLint("SetTextI18n")
   fun applyChange() {
     val targetSubdivisionsPerBeat = subdivisionsPerBeatPicker.value
     val targetLength = lengthPicker.value
@@ -110,7 +117,18 @@ class LengthDialog(context: Context, val melodyViewModel: MelodyViewModel) {
         length = targetLength
         subdivisionsPerBeat = targetSubdivisionsPerBeat
         melodyViewModel.updateToolbarsAndMelody()
+        //updateBeatCount(targetSubdivisionsPerBeat, targetLength)
       }
     }
+  }
+
+  private fun updateBeatCount(subdivisionsPerBeat: Int, length: Int) {
+    beatCount.text = "%.3f"
+      .format(length.toFloat() / subdivisionsPerBeat)
+      .trim('0')
+      .trimEnd('.')
+      .also {
+        beatsText.text = if(it == "1") "beat" else "beats"
+      }
   }
 }

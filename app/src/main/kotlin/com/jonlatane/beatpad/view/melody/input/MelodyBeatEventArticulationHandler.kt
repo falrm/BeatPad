@@ -1,8 +1,4 @@
-package com.jonlatane.beatpad.view.melody
-
-import com.jonlatane.beatpad.model.Melody
-import com.jonlatane.beatpad.model.Transposable
-import com.jonlatane.beatpad.view.beat.BeatEventHandlerBase
+package com.jonlatane.beatpad.view.melody.input
 
 interface MelodyBeatEventArticulationHandler : MelodyBeatEventHandlerBase {
 /*

@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.view.melody
+package com.jonlatane.beatpad.view.melody.input
 
 import android.graphics.PointF
 import android.util.SparseArray
@@ -7,9 +7,9 @@ import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.util.vibrate
+import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingModifiers
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.info
 import java.util.*
 
 /**

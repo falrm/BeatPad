@@ -17,7 +17,7 @@ import java.util.*
 import kotlin.math.*
 
 
-interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, CanvasToneDrawer {
+interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmRenderer {
   val notationAlpha: Float
 
   fun renderNotationMelodyBeat(canvas: Canvas) {
@@ -129,8 +129,8 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, CanvasToneDrawer 
       bounds.right = bounds.left + maxBoundsWidth
       val isCurrentlyPlayingBeat: Boolean =
         viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
-          from = BeatClockPaletteConsumer.ticksPerBeat,
-          to = melody
+          fromSubdivisionsPerBeat = BeatClockPaletteConsumer.ticksPerBeat,
+          toSubdivisionsPerBeat = melody.subdivisionsPerBeat
         ) == elementPosition
       colorGuideAlpha = (when {
         !drawColorGuide                -> when {

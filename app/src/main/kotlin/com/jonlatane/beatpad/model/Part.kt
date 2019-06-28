@@ -11,7 +11,6 @@ class Part(val instrument: Instrument = MIDIInstrument()) {
 		get() = instrument.volume
 		set(value) {
 			instrument.volume = value
-      (instrument as? MIDIInstrument)?.sendSelectInstrument()
 		}
 	val drumTrack: Boolean @JsonIgnore get() = (instrument as? MIDIInstrument)?.drumTrack == true
 }

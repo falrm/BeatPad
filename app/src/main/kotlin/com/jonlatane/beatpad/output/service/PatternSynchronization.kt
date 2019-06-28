@@ -20,7 +20,7 @@ fun Int.convertPatternIndex(
 fun Int.convertPatternIndex(
   fromSubdivisionsPerBeat: Int,
   toSubdivisionsPerBeat: Int,
-  toLength: Int
+  toLength: Int = Int.MAX_VALUE
 ): Int {
   // In the context of the "from" melody, in, say, sixteenth notes (subdivisionsPerBeat=4),
   // if this is 5, then currentBeat is 1.25.

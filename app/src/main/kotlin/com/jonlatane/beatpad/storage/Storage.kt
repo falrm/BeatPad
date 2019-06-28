@@ -21,43 +21,7 @@ import kotlin.reflect.KClass
 interface Storage: AnkoLogger {
 	val storageContext: Context
 
-	fun Context.loadPalette(
-		filename:String = openPaletteFileName,
-		fallbackToBackup: Boolean = true
-	): Palette? = try {
-		loadPalette(this, File("$filesDir$separator$paletteDir$separator$filename"))
-	} catch(t: Throwable) {
-		error("Failed to load palette data", t)
-		if(fallbackToBackup) {
-			toast("Failed to load data, attempting to load backup...")
-			try {
-				loadPalette(this, File("$filesDir$separator$paletteDir$separator${filename}_old"))
-			} catch (t: Throwable) {
-				error("Failed to load any palette data, starting from scratch...", t)
-				toast("Failed to load data from backup, starting from scratch...")
-				null
-			}
-		} else null
-	}
-
-	fun Context.storePalette(palette: Palette, filename:String = openPaletteFileName) = doAsync {
-		val tmpFile = File("$filesDir$separator$paletteDir${separator}tmp_palette.json")
-		val destFile = File("$filesDir$separator$paletteDir$separator$filename")
-		val oldFile = File("$filesDir$separator$paletteDir$separator${filename}_old")
-
-		try { tmpFile.delete() } catch(_: Throwable) {}
-		try { oldFile.delete() } catch(_: Throwable) {}
-		storePalette(palette, this.weakRef.get()!!, tmpFile)
-		try {
-			loadPalette("tmp_palette.json", false) ?: toast("Failed to save palette!")
-			try { destFile.renameTo(oldFile) || TODO("Rename returned false") } catch(t: Throwable) { warn(t) }
-			try { tmpFile.renameTo(destFile) || TODO("Rename returned false") } catch(t: Throwable) { error(t); throw t }
-		} catch(t: Throwable) {
-			error(t)
-		}
-	}
-
-  companion object: Storage, AnkoLogger {
+	companion object: Storage, AnkoLogger {
 		override val storageContext get() = MainApplication.instance
 		private const val paletteDir = "palettes"
 		private const val melodyDir = "melodies"
@@ -69,7 +33,7 @@ interface Storage: AnkoLogger {
 			createDir(paletteDir, context)
 			return File("${context.filesDir}$separator$paletteDir").listFiles()
 				.filter { it.name.endsWith("~") }
-				//.map { it.name }
+			//.map { it.name }
 		}
 
 		private fun storePalette(palette: Palette, context: Context, file: File) = try {
@@ -103,6 +67,42 @@ interface Storage: AnkoLogger {
 			val dir = context.filesDir
 			val dir2 = File(dir, name)
 			dir2.mkdirs()
+		}
+	}
+
+	fun Context.loadPalette(
+		filename:String = openPaletteFileName,
+		fallbackToBackup: Boolean = true
+	): Palette? = try {
+		loadPalette(this, File("$filesDir$separator$paletteDir$separator$filename"))
+	} catch(t: Throwable) {
+		error("Failed to load palette data", t)
+		if(fallbackToBackup) {
+			toast("Failed to load data, attempting to load backup...")
+			try {
+				loadPalette(this, File("$filesDir$separator$paletteDir$separator${filename}_old"))
+			} catch (t: Throwable) {
+				error("Failed to load any palette data, starting from scratch...", t)
+				toast("Failed to load data from backup, starting from scratch...")
+				null
+			}
+		} else null
+	}
+
+	fun Context.storePalette(palette: Palette, filename:String = openPaletteFileName) = doAsync {
+		val tmpFile = File("$filesDir$separator$paletteDir${separator}tmp_palette.json")
+		val destFile = File("$filesDir$separator$paletteDir$separator$filename")
+		val oldFile = File("$filesDir$separator$paletteDir$separator${filename}_old")
+
+		try { tmpFile.delete() } catch(_: Throwable) {}
+		try { oldFile.delete() } catch(_: Throwable) {}
+		storePalette(palette, this.weakRef.get()!!, tmpFile)
+		try {
+			loadPalette("tmp_palette.json", false) ?: toast("Failed to save palette!")
+			try { destFile.renameTo(oldFile) || TODO("Rename returned false") } catch(t: Throwable) { warn(t) }
+			try { tmpFile.renameTo(destFile) || TODO("Rename returned false") } catch(t: Throwable) { error(t); throw t }
+		} catch(t: Throwable) {
+			error(t)
 		}
 	}
 	fun Palette.toURI(): URI = toURI("palette")

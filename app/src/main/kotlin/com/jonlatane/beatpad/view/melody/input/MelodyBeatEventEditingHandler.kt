@@ -1,10 +1,10 @@
-package com.jonlatane.beatpad.view.melody
+package com.jonlatane.beatpad.view.melody.input
 
 import android.view.MotionEvent
-import android.view.View
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
+import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingModifiers
 
 interface MelodyBeatEventEditingHandler : MelodyBeatEventHandlerBase, AlphaDrawer {

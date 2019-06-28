@@ -2,22 +2,17 @@ package com.jonlatane.beatpad.view.melody.renderer
 
 import BeatClockPaletteConsumer
 import android.graphics.Canvas
-import android.graphics.Rect
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.service.convertPatternIndex
-import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
-import com.jonlatane.beatpad.view.colorboard.ColorGuide
-import com.jonlatane.beatpad.view.melody.MelodyBeatEventHandlerBase
 import com.jonlatane.beatpad.view.melody.MelodyBeatView
-import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
 
-interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatEventHandlerBase {
+interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythmRenderer {
   val colorblockAlpha: Float
   override var chord: Chord
 
@@ -63,8 +58,8 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatEventH
     iterateSubdivisions(melody) { elementPosition ->
       val isCurrentlyPlayingBeat: Boolean =
         viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
-          from = BeatClockPaletteConsumer.ticksPerBeat,
-          to = melody
+          fromSubdivisionsPerBeat = BeatClockPaletteConsumer.ticksPerBeat,
+          toSubdivisionsPerBeat = melody.subdivisionsPerBeat
         ) == elementPosition
       colorGuideAlpha = (when {
         !drawColorGuide -> when {
@@ -81,7 +76,7 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatEventH
       if(colorGuideAlpha > 0) {
         drawColorGuide()
       }
-      drawStepNotes(melody, elementPosition, stepNoteAlpha, alphaSource)
+      drawColorblockNotes(melody, elementPosition, stepNoteAlpha, alphaSource)
       if(drawRhythm) drawRhythm(melody, elementPosition, alphaSource)
     }
 
@@ -91,5 +86,45 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatEventH
       right = overallWidth
     }
     if(drawRhythm) drawRhythm(melody, melody.subdivisionsPerBeat, alphaSource)
+  }
+
+
+
+  fun Canvas.drawColorblockNotes(
+    melody: Melody<*>,
+    elementPosition: Int,
+    drawAlpha: Int = 0xAA,
+    alphaSource: Float
+  ) {
+    val element: Transposable<*>? = melody.changes[elementPosition % melody.length]
+    val nextElement: Transposable<*>? = melody.changes[elementPosition % melody.length]
+    val isChange = element != null
+    paint.color = (if (isChange) 0xAA212121.toInt() else 0xAA424242.toInt()).withAlpha((alphaSource * drawAlpha).toInt())
+
+    try {
+      val tones: Set<Int> = element?.let {
+        (it as? RationalMelody.Element)?.tones
+      } ?: emptySet()
+
+      if (tones.isNotEmpty()) {
+        val leftMargin = if (isChange) drawPadding else 0
+        val rightMargin = if (nextElement != null) drawPadding else 0
+        tones.forEach { tone ->
+          val realTone = tone + melody.offsetUnder(chord)
+          val top = height - height * (realTone - AlphaDrawer.BOTTOM) / 88f
+          val bottom = height - height * (realTone - AlphaDrawer.BOTTOM + 1) / 88f
+          drawRect(
+            bounds.left.toFloat() + leftMargin,
+            top,
+            bounds.right.toFloat() - rightMargin,
+            bottom,
+            paint
+          )
+        }
+      }
+    } catch (t: Throwable) {
+      warn("Error drawing pressed notes in sequence", t)
+      invalidateDrawingLayer()
+    }
   }
 }

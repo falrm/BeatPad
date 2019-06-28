@@ -137,6 +137,7 @@ class PlaybackService : Service(), AnkoLogger {
       .setTicker("MIDI Playback")
       .setPriority(PRIORITY_DEFAULT)
       .setVibrate(null)
+      .setSound(null)
       .setContentText(sectionName)
       //.setPriority()
 //      .setL
