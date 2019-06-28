@@ -19,6 +19,7 @@ import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.verbose
 import kotlin.math.ceil
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.round
 
 
@@ -34,14 +35,20 @@ class MelodyBeatAdapter(
   }
 
   private val axis get() = viewModel.verticalAxis!!
-  private val minimumElementWidth
+  val minimumElementWidth
     get() = recyclerView.run { dip(minimumBeatWidthDp) }
-  private val maximumElementWidth
+  val maximumElementWidth
     get() = viewModel.melodyVerticalScrollView.width / 2
-  private val minimumElementHeight
-    get() = recyclerView.run { dip(100) }
-  private val maximumElementHeight
-    get() = recyclerView.run { dip(maximumBeatHeightDp) }
+  val minimumElementHeight
+    get() = when(viewModel.layoutType) {
+      MelodyViewModel.LayoutType.LINEAR -> (viewModel.melodyVerticalScrollView.height * 5f/12f).toInt()
+      else -> recyclerView.run { dip(100) }
+    }
+  val maximumElementHeight
+    get() = when(viewModel.layoutType) {
+      MelodyViewModel.LayoutType.GRID -> (viewModel.melodyVerticalScrollView.height * 7f/12f).toInt()
+      else -> recyclerView.run { dip(maximumBeatHeightDp) }
+    }
 
 
   override var elementWidth: Int = recyclerView.run { dip(initialBeatWidthDp) }
@@ -120,7 +127,8 @@ class MelodyBeatAdapter(
   }
 
   fun animateElementHeight(height: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
-      val anim = ValueAnimator.ofInt(this.elementHeight, height)
+      val targetHeight = min(max(height, minimumElementHeight), maximumElementHeight)
+      val anim = ValueAnimator.ofInt(this.elementHeight, targetHeight)
       anim.interpolator = LinearInterpolator()
       anim.addUpdateListener { valueAnimator ->
         this.elementHeight = valueAnimator.animatedValue as Int
@@ -134,6 +142,7 @@ class MelodyBeatAdapter(
     }
 
   fun animateElementWidth(width: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
+    val targetWidth = min(max(width, minimumElementHeight), maximumElementHeight)
     val anim = ValueAnimator.ofInt(this.elementWidth, width)
     anim.interpolator = LinearInterpolator()
     anim.addUpdateListener { valueAnimator ->

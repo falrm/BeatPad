@@ -21,7 +21,7 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 	: Toolbar(context, viewModel), AnkoLogger
 {
 	val displayTypeButton = imageButton {
-		imageResource = R.drawable.colorboard_icon_vertical
+		imageResource = R.drawable.notehead_filled
 		scaleType = ImageView.ScaleType.FIT_CENTER
 		onClick {
 			melodyViewModel.displayType = when(melodyViewModel.displayType) {
@@ -31,7 +31,7 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 		}
 	}.squareButtonStyle()
 	val layoutTypeButton = imageButton {
-		imageResource = R.drawable.grid
+		imageResource = R.drawable.line
 		scaleType = ImageView.ScaleType.FIT_CENTER
 		onClick {
 			melodyViewModel.layoutType = when(melodyViewModel.layoutType) {

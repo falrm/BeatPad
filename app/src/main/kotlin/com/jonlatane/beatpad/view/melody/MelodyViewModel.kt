@@ -83,9 +83,9 @@ class MelodyViewModel(
 		}
 		fadeInAnim.setDuration(500).start()
 		fadeOutAnim.setDuration(500).start()
-		melodyReferenceToolbar.displayTypeButton.imageResource = when(displayType) {
-			DisplayType.COLORBLOCK -> R.drawable.notehead_filled
-			else -> R.drawable.colorboard_icon_vertical
+		melodyReferenceToolbar.displayTypeButton.imageResource = when(value) {
+			DisplayType.COLORBLOCK -> R.drawable.colorboard_icon_vertical
+			else -> R.drawable.notehead_filled
 		}
 	}
 
@@ -94,32 +94,28 @@ class MelodyViewModel(
 		set(value) = with(beatAdapter) {
 			layoutTypeDimensions[field] = elementWidth to elementHeight
 			field = value
-			val layoutTypeDimensions = layoutTypeDimensions[value]
+			val layoutTypeDimensions = layoutTypeDimensions[value] ?: elementWidth to elementHeight
 			info("Melody layout type: $value")
 			if(value == LayoutType.GRID) {
 				gridLayout()
-				layoutTypeDimensions?.let { (width, height) ->
+				layoutTypeDimensions.let { (width, height) ->
 					animateElementHeight(height)
-					animateElementWidth(width)
-				} ?: if(elementHeight > 2f/3 * melodyVerticalScrollView.height) {
-					animateElementHeight(round(2f/3 * melodyVerticalScrollView.height).toInt()) {
+					animateElementWidth(width) {
 						onZoomFinished()
 					}
-				} else {
-					onZoomFinished()
 				}
 			} else {
 				linearLayout()
-				layoutTypeDimensions?.let { (width, height) ->
+				layoutTypeDimensions.let { (width, height) ->
 					animateElementHeight(height)
-					animateElementWidth(width)
-				} ?: if(elementHeight < 2f/3 * melodyVerticalScrollView.height) {
-					animateElementHeight(round(2f/3 * melodyVerticalScrollView.height).toInt())
+					animateElementWidth(width) {
+						onZoomFinished()
+					}
 				}
 			}
-			melodyReferenceToolbar.layoutTypeButton.imageResource = when(layoutType) {
-				LayoutType.GRID -> R.drawable.line
-				else -> R.drawable.grid
+			melodyReferenceToolbar.layoutTypeButton.imageResource = when(value) {
+				LayoutType.GRID -> R.drawable.grid
+				else -> R.drawable.line
 			}
 		}
 

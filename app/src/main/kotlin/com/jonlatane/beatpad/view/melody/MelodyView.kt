@@ -79,10 +79,25 @@ inline fun ViewManager.melodyView(
 						AnkoLogger<MelodyViewModel>().verbose("Zooming: xDelta=$xDelta, yDelta=$yDelta")
 						when {
 							(xDelta.toInt() != 0 || yDelta.toInt() != 0) -> {
-								viewModel.melodyBeatAdapter?.apply {
+								viewModel.melodyBeatAdapter.apply {
+                  when(layoutType) {
+                    MelodyViewModel.LayoutType.GRID -> {
+                      if(
+                        elementHeight + (20f * yDelta).toInt() >= maximumElementHeight
+                      )
+                        layoutType = MelodyViewModel.LayoutType.LINEAR
+                    }
+                    MelodyViewModel.LayoutType.LINEAR -> {
+                      if(
+                        elementHeight + (20f * yDelta).toInt() <= minimumElementHeight
+                      )
+                        layoutType = MelodyViewModel.LayoutType.GRID
+                    }
+                  }
 									elementWidth += xDelta.toInt()
 									elementHeight += (10f * yDelta).toInt()
-									notifyDataSetChanged()
+//									viewModel.melodyViewModel.updateMelodyDisplay()
+//									notifyDataSetChanged()
 								}
 								true
 							}
