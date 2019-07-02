@@ -68,13 +68,13 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 			if (melodyViewModel.melodyEditingToolbar.isHidden) {
 				melodyViewModel.melodyEditingToolbar.show()
 				melodyViewModel.melodyEditingModifiers.show()
-				viewModel.backStack.push {
-					if (!melodyViewModel.melodyEditingToolbar.isHidden) {
-						melodyViewModel.melodyEditingToolbar.hide()
-						melodyViewModel.melodyEditingModifiers.hide()
-						true
-					} else false
-				}
+//				viewModel.backStack.push {
+//					if (!melodyViewModel.melodyEditingToolbar.isHidden) {
+//						melodyViewModel.melodyEditingToolbar.hide()
+//						melodyViewModel.melodyEditingModifiers.hide()
+//						true
+//					} else false
+//				}
 			} else {
 				melodyViewModel.melodyEditingToolbar.hide()
 				melodyViewModel.melodyEditingModifiers.hide()

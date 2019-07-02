@@ -105,13 +105,14 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     }?.map { it.melody } ?: emptyList()
 
   val sectionMelodiesOfPartType
-    get() = sectionMelodies.filter {
-      when (melody?.limitedToNotesInHarmony) {
-        null  -> false
-        true  -> it.limitedToNotesInHarmony
-        false -> !it.limitedToNotesInHarmony
+    get() = arrayOf(melody).filterNotNull() +
+      sectionMelodies.filter {
+        when (melody?.limitedToNotesInHarmony) {
+          null  -> false
+          true  -> it.limitedToNotesInHarmony
+          false -> !it.limitedToNotesInHarmony
+        }
       }
-    }
 
 
   fun Canvas.drawNotatedMelody(
