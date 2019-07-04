@@ -2,6 +2,8 @@ package com.jonlatane.beatpad.view.harmony
 
 import BeatClockPaletteConsumer
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.*
 import android.util.SparseArray
@@ -10,19 +12,27 @@ import android.view.View
 import android.widget.PopupMenu
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
+import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.model.harmony.chord.Chord
 import com.jonlatane.beatpad.output.service.convertPatternIndex
+import com.jonlatane.beatpad.showConfirmDialog
+import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.*
+import org.jetbrains.anko.error
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.withAlpha
+import java.net.URI
 
 
 @SuppressLint("ViewConstructor")
 class HarmonyBeatView constructor(
   context: Context,
   var viewModel: HarmonyViewModel
-): View(context) {
+): View(context), Storage {
+  override val storageContext: Context get() = context
   val harmony: Harmony? get() = viewModel.harmony
+  val section: Section? get() = viewModel.section
 
   var beatPosition = 0
   internal var beatSelectionAnimationPosition: Int = 0
@@ -41,6 +51,7 @@ class HarmonyBeatView constructor(
   private val lastTouchDownX get() = lastTouchDownXY[0]
   private val lastTouchDownY get() = lastTouchDownXY[1]
   private val removeChordMenuItem get() = editChangeMenu.menu.findItem(R.id.removeChordChange)
+  private val pasteHarmonyMenuItem get() = editChangeMenu.menu.findItem(R.id.pasteHarmony)
 
   init {
     isClickable = true
@@ -48,7 +59,7 @@ class HarmonyBeatView constructor(
     editChangeMenu = PopupMenu(context, this)
     editChangeMenu.inflate(R.menu.harmony_element_menu)
     editChangeMenu.setOnDismissListener {
-      viewModel?.apply {
+      viewModel.apply {
         if(!isChoosingHarmonyChord) selectedHarmonyElements = null
       }
     }
@@ -71,6 +82,14 @@ class HarmonyBeatView constructor(
           viewModel?.selectedHarmonyElements = null
           viewModel?.harmonyView?.syncScrollingChordText()
         }
+        R.id.copyHarmony -> {
+          val text = harmony?.toURI()?.toString() ?: ""
+          val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+          val clip = ClipData.newPlainText("BeatScratch Harmony", text)
+          clipboard.primaryClip = clip
+          context.toast("Copied BeatScratch Harmony data to clipboard!")
+        }
+        R.id.pasteHarmony -> viewModel.pasteHarmony()
         else -> context.toast("TODO!")
       }
       true
@@ -107,13 +126,14 @@ class HarmonyBeatView constructor(
       false
     }
 
-    setOnLongClickListener { _ ->
+    setOnLongClickListener {
       vibrate(150)
       harmony?.let { harmony ->
         getPositionAndElement(lastTouchDownX)?.let { (position, _) ->
-          viewModel?.selectedHarmonyElements = position..position
+          viewModel.selectedHarmonyElements = position..position
         }
-        removeChordMenuItem.isVisible = harmony.changes.count() > 1
+        removeChordMenuItem.isEnabled = harmony.changes.count() > 1
+        pasteHarmonyMenuItem.isEnabled = viewModel.getClipboardHarmony() != null
         editChangeMenu.show()
       }
       true

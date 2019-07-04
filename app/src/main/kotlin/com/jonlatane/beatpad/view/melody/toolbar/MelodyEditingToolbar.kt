@@ -148,8 +148,14 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
       }
     }
 
-
-		lengthButton.text = "${melodyViewModel.openedMelody?.length}/${melodyViewModel.openedMelody?.subdivisionsPerBeat}"
+		lengthButton.text = melodyViewModel.openedMelody?.run {
+			"%.3f"
+				.format(length.toFloat() / subdivisionsPerBeat)
+				.trim('0')
+				.trimEnd('.')
+				.let { "$it ${if (it == "1") "beat" else "beats"}" }
+		} ?: ""
+		
 		lengthDialog.updateText()
 	}
 	private fun updateMelody() = viewModel.melodyBeatAdapter.notifyDataSetChanged()

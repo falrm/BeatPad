@@ -4,6 +4,7 @@ import android.app.Application
 import android.graphics.Typeface
 import android.os.Build
 import com.jonlatane.beatpad.midi.MidiDevices
+import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.sensors.Orientation
 import com.jonlatane.beatpad.sensors.ShakeDetector
@@ -21,6 +22,7 @@ class MainApplication : Application() {
 
   companion object {
     var intentMelody: Melody<*>? = null
+    var intentHarmony: Harmony? = null
     lateinit var instance: MainApplication
       private set
 

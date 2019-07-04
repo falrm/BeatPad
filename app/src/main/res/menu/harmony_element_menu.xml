@@ -6,4 +6,8 @@
         android:id="@+id/editChordChange"/>
     <item android:title="Remove Chord Change"
           android:id="@+id/removeChordChange"/>
+    <item android:title="Copy Harmony"
+          android:id="@+id/copyHarmony"/>
+    <item android:title="Paste Harmony"
+          android:id="@+id/pasteHarmony"/>
 </menu>

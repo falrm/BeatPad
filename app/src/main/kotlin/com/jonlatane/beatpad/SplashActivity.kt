@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.storage.Storage
 import org.jetbrains.anko.error
@@ -26,6 +27,15 @@ class SplashActivity : AppCompatActivity(), Storage {
         } catch(t: Throwable) {
           toast("Failed to open melody")
           error("Failed to deserialize melody", t)
+          null
+        }
+      }
+      MainApplication.intentHarmony = intent.data?.let { URI(it.toString()) }?.let { uri ->
+        try {
+          uri.toEntity("harmony", "v1", Harmony::class)
+        } catch(t: Throwable) {
+          toast("Failed to open harmony")
+          error("Failed to deserialize harmony", t)
           null
         }
       }

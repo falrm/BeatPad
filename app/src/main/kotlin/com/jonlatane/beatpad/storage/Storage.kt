@@ -40,7 +40,7 @@ interface Storage: AnkoLogger {
 			createDir(paletteDir, context)
 			FileOutputStream(file.apply { createNewFile() }).use { fileOutputStream ->
 				//context.openFileOutput("$paletteDir$separator$filename", Context.MODE_PRIVATE).use { fileOutputStream ->
-				writer.writeValue(fileOutputStream, palette)
+				AppObjectMapper.writeValue(fileOutputStream, palette)
 			}
 			info {
 				"Stored palette: ${stringify(palette)}"
@@ -61,7 +61,8 @@ interface Storage: AnkoLogger {
 			return palette
 		}
 
-		fun stringify(o: Any) = writer.writeValueAsString(o)
+		fun stringify(o: Any): String
+			= AppObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(o)
 
 		private fun createDir(name: String, context: Context) {
 			val dir = context.filesDir
@@ -137,7 +138,7 @@ interface Storage: AnkoLogger {
 		val bytes = ByteArrayOutputStream().use { bytes ->
 			ZipOutputStream(bytes).use { out ->
 				out.putNextEntry(ZipEntry("object.json"))
-				writer.writeValue(out, this)
+				AppObjectMapper.writer().writeValue(out, this)
 			}
 			bytes.toByteArray()
 		}

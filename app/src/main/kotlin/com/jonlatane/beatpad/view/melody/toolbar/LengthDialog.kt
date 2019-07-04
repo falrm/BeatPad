@@ -85,7 +85,7 @@ class LengthDialog(context: Context, val melodyViewModel: MelodyViewModel) {
         }.lparams(wrapContent, wrapContent) {
           centerHorizontally()
         }
-        val beatTotal = linearLayout {
+        linearLayout {
           id = View.generateViewId()
           beatCount = textView {
             text = "?"

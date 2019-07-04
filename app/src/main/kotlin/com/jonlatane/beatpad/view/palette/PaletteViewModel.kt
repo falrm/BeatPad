@@ -61,7 +61,7 @@ class PaletteViewModel(
       melodyViewModel.beatAdapter = value
     }
 
-  val harmonyViewModel = HarmonyViewModel()
+  val harmonyViewModel = HarmonyViewModel(storageContext)
     .apply { paletteViewModel = this@PaletteViewModel }
   var harmonyView: HarmonyView
     get() = harmonyViewModel.harmonyView!!
