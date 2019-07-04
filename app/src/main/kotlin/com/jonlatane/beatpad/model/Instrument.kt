@@ -1,18 +1,14 @@
 package com.jonlatane.beatpad.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.jonlatane.beatpad.midi.AndroidMidi
-import com.jonlatane.beatpad.midi.GM1Effects
-import com.jonlatane.beatpad.midi.GM2Effects
 import com.jonlatane.beatpad.midi.MidiConstants
-import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import kotlin.experimental.or
+import com.jonlatane.beatpad.midi.AndroidMidi
 
 /**
  * You should implement Instrument at the platform level,
  * including serialization/deserialization of your instrument.
- * MIDI Instruments are pretty well-understood and a standard interface
- * will probably be added soon.
+ * Use [Instrument.Midi] to implement one that uses your OS's MIDI
+ * implementation (for now, [AndroidMidi]).
  */
 interface Instrument {
   fun play(tone: Int, velocity: Int)

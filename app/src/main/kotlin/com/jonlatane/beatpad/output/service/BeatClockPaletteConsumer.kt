@@ -106,10 +106,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
 
   fun tick() {
     (palette to section).let { palette: Palette, section: Section ->
-      val enabledMelodies = section.melodies.map { it.melody }
-      val totalBeats = enabledMelodies
-        .map { it.length.toFloat() / it.subdivisionsPerBeat.toFloat() }
-        .reduce(::max)
+      val totalBeats = harmony?.let { it.length.toFloat() / it.subdivisionsPerBeat } ?: 0f
       loadUpcomingAttacks(palette, section)
       for (attack in upcomingAttacks) {
         val instrument = attack.instrument!!
