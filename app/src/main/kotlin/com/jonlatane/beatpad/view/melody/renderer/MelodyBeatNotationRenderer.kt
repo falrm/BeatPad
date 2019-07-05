@@ -173,16 +173,20 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     }
     var result: Note.Sign? = null
     melody.changes.navigableKeySet()
-      .subSet(lastDownbeat * melody.subdivisionsPerBeat, melodyPosition)
+      .subSet(lastDownbeat * melody.subdivisionsPerBeat, true, melodyPosition, true)
       .reversed()
       .any { changeIndex ->
         val change = melody.changes[changeIndex]
-        val tones: Set<Int> = change.let {
+        val tones: Set<Int> = (change.let {
           (it as? RationalMelody.Element)?.tones
-        } ?: emptySet()
+        } ?: emptySet<Int>()).filter {
+          !(changeIndex == melodyPosition && note.tone == it)
+        }.toSet()
+
+        val chordAtTheTime = chordAt(changeIndex)!!
         val playbackNotes = tones.map {
-          val playbackTone = melody.playbackToneUnder(it, chord)
-          Note.naturalOrSharpNoteFor(playbackTone)
+          val playbackTone = melody.playbackToneUnder(it, chordAtTheTime)
+          Note.nameNoteUnderChord(playbackTone, chordAtTheTime)
         }
         playbackNotes.firstOrNull { it.heptatonicValue == note.heptatonicValue }?.also {
           result = it.sign
@@ -219,7 +223,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
 
         val playbackNotes = tones.map {
           val playbackTone = melody.playbackToneUnder(it, chord)
-          Note.naturalOrSharpNoteFor(playbackTone)
+          Note.nameNoteUnderChord(playbackTone, chord)
         }
         var maxCenter = Float.MIN_VALUE
         var minCenter = Float.MAX_VALUE
@@ -278,12 +282,16 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
             }
             else            -> null
           }?.let { drawable ->
-            val (sharpLeft, sharpRight) = if (shouldStagger) {
+            val (signLeft, signRight) = if (shouldStagger) {
               (bounds.right - 1.6f * noteheadWidth).toInt() to (bounds.right - 1.1f * noteheadWidth).toInt()
             } else {
               (bounds.right - 2.5f * noteheadWidth).toInt() to (bounds.right - 2.0f * noteheadWidth).toInt()
             }
-            drawable.setBounds(sharpLeft, top - noteheadHeight / 3, sharpRight, bottom + noteheadHeight / 3)
+            val (signTop, signBottom) = when(note.sign) {
+              Note.Sign.Flat -> top - 2 * noteheadHeight / 3 to bottom
+              else -> top - noteheadHeight / 3 to bottom + noteheadHeight / 3
+            }
+            drawable.setBounds(signLeft, signTop, signRight, signBottom)
             drawable.alpha = (255 * alphaSource).toInt()
             drawable.draw(this)
           }

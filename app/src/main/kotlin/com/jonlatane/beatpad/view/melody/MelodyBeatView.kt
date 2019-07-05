@@ -8,7 +8,7 @@ import android.view.MotionEvent
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 import com.jonlatane.beatpad.view.melody.input.MelodyBeatEventArticulationHandler

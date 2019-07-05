@@ -13,8 +13,8 @@ import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
-import com.jonlatane.beatpad.model.harmony.Orbifold
-import com.jonlatane.beatpad.model.harmony.chord.*
+import com.jonlatane.beatpad.model.orbifold.Orbifold
+import com.jonlatane.beatpad.model.chord.*
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import org.jetbrains.anko.AnkoLogger

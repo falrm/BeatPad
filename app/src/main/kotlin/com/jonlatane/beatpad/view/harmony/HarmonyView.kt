@@ -10,7 +10,7 @@ import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.output.service.let
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.view.HideableRelativeLayout

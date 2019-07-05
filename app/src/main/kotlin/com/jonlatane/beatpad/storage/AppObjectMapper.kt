@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.jonlatane.beatpad.model.*
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 
 object AppObjectMapper : ObjectMapper() {
 	init {

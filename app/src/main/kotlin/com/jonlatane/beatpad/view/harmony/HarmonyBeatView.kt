@@ -12,17 +12,13 @@ import android.view.View
 import android.widget.PopupMenu
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
-import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Section
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.output.service.convertPatternIndex
-import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.*
-import org.jetbrains.anko.error
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.withAlpha
-import java.net.URI
 
 
 @SuppressLint("ViewConstructor")

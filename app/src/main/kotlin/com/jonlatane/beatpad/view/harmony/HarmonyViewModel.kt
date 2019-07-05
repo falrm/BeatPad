@@ -6,7 +6,7 @@ import android.content.Context
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Section
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.isHidden

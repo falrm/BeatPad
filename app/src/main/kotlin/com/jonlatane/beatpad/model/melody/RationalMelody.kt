@@ -1,8 +1,7 @@
 package com.jonlatane.beatpad.model.melody
 
 import com.jonlatane.beatpad.model.Melody
-import com.jonlatane.beatpad.model.Transposable
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.util.between01
 import com.jonlatane.beatpad.util.mod12
 import java.util.*

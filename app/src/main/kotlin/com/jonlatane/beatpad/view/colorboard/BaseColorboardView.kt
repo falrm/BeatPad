@@ -5,8 +5,8 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
-import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.model.harmony.chord.Maj7
+import com.jonlatane.beatpad.model.chord.Chord
+import com.jonlatane.beatpad.model.chord.Maj7
 import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dip

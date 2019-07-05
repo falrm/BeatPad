@@ -2,7 +2,7 @@ import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.model.*
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.output.service.let
@@ -14,7 +14,6 @@ import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import org.jetbrains.anko.verbose
-import java.lang.Math.max
 import java.util.*
 import kotlin.math.floor
 import kotlin.properties.Delegates.observable

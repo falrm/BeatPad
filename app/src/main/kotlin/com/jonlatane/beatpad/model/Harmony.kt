@@ -1,6 +1,6 @@
 package com.jonlatane.beatpad.model
 
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import java.util.*
 
 data class Harmony(

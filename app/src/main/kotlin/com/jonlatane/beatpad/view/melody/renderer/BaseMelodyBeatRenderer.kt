@@ -3,7 +3,7 @@ package com.jonlatane.beatpad.view.melody.renderer
 import android.graphics.Canvas
 import android.graphics.Rect
 import com.jonlatane.beatpad.model.Melody
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.ColorGuide
 import com.jonlatane.beatpad.view.melody.input.MelodyBeatEventHandlerBase

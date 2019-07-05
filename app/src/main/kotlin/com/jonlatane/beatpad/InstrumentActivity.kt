@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.view.MenuItem
 import com.jonlatane.beatpad.model.Instrument
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.view.keyboard.KeyboardIOHandler
 import kotlinx.android.synthetic.main.activity_instrument.*

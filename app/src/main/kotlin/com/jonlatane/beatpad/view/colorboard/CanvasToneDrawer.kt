@@ -4,7 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.sensors.Orientation
 import kotlinx.io.pool.DefaultPool
 import java.util.*

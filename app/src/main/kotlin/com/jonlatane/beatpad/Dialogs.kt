@@ -24,7 +24,7 @@ import com.jonlatane.beatpad.MainApplication.Companion.chordTypeface
 import com.jonlatane.beatpad.MainApplication.Companion.chordTypefaceBold
 import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.midi.GM1Effects.MIDI_INSTRUMENT_RANGE
-import com.jonlatane.beatpad.model.harmony.Orbifold
+import com.jonlatane.beatpad.model.orbifold.Orbifold
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.storage.InstrumentSelectionStorage
 import com.jonlatane.beatpad.util.InstaRecycler

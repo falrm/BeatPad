@@ -10,7 +10,7 @@ import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.service.convertPatternIndex
@@ -155,7 +155,7 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 				.trimEnd('.')
 				.let { "$it ${if (it == "1") "beat" else "beats"}" }
 		} ?: ""
-		
+
 		lengthDialog.updateText()
 	}
 	private fun updateMelody() = viewModel.melodyBeatAdapter.notifyDataSetChanged()

@@ -10,11 +10,11 @@ import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Part
-import com.jonlatane.beatpad.model.harmony.Orbifold
-import com.jonlatane.beatpad.model.harmony.Orbit
-import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.model.harmony.chord.Maj13
-import com.jonlatane.beatpad.model.harmony.chordsequence.Chromatic
+import com.jonlatane.beatpad.model.orbifold.Orbifold
+import com.jonlatane.beatpad.model.orbifold.Orbit
+import com.jonlatane.beatpad.model.chord.Chord
+import com.jonlatane.beatpad.model.chord.Maj13
+import com.jonlatane.beatpad.model.orbifold.orbit.Chromatic
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showOrbifoldPicker
 import com.jonlatane.beatpad.util.color

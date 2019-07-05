@@ -1,6 +1,6 @@
 package com.jonlatane.beatpad.model
 
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.model.melody.RecordedMIDIMelody
 import com.jonlatane.beatpad.util.mod12
@@ -24,7 +24,7 @@ interface Melody<ElementType : Transposable<ElementType>> : Pattern<ElementType>
   var id: UUID
   var relatedMelodies: MutableSet<UUID>
   /**
-   * This was initially used to represent drum parts. But 
+   * This was initially used to represent drum parts. But
    * For drum parts, mainly. Also solos you really don't want modified. Indicates
    * the playback mechanism shouldn't "round" to the nearest in-chord note.
    */

@@ -4,7 +4,7 @@ import BeatClockPaletteConsumer
 import android.graphics.Canvas
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer

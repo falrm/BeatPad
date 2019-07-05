@@ -1,8 +1,7 @@
 package com.jonlatane.beatpad.model.harmony
 
-import com.jonlatane.beatpad.model.harmony.chord.*
+import com.jonlatane.beatpad.model.chord.*
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
-import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 import io.damo.aspen.*
 import org.assertj.core.api.Assertions.*
 
