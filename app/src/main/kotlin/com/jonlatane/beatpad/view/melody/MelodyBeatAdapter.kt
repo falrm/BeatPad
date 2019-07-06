@@ -40,17 +40,11 @@ class MelodyBeatAdapter(
     get() = viewModel.melodyVerticalScrollView.width / 2
   val minimumElementHeight
     get() = recyclerView.run { dip(100) }
-  val minimumRecommendedElementHeight
-    get() = when(viewModel.layoutType) {
-      MelodyViewModel.LayoutType.LINEAR -> (viewModel.melodyVerticalScrollView.height * 5f/12f).toInt()
-      else -> minimumElementHeight
-    }
+  val minimumRecommendedElementHeightForEditing
+    get() = (viewModel.melodyVerticalScrollView.height * 5f/12f).toInt()
   val maximumElementHeight: Int get() = recyclerView.run { dip(maximumBeatHeightDp) }
-  val maximumRecommendedElementHeight
-    get() = when(viewModel.layoutType) {
-      MelodyViewModel.LayoutType.GRID -> (viewModel.melodyVerticalScrollView.height * 7f/12f).toInt()
-      else -> maximumElementHeight
-    }
+  val maximumRecommendedElementHeightForOverview
+    get() = (viewModel.melodyVerticalScrollView.height * 7f/12f).toInt()
 
 
   override var elementWidth: Int = recyclerView.run { dip(initialBeatWidthDp) }

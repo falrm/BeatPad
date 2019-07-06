@@ -57,11 +57,11 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
       colorGuideAlpha = (when {
         !drawColorGuide -> 0
         isCurrentlyPlayingBeat -> 255
-        isSelectedBeatInHarmony -> 199
+        isSelectedBeatInHarmony -> 155
         viewModel.paletteViewModel.harmonyViewModel.isChoosingHarmonyChord
           && !isSelectedBeatInHarmony -> 69
         melody.drumPart -> 0
-        else -> 199
+        else -> 155
         } * alphaSource).toInt()
       if(colorGuideAlpha > 0) {
         drawColorGuide()
