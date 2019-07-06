@@ -89,35 +89,33 @@ class MelodyViewModel(
 		}
 	}
 
+
 	private var layoutTypeDimensions = mutableMapOf<LayoutType, Pair<Int, Int>>()
 	var layoutType = LayoutType.LINEAR
 		set(value) = with(beatAdapter) {
 			layoutTypeDimensions[field] = elementWidth to elementHeight
 			field = value
-			val layoutTypeDimensions = layoutTypeDimensions[value] ?: elementWidth to elementHeight
 			info("Melody layout type: $value")
 			if(value == LayoutType.GRID) {
 				gridLayout()
-				layoutTypeDimensions.let { (width, height) ->
-					animateElementHeight(height)
-					animateElementWidth(width) {
-						onZoomFinished()
-					}
-				}
 			} else {
 				linearLayout()
-				layoutTypeDimensions.let { (width, height) ->
-					animateElementHeight(height)
-					animateElementWidth(width) {
-						onZoomFinished()
-					}
-				}
 			}
 			melodyReferenceToolbar.layoutTypeButton.imageResource = when(value) {
 				LayoutType.GRID -> R.drawable.grid
 				else -> R.drawable.line
 			}
 		}
+
+	fun restoreLayoutTypeDimensions() = with(beatAdapter) {
+		val layoutTypeDimensions = layoutTypeDimensions[layoutType] ?: elementWidth to elementHeight
+		layoutTypeDimensions.let { (width, height) ->
+			animateElementHeight(height)
+			animateElementWidth(width) {
+				onZoomFinished()
+			}
+		}
+	}
 
 	/**
 	 * Exposed for access by [HarmonyView]

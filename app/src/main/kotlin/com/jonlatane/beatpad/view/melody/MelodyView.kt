@@ -82,16 +82,14 @@ inline fun ViewManager.melodyView(
 								viewModel.melodyBeatAdapter.apply {
                   when(layoutType) {
                     MelodyViewModel.LayoutType.GRID -> {
-                      if(
-                        elementHeight + (20f * yDelta).toInt() >= maximumElementHeight
-                      )
-                        layoutType = MelodyViewModel.LayoutType.LINEAR
-                    }
+											if (elementHeight + (20f * yDelta).toInt() >= maximumElementHeight) {
+												layoutType = MelodyViewModel.LayoutType.LINEAR
+											}
+										}
                     MelodyViewModel.LayoutType.LINEAR -> {
-                      if(
-                        elementHeight + (20f * yDelta).toInt() <= minimumElementHeight
-                      )
-                        layoutType = MelodyViewModel.LayoutType.GRID
+                      if(elementHeight + (20f * yDelta).toInt() <= minimumElementHeight) {
+												layoutType = MelodyViewModel.LayoutType.GRID
+											}
                     }
                   }
 									elementWidth += xDelta.toInt()

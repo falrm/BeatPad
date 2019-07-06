@@ -1,7 +1,6 @@
 package com.jonlatane.beatpad.model.orbifold
 
 import com.jonlatane.beatpad.model.orbifold.Orbit.Companion.orbit
-import com.jonlatane.beatpad.model.harmony.chordsequence.*
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.orbifold.orbit.*
 
