@@ -31,13 +31,13 @@ class MelodyBeatAdapter(
     const val initialBeatWidthDp: Float = 125f
     const val initialBeatHeightDp: Float = 400f
     const val minimumBeatWidthDp: Float = 30f
-    const val maximumBeatHeightDp: Float = 2500f
+    const val maximumBeatHeightDp: Float = 10000f
   }
 
   private val axis get() = viewModel.verticalAxis!!
   val minimumElementWidth get() = recyclerView.run { dip(minimumBeatWidthDp) }
   val maximumElementWidth
-    get() = viewModel.melodyVerticalScrollView.width / 2
+    get() = viewModel.melodyVerticalScrollView.width * 4
   val minimumElementHeight
     get() = recyclerView.run { dip(100) }
   val minimumRecommendedElementHeightForEditing

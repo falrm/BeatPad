@@ -85,11 +85,16 @@ class SectionListAdapter(
 //    }
 	}
 
-  internal fun addSection() {
-    viewModel.palette.sections.add(
-      Section.forList(viewModel.palette.sections, harmony = blankHarmony)
-    )
-    notifyItemInserted (viewModel.palette.sections.size - 1)
+  internal fun addSection(
+    section: Section = Section.forList(viewModel.palette.sections, harmony = blankHarmony),
+    position: Int = viewModel.palette.sections.size
+  ) {
+    viewModel.palette.sections.add(position, section)
+    notifyItemInserted(position)
+//    viewModel.sectionListAdapter?.notifyItemRangeChanged(
+//      position,
+//      itemCount - position
+//    )
   }
 
 	override fun getItemCount(): Int = viewModel.palette.sections.size + 1

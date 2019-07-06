@@ -4,10 +4,10 @@ import android.view.ViewManager
 import org.jetbrains.anko.custom.ankoView
 
 
-fun ViewManager.numberPickerWithTypeface(theme: Int = 0)
-	= numberPickerWithTypeface(theme) {}
-inline fun ViewManager.numberPickerWithTypeface(theme: Int = 0, init: NumberPickerWithTypeface.() -> Unit)
-	= ankoView({ NumberPickerWithTypeface(it) }, theme, init)
+//fun ViewManager.numberPickerWithTypeface(theme: Int = 0)
+//	= numberPickerWithTypeface(theme) {}
+//inline fun ViewManager.numberPickerWithTypeface(theme: Int = 0, init: NumberPickerWithTypeface.() -> Unit)
+//	= ankoView({ NumberPickerWithTypeface(it) }, theme, init)
 
 fun ViewManager.nonDelayedHorizontalScrollView(theme: Int = 0)
 	= nonDelayedHorizontalScrollView(theme) {}

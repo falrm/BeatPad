@@ -59,7 +59,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
     viewModel.palette = palette
 
     val bundle = savedInstanceState ?: try {
-      intent.extras.getBundle("playgroundState")
+      intent.extras!!.getBundle("playgroundState")
     } catch (t: Throwable) {
       savedInstanceState
     }

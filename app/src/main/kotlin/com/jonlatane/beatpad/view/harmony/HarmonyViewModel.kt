@@ -76,13 +76,13 @@ open class HarmonyViewModel(
     beatAdapter.notifyDataSetChanged()
     harmonyView?.syncScrollingChordText()
   }
-  fun pasteHarmony() {
+  fun pasteHarmony(section: Section? = this@HarmonyViewModel.section) {
     getClipboardHarmony()?.let { newHarmony ->
-      importHarmony(newHarmony)
+      importHarmony(newHarmony, section)
     } ?: storageContext.toast("Failed to read Harmony from clipboard.")
   }
 
-  fun importHarmony(newHarmony: Harmony) {
+  fun importHarmony(newHarmony: Harmony, section: Section? = this@HarmonyViewModel.section) {
     val doImport = {
       section?.harmony = newHarmony
       notifyHarmonyChanged()

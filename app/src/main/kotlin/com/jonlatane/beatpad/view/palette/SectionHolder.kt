@@ -1,5 +1,8 @@
 package com.jonlatane.beatpad.view.palette
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
@@ -15,6 +18,7 @@ import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showRenameDialog
+import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.layoutWidth
 import org.jetbrains.anko.*
 import java.util.*
@@ -73,7 +77,7 @@ class SectionHolder(
       )
     }
   }
-) {
+), Storage {
   companion object {
     fun sectionDrawableResource(sectionIndex: Int) = arrayOf(
       R.drawable.orbifold_chord_major,
@@ -93,6 +97,8 @@ class SectionHolder(
       section?.let { BeatClockPaletteConsumer.palette?.sections?.indexOf(section) } ?: 0
     )
   }
+
+  override val storageContext: Context = parent.context
   val nameTextView: TextView get() = itemView.findViewById(R.id.section_name)
   //val dragHandle: ImageView get() = itemView.findViewById(R.id.section_drag_handle)
   val adapter: SectionListAdapter get() = viewModel.sectionListAdapter!!
@@ -140,6 +146,39 @@ class SectionHolder(
               }
             }
           }
+          duplicateSection -> section?.let { section ->
+            val candidateBasis = section.name.trimEnd('0','1','2','3','4','5','6','7','8','9').trimEnd()
+            val basis = when {
+              section.name.last().isDigit() -> when {
+                viewModel.palette.sections.any { it.name.startsWith(candidateBasis)} -> section.name + '-'
+                else -> "$candidateBasis "
+              }
+              else -> "$candidateBasis "
+            }
+            val copiedSection = section.copy(
+              id = UUID.randomUUID(),
+              name = Section.generateNewSectionName(
+                viewModel.palette.sections,
+                basis = basis
+              ),
+              harmony = section.harmony!!.copy(changes = TreeMap(section.harmony!!.changes)),
+              relatedSections = (section.relatedSections + section.id).toMutableSet(),
+              melodies = section.melodies.map {
+                it.copy(melody = it.melody)
+              }.toMutableSet()
+            )
+            adapter.addSection(section = copiedSection, position = adapterPosition + 1)
+          }
+          copyHarmony -> {
+              val text = section?.harmony?.toURI()?.toString() ?: ""
+              val clipboard = parent.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+              val clip = ClipData.newPlainText("BeatScratch Harmony", text)
+              clipboard.setPrimaryClip(clip)
+              //clipboard.primaryClip = clip
+              parent.context.toast("Copied BeatScratch Harmony data to clipboard!")
+          }
+          pasteHarmony -> viewModel.harmonyViewModel.pasteHarmony(section)
+          else -> parent.context.toast("TODO")
         }
         true
       }
@@ -147,14 +186,18 @@ class SectionHolder(
   }
   private val renameSection: MenuItem get() = menu.menu.findItem(R.id.renameSection)
   private val deleteSection: MenuItem get() = menu.menu.findItem(R.id.deleteSection)
+  private val duplicateSection: MenuItem get() = menu.menu.findItem(R.id.duplicateSection)
+  private val copyHarmony: MenuItem get() = menu.menu.findItem(R.id.copySectionHarmony)
+  private val pasteHarmony: MenuItem get() = menu.menu.findItem(R.id.pasteSectionHarmony)
 
   fun invalidate() {
-    deleteSection.isVisible = viewModel.palette.sections.size > 1
+    deleteSection.isEnabled = viewModel.palette.sections.size > 1
     itemView.backgroundResource = when (section) {
       BeatClockPaletteConsumer.section -> sectionDrawableResource(adapterPosition)
       else -> R.drawable.orbifold_chord
     }
     itemView.padding = itemView.dip(3)
+    pasteHarmony.isEnabled = viewModel.harmonyViewModel.getClipboardHarmony() != null
 
     if (adapterPosition < viewModel.palette.sections.size) {
       makeEditableSection()

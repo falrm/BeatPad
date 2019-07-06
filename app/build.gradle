@@ -26,14 +26,14 @@ kotlin {
 }
 
 android {
-	compileSdkVersion 28
+	compileSdkVersion 29
 	buildToolsVersion '28.0.3'
 	defaultConfig {
 		applicationId "com.jonlatane.beatpad"
 		minSdkVersion 23
-		targetSdkVersion 28
-		versionCode 62
-		versionName "0.20.2"
+		targetSdkVersion 29
+		versionCode 70
+		versionName "0.25.0"
 		multiDexEnabled true
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 	}

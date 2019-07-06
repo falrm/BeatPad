@@ -6,8 +6,9 @@ import java.util.*
 data class Section(
   val id: UUID = UUID.randomUUID(),
   var name: String = generateNewSectionName(emptyList()),
-  var harmony: Harmony? = PaletteStorage.blankHarmony,
-  val melodies: MutableSet<MelodyReference> = mutableSetOf()
+  var harmony: Harmony = PaletteStorage.blankHarmony,
+  val melodies: MutableSet<MelodyReference> = mutableSetOf(),
+  var relatedSections: MutableSet<UUID> = mutableSetOf()
 ) {
   sealed class PlaybackType {
     object Disabled: PlaybackType()
@@ -35,7 +36,7 @@ data class Section(
   companion object {
     fun forList(
       sectionList: List<Section>,
-      harmony: Harmony? = null,
+      harmony: Harmony,
       melodies: MutableSet<MelodyReference> = mutableSetOf()
     ) = Section(
       name = generateNewSectionName(sectionList),
@@ -43,8 +44,9 @@ data class Section(
       melodies = melodies
     )
 
-    fun generateNewSectionName(sectionList: List<Section>) = "Section ${(1..100).firstOrNull { index ->
-      sectionList.none { it.name == "Section $index" }
-    }?.toString() ?: ":)"}"
+    fun generateNewSectionName(sectionList: List<Section>, basis: String = "Section "): String
+      = "$basis${(1..100).firstOrNull { index ->
+      sectionList.none { it.name == "$basis$index" }
+    }?.toString() ?: "$basis:)"}"
   }
 }

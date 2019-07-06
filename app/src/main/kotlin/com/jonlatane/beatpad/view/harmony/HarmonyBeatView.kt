@@ -72,17 +72,18 @@ class HarmonyBeatView constructor(
           editSelectedChord()
         }
         R.id.removeChordChange -> {
-          val position = viewModel?.selectedHarmonyElements!!.first
+          val position = viewModel.selectedHarmonyElements!!.first
           val key = harmony!!.floorKey(position)!!
           harmony!!.changes.remove(key)
-          viewModel?.selectedHarmonyElements = null
-          viewModel?.harmonyView?.syncScrollingChordText()
+          viewModel.selectedHarmonyElements = null
+          viewModel.harmonyView?.syncScrollingChordText()
         }
         R.id.copyHarmony -> {
           val text = harmony?.toURI()?.toString() ?: ""
           val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
           val clip = ClipData.newPlainText("BeatScratch Harmony", text)
-          clipboard.primaryClip = clip
+          clipboard.setPrimaryClip(clip)
+          //clipboard.primaryClip = clip
           context.toast("Copied BeatScratch Harmony data to clipboard!")
         }
         R.id.pasteHarmony -> viewModel.pasteHarmony()

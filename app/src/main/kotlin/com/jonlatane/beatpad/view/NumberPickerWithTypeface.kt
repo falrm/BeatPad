@@ -12,32 +12,32 @@ import com.jonlatane.beatpad.util.color
 import org.jetbrains.anko.textColor
 
 
-class NumberPickerWithTypeface @JvmOverloads constructor(
-  context: Context,
-  var typeface: Typeface = MainApplication.chordTypeface,
-  var textSize: Float = 25f
-) : android.widget.NumberPicker(context) {
-  override fun addView(child: View) {
-    super.addView(child)
-    updateView(child)
-  }
-
-  override fun addView(child: View, index: Int,
-              params: android.view.ViewGroup.LayoutParams) {
-    super.addView(child, index, params)
-    updateView(child)
-  }
-
-  override fun addView(child: View, params: android.view.ViewGroup.LayoutParams) {
-    super.addView(child, params)
-    updateView(child)
-  }
-
-  private fun updateView(view: View) {
-    (view as? TextView)?.let {
-      it.typeface = typeface
-      it.textSize = textSize
-      it.textColor = color(R.color.black)
-    }
-  }
-}
+//class NumberPickerWithTypeface @JvmOverloads constructor(
+//  context: Context,
+//  var typeface: Typeface = MainApplication.chordTypeface,
+//  var textSize: Float = 25f
+//) : android.widget.NumberPicker(context) {
+//  override fun addView(child: View) {
+//    super.addView(child)
+//    updateView(child)
+//  }
+//
+//  override fun addView(child: View, index: Int,
+//              params: android.view.ViewGroup.LayoutParams) {
+//    super.addView(child, index, params)
+//    updateView(child)
+//  }
+//
+//  override fun addView(child: View, params: android.view.ViewGroup.LayoutParams) {
+//    super.addView(child, params)
+//    updateView(child)
+//  }
+//
+//  private fun updateView(view: View) {
+//    (view as? TextView)?.let {
+//      it.typeface = typeface
+//      it.textSize = textSize
+//      it.textColor = color(R.color.black)
+//    }
+//  }
+//}

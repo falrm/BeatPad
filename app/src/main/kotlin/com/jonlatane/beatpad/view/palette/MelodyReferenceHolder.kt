@@ -225,7 +225,7 @@ class MelodyReferenceHolder(
     val text = melody?.toURI()?.toString() ?: ""
     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val clip = ClipData.newPlainText("BeatScratch Melody", text)
-    clipboard.primaryClip = clip
+    clipboard.setPrimaryClip(clip)
     context.toast("Copied BeatScratch Melody data to clipboard!")
   }
 }

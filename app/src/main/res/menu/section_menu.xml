@@ -4,4 +4,10 @@
           android:id="@+id/renameSection"/>
     <item android:title="Delete Section"
           android:id="@+id/deleteSection"/>
+    <item android:title="Duplicate Section"
+          android:id="@+id/duplicateSection"/>
+    <item android:title="Copy Harmony from Section"
+          android:id="@+id/copySectionHarmony"/>
+    <item android:title="Paste Harmony into Section"
+          android:id="@+id/pasteSectionHarmony"/>
 </menu>

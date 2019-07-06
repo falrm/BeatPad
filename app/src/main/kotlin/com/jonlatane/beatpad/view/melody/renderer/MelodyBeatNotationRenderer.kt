@@ -131,7 +131,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
       colorGuideAlpha = (when {
         !drawColorGuide                -> when {
           forceDrawColorGuideForCurrentBeat && isCurrentlyPlayingBeat -> 119
-          forceDrawColorGuideForSelectedBeat && isSelectedBeatInHarmony -> 87
+          forceDrawColorGuideForSelectedBeat && isSelectedBeatInHarmony -> 69
           else                                                        -> 0
         }
         melody.limitedToNotesInHarmony -> when {
