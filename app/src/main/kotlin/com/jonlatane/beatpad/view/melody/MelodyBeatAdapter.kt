@@ -35,19 +35,21 @@ class MelodyBeatAdapter(
   }
 
   private val axis get() = viewModel.verticalAxis!!
-  val minimumElementWidth
-    get() = recyclerView.run { dip(minimumBeatWidthDp) }
+  val minimumElementWidth get() = recyclerView.run { dip(minimumBeatWidthDp) }
   val maximumElementWidth
     get() = viewModel.melodyVerticalScrollView.width / 2
   val minimumElementHeight
+    get() = recyclerView.run { dip(100) }
+  val minimumRecommendedElementHeight
     get() = when(viewModel.layoutType) {
       MelodyViewModel.LayoutType.LINEAR -> (viewModel.melodyVerticalScrollView.height * 5f/12f).toInt()
-      else -> recyclerView.run { dip(100) }
+      else -> minimumElementHeight
     }
-  val maximumElementHeight
+  val maximumElementHeight: Int get() = recyclerView.run { dip(maximumBeatHeightDp) }
+  val maximumRecommendedElementHeight
     get() = when(viewModel.layoutType) {
       MelodyViewModel.LayoutType.GRID -> (viewModel.melodyVerticalScrollView.height * 7f/12f).toInt()
-      else -> recyclerView.run { dip(maximumBeatHeightDp) }
+      else -> maximumElementHeight
     }
 
 

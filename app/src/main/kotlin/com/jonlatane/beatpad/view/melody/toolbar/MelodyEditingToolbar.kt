@@ -29,6 +29,8 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 
 	private val lengthButton: Button = button {
 		text = "0/0"
+		backgroundResource = R.drawable.toolbar_melody_button
+		padding = dip(10)
 		typeface = MainApplication.chordTypefaceBold
 		onClick {
 			//context.toast("TODO")
@@ -42,6 +44,8 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 
 	private val relativeToButton: Button = button {
 		text = ""
+		backgroundResource = R.drawable.toolbar_melody_button
+		setPadding(dip(15), dip(10), dip(10), dip(10))
 		gravity = Gravity.LEFT or Gravity.CENTER_VERTICAL
 		onClick {
 			relativeToMenu.show()
@@ -204,6 +208,8 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 
 	private val upButton = imageButton {
 		imageResource = R.drawable.icons8_sort_up_100
+		backgroundResource = R.drawable.toolbar_melody_button
+		padding = dip(10)
 		scaleType = ImageView.ScaleType.FIT_CENTER
 		onClick {
       melodyViewModel.openedMelody?.transposeInPlace(1)
@@ -218,6 +224,8 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 
 	private val downButton = imageButton {
 		imageResource = R.drawable.icons8_sort_down_100
+		backgroundResource = R.drawable.toolbar_melody_button
+		padding = dip(10)
 		scaleType = ImageView.ScaleType.FIT_CENTER
 		onClick {
       melodyViewModel.openedMelody?.transposeInPlace(-1)

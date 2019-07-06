@@ -6,7 +6,6 @@ import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
-import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.melody.MelodyBeatView
 import org.jetbrains.anko.warn
@@ -16,12 +15,12 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
   val colorblockAlpha: Float
   override var chord: Chord
 
-  fun MelodyBeatView.renderColorblockMelodyBeat(canvas: Canvas) {
+  fun renderColorblockMelodyBeat(canvas: Canvas) {
     paint.strokeWidth = 0f
     canvas.renderSteps()
     melody?.let { melody ->
       val alphaMultiplier = if(viewModel.isMelodyReferenceEnabled) 1f else 2f/3
-      canvas.drawMelody(
+      canvas.drawColorblockMelody(
         melody,
         stepNoteAlpha = (0xAA * colorblockAlpha * alphaMultiplier).toInt(),
         drawRhythm = true,
@@ -37,7 +36,7 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
           false -> !it.melody.limitedToNotesInHarmony
         }
       }.map { it.melody }.forEach { melody ->
-        canvas.drawMelody(
+        canvas.drawColorblockMelody(
           melody,
           stepNoteAlpha = 66,
           drawColorGuide = false,
@@ -47,32 +46,23 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
     }
   }
 
-  fun Canvas.drawMelody(
+  fun Canvas.drawColorblockMelody(
     melody: Melody<*>,
     stepNoteAlpha: Int,
     drawRhythm: Boolean = false,
     drawColorGuide: Boolean = true,
-    forceDrawColorGuideForCurrentBeat: Boolean = false,
     alphaSource: Float
   ) {
     iterateSubdivisions(melody) { elementPosition ->
-      val isCurrentlyPlayingBeat: Boolean =
-        viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
-          fromSubdivisionsPerBeat = BeatClockPaletteConsumer.ticksPerBeat,
-          toSubdivisionsPerBeat = melody.subdivisionsPerBeat
-        ) == elementPosition
       colorGuideAlpha = (when {
-        !drawColorGuide -> when {
-          forceDrawColorGuideForCurrentBeat && isCurrentlyPlayingBeat -> 119
-          else -> 0
-        }
-        melody.limitedToNotesInHarmony -> when {
-          isCurrentlyPlayingBeat -> 255
-          else -> 187
-        }
-        isCurrentlyPlayingBeat         -> 119
-        else                           -> 0
-      } * alphaSource).toInt()
+        !drawColorGuide -> 0
+        isCurrentlyPlayingBeat -> 255
+        isSelectedBeatInHarmony -> 199
+        viewModel.paletteViewModel.harmonyViewModel.isChoosingHarmonyChord
+          && !isSelectedBeatInHarmony -> 69
+        melody.drumPart -> 0
+        else -> 199
+        } * alphaSource).toInt()
       if(colorGuideAlpha > 0) {
         drawColorGuide()
       }

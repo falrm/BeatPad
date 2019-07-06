@@ -49,6 +49,8 @@ class PaletteToolbar(
   val playButton = imageButton {
     imageResource = if(PlaybackService.instance?.isStopped != false) R.drawable.icons8_play_100
       else R.drawable.icons8_skip_to_start_filled_100
+    backgroundResource = R.drawable.toolbar_button
+    padding = dip(7)
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
       imageResource = R.drawable.icons8_skip_to_start_filled_100
@@ -61,6 +63,8 @@ class PaletteToolbar(
 
   val stopButton = imageButton {
     imageResource = R.drawable.icons8_stop_100
+    backgroundResource = R.drawable.toolbar_button
+    padding = dip(7)
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
       val startIntent = Intent(MainApplication.instance, PlaybackService::class.java)
@@ -74,6 +78,8 @@ class PaletteToolbar(
   val tempoArea = relativeLayout {
     tempoTapper = imageButton {
       imageResource = R.drawable.noun_metronome_415494_000000
+      backgroundResource = R.drawable.toolbar_button
+      padding = dip(10)
       imageAlpha = 127
       scaleType = ImageView.ScaleType.FIT_CENTER
       onLongClick(returnValue = true) {
@@ -106,6 +112,8 @@ class PaletteToolbar(
 
   val keysButton = imageButton {
     imageResource = R.drawable.icons8_piano_100
+    backgroundResource = R.drawable.toolbar_button
+    padding = dip(7)
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
       if (viewModel.keyboardView.isHidden) {
@@ -127,6 +135,8 @@ class PaletteToolbar(
 
   val colorsButton = imageButton {
     imageResource = R.drawable.colorboard_icon_2
+    backgroundResource = R.drawable.toolbar_button
+    padding = dip(7)
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
       if (viewModel.colorboardView.isHidden) {
@@ -148,6 +158,9 @@ class PaletteToolbar(
 
   val orbifoldButton = imageButton {
     imageResource = R.drawable.icons8_molecule_filled_100
+    backgroundResource = R.drawable.toolbar_button
+    padding = dip(10)
+    backgroundResource = R.drawable.toolbar_button
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
       if (viewModel.orbifold.isHidden) {
@@ -163,6 +176,9 @@ class PaletteToolbar(
 
   val volumeButton = imageButton {
     imageResource = R.drawable.icons8_tune_100
+    backgroundResource = R.drawable.toolbar_button
+    padding = dip(10)
+    backgroundResource = R.drawable.toolbar_button
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
       viewModel.editingMix = !viewModel.editingMix

@@ -22,6 +22,8 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 {
 	val displayTypeButton = imageButton {
 		imageResource = R.drawable.notehead_filled
+		backgroundResource = R.drawable.toolbar_melody_button
+		padding = dip(12)
 		scaleType = ImageView.ScaleType.FIT_CENTER
 		onClick {
 			melodyViewModel.displayType = when(melodyViewModel.displayType) {
@@ -32,6 +34,8 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 	}.squareButtonStyle()
 	val layoutTypeButton = imageButton {
 		imageResource = R.drawable.line
+		backgroundResource = R.drawable.toolbar_melody_button
+		padding = dip(10)
 		scaleType = ImageView.ScaleType.FIT_CENTER
 		onClick {
 			melodyViewModel.layoutType = when(melodyViewModel.layoutType) {
@@ -44,6 +48,8 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 
 	private val volumeButton = imageButton {
 		imageResource = R.drawable.repeat
+		backgroundResource = R.drawable.toolbar_melody_button
+		padding = dip(7)
 		onClick {
 			with(viewModel.melodyViewModel) {
 				if(!isMelodyReferenceEnabled) {
@@ -64,6 +70,8 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 
 	private val editButton = imageButton {
 		imageResource = R.drawable.edit_black
+		backgroundResource = R.drawable.toolbar_melody_button
+		padding = dip(10)
 		scaleType = ImageView.ScaleType.FIT_CENTER
 		onClick {
 			if (melodyViewModel.melodyEditingToolbar.isHidden) {

@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.chord.Chord
+import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.ColorGuide
 import com.jonlatane.beatpad.view.melody.input.MelodyBeatEventHandlerBase
@@ -12,7 +13,7 @@ import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import org.jetbrains.anko.withAlpha
 
 /**
- * The primary thing of interest
+ * This interface ain't threadsafe, yo. [chor]
  */
 interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
   val viewModel: MelodyViewModel
@@ -20,6 +21,8 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
   override val bounds: Rect
   val renderableToneBounds: Rect
   override var chord: Chord
+  var isCurrentlyPlayingBeat: Boolean
+  var isSelectedBeatInHarmony: Boolean
 
   /**
    * Returns the range of indexes for the melody in this beat. i.e., for [beatPosition] = 3
@@ -33,8 +36,9 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
    * The base method used to render a beat. Given the melody and our music-drawing view's
    * [beatPosition], subdivides the rendering area into slices based on [Melody.subdivisionsPerBeat]
    * and applies them to [bounds] (limiting memory swapping), and executes [stuff] providing the
-   * element position.
+   * element position. Meant for drawing, not threadsafe yo.
    *
+   * Sets values for [chord], [isCurrentlyPlayingBeat], and [isSelectedBeatInHarmony].
    */
   fun Canvas.iterateSubdivisions(
     melody: Melody<*>,
@@ -51,6 +55,14 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
       chord = chordAt(elementPosition)
         ?: viewModel.paletteViewModel.orbifold.chord
           ?: MelodyBeatView.DEFAULT_CHORD
+      isCurrentlyPlayingBeat =
+        viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
+          fromSubdivisionsPerBeat = BeatClockPaletteConsumer.ticksPerBeat,
+          toSubdivisionsPerBeat = melody.subdivisionsPerBeat
+        ) == elementPosition
+      isSelectedBeatInHarmony = viewModel.paletteViewModel.harmonyViewModel.selectedHarmonyElements
+        ?.contains(elementPosition.convertPatternIndex(melody, harmony))
+        ?: false
       stuff(elementPosition)
     }
   }

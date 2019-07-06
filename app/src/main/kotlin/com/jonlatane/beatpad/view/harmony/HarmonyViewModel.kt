@@ -48,6 +48,7 @@ open class HarmonyViewModel(
       animateBeatsOfSelectedChord()
     } else {
       paletteViewModel?.orbifold?.canEditChords = false
+      paletteViewModel?.melodyViewModel?.updateMelodyDisplay()
     }
   }
 

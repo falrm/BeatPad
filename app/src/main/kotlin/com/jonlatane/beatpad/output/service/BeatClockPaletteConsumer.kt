@@ -201,8 +201,8 @@ object BeatClockPaletteConsumer : AnkoLogger {
     return indexHits.mapNotNull {
       val attack = attackPool.borrow()
       when {
-        isChangeAt(it) -> {
-          val change = changeBefore(it)
+        isChangeAt(it % length) -> {
+          val change = changeBefore(it % length)
           attack.part = part
           attack.instrument = part.instrument
           attack.melody = this

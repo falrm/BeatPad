@@ -8,8 +8,6 @@ import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.melody.RationalMelody
-import com.jonlatane.beatpad.output.service.convertPatternIndex
-import com.jonlatane.beatpad.view.colorboard.CanvasToneDrawer
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
@@ -33,12 +31,13 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
 
     melody?.let { melody ->
       val alphaMultiplier = if (viewModel.isMelodyReferenceEnabled) 1f else 2f / 3
-      canvas.drawNotatedMelody(
+      canvas.drawNotationMelody(
         melody,
         drawAlpha = notationAlpha * alphaMultiplier,
         drawRhythm = false,
         drawColorGuide = false,
-        forceDrawColorGuideForCurrentBeat = true
+        forceDrawColorGuideForCurrentBeat = true,
+        forceDrawColorGuideForSelectedBeat = true
       )
     }
 
@@ -53,7 +52,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
 
     paint.color = color(android.R.color.black).withAlpha((255 * notationAlpha / 3f).toInt())
     sectionMelodiesOfPartType.filter { it != melody }.forEach { melody ->
-      canvas.drawNotatedMelody(
+      canvas.drawNotationMelody(
         melody,
         drawAlpha = notationAlpha / 3f,
         drawColorGuide = false,
@@ -115,12 +114,13 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
       }
 
 
-  fun Canvas.drawNotatedMelody(
+  fun Canvas.drawNotationMelody(
     melody: Melody<*>,
     drawAlpha: Float = notationAlpha,
     drawRhythm: Boolean = false,
     drawColorGuide: Boolean = true,
     forceDrawColorGuideForCurrentBeat: Boolean = false,
+    forceDrawColorGuideForSelectedBeat: Boolean = false,
     stemsUp: Boolean = true
   ) {
     val maxSubdivisonsPerBeat = (sectionMelodiesOfPartType + melody)
@@ -128,14 +128,10 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     val maxBoundsWidth = (overallBounds.right - overallBounds.left) / maxSubdivisonsPerBeat
     iterateSubdivisions(melody) { elementPosition ->
       bounds.right = bounds.left + maxBoundsWidth
-      val isCurrentlyPlayingBeat: Boolean =
-        viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
-          fromSubdivisionsPerBeat = BeatClockPaletteConsumer.ticksPerBeat,
-          toSubdivisionsPerBeat = melody.subdivisionsPerBeat
-        ) == elementPosition
       colorGuideAlpha = (when {
         !drawColorGuide                -> when {
           forceDrawColorGuideForCurrentBeat && isCurrentlyPlayingBeat -> 119
+          forceDrawColorGuideForSelectedBeat && isSelectedBeatInHarmony -> 87
           else                                                        -> 0
         }
         melody.limitedToNotesInHarmony -> when {

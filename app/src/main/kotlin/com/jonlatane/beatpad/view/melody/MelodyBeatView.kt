@@ -27,6 +27,8 @@ class MelodyBeatView constructor(
   override val viewModel: MelodyViewModel
 ) : BaseColorboardView(context), MelodyBeatRenderer,
   MelodyBeatEventArticulationHandler, MelodyBeatEventEditingHandler, AnkoLogger {
+  override var isCurrentlyPlayingBeat = false
+  override var isSelectedBeatInHarmony = false
 
   override val displayType: MelodyViewModel.DisplayType get() = viewModel.displayType
   override val renderableToneBounds: Rect = Rect()

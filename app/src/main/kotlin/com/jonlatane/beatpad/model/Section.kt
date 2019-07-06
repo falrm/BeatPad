@@ -14,7 +14,7 @@ data class Section(
     object Indefinite: PlaybackType()
     class Repeat(val repetitions: Int): PlaybackType()
   }
-  class MelodyReference constructor(
+  data class MelodyReference constructor(
     var melody: Melody<*>,
     var volume: Float =  0.5f,
     var playbackType: PlaybackType = PlaybackType.Indefinite,
