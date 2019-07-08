@@ -4,10 +4,7 @@ import BeatClockPaletteConsumer
 import android.content.Context
 import android.content.Intent
 import android.view.View
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.MainApplication.Companion.chordTypefaceBold
 import com.jonlatane.beatpad.R
@@ -73,10 +70,10 @@ class PaletteToolbar(
     }
   }.palletteToolbarStyle()
 
-  lateinit var tempoText: TextView private set
-  lateinit var tempoTapper: ImageButton private set
-  val tempoArea = relativeLayout {
-    tempoTapper = imageButton {
+  private lateinit var tempoText: TextView private set
+  private lateinit var tempoButton: ImageButton private set
+  private val tempoArea = relativeLayout {
+    tempoButton = imageButton {
       imageResource = R.drawable.noun_metronome_415494_000000
       backgroundResource = R.drawable.toolbar_button
       padding = dip(10)
@@ -100,7 +97,7 @@ class PaletteToolbar(
   }.palletteToolbarStyle()
 
   init {
-    TempoTracking.trackTempo(tempoTapper) { tempo: Float ->
+    TempoTracking.trackTempo(tempoButton) { tempo: Float ->
       info("onTempoChanged: $tempo")
       val bpm = Math.round(tempo)
       if (bpm > 20) {
@@ -117,15 +114,9 @@ class PaletteToolbar(
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
       if (viewModel.keyboardView.isHidden) {
-        viewModel.backStack.push {
-          if(!viewModel.keyboardView.isHidden) {
-            viewModel.keyboardView.hide()
-            true
-          } else false
-        }
-        viewModel.keyboardView.show()
+        viewModel.showKeyboard()
       } else {
-        viewModel.keyboardView.hide()
+        viewModel.hideKeyboard()
       }
     }
     onLongClick(returnValue = true) {
@@ -140,21 +131,21 @@ class PaletteToolbar(
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
       if (viewModel.colorboardView.isHidden) {
-        viewModel.backStack.push {
-          if(!viewModel.colorboardView.isHidden) {
-            viewModel.colorboardView.hide()
-            true
-          } else false
-        }
-        viewModel.colorboardView.show()
+        viewModel.showColorboard()
       } else {
-        viewModel.colorboardView.hide()
+        viewModel.hideColorboard()
       }
     }
     onLongClick(returnValue = true) {
       colorboardConfigurationAlert.show()
     }
   }.palletteToolbarStyle()
+
+  fun updateInstrumentButtonPaddings() {
+    keysButton.padding = dip(7)
+    colorsButton.padding = dip(7)
+    orbifoldButton.padding = dip(10)
+  }
 
   val orbifoldButton = imageButton {
     imageResource = R.drawable.icons8_molecule_filled_100

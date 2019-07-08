@@ -6,6 +6,7 @@ import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
+import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
@@ -23,6 +24,7 @@ import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.configuration
 import org.jetbrains.anko.portrait
 import java.util.*
@@ -299,11 +301,13 @@ class PaletteViewModel(
     if(orbifold.isHidden) {
       backStack.push {
         if (!orbifold.isHidden) {
-          orbifold.hide()
+          hideOrbifold()
           true
         } else false
       }
     }
+    toolbarView.orbifoldButton.backgroundResource = R.drawable.toolbar_button_active_instrument
+    toolbarView.updateInstrumentButtonPaddings()
     orbifold.conditionallyAnimateToSelectionState()
     orbifold.show(
       animation = if (orbifold.context.configuration.portrait) {
@@ -314,16 +318,53 @@ class PaletteViewModel(
         orbifold.conditionallyAnimateToSelectionState()
       }
     )
-
   }
 
   fun hideOrbifold(animated: Boolean = true) {
+    toolbarView.orbifoldButton.backgroundResource = R.drawable.toolbar_button
+    toolbarView.updateInstrumentButtonPaddings()
     orbifold.hide(
       animation = if (orbifold.context.configuration.portrait) {
         HideAnimation.VERTICAL
       } else HideAnimation.HORIZONTAL,
       animated = animated
     )
+  }
+
+  fun showKeyboard(animated: Boolean = true) {
+    backStack.push {
+      if(!keyboardView.isHidden) {
+        hideKeyboard()
+        true
+      } else false
+    }
+    keyboardView.show()
+    toolbarView.keysButton.backgroundResource = R.drawable.toolbar_button_active_instrument
+    toolbarView.updateInstrumentButtonPaddings()
+  }
+
+  fun hideKeyboard(animated: Boolean = true) {
+    toolbarView.keysButton.backgroundResource = R.drawable.toolbar_button
+    toolbarView.updateInstrumentButtonPaddings()
+    keyboardView.hide(animated)
+  }
+
+  fun showColorboard(animated: Boolean = true) {
+    backStack.push {
+      if(!colorboardView.isHidden) {
+        hideColorboard()
+        true
+      } else false
+    }
+    colorboardView.show()
+    toolbarView.colorsButton.backgroundResource = R.drawable.toolbar_button_active_instrument
+    toolbarView.updateInstrumentButtonPaddings()
+  }
+
+  fun hideColorboard(animated: Boolean = true) {
+    toolbarView.colorsButton.backgroundResource = R.drawable.toolbar_button
+    toolbarView.updateInstrumentButtonPaddings()
+    colorboardView.hide(animated)
   }
 
   private fun partListModeBoring() {
