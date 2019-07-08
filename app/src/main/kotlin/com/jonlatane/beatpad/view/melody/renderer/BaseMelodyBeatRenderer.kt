@@ -52,7 +52,7 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
         left = (overallWidth.toFloat() * elementIndex / elementCount).toInt()
         right = (overallWidth.toFloat() * (elementIndex + 1) / elementCount).toInt()
       }
-      chord = chordAt(elementPosition)
+      chord = chordAt(elementPosition, melody)
         ?: viewModel.paletteViewModel.orbifold.chord
           ?: MelodyBeatView.DEFAULT_CHORD
       isCurrentlyPlayingBeat =

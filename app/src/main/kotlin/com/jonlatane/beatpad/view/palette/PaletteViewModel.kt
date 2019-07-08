@@ -39,6 +39,7 @@ class PaletteViewModel(
     //BeatClockPaletteConsumer.viewModel = this
   }
 
+  fun save() = storageContext.storePalette(palette)
 
   var playbackTick by observable<Int?>(null) { _, old, new ->
     arrayOf(old, new).filterNotNull().map { tickPosition ->

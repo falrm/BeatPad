@@ -5,7 +5,7 @@ import android.util.SparseArray
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
-import com.jonlatane.beatpad.output.service.convertPatternIndex
+import com.jonlatane.beatpad.model.dsl.Patterns
 import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingModifiers
@@ -15,7 +15,7 @@ import java.util.*
 /**
  * In handling Beat interactions,
  */
-interface MelodyBeatEventHandlerBase: AnkoLogger {
+interface MelodyBeatEventHandlerBase: Patterns, AnkoLogger {
   /**
    * For a touch X value (time laid along the x-axis), returns the
    * element position (within the melody) and the element data there.
@@ -27,7 +27,7 @@ interface MelodyBeatEventHandlerBase: AnkoLogger {
 	val melody: Melody<*>?
   val harmony: Harmony
   val changes: NavigableMap<Int, out Transposable<*>>? get() = melody?.changes
-  fun chordAt(elementPosition: Int) = melody?.let { melody ->
+  fun chordAt(elementPosition: Int, melody: Melody<*>? = this.melody) = melody?.let { melody ->
     harmony.let { harmony ->
       val harmonyPosition = elementPosition.convertPatternIndex(melody, harmony)
       val result = harmony.changeBefore(harmonyPosition)

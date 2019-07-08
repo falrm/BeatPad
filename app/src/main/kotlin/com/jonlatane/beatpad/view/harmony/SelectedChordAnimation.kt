@@ -2,11 +2,10 @@ package com.jonlatane.beatpad.view.harmony
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
 import android.view.animation.LinearInterpolator
-import com.jonlatane.beatpad.output.service.let
 import com.jonlatane.beatpad.util.viewHolders
+import io.multifunctions.letCheckNull
 import org.jetbrains.anko.AnkoLogger
 
 interface SelectedChordAnimation: AnkoLogger {
@@ -19,7 +18,7 @@ interface SelectedChordAnimation: AnkoLogger {
 
     ValueAnimator.ofInt(0, steps).apply {
       addUpdateListener { valueAnimator ->
-        val views = (harmony to selectedHarmonyElements).let { harmony, selectedHarmonyElements ->
+        val views = (harmony to selectedHarmonyElements).letCheckNull { harmony, selectedHarmonyElements ->
           harmonyElementRecycler?.viewHolders<HarmonyBeatHolder>()?.filter {
             val beatViewRange =
               it.element.beatPosition * harmony.subdivisionsPerBeat..

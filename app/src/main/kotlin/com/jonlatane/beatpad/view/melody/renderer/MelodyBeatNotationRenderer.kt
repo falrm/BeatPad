@@ -9,6 +9,7 @@ import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import kotlinx.io.pool.DefaultPool
+import org.jetbrains.anko.info
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
 import java.util.*
@@ -217,9 +218,15 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
         val noteheadWidth = Math.min((letterStepSize * 2).toInt(), maxFittableNoteheadWidth)
         val noteheadHeight = noteheadWidth//(bounds.right - bounds.left)
 
+        if(tones.contains(18)) {
+          info("here")
+        }
         val playbackNotes = tones.map {
           val playbackTone = melody.playbackToneUnder(it, chord)
           Note.nameNoteUnderChord(playbackTone, chord)
+        }
+        if(playbackNotes.contains(Note.Companion.note(Note.Letter.F, 5))) {
+          info("here")
         }
         var maxCenter = Float.MIN_VALUE
         var minCenter = Float.MAX_VALUE
@@ -262,35 +269,38 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
           notehead.draw(this)
 
           // Draw signs (currently only sharp)
+          val previousSign = previousSignOf(melody, harmony, note, elementPosition)
           when (note.sign) {
-            Note.Sign.Sharp -> when(previousSignOf(melody, harmony, note, elementPosition)) {
+            Note.Sign.Sharp -> when(previousSign) {
               Note.Sign.Sharp -> null
-              else -> sharpPool.borrow().apply { alpha = (255 * alphaSource).toInt() }
+              else -> sharpPool
             }
-            Note.Sign.Flat  -> when(previousSignOf(melody, harmony, note, elementPosition)) {
+            Note.Sign.Flat  -> when(previousSign) {
               Note.Sign.Flat -> null
-              else -> flatPool.borrow().apply { alpha = (255 * alphaSource).toInt() }
+              else -> flatPool
             }
-            Note.Sign.Natural -> when(previousSignOf(melody, harmony, note, elementPosition)) {
+            Note.Sign.Natural -> when(previousSign) {
               Note.Sign.Natural -> null
               null -> null
-              else -> naturalPool.borrow().apply { alpha = (255 * alphaSource).toInt() }
+              else -> naturalPool
             }
             else            -> null
-          }?.let { drawable ->
-            val (signLeft, signRight) = if (shouldStagger) {
-              (bounds.right - 1.6f * noteheadWidth).toInt() to (bounds.right - 1.1f * noteheadWidth).toInt()
-            } else {
-              (bounds.right - 2.5f * noteheadWidth).toInt() to (bounds.right - 2.0f * noteheadWidth).toInt()
+          }?.borrow()
+            ?.apply { alpha = (255 * alphaSource).toInt() }
+            ?.let { drawable ->
+              val (signLeft, signRight) = if (shouldStagger) {
+                (bounds.right - 1.6f * noteheadWidth).toInt() to (bounds.right - 1.1f * noteheadWidth).toInt()
+              } else {
+                (bounds.right - 2.5f * noteheadWidth).toInt() to (bounds.right - 2.0f * noteheadWidth).toInt()
+              }
+              val (signTop, signBottom) = when (note.sign) {
+                Note.Sign.Flat -> top - 2 * noteheadHeight / 3 to bottom
+                else           -> top - noteheadHeight / 3 to bottom + noteheadHeight / 3
+              }
+              drawable.setBounds(signLeft, signTop, signRight, signBottom)
+              drawable.alpha = (255 * alphaSource).toInt()
+              drawable.draw(this)
             }
-            val (signTop, signBottom) = when(note.sign) {
-              Note.Sign.Flat -> top - 2 * noteheadHeight / 3 to bottom
-              else -> top - noteheadHeight / 3 to bottom + noteheadHeight / 3
-            }
-            drawable.setBounds(signLeft, signTop, signRight, signBottom)
-            drawable.alpha = (255 * alphaSource).toInt()
-            drawable.draw(this)
-          }
           renderLedgerLines(note, left, right)
         }
 

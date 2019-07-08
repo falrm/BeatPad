@@ -136,6 +136,7 @@ class MelodyReferenceHolder(
           } else {
             disableMelodyReference()
           }
+          viewModel.save()
           editMode()
         }
       }

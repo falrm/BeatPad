@@ -80,6 +80,7 @@ dependencies {
 	implementation "org.jetbrains.anko:anko-constraint-layout:$anko_version"
 	implementation "org.jetbrains.anko:anko-design:$anko_version"
 	implementation 'commons-codec:commons-codec:1.10'
+	implementation 'com.github.stupacki:MultiFunctions:1.2.1'
 
 
 

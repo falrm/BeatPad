@@ -1,15 +1,16 @@
+//import com.jonlatane.beatpad.output.service.let
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.model.*
 import com.jonlatane.beatpad.model.chord.Chord
+import com.jonlatane.beatpad.model.dsl.Patterns
 import com.jonlatane.beatpad.model.melody.RationalMelody
-import com.jonlatane.beatpad.output.service.convertPatternIndex
-import com.jonlatane.beatpad.output.service.let
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.to127Int
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import com.jonlatane.beatpad.view.palette.SectionHolder
+import io.multifunctions.letCheckNull
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
@@ -22,7 +23,7 @@ import kotlin.properties.Delegates.observable
  * A platform-agnostic model for a playback thread that plays back [Section],
  * [Melody] and [Harmony] data as the end-user would expect.
  */
-object BeatClockPaletteConsumer : AnkoLogger {
+object BeatClockPaletteConsumer : Patterns, AnkoLogger {
   var palette: Palette? = null
   set(value) {
     field = value
@@ -52,7 +53,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
   private val harmonyPosition: Int?
     get() = harmony?.let { tickPosition.convertPatternIndex(ticksPerBeat, it) }
   private val harmonyChord: Chord?
-    get() = (harmony to harmonyPosition).let { harmony, harmonyPosition ->
+    get() = (harmony to harmonyPosition).letCheckNull { harmony, harmonyPosition ->
       harmony.changeBefore(harmonyPosition)
     }
   var tickPosition: Int = 0 // Always relative to ticksPerBeat
@@ -74,13 +75,10 @@ object BeatClockPaletteConsumer : AnkoLogger {
   private val upcomingAttacks = Vector<Attack>(16)
 
   private fun loadUpcomingAttacks(palette: Palette, section: Section) {
-
-    var currentAttackIndex = 0
     chord = (harmonyChord ?: chord)?.also { chord ->
       viewModel?.orbifold?.post {
         if (
-          section.harmony != null
-          && viewModel?.harmonyViewModel?.isChoosingHarmonyChord != true
+          viewModel?.harmonyViewModel?.isChoosingHarmonyChord != true
           && chord != viewModel?.orbifold?.chord
         ) {
           viewModel?.orbifold?.disableNextTransitionAnimation()
@@ -104,7 +102,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
   }
 
   fun tick() {
-    (palette to section).let { palette: Palette, section: Section ->
+    (palette to section).letCheckNull { palette: Palette, section: Section ->
       val totalBeats = harmony?.let { it.length.toFloat() / it.subdivisionsPerBeat } ?: 0f
       loadUpcomingAttacks(palette, section)
       for (attack in upcomingAttacks) {
@@ -209,22 +207,12 @@ object BeatClockPaletteConsumer : AnkoLogger {
           attack.velocity = change.velocity * volume
 
           change.tones.forEach { tone ->
-            val playbackTone = playbackToneUnder(tone, chord!!)
+            val playbackTone =  chord?.let { chord -> playbackToneUnder(tone, chord) } ?: tone
             attack.chosenTones.add(playbackTone)
           }
-
-          if(subdivisionsPerBeat == 5) {
-            info("Emitting attack for /5 melody: tickPosition=$tickPosition, indexHit=$it")
-          }
-
           attack
         }
-        else ->  {
-          if(subdivisionsPerBeat == 5) {
-            info("NOT Emitting attack for /5 melody: tickPosition=$tickPosition, indexHit=$it (no change)")
-          }
-          null
-        }
+        else -> null
       }
     }
   }

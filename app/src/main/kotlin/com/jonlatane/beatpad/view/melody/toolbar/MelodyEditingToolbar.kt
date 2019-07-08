@@ -2,6 +2,7 @@ package com.jonlatane.beatpad.view.melody.toolbar
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.TypedValue
 import android.view.Gravity
 import android.widget.Button
 import android.widget.ImageView
@@ -13,7 +14,6 @@ import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.output.service.convertPatternIndex
 import com.jonlatane.beatpad.util.mod12
 import com.jonlatane.beatpad.util.mod12Nearest
 import com.jonlatane.beatpad.util.toolbarTextStyle
@@ -28,10 +28,15 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 	private val lengthDialog = LengthDialog(context, melodyViewModel)
 
 	private val lengthButton: Button = button {
-		text = "0/0"
+		text = "0/0\n0 beats"
+		setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12f)
 		backgroundResource = R.drawable.toolbar_melody_button
-		padding = dip(10)
+		padding = dip(0)
 		typeface = MainApplication.chordTypefaceBold
+//		singleLine = true
+//		ellipsize = TextUtils.TruncateAt.MARQUEE
+//		marqueeRepeatLimit = -1
+//		isSelected = true
 		onClick {
 			//context.toast("TODO")
       try {
@@ -40,7 +45,7 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
         error("Error showing length dialog", t)
       }
 		}
-	}.longSquareButtonStyle()
+	}.longSquareButtonStyle().lparams { height = matchParent }
 
 	private val relativeToButton: Button = button {
 		text = ""
@@ -153,6 +158,7 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
     }
 
 		lengthButton.text = melodyViewModel.openedMelody?.run {
+			"$length/$subdivisionsPerBeat\n" +
 			"%.3f"
 				.format(length.toFloat() / subdivisionsPerBeat)
 				.trim('0')

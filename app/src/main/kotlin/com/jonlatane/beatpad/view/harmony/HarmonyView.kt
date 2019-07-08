@@ -11,12 +11,12 @@ import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.chord.Chord
-import com.jonlatane.beatpad.output.service.let
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import com.jonlatane.beatpad.view.zoomableRecyclerView
+import io.multifunctions.letCheckNull
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.*
 import java.util.*
@@ -173,7 +173,7 @@ class HarmonyView(
                 maxWidth = (beatView.width * 0.85f * length.toFloat() / harmony.subdivisionsPerBeat).toInt()
               }
 
-              (lastTranslationX to lastView).let { lastTranslationX, lastView ->
+              (lastTranslationX to lastView).letCheckNull { lastTranslationX, lastView ->
                 if(chordTranslationX - lastTranslationX <= lastView.width) {
                   val newAlpha = ((chordTranslationX - lastTranslationX) / lastView.width)
                     .takeIf { it.isFinite() } ?: 0f

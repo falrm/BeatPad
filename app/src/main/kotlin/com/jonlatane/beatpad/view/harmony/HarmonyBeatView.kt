@@ -14,9 +14,12 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.model.chord.Chord
-import com.jonlatane.beatpad.output.service.convertPatternIndex
+import com.jonlatane.beatpad.model.dsl.Patterns
 import com.jonlatane.beatpad.storage.Storage
-import com.jonlatane.beatpad.util.*
+import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.util.mod12
+import com.jonlatane.beatpad.util.size
+import com.jonlatane.beatpad.util.vibrate
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.withAlpha
 
@@ -25,7 +28,7 @@ import org.jetbrains.anko.withAlpha
 class HarmonyBeatView constructor(
   context: Context,
   var viewModel: HarmonyViewModel
-): View(context), Storage {
+): View(context), Storage, Patterns {
   override val storageContext: Context get() = context
   val harmony: Harmony? get() = viewModel.harmony
   val section: Section? get() = viewModel.section

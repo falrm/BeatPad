@@ -183,7 +183,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
 
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
-    storePalette(viewModel.palette)
+    viewModel.save()
     outState.putString("melodyDisplayType", viewModel.melodyViewModel.displayType.name)
     outState.putString("melodyLayoutType", viewModel.melodyViewModel.layoutType.name)
     outState.putBoolean("keyboardOpen", !viewModel.keyboardView.isHidden)
