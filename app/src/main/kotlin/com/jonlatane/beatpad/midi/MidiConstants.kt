@@ -9,6 +9,8 @@ import java.util.*
 
 object MidiConstants {
 	const val NOTE_ON = 0x90.toByte()
+	const val ALL_CONTROLLERS_OFF: Byte = 121.toByte()
+	const val ALL_NOTES_OFF: Byte = 123.toByte()
 	const val NOTE_OFF: Byte = 0x80.toByte()
 	const val PROGRAM_CHANGE = 0xC0.toByte()
 	const val CONTROL_CHANGE = 0xB0.toByte()

@@ -2,7 +2,6 @@ package com.jonlatane.beatpad
 
 import BeatClockPaletteConsumer
 import android.app.Activity
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -11,27 +10,24 @@ import android.support.constraint.ConstraintSet
 import android.view.View
 import android.view.WindowManager
 import com.jonlatane.beatpad.model.Melody
-import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
-import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.sensors.ShakeDetector
 import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.*
+import com.jonlatane.beatpad.util.smartrecycler.viewHolders
 //import com.jonlatane.beatpad.util.show
 import com.jonlatane.beatpad.view.InstrumentConfiguration
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.palette.PaletteUI
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import com.jonlatane.beatpad.view.palette.PartHolder
-import com.jonlatane.beatpad.view.palette.partListView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder
 import org.jetbrains.anko.constraint.layout.applyConstraintSet
 import org.jetbrains.anko.constraint.layout.constraintLayout
-import java.net.URI
 import java.util.*
 
 

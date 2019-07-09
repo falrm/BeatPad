@@ -1,4 +1,4 @@
-package com.jonlatane.beatpad.util
+package com.jonlatane.beatpad.util.smartrecycler
 
 import android.support.v7.widget.RecyclerView
 
@@ -13,5 +13,13 @@ abstract class SmartAdapter<HolderType: RecyclerView.ViewHolder>: RecyclerView.A
   override fun onViewRecycled(holder: HolderType) {
     super.onViewRecycled(holder)
     _boundViewHolders -= holder
+  }
+
+  fun updateSmartHolders() {
+    boundViewHolders.mapNotNull { it as? Holder }.forEach { it.updateSmartHolder() }
+  }
+
+  interface Holder {
+    fun updateSmartHolder()
   }
 }

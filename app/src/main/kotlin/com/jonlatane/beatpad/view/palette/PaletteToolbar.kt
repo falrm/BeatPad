@@ -82,7 +82,7 @@ class PaletteToolbar(
       onLongClick(returnValue = true) {
         tempoConfigurationAlert.show()
       }
-    }.lparams(matchParent, dip(48))
+    }.lparams(matchParent, matchParent)
     tempoText = textView {
       textSize = 18f
       textColor = 0xFF000000.toInt()

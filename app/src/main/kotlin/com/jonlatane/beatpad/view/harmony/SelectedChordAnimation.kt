@@ -4,7 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.view.animation.LinearInterpolator
-import com.jonlatane.beatpad.util.viewHolders
+import com.jonlatane.beatpad.util.smartrecycler.viewHolders
 import io.multifunctions.letCheckNull
 import org.jetbrains.anko.AnkoLogger
 

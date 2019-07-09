@@ -16,6 +16,8 @@ import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.*
+import com.jonlatane.beatpad.util.smartrecycler.updateSmartHolders
+import com.jonlatane.beatpad.util.smartrecycler.viewHolders
 import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
 import com.jonlatane.beatpad.view.harmony.HarmonyView
 import com.jonlatane.beatpad.view.harmony.HarmonyViewModel
@@ -200,13 +202,12 @@ class PaletteViewModel(
     }
     beatScratchToolbar.updateButtonColors()
 
-    sectionListAdapter?.notifyDataSetChanged()
-    melodyViewModel.beatAdapter.notifyDataSetChanged()
+    melodyViewModel.beatAdapter.updateSmartHolders()
     melodyViewModel.melodyReferenceToolbar.updateButtonText()
     if(editingMix) { // Trigger an update of the mix state.
       editingMix = editingMix
     }
-    partListAdapter?.notifyDataSetChanged()
+    updateMelodyReferences()
     PlaybackService.instance?.showNotification()
   }
 
@@ -379,6 +380,14 @@ class PaletteViewModel(
       translationX = 0f
       translationY = 0f
       layoutWidth = 0
+    }
+  }
+
+  fun updateMelodyReferences() {
+    partListAdapter?.boundViewHolders?.forEach {
+      it.melodyReferenceAdapter.boundViewHolders.forEach {
+        it.onPositionChanged()
+      }
     }
   }
 }

@@ -3,13 +3,10 @@ package com.jonlatane.beatpad.view.palette
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.ViewGroup
-import android.widget.SeekBar
-import android.widget.TextView
 import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.util.SmartAdapter
-import org.jetbrains.anko.constraint.layout._ConstraintLayout
+import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.recyclerview.v7._RecyclerView

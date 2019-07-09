@@ -2,7 +2,7 @@ package com.jonlatane.beatpad.view.harmony
 
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
-import com.jonlatane.beatpad.util.applyToHolders
+import com.jonlatane.beatpad.util.smartrecycler.applyToHolders
 import com.jonlatane.beatpad.util.layoutWidth
 import com.jonlatane.beatpad.view.melody.BeatAdapter
 import com.jonlatane.beatpad.view.melody.MelodyBeatAdapter.Companion.initialBeatWidthDp

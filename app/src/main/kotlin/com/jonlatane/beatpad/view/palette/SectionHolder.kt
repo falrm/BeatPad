@@ -9,17 +9,16 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showRenameDialog
 import com.jonlatane.beatpad.storage.Storage
-import com.jonlatane.beatpad.util.layoutWidth
+import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
+import com.jonlatane.beatpad.util.smartrecycler.updateSmartHolders
 import org.jetbrains.anko.*
 import java.util.*
 
@@ -77,7 +76,7 @@ class SectionHolder(
       )
     }
   }
-), Storage {
+), SmartAdapter.Holder, Storage {
   companion object {
     fun sectionDrawableResource(sectionIndex: Int) = arrayOf(
       R.drawable.orbifold_chord_major,
@@ -117,7 +116,7 @@ class SectionHolder(
             section?.let { section ->
               itemView.context.showRenameDialog(section.name, "Section") {
                 section.name = it
-                invalidate()
+                this.updateSmartHolder()
               }
             }
           }
@@ -190,7 +189,7 @@ class SectionHolder(
   private val copyHarmony: MenuItem get() = menu.menu.findItem(R.id.copySectionHarmony)
   private val pasteHarmony: MenuItem get() = menu.menu.findItem(R.id.pasteSectionHarmony)
 
-  fun invalidate() {
+  override fun updateSmartHolder() {
     deleteSection.isEnabled = viewModel.palette.sections.size > 1
     itemView.backgroundResource = when (section) {
       BeatClockPaletteConsumer.section -> sectionDrawableResource(adapterPosition)
@@ -204,6 +203,7 @@ class SectionHolder(
     } else {
       makeAddButton()
     }
+    //sectionName.requestLayout()
   }
 
 
@@ -217,6 +217,7 @@ class SectionHolder(
     itemView.apply {
       setOnClickListener {
         BeatClockPaletteConsumer.section = section
+        viewModel.sectionListRecycler.updateSmartHolders()
       }
       setOnLongClickListener {
         menu.show()

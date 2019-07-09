@@ -82,6 +82,7 @@ class PlaybackService : Service(), AnkoLogger {
         playbackThread.stopped = true
         BeatClockPaletteConsumer.tickPosition = 0
         BeatClockPaletteConsumer.viewModel?.playbackTick = 0
+        AndroidMidi.send(byteArrayOf(0xFF.toByte()))// Midi reset
         showNotification()
       }
       Action.STOPFOREGROUND_ACTION  -> {
@@ -98,6 +99,7 @@ class PlaybackService : Service(), AnkoLogger {
     info("In onDestroy")
     playbackThread.terminated = true
     AudioTrackCache.releaseAll()
+    AndroidMidi.send(byteArrayOf(0xFF.toByte()))// Midi reset
     AndroidMidi.ONBOARD_DRIVER.stop()
   }
 

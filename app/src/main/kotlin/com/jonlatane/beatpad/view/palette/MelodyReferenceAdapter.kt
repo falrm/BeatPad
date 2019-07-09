@@ -1,6 +1,5 @@
 package com.jonlatane.beatpad.view.palette
 
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.ViewGroup
@@ -9,7 +8,7 @@ import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.storage.PaletteStorage
-import com.jonlatane.beatpad.util.SmartAdapter
+import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.uiThread

@@ -1,12 +1,14 @@
-package com.jonlatane.beatpad.util
+package com.jonlatane.beatpad.util.smartrecycler
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import com.jonlatane.beatpad.view.palette.PartHolder
+
+fun RecyclerView.updateSmartHolders()
+  = applyToHolders<SmartAdapter.Holder> { it.updateSmartHolder() }
 
 @Suppress("UNCHECKED_CAST")
 @Synchronized
-fun <HolderType: RecyclerView.ViewHolder>RecyclerView.applyToHolders(
+fun <HolderType>RecyclerView.applyToHolders(
 	mutation: (HolderType) -> Unit
 ) {
   viewHolders<HolderType>()
@@ -16,7 +18,7 @@ fun <HolderType: RecyclerView.ViewHolder>RecyclerView.applyToHolders(
 
 @Suppress("UNCHECKED_CAST")
 @Synchronized
-fun <HolderType : RecyclerView.ViewHolder> RecyclerView.viewHolders(): List<HolderType>
+fun <HolderType> RecyclerView.viewHolders(): List<HolderType>
   = (0 until childCount)
   .map { getChildAt(it) }
   .map {

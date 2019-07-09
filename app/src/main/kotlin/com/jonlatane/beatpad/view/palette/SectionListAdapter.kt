@@ -1,18 +1,17 @@
 package com.jonlatane.beatpad.view.palette
 
-import android.support.v4.view.MotionEventCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.view.MotionEvent
 import android.view.ViewGroup
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.storage.PaletteStorage.blankHarmony
+import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import java.util.*
 
 class SectionListAdapter(
 	val viewModel: PaletteViewModel
-) : RecyclerView.Adapter<SectionHolder>() {
+) : SmartAdapter<SectionHolder>() {
   val recyclerView: RecyclerView get() = viewModel.sectionListRecycler
   val orientation: Int get() = (recyclerView.layoutManager as? LinearLayoutManager)?.orientation
     ?: LinearLayoutManager.HORIZONTAL
@@ -58,7 +57,9 @@ class SectionListAdapter(
         listOf(viewHolder, target).mapNotNull { (it as? SectionHolder)?.section }
           .any { it == BeatClockPaletteConsumer.section }
       ) {
-        viewModel.partListAdapter?.notifyDataSetChanged()
+        viewModel.beatScratchToolbar.updateButtonColors()
+        //viewModel.partListAdapter?.updateSmartHolders()
+        viewModel.notifySectionChange()
       }
       return true
     }
@@ -74,15 +75,7 @@ class SectionListAdapter(
 	}
 
 	override fun onBindViewHolder(holder: SectionHolder, position: Int) {
-    holder.invalidate()
-		holder.sectionName.requestLayout()
-//		holder.dragHandle.setOnTouchListener { view, event ->
-//      if (MotionEventCompat.getActionMasked(event) ==
-//        MotionEvent.ACTION_DOWN) {
-//        itemTouchHelper.startDrag(holder)
-//      }
-//      false
-//    }
+    holder.updateSmartHolder()
 	}
 
   internal fun addSection(

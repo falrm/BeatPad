@@ -2,7 +2,7 @@ package com.jonlatane.beatpad.view.melody
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import com.jonlatane.beatpad.util.firstVisibleItemPosition
+import com.jonlatane.beatpad.util.smartrecycler.firstVisibleItemPosition
 
 interface BeatAdapter {
   var elementWidth: Int

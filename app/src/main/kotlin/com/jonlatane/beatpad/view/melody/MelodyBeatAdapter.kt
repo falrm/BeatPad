@@ -9,10 +9,9 @@ import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import com.jonlatane.beatpad.model.Pattern
-import com.jonlatane.beatpad.util.applyToHolders
-import com.jonlatane.beatpad.util.defaultDuration
-import com.jonlatane.beatpad.util.layoutHeight
-import com.jonlatane.beatpad.util.layoutWidth
+import com.jonlatane.beatpad.util.*
+import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
+import com.jonlatane.beatpad.util.smartrecycler.applyToHolders
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
@@ -26,7 +25,7 @@ import kotlin.math.round
 class MelodyBeatAdapter(
   val viewModel: MelodyViewModel,
   override val recyclerView: _RecyclerView
-) : RecyclerView.Adapter<MelodyBeatHolder>(), AnkoLogger, BeatAdapter {
+) : SmartAdapter<MelodyBeatHolder>(), AnkoLogger, BeatAdapter {
   companion object {
     const val initialBeatWidthDp: Float = 125f
     const val initialBeatHeightDp: Float = 400f

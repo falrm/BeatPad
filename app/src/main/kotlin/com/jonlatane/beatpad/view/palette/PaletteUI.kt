@@ -1,7 +1,6 @@
 package com.jonlatane.beatpad.view.palette
 
 //import com.jonlatane.beatpad.util.syncPositionTo
-import BeatClockPaletteConsumer
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -10,7 +9,7 @@ import android.widget.RelativeLayout
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.util.firstVisibleItemPosition
+import com.jonlatane.beatpad.util.smartrecycler.firstVisibleItemPosition
 import com.jonlatane.beatpad.view.colorboard.colorboardView
 import com.jonlatane.beatpad.view.harmony.harmonyView
 import com.jonlatane.beatpad.view.keyboard.keyboardView
@@ -217,20 +216,6 @@ class PaletteUI constructor(
       rightOf(viewModel.sectionListView)
       alignParentTop()
     }
-
-
-//    if (isTablet) {
-//      view {
-//        id = R.id.spacer
-//        backgroundColor = context.color(R.color.colorPrimaryDark)
-//      }.lparams {
-//        alignParentLeft()
-//        below(viewModel.orbifold)
-//        width = leftSideWidth
-//        height = matchParent
-//        elevation = 5f
-//      }
-//    }
 
     viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
       id = R.id.toolbar

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="New Palette"
+    <item android:title="New Palette..."
           android:id="@+id/newPalette"/>
     <item android:title="Open Palette..."
           android:id="@+id/openPalette"/>
-    <item android:title="Duplicate Palette"
+    <item android:title="Duplicate Palette..."
           android:id="@+id/duplicatePalette"/>
-    <item android:title=""
-          android:id="@+id/copySectionHarmony"/>
+    <item android:title="Copy Palette"
+          android:id="@+id/copyPalette"/>
     <item android:title="About BeatScratch"
           android:id="@+id/aboutBeatScratch"/>
 </menu>
