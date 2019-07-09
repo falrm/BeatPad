@@ -43,10 +43,11 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
       SectionHolder.sectionDrawableResource(sectionIndex)
     } ?: R.drawable.orbifold_chord
 
-  val currentSectionColor: Int get() = palette?.sections
-    ?.indexOf(section)?.let { sectionIndex ->
-      MainApplication.instance.color(SectionHolder.sectionColor(sectionIndex))
-    } ?: R.color.subDominant
+  val currentSectionColor: Int
+    get() = (
+      palette?.sections?.indexOf(section)?.let { SectionHolder.sectionColor(it) }
+        ?: R.color.subDominant
+      ).let { MainApplication.instance.color(it) }
 
   private var chord: Chord? = null
   val harmony: Harmony? get() = section?.harmony

@@ -137,6 +137,7 @@ class PaletteViewModel(
   var sectionListAdapter: SectionListAdapter? = null
   lateinit var partListView: PartListView
   lateinit var partListTransitionView: TextView
+  lateinit var beatScratchToolbar: BeatScratchToolbar
   lateinit var toolbarView: PaletteToolbar
   lateinit var keyboardView: KeyboardView
   lateinit var colorboardView: ColorboardInputView
@@ -197,6 +198,7 @@ class PaletteViewModel(
       editingChord = null
       selectedHarmonyElements = null
     }
+    beatScratchToolbar.updateButtonColors()
 
     sectionListAdapter?.notifyDataSetChanged()
     melodyViewModel.beatAdapter.notifyDataSetChanged()

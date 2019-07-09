@@ -21,3 +21,10 @@ inline fun ViewManager.partListView(
 	viewModel: PaletteViewModel,
 	init: HideableRecyclerView.() -> Unit
 ): PartListView = ankoView({ PartListView(it, viewModel) }, theme, init)
+
+
+inline fun ViewManager.beatScratchToolbar(
+	theme: Int = 0,
+	viewModel: PaletteViewModel,
+	init: BeatScratchToolbar.() -> Unit = {}
+) = ankoView({ BeatScratchToolbar(it, viewModel) }, theme, init)

@@ -50,7 +50,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
 
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-
+    BeatClockPaletteConsumer.viewModel = ui.viewModel
     val palette = BeatClockPaletteConsumer.palette ?: {
       val storedPalette = loadPalette() ?: PaletteStorage.basePalette
       BeatClockPaletteConsumer.palette = storedPalette

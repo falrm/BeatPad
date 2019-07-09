@@ -5,6 +5,7 @@ import BeatClockPaletteConsumer
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
@@ -132,14 +133,23 @@ class PaletteUI constructor(
   }
 
   private fun _RelativeLayout.portraitLayout() {
-
-    viewModel.sectionListView = sectionListView(viewModel = viewModel) {
-      id = R.id.chord_list
+    viewModel.beatScratchToolbar = beatScratchToolbar(viewModel = viewModel) {
+      id = View.generateViewId()
+      orientation = LinearLayout.HORIZONTAL
     }.lparams {
       elevation = 5f
       width = matchParent
       height = wrapContent
       alignParentTop()
+    }
+
+    viewModel.sectionListView = sectionListView(viewModel = viewModel) {
+      id = R.id.chord_list
+    }.lparams {
+      below(viewModel.beatScratchToolbar)
+      elevation = 5f
+      width = matchParent
+      height = wrapContent
     }
 
     viewModel.harmonyView = harmonyView(viewModel = viewModel) {
@@ -198,6 +208,16 @@ class PaletteUI constructor(
       alignParentTop()
     }
 
+    viewModel.beatScratchToolbar = beatScratchToolbar(viewModel = viewModel) {
+      id = View.generateViewId()
+      orientation = LinearLayout.VERTICAL
+    }.lparams {
+      width = wrapContent
+      height = matchParent
+      rightOf(viewModel.sectionListView)
+      alignParentTop()
+    }
+
 
 //    if (isTablet) {
 //      view {
@@ -217,7 +237,7 @@ class PaletteUI constructor(
     }.lparams {
       width = matchParent
       height = wrapContent
-      rightOf(viewModel.sectionListView)
+      rightOf(viewModel.beatScratchToolbar)
       alignParentTop()
       alignParentRight()
 
@@ -231,7 +251,7 @@ class PaletteUI constructor(
     }.lparams {
       width = matchParent
       height = wrapContent
-      rightOf(viewModel.sectionListView)
+      rightOf(viewModel.beatScratchToolbar)
       below(viewModel.toolbarView)
       alignParentRight()
     }
@@ -242,7 +262,7 @@ class PaletteUI constructor(
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      rightOf(viewModel.sectionListView)
+      rightOf(viewModel.beatScratchToolbar)
       below(viewModel.harmonyView)
       alignParentRight()
     }
@@ -252,7 +272,7 @@ class PaletteUI constructor(
       textSize = 25f
       background = context.getDrawable(R.drawable.orbifold_chord)
     }.lparams(0, dip(40)) {
-      rightOf(viewModel.sectionListView)
+      rightOf(viewModel.beatScratchToolbar)
       below(viewModel.harmonyView)
     }
 
@@ -263,7 +283,7 @@ class PaletteUI constructor(
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      rightOf(viewModel.sectionListView)
+      rightOf(viewModel.beatScratchToolbar)
       below(viewModel.harmonyView)
       alignParentRight()
     }
