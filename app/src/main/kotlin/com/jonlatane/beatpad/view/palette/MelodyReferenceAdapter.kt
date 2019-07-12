@@ -104,6 +104,10 @@ class MelodyReferenceAdapter(
 			}
 		}
 	) {
+		while(BeatClockPaletteConsumer.palette?.parts?.flatMap { it.melodies.map { it.id } }?.contains(newMelody.id) == true) {
+			newMelody.relatedMelodies.add(newMelody.id)
+			newMelody.id = UUID.randomUUID()
+		}
 		BeatClockPaletteConsumer.section?.melodies?.add(
 			Section.MelodyReference(newMelody, 0.5f, Section.PlaybackType.Indefinite)
 		)

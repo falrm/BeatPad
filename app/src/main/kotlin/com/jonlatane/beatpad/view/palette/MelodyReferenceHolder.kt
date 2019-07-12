@@ -51,10 +51,7 @@ class MelodyReferenceHolder(
 			when (item.itemId) {
 				R.id.composeMidiMelody -> adapter.createAndOpenDrawnMelody()
 				R.id.recordMidiMelody  -> context.toast("TODO!")
-        R.id.pasteMelody -> {
-          getClipboardMelody()?.let { adapter.createAndOpenDrawnMelody(it) }
-            ?: context.toast("Failed to read Melody from clipboard.")
-        }
+        R.id.pasteMelody       -> pasteMelody()
 				else                   -> context.toast("Impossible!")
 			}
 			true
@@ -220,6 +217,14 @@ class MelodyReferenceHolder(
   } catch(t: Throwable) {
     error("Failed to deserialize melody", t)
     null
+  }
+
+  fun pasteMelody() {
+    getClipboardMelody()?.let {
+
+      adapter.createAndOpenDrawnMelody(it)
+    }
+      ?: context.toast("Failed to read Melody from clipboard.")
   }
 
   fun copyMelody() {

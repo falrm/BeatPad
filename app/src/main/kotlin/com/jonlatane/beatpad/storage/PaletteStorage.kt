@@ -9,10 +9,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.fasterxml.jackson.module.kotlin.treeToValue
-import com.jonlatane.beatpad.model.Harmony
-import com.jonlatane.beatpad.model.Palette
-import com.jonlatane.beatpad.model.Part
-import com.jonlatane.beatpad.model.Section
+import com.jonlatane.beatpad.model.*
 import com.jonlatane.beatpad.model.orbifold.Orbifold
 import com.jonlatane.beatpad.model.chord.*
 import com.jonlatane.beatpad.model.melody.RationalMelody
@@ -166,6 +163,16 @@ object PaletteStorage : AnkoLogger {
           )
           if(section.harmony == null) {
             section.harmony = blankHarmony
+          }
+        }
+
+        // Deduplicate melody references
+        val melodies: List<Melody<*>> = parts.flatMap { it.melodies }
+        melodies.forEach { melody: Melody<*> ->
+          val others: List<Melody<*>> = melodies.toMutableList().also{ it.remove(melody) }
+          while(others.map { it.id }.contains(melody.id)) {
+            melody.relatedMelodies.add(melody.id)
+            melody.id = UUID.randomUUID()
           }
         }
       }
