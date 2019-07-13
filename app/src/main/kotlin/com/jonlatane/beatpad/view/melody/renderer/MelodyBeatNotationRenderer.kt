@@ -218,15 +218,9 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
         val noteheadWidth = Math.min((letterStepSize * 2).toInt(), maxFittableNoteheadWidth)
         val noteheadHeight = noteheadWidth//(bounds.right - bounds.left)
 
-        if(tones.contains(18)) {
-          info("here")
-        }
         val playbackNotes = tones.map {
           val playbackTone = melody.playbackToneUnder(it, chord)
           Note.nameNoteUnderChord(playbackTone, chord)
-        }
-        if(playbackNotes.contains(Note.Companion.note(Note.Letter.F, 5))) {
-          info("here")
         }
         var maxCenter = Float.MIN_VALUE
         var minCenter = Float.MAX_VALUE

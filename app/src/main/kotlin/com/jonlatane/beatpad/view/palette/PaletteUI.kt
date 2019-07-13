@@ -138,7 +138,9 @@ class PaletteUI constructor(
     }.lparams {
       elevation = 5f
       width = matchParent
-      height = wrapContent
+      //TODO: re-enable the toolbar
+      //height = wrapContent
+      height = 0
       alignParentTop()
     }
 
@@ -211,7 +213,9 @@ class PaletteUI constructor(
       id = View.generateViewId()
       orientation = LinearLayout.VERTICAL
     }.lparams {
-      width = wrapContent
+      //TODO: re-enable the toolbar
+      //width = wrapContent
+      width = 0
       height = matchParent
       rightOf(viewModel.sectionListView)
       alignParentTop()

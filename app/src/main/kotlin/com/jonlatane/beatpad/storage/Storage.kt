@@ -99,7 +99,7 @@ interface Storage: AnkoLogger {
 		try { oldFile.delete() } catch(_: Throwable) {}
 		storePalette(palette, this.weakRef.get()!!, tmpFile)
 		try {
-			loadPalette("tmp_palette.json", false) ?: toast("Failed to save palette!")
+			loadPalette("tmp_palette.json", false) ?: uiThread { toast("Failed to save palette!") }
 			try { destFile.renameTo(oldFile) || TODO("Rename returned false") } catch(t: Throwable) { warn(t) }
 			try { tmpFile.renameTo(destFile) || TODO("Rename returned false") } catch(t: Throwable) { error(t); throw t }
 		} catch(t: Throwable) {

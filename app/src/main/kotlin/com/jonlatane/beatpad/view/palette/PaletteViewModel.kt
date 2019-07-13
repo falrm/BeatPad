@@ -3,6 +3,7 @@ package com.jonlatane.beatpad.view.palette
 //import com.jonlatane.beatpad.util.syncPositionTo
 import BeatClockPaletteConsumer
 import android.content.Context
+import android.os.Build
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
@@ -344,6 +345,7 @@ class PaletteViewModel(
     keyboardView.show()
     toolbarView.keysButton.backgroundResource = R.drawable.toolbar_button_active_instrument
     toolbarView.updateInstrumentButtonPaddings()
+
   }
 
   fun hideKeyboard(animated: Boolean = true) {

@@ -4,6 +4,8 @@ import android.animation.IntEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Rect
+import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -26,6 +28,14 @@ class KeyboardView @JvmOverloads constructor(
   init {
     LayoutInflater.from(context).inflate(R.layout.view_keyboard, this, true)
     ioHandler = KeyboardIOHandler(this)
+  }
+
+  private val exclusionRect = Rect()
+  override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+    super.onLayout(changed, left, top, right, bottom)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      systemGestureExclusionRects = listOf(exclusionRect.also { it.set(0, 0, right, bottom) })
+    }
   }
 
   override fun onTouchEvent(event: MotionEvent): Boolean {

@@ -166,7 +166,7 @@ object PaletteStorage : AnkoLogger {
           }
         }
 
-        // Deduplicate melody references
+        // Deduplicate melody ids
         val melodies: List<Melody<*>> = parts.flatMap { it.melodies }
         melodies.forEach { melody: Melody<*> ->
           val others: List<Melody<*>> = melodies.toMutableList().also{ it.remove(melody) }
