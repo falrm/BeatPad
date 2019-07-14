@@ -36,7 +36,6 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
   override val storageContext: Context get() = this
   private lateinit var ui: PaletteUI
   override val viewModel get() = ui.viewModel
-  private var lastBackPress: Long? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -66,10 +65,10 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
     }
   }
 
+  private var lastBackPress: Long? = null
   override fun onBackPressed() {
     when {
-      viewModel.onBackPressed() -> {
-      }
+      viewModel.onBackPressed() -> {}
       lastBackPress?.let { System.currentTimeMillis() - it < 3000 } ?: false -> {
         val intent = Intent(this, PlaybackService::class.java)
         intent.action = PlaybackService.Companion.Action.STOPFOREGROUND_ACTION

@@ -24,7 +24,7 @@ class PartHolder(
 ) : RecyclerView.ViewHolder(layout), PartHolderLayout, AnkoLogger {
 	val part: Part?  get() = viewModel.palette.parts.getOrNull(adapterPosition)
 	val context get() = layout.context
-	val melodyReferenceAdapter = MelodyReferenceAdapter(viewModel, layout.melodyReferenceRecycler, 0)
+	val melodyReferenceAdapter = MelodyReferenceAdapter(viewModel, layout.melodyReferenceRecycler, this)
 	val volumeSlider: SeekBar get() = layout.volumeSlider
 	val partName: TextView get() = layout.partName
 	var editingVolume: Boolean by observable(false) { _, _, editingVolume: Boolean ->
@@ -118,7 +118,6 @@ class PartHolder(
 
   fun onPartPositionChanged() {
     editingVolume = viewModel.editingMix
-		melodyReferenceAdapter.partPosition = adapterPosition
 		if(isEditablePart) {
 			makeEditablePart()
 		} else {

@@ -12,6 +12,7 @@ buildscript {
 	}
 	dependencies {
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+//		classpath 'com.android.tools.build.jetifier:jetifier-processor:1.0.0-beta05'
 	}
 }
 
@@ -24,6 +25,18 @@ kotlin {
 //    coroutines 'enable'
 //  }
 }
+//dependencies {
+//	configurations.all {
+//		resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+//			def requested = details.requested
+//			if (requested.group == 'com.android.support') {
+//				if (!requested.name.startsWith("multidex")) {
+//					details.useVersion "$support_version"
+//				}
+//			}
+//		}
+//	}
+//}
 
 android {
 	compileSdkVersion 29
@@ -34,7 +47,7 @@ android {
 		targetSdkVersion 29
 		versionCode 71
 		versionName "0.26.0"
-		multiDexEnabled true
+		multiDexEnabled false
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 	}
 	buildTypes {
@@ -79,7 +92,8 @@ dependencies {
 	implementation "org.jetbrains.anko:anko-appcompat-v7-coroutines:$anko_version"
 	implementation "org.jetbrains.anko:anko-constraint-layout:$anko_version"
 	implementation "org.jetbrains.anko:anko-design:$anko_version"
-	implementation 'commons-codec:commons-codec:1.10'
+	//implementation 'commons-codec:commons-codec:1.12'
+	implementation 'net.iharder:base64:2.3.9'
 	implementation 'com.github.stupacki:MultiFunctions:1.2.1'
 
 

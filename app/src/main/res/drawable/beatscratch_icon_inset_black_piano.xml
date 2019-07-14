@@ -1,0 +1,8 @@
+<inset
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:drawable="@drawable/beatscratch_icon_black_piano"
+  android:insetBottom="6.96dp"
+  android:insetLeft="4.8dp"
+  android:insetRight="4.8dp"
+  android:insetTop="2.64dp"
+  />

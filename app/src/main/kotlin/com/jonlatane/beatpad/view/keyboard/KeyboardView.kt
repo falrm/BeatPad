@@ -34,7 +34,10 @@ class KeyboardView @JvmOverloads constructor(
   override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
     super.onLayout(changed, left, top, right, bottom)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-      systemGestureExclusionRects = listOf(exclusionRect.also { it.set(0, 0, right, bottom) })
+      systemGestureExclusionRects = when {
+        bottom - top > 0 -> listOf(exclusionRect.also { it.set(0, 0, right-left, bottom-top) })
+        else             -> emptyList()
+      }
     }
   }
 

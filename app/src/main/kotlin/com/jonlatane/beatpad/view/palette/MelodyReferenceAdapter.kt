@@ -19,14 +19,9 @@ import kotlin.properties.Delegates
 class MelodyReferenceAdapter(
 	val viewModel: PaletteViewModel,
 	val recyclerView: _RecyclerView,
-	initialPart: Int = 0
+	private val partHolder: PartHolder
 ) : SmartAdapter<MelodyReferenceHolder>() {
-  init {
-//    setHasStableIds(true)
-  }
-	var partPosition by Delegates.observable(initialPart) {
-		_, _, _ -> notifyDataSetChanged()
-	}
+	val partPosition: Int get() = partHolder.adapterPosition
 	val part: Part? get() = viewModel.palette.parts.getOrNull(partPosition)
 
 	val itemTouchHelper = ItemTouchHelper(object: ItemTouchHelper.Callback() {

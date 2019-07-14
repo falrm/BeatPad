@@ -3,17 +3,12 @@ package com.jonlatane.beatpad.output.service
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.IBinder
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationCompat.PRIORITY_DEFAULT
-import android.support.v4.app.NotificationCompat.PRIORITY_MAX
 import android.support.v4.media.app.NotificationCompat.MediaStyle
-import android.widget.RemoteViews
-import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.SplashActivity
 import com.jonlatane.beatpad.midi.AndroidMidi
@@ -134,7 +129,7 @@ class PlaybackService : Service(), AnkoLogger {
 
     val sectionName = BeatClockPaletteConsumer.section?.name ?: "..."
     val notification = NotificationCompat.Builder(this, channelId)
-      .setSmallIcon(R.drawable.beatscratch_icon_notification_inset_slight)
+      .setSmallIcon(R.drawable.beatscratch_icon_inset_slight_transparent_keys)
       .setContentTitle("MIDI Playback")
       .setTicker("MIDI Playback")
       .setPriority(PRIORITY_DEFAULT)

@@ -128,7 +128,7 @@ class PaletteViewModel(
        editMelodyMode()
     } else {
       if(old != new) {
-        melodyView.context.storePalette(palette)
+        save()
       }
       partListMode(old)
     }
@@ -181,19 +181,6 @@ class PaletteViewModel(
     }
     else                                    -> false
   }
-
-//  fun onBackPressed(): Boolean {
-//    val result = harmonyViewModel.isChoosingHarmonyChord || editingMix || editingMelody != null
-//    if(harmonyViewModel.isChoosingHarmonyChord) {
-//      harmonyViewModel.isChoosingHarmonyChord = false
-//      harmonyViewModel.selectedHarmonyElements = null
-//    } else if(editingMix) {
-//      editingMix = false
-//    } else {
-//      editingMelody = null
-//    }
-//    return result
-//  }
 
   fun notifySectionChange() {
     harmonyViewModel.apply {

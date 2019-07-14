@@ -144,9 +144,13 @@ class MelodyViewModel(
 
 
 
-	fun enableMelodyReference(melody: Melody<*>, melodyReference: Section.MelodyReference?) {
+	fun enableMelodyReference(
+    melody: Melody<*>,
+    melodyReference: Section.MelodyReference?,
+    section: Section = BeatClockPaletteConsumer.section!!
+  ) {
 		if(melodyReference == null) {
-			BeatClockPaletteConsumer.section?.melodies?.add(
+      section.melodies.add(
 				Section.MelodyReference(melody, 0.5f, Section.PlaybackType.Indefinite)
 			)
 		} else if(melodyReference.isDisabled) {
