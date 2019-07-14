@@ -31,7 +31,8 @@ class MelodyViewModel(
 	val melodyReference get() = openedMelody?.let { melody ->
 		BeatClockPaletteConsumer.section?.let { section ->
 			section.melodies.firstOrNull { it.melody == melody }
-				?: Section.MelodyReference(melody).also { section.melodies.add(it) }
+				?: Section.MelodyReference(melody, playbackType = Section.PlaybackType.Disabled)
+					.also { section.melodies.add(it) }
 		}
 	}
 	val isMelodyReferenceEnabled: Boolean get()  = melodyReference != null && !melodyReference!!.isDisabled

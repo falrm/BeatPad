@@ -6,6 +6,8 @@
           android:id="@+id/openPalette"/>
     <item android:title="Duplicate Palette..."
           android:id="@+id/duplicatePalette"/>
+    <item android:title="Save Palette"
+          android:id="@+id/savePalette"/>
     <item android:title="Copy Palette"
           android:id="@+id/copyPalette"/>
     <item android:title="About BeatScratch"

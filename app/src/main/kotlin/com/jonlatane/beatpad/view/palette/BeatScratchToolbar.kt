@@ -12,6 +12,7 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.view.palette.filemanagement.PaletteManagementDialog
 import io.multifunctions.let
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -22,9 +23,7 @@ class BeatScratchToolbar(
   override val storageContext: Context,
   val viewModel: PaletteViewModel
 ) : _LinearLayout(storageContext), AnkoLogger, Storage {
-  private val metronomeImage = context.resources.getDrawable(R.drawable.noun_metronome_415494_000000, null).apply {
-    setBounds(0, 0, 60, 60)
-  }
+  private val paletteManagement = PaletteManagementDialog(context, viewModel)
 
   init {
     backgroundColor = context.color(R.color.colorPrimaryDark)
@@ -55,6 +54,10 @@ class BeatScratchToolbar(
     inflate(R.menu.beatscratch_app_menu)
     setOnMenuItemClickListener { item ->
       when (item.itemId) {
+        R.id.newPalette -> paletteManagement.show(PaletteManagementDialog.Mode.NEW)
+        R.id.openPalette -> paletteManagement.show(PaletteManagementDialog.Mode.OPEN)
+        R.id.duplicatePalette -> paletteManagement.show(PaletteManagementDialog.Mode.DUPLICATE)
+        R.id.savePalette -> viewModel.save()
         R.id.copyPalette -> copyPalette()
         else             -> context.toast("TODO!")
       }

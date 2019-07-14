@@ -13,7 +13,6 @@ import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onValueChanged
 
 class LengthDialog(context: Context, val melodyViewModel: MelodyViewModel) {
@@ -33,13 +32,14 @@ class LengthDialog(context: Context, val melodyViewModel: MelodyViewModel) {
   }
 
   fun show() {
-    (lengthLayout.parent as? ViewGroup)?.removeView(lengthLayout)
+    // Needed to prevent error on call to show()
+    (baseLayout.parent as? ViewGroup)?.removeView(baseLayout)
     alert.show()
   }
-  private lateinit var lengthLayout: RelativeLayout
+  private lateinit var baseLayout: RelativeLayout
   private val alert = context.alert {
     customView {
-      lengthLayout = relativeLayout {
+      baseLayout = relativeLayout {
         val numberPickers = linearLayout {
           orientation = LinearLayout.HORIZONTAL
           id = View.generateViewId()

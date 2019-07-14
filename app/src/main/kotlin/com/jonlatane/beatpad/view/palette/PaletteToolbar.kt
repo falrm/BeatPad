@@ -15,6 +15,7 @@ import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.view.colorboard.ColorboardConfiguration
 import com.jonlatane.beatpad.view.keyboard.KeyboardConfiguration
 import com.jonlatane.beatpad.view.orbifold.OrbifoldConfiguration
+import com.jonlatane.beatpad.view.palette.filemanagement.PaletteManagementDialog
 import com.jonlatane.beatpad.view.tempo.TempoConfiguration
 import com.jonlatane.beatpad.view.tempo.TempoTracking
 import org.jetbrains.anko.*

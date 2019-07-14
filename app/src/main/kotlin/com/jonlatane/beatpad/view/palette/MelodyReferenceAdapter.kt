@@ -23,6 +23,7 @@ class MelodyReferenceAdapter(
 ) : SmartAdapter<MelodyReferenceHolder>() {
 	val partPosition: Int get() = partHolder.adapterPosition
 	val part: Part? get() = viewModel.palette.parts.getOrNull(partPosition)
+	override fun getItemCount(): Int = part?.melodies?.let { it.size + 1 } ?: 0
 
 	val itemTouchHelper = ItemTouchHelper(object: ItemTouchHelper.Callback() {
 		init {
@@ -79,18 +80,6 @@ class MelodyReferenceAdapter(
 		holder.onPositionChanged()
 	}
 
-	private fun insert(melody: Melody<*>) {
-		part?.let { part ->
-			while(viewModel.palette.parts.flatMap { it.melodies }.any { it.id == melody.id }) {
-				melody.relatedMelodies.add(melody.id)
-				melody.id = UUID.randomUUID()
-			}
-			part.melodies.add(melody)
-			notifyItemInserted(part.melodies.size - 1)
-			//notifyItemChanged(part.melodies.size)
-		}
-	}
-
 	fun createAndOpenDrawnMelody(
 		newMelody: Melody<*> = PaletteStorage.baseMelody.also {
 			// Don't try to conform drum parts to harmony
@@ -106,7 +95,10 @@ class MelodyReferenceAdapter(
 		BeatClockPaletteConsumer.section?.melodies?.add(
 			Section.MelodyReference(newMelody, 0.5f, Section.PlaybackType.Indefinite)
 		)
-		insert(newMelody)
+		part?.apply {
+			melodies.add(newMelody)
+			notifyItemInserted(melodies.size - 1)
+		}
 		doAsync {
 			Thread.sleep(300L)
 			uiThread {
@@ -114,10 +106,4 @@ class MelodyReferenceAdapter(
 			}
 		}
 	}
-
-	override fun getItemCount(): Int = part?.melodies
-		?.let { it.size + 1 } ?: 0
-
-//  override fun getItemId(position: Int): Long
-//    = part?.melodies?.getOrNull(position)?.id?.mostSignificantBits ?: 0L
 }
