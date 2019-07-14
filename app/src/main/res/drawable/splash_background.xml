@@ -5,7 +5,7 @@
   <item
     android:width="200dp"
     android:height="200dp"
-    android:drawable="@drawable/beatscratch_icon_inset_slight_black_piano"
+    android:drawable="@drawable/launcher_icon_foreground"
     android:gravity="center" />
 
 </layer-list>
