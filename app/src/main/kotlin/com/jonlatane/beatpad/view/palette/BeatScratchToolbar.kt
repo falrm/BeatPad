@@ -38,7 +38,7 @@ class BeatScratchToolbar(
   }
 
   val appButton: ImageButton = imageButton {
-    imageResource = R.drawable.beatscratch_icon_inset
+    imageResource = R.drawable.beatscratch_icon_toolbar
     backgroundResource = R.drawable.toolbar_button_beatscratch
     padding = dip(0)
     scaleType = ImageView.ScaleType.FIT_CENTER
