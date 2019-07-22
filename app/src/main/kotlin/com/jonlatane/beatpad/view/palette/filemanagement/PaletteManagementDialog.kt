@@ -6,9 +6,11 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
+import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.InstaRecycler
 import com.jonlatane.beatpad.view.nonDelayedRecyclerView
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
@@ -42,6 +44,7 @@ class PaletteManagementDialog(context: Context, val paletteViewModel: PaletteVie
           id = View.generateViewId()
           typeface = MainApplication.chordTypefaceBold
           textSize = 18f
+          padding = dip(16)
         }.lparams(wrapContent, wrapContent) {
           centerHorizontally()
           alignParentTop()
@@ -72,11 +75,35 @@ class PaletteManagementDialog(context: Context, val paletteViewModel: PaletteVie
           }
         ).also {
           it.id = View.generateViewId()
+          it.padding = dip(16)
         }.lparams(matchParent, wrapContent) {
           below(titleText)
           alignParentLeft()
           alignParentRight()
           minimumHeight = dip(200)
+        }
+
+        linearLayout {
+          orientation = LinearLayout.HORIZONTAL
+          padding = dip(16)
+
+          editPaletteName = editText {
+            id = View.generateViewId()
+            typeface = MainApplication.chordTypeface
+          }.lparams(matchParent, wrapContent) {
+            weight = 1f
+          }
+
+          val saveButton = button {
+            text = "Save"
+            typeface = MainApplication.chordTypeface
+            backgroundResource = R.drawable.toolbar_button
+          }.lparams(wrapContent, wrapContent) {
+            weight = 0f
+          }
+        }.lparams(matchParent, wrapContent) {
+          below(paletteRecycler)
+          alignParentLeft()
         }
 
 
