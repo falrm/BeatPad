@@ -57,7 +57,7 @@ class BeatScratchToolbar(
         R.id.newPalette -> paletteManagement.show(PaletteManagementDialog.Mode.NEW)
         R.id.openPalette -> paletteManagement.show(PaletteManagementDialog.Mode.OPEN)
         R.id.duplicatePalette -> paletteManagement.show(PaletteManagementDialog.Mode.DUPLICATE)
-        R.id.savePalette -> viewModel.save()
+        R.id.savePalette -> { context.toast("Saving..."); viewModel.save() }
         R.id.copyPalette -> copyPalette()
         else             -> context.toast("TODO!")
       }

@@ -214,7 +214,7 @@ class PaletteUI constructor(
       orientation = LinearLayout.VERTICAL
     }.lparams {
       //TODO: re-enable the toolbar
-      width = wrapContent
+      width = dip(48)
 //      width = 0
       height = matchParent
       rightOf(viewModel.sectionListView)

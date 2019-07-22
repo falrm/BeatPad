@@ -9,6 +9,10 @@ import org.jetbrains.anko.custom.ankoView
 //inline fun ViewManager.numberPickerWithTypeface(theme: Int = 0, init: NumberPickerWithTypeface.() -> Unit)
 //	= ankoView({ NumberPickerWithTypeface(it) }, theme, init)
 
+
+inline fun ViewManager.hideableLinearLayout(theme: Int = 0, init: HideableLinearLayout.() -> Unit = {})
+	= ankoView({ HideableLinearLayout(it) }, theme, init)
+
 fun ViewManager.nonDelayedHorizontalScrollView(theme: Int = 0)
 	= nonDelayedHorizontalScrollView(theme) {}
 
@@ -32,7 +36,7 @@ fun ViewManager.hideableRecyclerView(theme: Int = 0)
   = hideableRecyclerView(theme) {}
 
 inline fun ViewManager.hideableRecyclerView(theme: Int = 0, init: HideableRecyclerView.() -> Unit)
-  = ankoView({ HideableRecyclerView(it) }, theme, init)
+	= ankoView({ HideableRecyclerView(it) }, theme, init)
 
 fun ViewManager.nonDelayedRecyclerView(theme: Int = 0)
 	= nonDelayedRecyclerView(theme) {}

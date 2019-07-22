@@ -30,7 +30,6 @@ interface Storage : AnkoLogger {
     private const val baseHarmonyDir = "harmonies"
     private const val openPaletteFileName = "palette.json"
 
-
     fun getPalettes(context: Context): List<File> {
       File(context.paletteDir).mkdirs()
       return (File(context.paletteDir).listFiles() ?: emptyArray())
@@ -96,11 +95,21 @@ interface Storage : AnkoLogger {
     fallbackToBackup
   )
 
-  fun Context.storePalette(palette: Palette, filename: String = openPaletteFileName) = storePalette(
-    palette, File("$paletteDir$separator$filename")
+  fun Context.storePalette(
+    palette: Palette,
+    filename: String = openPaletteFileName,
+    showSuccessToast: Boolean = false
+  ) = storePalette(
+    palette,
+    File("$paletteDir$separator$filename"),
+    showSuccessToast
   )
 
-  fun Context.storePalette(palette: Palette, file: File) = doAsync {
+  fun Context.storePalette(
+    palette: Palette,
+    file: File,
+    showSuccessToast: Boolean = false
+  ) = doAsync {
     val tmpFile = file.newTmpVersion
     val backupFile = file.backup
 
@@ -136,6 +145,8 @@ interface Storage : AnkoLogger {
 
     if (!success) {
       uiThread { toast("Failed to save palette!") }
+    } else if(showSuccessToast) {
+      uiThread { toast("Saved Palette!") }
     }
   }
 
