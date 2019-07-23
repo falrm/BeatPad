@@ -18,6 +18,10 @@ class SplashActivity : AppCompatActivity(), Storage {
     super.onCreate(savedInstanceState)
     // Start home activity
     //Thread.sleep(10000L)
+    // Load all the typefaces
+    MainApplication.chordTypeface
+    MainApplication.chordTypefaceBold
+    MainApplication.chordTypefaceRegular
 
     // Deserialize any Melody data opened.
     if (Intent.ACTION_VIEW == intent.action) {

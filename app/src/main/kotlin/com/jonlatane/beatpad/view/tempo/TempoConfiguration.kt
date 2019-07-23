@@ -4,6 +4,7 @@ import android.support.constraint.ConstraintSet
 import android.view.View
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.view.BaseConfiguration
+import com.jonlatane.beatpad.view.numberPickerWithTypeface
 import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder
 import org.jetbrains.anko.constraint.layout.applyConstraintSet
@@ -19,7 +20,7 @@ interface TempoConfiguration: BaseConfiguration {
           typeface = MainApplication.chordTypefaceBold
           textSize = 18f
         }
-        val picker = numberPicker {
+        val picker = numberPickerWithTypeface {
           id = View.generateViewId()
 //            textSize = 16f
           maxValue = 960

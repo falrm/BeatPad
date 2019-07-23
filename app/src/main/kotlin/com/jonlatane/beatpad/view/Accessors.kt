@@ -1,6 +1,8 @@
 package com.jonlatane.beatpad.view
 
+import android.graphics.Typeface
 import android.view.ViewManager
+import com.jonlatane.beatpad.MainApplication
 import org.jetbrains.anko.custom.ankoView
 
 
@@ -30,6 +32,12 @@ fun ViewManager.noDefaultSpinner(theme: Int = 0)
 
 inline fun ViewManager.noDefaultSpinner(theme: Int = 0, init: NoDefaultSpinner.() -> Unit)
 	= ankoView({ NoDefaultSpinner(it) }, theme, init)
+
+inline fun ViewManager.numberPickerWithTypeface(
+	theme: Int = 0,
+	init: NumberPickerWithTypeface.() -> Unit = {}
+)
+	= ankoView({ NumberPickerWithTypeface(it) }, theme, init)
 
 
 fun ViewManager.hideableRecyclerView(theme: Int = 0)
