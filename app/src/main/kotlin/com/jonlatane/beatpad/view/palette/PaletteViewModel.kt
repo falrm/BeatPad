@@ -185,7 +185,7 @@ class PaletteViewModel(
   fun notifySectionChange() {
     harmonyViewModel.apply {
       notifyHarmonyChanged()
-      editingChord = null
+      isChoosingHarmonyChord = false
       selectedHarmonyElements = null
     }
     beatScratchToolbar.updateButtonColors()
@@ -314,6 +314,8 @@ class PaletteViewModel(
   fun hideOrbifold(animated: Boolean = true) {
     toolbarView.orbifoldButton.backgroundResource = R.drawable.toolbar_button
     toolbarView.updateInstrumentButtonPaddings()
+    harmonyViewModel.isChoosingHarmonyChord = false
+    harmonyViewModel.selectedHarmonyElements = null
     orbifold.hide(
       animation = if (orbifold.context.configuration.portrait) {
         HideAnimation.VERTICAL

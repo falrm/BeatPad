@@ -53,19 +53,23 @@ open class HarmonyViewModel(
   }
 
   var selectedHarmonyElements: IntRange? = null
-  set(value) {
+  internal set(value) {
     field = value
     notifyHarmonyChanged()
     beatAdapter.notifyDataSetChanged()
   }
+  /**
+   * Get: get the current chord being edited (per [isChoosingHarmonyChord]/[selectedHarmonyElements]),
+   *      or null if a chord isn't being edited
+   * Set:
+   *      When [selectedHarmonyElements] is not null, sets the chord at the beginning of the selection.
+   *      When [selectedHarmonyElements] is null, setting to anything other than null is an error.
+   */
   var editingChord: Chord?
   get() = selectedHarmonyElements?.let {
     harmony!!.changeBefore(it.first)
   }
   set(value) {
-    if(value == null) {
-      selectedHarmonyElements = null
-    }
     selectedHarmonyElements?.let {
       harmony!!.changes[it.first] = value
     }

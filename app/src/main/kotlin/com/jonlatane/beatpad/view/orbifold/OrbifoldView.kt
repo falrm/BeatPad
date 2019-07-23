@@ -88,13 +88,14 @@ class OrbifoldView @JvmOverloads constructor(
       }
     }
   }
+  var keyboardWasShowingBeforeCustomMode: Boolean = true
   var customChordMode: Boolean = false
   set(value) {
     field = value
     customButton.text = if(value) "Done" else "Custom"
     if(value) {
       orbifoldBeforeCustomMode = orbifold
-      val keyboardWasShowingBeforeCustomMode = keyboard?.isHidden == false
+      keyboardWasShowingBeforeCustomMode = keyboard?.isHidden == false
       this@OrbifoldView.orbifold = Orbifold.custom
       if(keyboard?.isHidden == true) {
         keyboard?.show()
@@ -114,16 +115,9 @@ class OrbifoldView @JvmOverloads constructor(
             }
         }
 
-      BeatClockPaletteConsumer.viewModel?.backStack?.push {
+      viewModel?.backStack?.push {
         if (customChordMode) {
           customChordMode = false
-          if(!keyboardWasShowingBeforeCustomMode) {
-            keyboard?.hide()
-          }
-          drumPartBeforeCustomMode?.let {
-            viewModel?.keyboardPart = it
-            viewModel?.keyboardView?.ioHandler?.highlightChord(null)
-          }
           true
         } else false
       }
@@ -132,6 +126,9 @@ class OrbifoldView @JvmOverloads constructor(
       drumPartBeforeCustomMode?.let {
         viewModel?.keyboardPart = it
         viewModel?.keyboardView?.ioHandler?.highlightChord(null)
+      }
+      if(!keyboardWasShowingBeforeCustomMode) {
+        keyboard?.hide()
       }
       orbifoldBeforeCustomMode = null
       keyboard?.ioHandler?.onEstablishedChordChanged = null
@@ -213,7 +210,7 @@ class OrbifoldView @JvmOverloads constructor(
       text = "/"
       textScaleX = 5f
       isEnabled = false
-      alpha = 1f
+      alpha = 0f
       typeface = MainApplication.chordTypefaceBold
       onClick {
         //showOrbifoldPicker(this@OrbifoldView)
