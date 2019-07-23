@@ -37,6 +37,8 @@ class MelodyBeatView constructor(
   override val filledNoteheadPool = DrawablePool(R.drawable.notehead_filled, context)
   override val sharpPool = DrawablePool(R.drawable.sharp, context)
   override val flatPool = DrawablePool(R.drawable.flat, context)
+  override val doubleSharpPool = DrawablePool(R.drawable.doublesharp, context)
+  override val doubleFlatPool = DrawablePool(R.drawable.doubleflat, context)
   override val naturalPool = DrawablePool(R.drawable.natural_sign, context)
   override val xNoteheadPool: DrawablePool = DrawablePool(R.drawable.notehead_x, context)
 

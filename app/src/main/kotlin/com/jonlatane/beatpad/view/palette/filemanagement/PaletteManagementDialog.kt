@@ -22,11 +22,12 @@ class PaletteManagementDialog(val context: Context, val paletteViewModel: Palett
   private lateinit var editArea: LinearLayout
   enum class Mode(
     val titleText: String,
-    val buttonText: String?
+    val buttonText: String?,
+    val textEditable: Boolean = true
   ) {
     NEW("New Palette", "Create"),
     DUPLICATE("Save Palette As", "Save"),
-    OPEN("Open Palette", "Open")
+    OPEN("Open Palette", "Open", textEditable = false)
   }
 
   fun show(mode: Mode) {
@@ -37,6 +38,7 @@ class PaletteManagementDialog(val context: Context, val paletteViewModel: Palett
       paletteViewModel.save()
     }
     (lengthLayout.parent as? ViewGroup)?.removeView(lengthLayout)
+    editPaletteName.isEnabled = mode.textEditable
     alert.show()
   }
   private lateinit var lengthLayout: RelativeLayout

@@ -16,10 +16,7 @@ import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.dsl.Patterns
 import com.jonlatane.beatpad.storage.Storage
-import com.jonlatane.beatpad.util.color
-import com.jonlatane.beatpad.util.mod12
-import com.jonlatane.beatpad.util.size
-import com.jonlatane.beatpad.util.vibrate
+import com.jonlatane.beatpad.util.*
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.withAlpha
 
@@ -57,6 +54,7 @@ class HarmonyBeatView constructor(
 
     editChangeMenu = PopupMenu(context, this)
     editChangeMenu.inflate(R.menu.harmony_element_menu)
+    editChangeMenu.applyTypeface()
     editChangeMenu.setOnDismissListener {
       viewModel.apply {
         if(!isChoosingHarmonyChord) selectedHarmonyElements = null

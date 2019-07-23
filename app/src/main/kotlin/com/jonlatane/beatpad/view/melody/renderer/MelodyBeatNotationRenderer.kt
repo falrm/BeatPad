@@ -77,6 +77,8 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
 
   val sharpPool: DrawablePool
   val flatPool: DrawablePool
+  val doubleSharpPool: DrawablePool
+  val doubleFlatPool: DrawablePool
   val naturalPool: DrawablePool
   val filledNoteheadPool: DrawablePool
   val xNoteheadPool: DrawablePool
@@ -173,14 +175,14 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
       .subSet(lastDownbeat * melody.subdivisionsPerBeat, true, melodyPosition, true)
       .reversed()
       .any { changeIndex ->
+        val chordAtTheTime = chordAt(changeIndex)!!
         val change = melody.changes[changeIndex]
         val tones: Set<Int> = (change.let {
           (it as? RationalMelody.Element)?.tones
         } ?: emptySet<Int>()).filter {
-          !(changeIndex == melodyPosition && note.tone == it)
+          !(changeIndex == melodyPosition && note.tone == melody.playbackToneUnder(it, chordAtTheTime))
         }.toSet()
 
-        val chordAtTheTime = chordAt(changeIndex)!!
         val playbackNotes = tones.map {
           val playbackTone = melody.playbackToneUnder(it, chordAtTheTime)
           Note.nameNoteUnderChord(playbackTone, chordAtTheTime)
@@ -202,13 +204,9 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     alphaSource: Float,
     stemsUp: Boolean = true
   ) {
-    val element: Transposable<*>? = melody.changes[elementPosition % melody.length]
-    val nextElement: Transposable<*>? = melody.changes[elementPosition % melody.length]
-    val isChange = element != null
-    //paint.color = (if (isChange) 0xAA212121.toInt() else 0xAA424242.toInt()).withAlpha((alphaSource * drawAlpha).toInt())
-
     try {
-      val tones: Set<Int> = melody.changeBefore(elementPosition % melody.length).let {
+      val change = melody.changeBefore(elementPosition % melody.length)
+      val tones: Set<Int> = change.let {
         (it as? RationalMelody.Element)?.tones
       } ?: emptySet()
 
@@ -273,12 +271,19 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
               Note.Sign.Flat -> null
               else -> flatPool
             }
+            Note.Sign.DoubleSharp -> when(previousSign) {
+              Note.Sign.DoubleSharp -> null
+              else -> doubleSharpPool
+            }
+            Note.Sign.DoubleFlat -> when(previousSign) {
+              Note.Sign.DoubleFlat -> null
+              else -> doubleFlatPool
+            }
             Note.Sign.Natural -> when(previousSign) {
               Note.Sign.Natural -> null
               null -> null
               else -> naturalPool
             }
-            else            -> null
           }?.borrow()
             ?.apply { alpha = (255 * alphaSource).toInt() }
             ?.let { drawable ->
@@ -288,8 +293,12 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
                 (bounds.right - 2.5f * noteheadWidth).toInt() to (bounds.right - 2.0f * noteheadWidth).toInt()
               }
               val (signTop, signBottom) = when (note.sign) {
-                Note.Sign.Flat -> top - 2 * noteheadHeight / 3 to bottom
-                else           -> top - noteheadHeight / 3 to bottom + noteheadHeight / 3
+                Note.Sign.Flat, Note.Sign.DoubleFlat ->
+                  top - 2 * noteheadHeight / 3 to bottom
+                Note.Sign.DoubleSharp ->
+                  top + noteheadHeight / 4 to bottom - noteheadHeight / 4
+                Note.Sign.Sharp, Note.Sign.Natural ->
+                  top - noteheadHeight / 3 to bottom + noteheadHeight / 3
               }
               drawable.setBounds(signLeft, signTop, signRight, signBottom)
               drawable.alpha = (255 * alphaSource).toInt()

@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.view.palette
 
+import BeatClockPaletteConsumer
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -11,6 +12,7 @@ import android.widget.PopupMenu
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.storage.Storage
+import com.jonlatane.beatpad.util.applyTypeface
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.view.palette.filemanagement.PaletteManagementDialog
 import io.multifunctions.let
@@ -50,8 +52,12 @@ class BeatScratchToolbar(
 //      MainApplication.instance.startService(startIntent)
     }
   }.beatScratchToolbarStyle()
+
   private val appMenu = PopupMenu(context, appButton).apply {
     inflate(R.menu.beatscratch_app_menu)
+
+    applyTypeface()
+
     setOnMenuItemClickListener { item ->
       when (item.itemId) {
         R.id.newPalette -> paletteManagement.show(PaletteManagementDialog.Mode.NEW)

@@ -338,6 +338,7 @@ class PaletteViewModel(
   fun hideKeyboard(animated: Boolean = true) {
     toolbarView.keysButton.backgroundResource = R.drawable.toolbar_button
     toolbarView.updateInstrumentButtonPaddings()
+    orbifold.customChordMode = false
     keyboardView.hide(animated)
   }
 

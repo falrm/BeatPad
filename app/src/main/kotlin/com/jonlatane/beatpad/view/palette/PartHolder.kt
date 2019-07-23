@@ -11,6 +11,7 @@ import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showInstrumentPicker2
+import com.jonlatane.beatpad.util.applyTypeface
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.vibrate
 import org.jetbrains.anko.*
@@ -55,6 +56,7 @@ class PartHolder(
 
 	init {
 		editPartMenu.inflate(R.menu.part_edit_menu)
+		editPartMenu.applyTypeface()
     editPartMenu.setOnMenuItemClickListener { item ->
       when (item.itemId) {
         R.id.editPartInstrument -> editInstrument()
@@ -86,6 +88,7 @@ class PartHolder(
       true
     }
     newPartMenu.inflate(R.menu.part_new_menu)
+		newPartMenu.applyTypeface()
     newPartMenu.setOnMenuItemClickListener { item ->
       when (item.itemId) {
         R.id.newMidiPart -> adapter.addPart()

@@ -17,6 +17,7 @@ import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showRenameDialog
 import com.jonlatane.beatpad.storage.Storage
+import com.jonlatane.beatpad.util.applyTypeface
 import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import com.jonlatane.beatpad.util.smartrecycler.updateSmartHolders
 import org.jetbrains.anko.*
@@ -110,6 +111,7 @@ class SectionHolder(
   val menu: PopupMenu by lazy {
     PopupMenu(parent.context, sectionName).also { popupMenu ->
       popupMenu.inflate(R.menu.section_menu)
+      popupMenu.applyTypeface()
       popupMenu.setOnMenuItemClickListener { item ->
         when (item) {
           renameSection -> {

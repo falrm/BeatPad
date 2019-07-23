@@ -44,14 +44,14 @@ data class Note private constructor(
     companion object {
       fun fromNoteNameString(string: String): Sign = values().maxBy {
         when {
-          string.endsWith(it.name) -> it.stringValue.length
+          string.endsWith(it.stringValue) -> it.stringValue.length
           else                     -> 0
         }
       }!!
     }
   }
   val stringValue: String get() = "${letter.name}${sign.stringValue}$octave"
-  val heptatonicValue get() = 8 * octave + letter.letterOffset
+  val heptatonicValue get() = 7 * octave + letter.letterOffset
 
   companion object {
     fun nameNoteUnderChord(tone: Int, chord: Chord): Note {
@@ -95,7 +95,10 @@ data class Note private constructor(
             it.letter == rootNote.letter + 6
           }
         }
-        11   -> notesFor[tone]!!.first { it.letter == (rootNote.letter + 6) }
+        11   -> when(rootNote.sign) {
+          Sign.DoubleSharp -> notesFor[tone]!!.first { it.letter == rootNote.letter }
+          else -> notesFor[tone]!!.first { it.letter == (rootNote.letter + 6) }
+        }
         else -> TODO()
       }
     }

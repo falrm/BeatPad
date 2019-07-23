@@ -27,11 +27,15 @@ class MainApplication : Application() {
       private set
 
     val chordTypeface by lazy {
-      Typeface.createFromAsset(instance.assets, "font/gilroy_regular.otf")
+      Typeface.createFromAsset(instance.assets, "font/vulf_sans_light.otf")
+    }
+
+    val chordTypefaceRegular by lazy {
+      Typeface.createFromAsset(instance.assets, "font/vulf_sans_regular.otf")
     }
 
     val chordTypefaceBold by lazy {
-      Typeface.createFromAsset(instance.assets, "font/gilroy_bold.otf")
+      Typeface.createFromAsset(instance.assets, "font/vulf_sans_medium.otf")
     }
   }
 }

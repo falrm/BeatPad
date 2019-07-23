@@ -12,10 +12,9 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
-import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showConfirmDialog
-import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.storage.Storage
+import com.jonlatane.beatpad.util.applyTypeface
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onSeekBarChangeListener
@@ -41,12 +40,13 @@ class MelodyReferenceHolder(
   private val context get() = adapter.recyclerView.context
 
 	private val newMelodyMenu = PopupMenu(layout.context, layout)
-	internal val editPatternMenu = PopupMenu(layout.context, layout)
+	internal val editMelodyMenu = PopupMenu(layout.context, layout)
   private val isMelodyReferenceEnabled: Boolean get()  = melodyReference != null && !melodyReference!!.isDisabled
   private val pasteMelody get() = newMelodyMenu.menu.findItem(R.id.pasteMelody)
 
 	init {
 		newMelodyMenu.inflate(R.menu.part_melody_new_menu)
+    newMelodyMenu.applyTypeface()
 		newMelodyMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
 				R.id.composeMidiMelody -> adapter.createAndOpenDrawnMelody()
@@ -56,8 +56,9 @@ class MelodyReferenceHolder(
 			}
 			true
 		}
-		editPatternMenu.inflate(R.menu.part_melody_edit_menu)
-		editPatternMenu.setOnMenuItemClickListener { item ->
+		editMelodyMenu.inflate(R.menu.part_melody_edit_menu)
+    editMelodyMenu.applyTypeface()
+		editMelodyMenu.setOnMenuItemClickListener { item ->
 			when (item.itemId) {
 				R.id.editMelody   -> viewModel.editingMelody = melody
 				R.id.removeMelody -> showConfirmDialog(
@@ -174,7 +175,7 @@ class MelodyReferenceHolder(
 					viewModel.editingMelody = melody
 				}
 				setOnLongClickListener {
-					editPatternMenu.show()
+					editMelodyMenu.show()
 					true
 				}
         alpha = if(!isMelodyReferenceEnabled) 0.5f else 1f

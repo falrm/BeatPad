@@ -13,7 +13,6 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.uiThread
 import java.util.*
-import kotlin.properties.Delegates
 
 
 class MelodyReferenceAdapter(
@@ -43,7 +42,7 @@ class MelodyReferenceAdapter(
 			if(viewHolder == null || target == null) return false
 			val fromPosition = viewHolder.adapterPosition
 			val toPosition = target.adapterPosition
-			(viewHolder as? MelodyReferenceHolder)?.editPatternMenu?.dismiss()
+			(viewHolder as? MelodyReferenceHolder)?.editMelodyMenu?.dismiss()
 			return part?.let { part ->
 				if(toPosition >= part.melodies.size || fromPosition >= part.melodies.size) return false
 				if (fromPosition < toPosition) {

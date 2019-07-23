@@ -57,6 +57,7 @@ class OrbifoldView @JvmOverloads constructor(
   }
   var keyboard: KeyboardView? = null
   internal val customButton: Button
+  internal val slashButton: Button
   internal val modeButton: Button
   internal var centralChord: TextView
   internal lateinit var centralChordBackground: View
@@ -73,7 +74,7 @@ class OrbifoldView @JvmOverloads constructor(
   set(value) {
     field = value
     if(value) {
-      listOf(customButton, modeButton).forEach {
+      listOf(customButton, modeButton, slashButton).forEach {
         it.isEnabled = true
         it.animate().alpha(1f)
       }
@@ -81,7 +82,7 @@ class OrbifoldView @JvmOverloads constructor(
       //TODO: Make this work with animateTo
       selectedChord = null
       animateTo(InitialState)
-      listOf(customButton, modeButton).forEach {
+      listOf(customButton, modeButton, slashButton).forEach {
         it.isEnabled = false
         it.animate().alpha(0f)
       }
@@ -186,6 +187,7 @@ class OrbifoldView @JvmOverloads constructor(
       text = "Mode"
       isEnabled = false
       alpha = 0f
+      typeface = MainApplication.chordTypefaceBold
       onClick {
         showOrbifoldPicker(this@OrbifoldView)
       }
@@ -198,12 +200,27 @@ class OrbifoldView @JvmOverloads constructor(
       text = "Custom"
       isEnabled = false
       alpha = 0f
+      typeface = MainApplication.chordTypefaceBold
       onClick {
         customChordMode = ! customChordMode
       }
     }.lparams {
       alignParentBottom()
       alignParentLeft()
+      elevation = 1f
+    }
+    slashButton = button {
+      text = "/"
+      textScaleX = 5f
+      isEnabled = false
+      alpha = 1f
+      typeface = MainApplication.chordTypefaceBold
+      onClick {
+        //showOrbifoldPicker(this@OrbifoldView)
+      }
+    }.lparams {
+      alignParentTop()
+      alignParentRight()
       elevation = 1f
     }
 
