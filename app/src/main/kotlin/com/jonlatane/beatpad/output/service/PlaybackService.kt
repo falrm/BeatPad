@@ -77,6 +77,7 @@ class PlaybackService : Service(), AnkoLogger {
         playbackThread.stopped = true
         BeatClockPaletteConsumer.tickPosition = 0
         BeatClockPaletteConsumer.viewModel?.playbackTick = 0
+        AndroidMidi.send(byteArrayOf(123.toByte()))// All notes off
         AndroidMidi.send(byteArrayOf(0xFF.toByte()))// Midi reset
         showNotification()
       }

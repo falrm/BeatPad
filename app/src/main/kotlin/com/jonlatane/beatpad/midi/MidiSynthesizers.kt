@@ -11,6 +11,7 @@ import org.jetbrains.anko.error
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.warn
 
+@RequiresApi(Build.VERSION_CODES.M)
 object MidiSynthesizers: AnkoLogger {
 	private const val maxSendRetries = 1000
 
@@ -18,7 +19,6 @@ object MidiSynthesizers: AnkoLogger {
 	private val outputDevices = mutableMapOf<MidiDeviceInfo, MidiInputPort>()
 	val synthesizers get() = outputDevices.keys
 
-	@RequiresApi(Build.VERSION_CODES.M)
 	internal fun setupSynthesizer(info: MidiDeviceInfo) {
 		val portNumber = info.ports.find {
 			it.type == MidiDeviceInfo.PortInfo.TYPE_INPUT

@@ -15,7 +15,6 @@ import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.view.colorboard.ColorboardConfiguration
 import com.jonlatane.beatpad.view.keyboard.KeyboardConfiguration
 import com.jonlatane.beatpad.view.orbifold.OrbifoldConfiguration
-import com.jonlatane.beatpad.view.palette.filemanagement.PaletteManagementDialog
 import com.jonlatane.beatpad.view.tempo.TempoConfiguration
 import com.jonlatane.beatpad.view.tempo.TempoTracking
 import org.jetbrains.anko.*
@@ -65,9 +64,9 @@ class PaletteToolbar(
     padding = dip(7)
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
-      val startIntent = Intent(MainApplication.instance, PlaybackService::class.java)
-      startIntent.action = PlaybackService.Companion.Action.STOP_ACTION
-      MainApplication.instance.startService(startIntent)
+      val stopIntent = Intent(MainApplication.instance, PlaybackService::class.java)
+      stopIntent.action = PlaybackService.Companion.Action.STOP_ACTION
+      MainApplication.instance.startService(stopIntent)
     }
   }.palletteToolbarStyle()
 

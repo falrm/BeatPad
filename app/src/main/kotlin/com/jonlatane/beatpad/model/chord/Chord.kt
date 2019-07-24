@@ -1,32 +1,24 @@
 package com.jonlatane.beatpad.model.chord
 
-import android.os.Parcel
-import android.os.Parcelable
 import com.jonlatane.beatpad.BuildConfig
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.chord.heptatonics.Heptatonics
 import com.jonlatane.beatpad.util.mod12
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 
-class Chord : Parcelable, Transposable<Chord> {
-	val root: Int
-	val extension: IntArray
-	val heptatonics: Heptatonics
+class Chord(
+	root: Int,
+	extension: IntArray,
+	val rootName: String = mod12Names[root.mod12],
+	val bassName: String = rootName
+) : Transposable<Chord> {
+	val root: Int = root.mod12
+	val extension: IntArray = (extension + 0).map { it.mod12 }.toSet().let {
+		if(BuildConfig.DEBUG) it.sorted() else it
+	}.toIntArray()
+	val heptatonics: Heptatonics = Heptatonics(this.extension.toSet())
 
-	constructor(root: Int, extension: IntArray) {
-		this.root = root.mod12
-		this.extension = (extension + 0).map { it.mod12 }.toSet().let {
-			if(BuildConfig.DEBUG) it.sorted() else it
-		}.toIntArray()
-		this.heptatonics = Heptatonics(this.extension.toSet())
-	}
 
-	private constructor(parcel: Parcel) {
-		root = parcel.readInt().mod12
-		extension = IntArray(parcel.readInt())
-		parcel.readIntArray(extension)
-		heptatonics = Heptatonics(setOf(*extension.toTypedArray()))
-	}
 
 	fun plus(vararg newTones: Int): Chord {
 		val newExtension = IntArray(extension.size + newTones.size)
@@ -142,8 +134,6 @@ class Chord : Parcelable, Transposable<Chord> {
 		return root
 	}
 
-	inline val rootName: String get() = mod12Names[root]
-
 	inline val name: String get() = rootName + heptatonics.colorString
 
 	fun containsTone(tone: Int): Boolean = containsColor(tone - root)
@@ -177,23 +167,25 @@ class Chord : Parcelable, Transposable<Chord> {
 		val mod12Names = arrayOf("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 		val mod7Names = arrayOf("C", "D", "E", "F", "G", "A", "B")
 
-		@JvmField
-		val CREATOR: Parcelable.Creator<Chord> = object : Parcelable.Creator<Chord> {
-			override fun createFromParcel(parcel: Parcel): Chord {
-				return Chord(parcel)
-			}
-
-			override fun newArray(size: Int): Array<Chord?> {
-				return arrayOfNulls(size)
-			}
-		}
+//		@JvmField
+//		val CREATOR: Parcelable.Creator<Chord> = object : Parcelable.Creator<Chord> {
+//			override fun createFromParcel(parcel: Parcel): Chord {
+//				return Chord(parcel)
+//			}
+//
+//			override fun newArray(size: Int): Array<Chord?> {
+//				return arrayOfNulls(size)
+//			}
+//		}
 	}
 
-	override fun describeContents(): Int = 0
-
-	override fun writeToParcel(dest: Parcel, flags: Int) {
-		dest.writeInt(root)
-		dest.writeInt(extension.size)
-		dest.writeIntArray(extension)
-	}
+//	override fun describeContents(): Int = 0
+//
+//	override fun writeToParcel(dest: Parcel, flags: Int) {
+//		dest.writeInt(root)
+//		dest.writeInt(extension.size)
+//		dest.writeIntArray(extension)
+//		dest.writeString(rootName)
+//		dest.writeString(bassName)
+//	}
 }

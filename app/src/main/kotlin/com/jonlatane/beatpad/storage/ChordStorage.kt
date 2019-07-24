@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.jonlatane.beatpad.model.chord.Chord
+import com.jonlatane.beatpad.util.mod12
 
 object ChordStorage {
 	object Serializer : StdSerializer<Chord>(Chord::class.java) {
@@ -16,17 +17,21 @@ object ChordStorage {
 			jgen.writeStartObject()
 			jgen.writeObjectField("root", value.root)
 			jgen.writeObjectField("extension", value.extension)
+			jgen.writeObjectField("rootName", value.rootName)
+			jgen.writeObjectField("bassName", value.bassName)
 			jgen.writeEndObject()
 		}
 	}
 	object Deserializer : StdDeserializer<Chord>(Chord::class.java) {
 		override fun deserialize(jp: JsonParser, context: DeserializationContext): Chord {
 			val mapper = jp.codec as ObjectMapper
-			val root = mapper.readTree<ObjectNode>(jp)
-			/*send you own condition*/
+			val node = mapper.readTree<ObjectNode>(jp)
+			val root = node["root"].asInt()
 			return Chord(
-				root = root["root"].asInt(),
-				extension =  root["extension"].asIterable().map { it.asInt() }.toIntArray()
+				root = root,
+				extension =  node["extension"].asIterable().map { it.asInt() }.toIntArray(),
+				rootName = node["rootName"]?.run{asText()} ?: Chord.mod12Names[root.mod12],
+				bassName = node["bassName"]?.run{asText()} ?: Chord.mod12Names[root.mod12]
 			)
 		}
 	}
