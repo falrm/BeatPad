@@ -6,6 +6,7 @@ import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Palette
+import com.jonlatane.beatpad.util.stringPref
 import net.iharder.Base64
 import org.jetbrains.anko.*
 import java.io.*
@@ -28,12 +29,14 @@ interface Storage : AnkoLogger {
     private const val basePaletteDir = "palettes"
     private const val baseMelodyDir = "melodies"
     private const val baseHarmonyDir = "harmonies"
-    private const val openPaletteFileName = "palette.json"
+    private val openPaletteFile: String by stringPref("openPaletteFile", "palette")
+    private val openPaletteFileName = "$openPaletteFile.json"
 
     fun getPalettes(context: Context): List<File> {
       File(context.paletteDir).mkdirs()
       return (File(context.paletteDir).listFiles() ?: emptyArray())
-        .filter { it.name.endsWith("~") }
+        .toList()
+        .filter { it.name.endsWith(".json") }
       //.map { it.name }
     }
 

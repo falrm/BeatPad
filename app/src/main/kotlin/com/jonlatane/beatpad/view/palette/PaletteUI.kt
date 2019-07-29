@@ -223,12 +223,13 @@ class PaletteUI constructor(
 
     viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
       id = R.id.toolbar
+      orientation = LinearLayout.VERTICAL
     }.lparams {
-      width = matchParent
-      height = wrapContent
+      width = dip(48)
+      height = matchParent
       rightOf(viewModel.beatScratchToolbar)
       alignParentTop()
-      alignParentRight()
+      alignParentBottom()
 
     }
 
@@ -240,8 +241,8 @@ class PaletteUI constructor(
     }.lparams {
       width = matchParent
       height = wrapContent
-      rightOf(viewModel.beatScratchToolbar)
-      below(viewModel.toolbarView)
+      rightOf(viewModel.toolbarView)
+      alignParentTop()
       alignParentRight()
     }
 
@@ -251,7 +252,7 @@ class PaletteUI constructor(
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      rightOf(viewModel.beatScratchToolbar)
+      rightOf(viewModel.toolbarView)
       below(viewModel.harmonyView)
       alignParentRight()
     }
@@ -261,7 +262,7 @@ class PaletteUI constructor(
       textSize = 25f
       background = context.getDrawable(R.drawable.orbifold_chord)
     }.lparams(0, dip(40)) {
-      rightOf(viewModel.beatScratchToolbar)
+      rightOf(viewModel.toolbarView)
       below(viewModel.harmonyView)
     }
 
@@ -272,7 +273,7 @@ class PaletteUI constructor(
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      rightOf(viewModel.beatScratchToolbar)
+      rightOf(viewModel.toolbarView)
       below(viewModel.harmonyView)
       alignParentRight()
     }

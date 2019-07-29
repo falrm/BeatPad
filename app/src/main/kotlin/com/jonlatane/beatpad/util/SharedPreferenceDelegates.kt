@@ -32,11 +32,10 @@ abstract class PrefDelegate<T>(val prefName: String?, val prefKey: String) {
 	abstract operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T)
 }
 
-fun stringPref(prefKey: String, defaultValue: String? = null) = StringPrefDelegate(null, prefKey, defaultValue)
-fun stringPref(prefName: String, prefKey: String, defaultValue: String? = null) = StringPrefDelegate(prefName, prefKey, defaultValue)
-class StringPrefDelegate(prefName: String?, prefKey: String, val defaultValue: String?) : PrefDelegate<String?>(prefName, prefKey) {
-	override fun getValue(thisRef: Any?, property: KProperty<*>) = prefs.getString(prefKey, defaultValue)
-	override fun setValue(thisRef: Any?, property: KProperty<*>, value: String?) = prefs.edit().putString(prefKey, value).apply()
+fun stringPref(prefKey: String, defaultValue: String) = StringPrefDelegate(prefKey, defaultValue)
+class StringPrefDelegate(prefKey: String, val defaultValue: String?) : PrefDelegate<String>(null, prefKey) {
+	override fun getValue(thisRef: Any?, property: KProperty<*>) = prefs.getString(prefKey, defaultValue)!!
+	override fun setValue(thisRef: Any?, property: KProperty<*>, value: String) = prefs.edit().putString(prefKey, value).apply()
 }
 
 fun intPref(prefKey: String, defaultValue: Int = 0) = IntPrefDelegate(null, prefKey, defaultValue)

@@ -45,11 +45,6 @@ class BeatScratchToolbar(
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
       appMenu.show()
-//      imageResource = R.drawable.icons8_skip_to_start_filled_100
-//      val startIntent = Intent(MainApplication.instance, PlaybackService::class.java)
-//      startIntent.action = if(PlaybackService.instance?.isStopped != false) PlaybackService.Companion.Action.PLAY_ACTION
-//      else PlaybackService.Companion.Action.REWIND_ACTION
-//      MainApplication.instance.startService(startIntent)
     }
   }.beatScratchToolbarStyle()
 
@@ -63,7 +58,10 @@ class BeatScratchToolbar(
         R.id.newPalette -> paletteManagement.show(PaletteManagementDialog.Mode.NEW)
         R.id.openPalette -> paletteManagement.show(PaletteManagementDialog.Mode.OPEN)
         R.id.duplicatePalette -> paletteManagement.show(PaletteManagementDialog.Mode.DUPLICATE)
-        R.id.savePalette -> { context.toast("Saving..."); viewModel.save() }
+        R.id.savePalette -> {
+          context.toast("Saving...")
+          viewModel.save(showSuccessToast = true)
+        }
         R.id.copyPalette -> copyPalette()
         else             -> context.toast("TODO!")
       }

@@ -74,7 +74,7 @@ class PaletteToolbar(
   private lateinit var tempoButton: ImageButton private set
   private val tempoArea = relativeLayout {
     tempoButton = imageButton {
-      imageResource = R.drawable.noun_metronome_415494_000000
+      imageResource = R.drawable.metronome_thin//noun_metronome_415494_000000
       backgroundResource = R.drawable.toolbar_button
       padding = dip(10)
       imageAlpha = 127

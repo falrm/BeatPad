@@ -10,6 +10,10 @@
           android:id="@+id/savePalette"/>
     <item android:title="Copy Palette"
           android:id="@+id/copyPalette"/>
+    <item android:title="Export MIDI..."
+          android:id="@+id/exportMidi"/>
+    <item android:title="Export MusicXML..."
+          android:id="@+id/exportMusicXml"/>
     <item android:title="About BeatScratch"
           android:id="@+id/aboutBeatScratch"/>
 </menu>

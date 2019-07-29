@@ -8,18 +8,21 @@ import android.view.ViewGroup
 import android.widget.*
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.InstaRecycler
 import com.jonlatane.beatpad.view.hideableLinearLayout
+import com.jonlatane.beatpad.view.hideableRelativeLayout
 import com.jonlatane.beatpad.view.nonDelayedRecyclerView
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 class PaletteManagementDialog(val context: Context, val paletteViewModel: PaletteViewModel) {
   private lateinit var titleText: TextView
   private lateinit var paletteRecycler: RecyclerView
   private lateinit var editPaletteName: EditText
   private lateinit var saveButton: Button
-  private lateinit var editArea: LinearLayout
+  private lateinit var editArea: RelativeLayout
   enum class Mode(
     val titleText: String,
     val buttonText: String?,
@@ -33,9 +36,12 @@ class PaletteManagementDialog(val context: Context, val paletteViewModel: Palett
   fun show(mode: Mode) {
     titleText.text = mode.titleText
     saveButton.text = mode.buttonText
+    saveButton.onClick {
+      context.toast("TODO!")
+    }
     if(mode == Mode.OPEN) {
       context.toast("Saving Current Palette...")
-      paletteViewModel.save()
+      paletteViewModel.save(showSuccessToast = true)
     }
     (lengthLayout.parent as? ViewGroup)?.removeView(lengthLayout)
     editPaletteName.isEnabled = mode.textEditable
@@ -55,24 +61,25 @@ class PaletteManagementDialog(val context: Context, val paletteViewModel: Palett
           alignParentTop()
         }
 
-        editArea = hideableLinearLayout {
-          orientation = LinearLayout.HORIZONTAL
+        editArea = hideableRelativeLayout {
           padding = dip(16)
           id = View.generateViewId()
-
-          editPaletteName = editText {
-            id = View.generateViewId()
-            typeface = MainApplication.chordTypeface
-          }.lparams(matchParent, wrapContent) {
-            weight = 1f
-          }
-
           saveButton = button {
             text = "Save"
             typeface = MainApplication.chordTypeface
             backgroundResource = R.drawable.toolbar_button
+            id = View.generateViewId()
           }.lparams(wrapContent, wrapContent) {
-            weight = 0f
+            alignParentTop()
+            alignParentRight()
+          }
+          editPaletteName = editText {
+            id = View.generateViewId()
+            typeface = MainApplication.chordTypeface
+          }.lparams(matchParent, wrapContent) {
+            alignParentTop()
+            alignParentLeft()
+            leftOf(saveButton)
           }
         }.lparams(matchParent, wrapContent) {
           alignParentLeft()
@@ -80,13 +87,14 @@ class PaletteManagementDialog(val context: Context, val paletteViewModel: Palett
           alignParentBottom()
         }
 
+        val paletteList = Storage.getPalettes(context)
         paletteRecycler = InstaRecycler.instaRecycler(
           context,
           factory = { nonDelayedRecyclerView().apply { id = View.generateViewId() } },
-          itemCount = { /*availableParts.count()*/ 20 },
+          itemCount = { paletteList.size },
           binder = { position ->
             findViewById<TextView>(InstaRecycler.example_id).apply {
-              text = "Palette $position"
+              text = paletteList[position].name.removeSuffix(".json")
 //              val part = availableParts[position]
 //              text = part.instrument.instrumentName
 //              backgroundResource = when {
