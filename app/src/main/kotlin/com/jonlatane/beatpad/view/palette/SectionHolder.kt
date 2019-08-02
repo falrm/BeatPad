@@ -148,19 +148,11 @@ class SectionHolder(
             }
           }
           duplicateSection -> section?.let { section ->
-            val candidateBasis = section.name.trimEnd('0','1','2','3','4','5','6','7','8','9').trimEnd()
-            val basis = when {
-              section.name.last().isDigit() -> when {
-                viewModel.palette.sections.any { it.name.startsWith(candidateBasis)} -> section.name + '-'
-                else -> "$candidateBasis "
-              }
-              else -> "$candidateBasis "
-            }
             val copiedSection = section.copy(
               id = UUID.randomUUID(),
-              name = Section.generateNewSectionName(
+              name = Section.generateDuplicateSectionName(
                 viewModel.palette.sections,
-                basis = basis
+                basis = section.name
               ),
               harmony = section.harmony!!.copy(changes = TreeMap(section.harmony!!.changes)),
               relatedSections = (section.relatedSections + section.id).toMutableSet(),

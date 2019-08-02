@@ -45,8 +45,26 @@ data class Section(
     )
 
     fun generateNewSectionName(sectionList: List<Section>, basis: String = "Section "): String
+      = generateNewName(sectionList.map { it.name }, basis)
+
+    fun generateDuplicateSectionName(sectionList: List<Section>, basis: String = "Section "): String
+      = generateDuplicateName(sectionList.map { it.name }, basis)
+
+    fun generateNewName(sectionList: List<String>, basis: String = "Section "): String
       = "$basis${(1..100).firstOrNull { index ->
-      sectionList.none { it.name == "$basis$index" }
+      sectionList.none { it == "$basis$index" }
     }?.toString() ?: "$basis:)"}"
+
+    fun generateDuplicateName(others: List<String>, name: String): String {
+      val candidateBasis = name.trimEnd(*('0'..'9').toList().toCharArray()).trimEnd()
+      val basis = when {
+        name.last().isDigit() -> when {
+          others.any { it.startsWith(candidateBasis)} -> name + '-'
+          else -> "$candidateBasis "
+        }
+        else -> "$candidateBasis "
+      }
+      return generateNewName(others, basis)
+    }
   }
 }

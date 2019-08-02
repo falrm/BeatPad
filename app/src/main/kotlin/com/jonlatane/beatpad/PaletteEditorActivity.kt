@@ -114,6 +114,11 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
       MainApplication.intentHarmony = null
       viewModel.harmonyViewModel.importHarmony(intentHarmony)
     }
+    // Open palette from intent
+    MainApplication.intentHarmony?.let { intentHarmony ->
+      MainApplication.intentHarmony = null
+      viewModel.harmonyViewModel.importHarmony(intentHarmony)
+    }
   }
 
   override fun onPause() {

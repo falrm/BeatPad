@@ -6,8 +6,10 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.storage.Storage
 import org.jetbrains.anko.error
+import org.jetbrains.anko.info
 import org.jetbrains.anko.toast
 import java.net.URI
 
@@ -40,6 +42,17 @@ class SplashActivity : AppCompatActivity(), Storage {
         } catch(t: Throwable) {
           toast("Failed to open harmony")
           error("Failed to deserialize harmony", t)
+          null
+        }
+      }
+      MainApplication.intentPalette = intent.data?.let { URI(it.toString()) }?.let { uri ->
+        try {
+          uri.toEntity("palette", "v1", Palette::class).also {
+            info("successfully opened palette")
+          }
+        } catch(t: Throwable) {
+          toast("Failed to open palette")
+          error("Failed to deserialize palette", t)
           null
         }
       }

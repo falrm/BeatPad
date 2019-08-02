@@ -29,8 +29,8 @@ interface Storage : AnkoLogger {
     private const val basePaletteDir = "palettes"
     private const val baseMelodyDir = "melodies"
     private const val baseHarmonyDir = "harmonies"
-    private val openPaletteFile: String by stringPref("openPaletteFile", "palette")
-    private val openPaletteFileName = "$openPaletteFile.json"
+    var openPaletteFile: String by stringPref("openPaletteFile", "palette")
+    private val openPaletteFileName get() = "$openPaletteFile.json"
 
     fun getPalettes(context: Context): List<File> {
       File(context.paletteDir).mkdirs()
@@ -99,7 +99,7 @@ interface Storage : AnkoLogger {
   )
 
   fun Context.storePalette(
-    palette: Palette,
+    palette: Palette = BeatClockPaletteConsumer.palette!!,
     filename: String = openPaletteFileName,
     showSuccessToast: Boolean = false
   ) = storePalette(
