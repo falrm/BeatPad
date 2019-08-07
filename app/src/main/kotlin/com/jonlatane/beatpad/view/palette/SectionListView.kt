@@ -22,8 +22,8 @@ inline fun ViewManager.sectionListView(
 	init: _RecyclerView.() -> Unit
 ) = ankoView({
 	_RecyclerView(it).apply {
-		viewModel.sectionListRecycler = this
-		viewModel.sectionListAdapter = SectionListAdapter(viewModel)
+		viewModel.sectionListRecyclerHorizontal = this
+		viewModel.sectionListAdapter = SectionListAdapter(viewModel, this)
 
 		backgroundColor = context.color(R.color.colorPrimaryDark)
 		layoutManager = LinearLayoutManager(context, orientation, false).apply {

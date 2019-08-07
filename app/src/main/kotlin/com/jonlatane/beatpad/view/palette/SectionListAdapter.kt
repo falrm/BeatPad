@@ -10,9 +10,9 @@ import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import java.util.*
 
 class SectionListAdapter(
-	val viewModel: PaletteViewModel
+	val viewModel: PaletteViewModel,
+  val recyclerView: RecyclerView
 ) : SmartAdapter<SectionHolder>() {
-  val recyclerView: RecyclerView get() = viewModel.sectionListRecycler
   val orientation: Int get() = (recyclerView.layoutManager as? LinearLayoutManager)?.orientation
     ?: LinearLayoutManager.HORIZONTAL
 

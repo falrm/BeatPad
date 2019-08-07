@@ -40,6 +40,7 @@ class SectionHolder(
             minimumWidth = context.dip(90)
             gravity = Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL
             typeface = MainApplication.chordTypeface
+            textScaleX = 0.9f
           }.lparams(wrapContent, wrapContent) {
             alignParentLeft()
             alignParentRight()
@@ -55,6 +56,7 @@ class SectionHolder(
             marqueeRepeatLimit = -1
             isSelected = true
             typeface = MainApplication.chordTypeface
+            textScaleX = 0.9f
           }.lparams(matchParent, wrapContent) {
             alignParentLeft()
             alignParentRight()
@@ -211,7 +213,7 @@ class SectionHolder(
     itemView.apply {
       setOnClickListener {
         BeatClockPaletteConsumer.section = section
-        viewModel.sectionListRecycler.updateSmartHolders()
+        viewModel.sectionListRecyclerHorizontal.updateSmartHolders()
       }
       setOnLongClickListener {
         menu.show()

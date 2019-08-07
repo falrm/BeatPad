@@ -12,7 +12,7 @@ import kotlin.reflect.KProperty
  *
  * Usage:
  *
- * PrefDelegate.init(context)
+ * PrefDelegate.init(storageContext)
  * ...
  * var accessToken by stringPref(PREFS_ID, "access_token")
  * var appLaunchCount by intPref(PREFS_ID, "app_launch_count", 0)

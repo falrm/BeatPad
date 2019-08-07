@@ -7,12 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
+import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 
 object InstaRecycler {
   val example_id = 775839
 
+  /**
+   * @param holderViewFactory must be used by any custom [holderFactory]. If not, parameter is ignored.
+   */
   fun <T: _RecyclerView> instaRecycler(
     context: Context,
     factory: (context: Context) -> T,
@@ -26,7 +30,12 @@ object InstaRecycler {
         }.lparams(matchParent, wrapContent)
     },
     holderFactory: T.() -> RecyclerView.ViewHolder = {
-      object: RecyclerView.ViewHolder(holderViewFactory()) {}
+      val view = holderViewFactory()
+      object: RecyclerView.ViewHolder(view), SmartAdapter.Holder {
+        override fun updateSmartHolder() {
+          if(adapterPosition >= 0) binder(adapterPosition)
+        }
+      }
     },
     itemCount: () -> Int = { 7 },
     binder: View.(Int) -> Unit = { position ->
@@ -42,11 +51,13 @@ object InstaRecycler {
       it.layoutManager = layoutManager
       it.overScrollMode = overScrollMode
     }
-    val adapter = object: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    val adapter = object: SmartAdapter<RecyclerView.ViewHolder>() {
       override fun getItemCount(): Int = itemCount()
 
-      override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int)
-        = holder.itemView.binder(position)
+      override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        super.onBindViewHolder(holder, position)
+        holder.itemView.binder(position);
+      }
 
       override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder
         = recyclerView.holderFactory()

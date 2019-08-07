@@ -53,6 +53,8 @@ inline fun ViewManager.nonDelayedRecyclerView(theme: Int = 0, init: NonDelayedRe
 	= ankoView({ NonDelayedRecyclerView(it) }, theme, init)
 inline fun ViewManager.hideableRelativeLayout(theme: Int = 0, init: HideableRelativeLayout.() -> Unit)
 	= ankoView({ HideableRelativeLayout(it) }, theme, init)
+inline fun ViewManager.hideableConstraintLayout(theme: Int = 0, init: HideableConstraintLayout.() -> Unit)
+	= ankoView({ HideableConstraintLayout(it) }, theme, init)
 
 fun ViewManager.zoomableRecyclerView(theme: Int = 0)
 	= zoomableRecyclerView(theme) {}

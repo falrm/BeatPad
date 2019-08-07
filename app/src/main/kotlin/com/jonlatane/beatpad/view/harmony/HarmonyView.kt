@@ -34,9 +34,12 @@ class HarmonyView(
   private val chordChangeLabelPool: DefaultPool<TextView> = object : DefaultPool<TextView>(16) {
     override fun produceInstance() = textView {
       textSize = 20f
+      textScaleX = 0.9f
       maxLines = 1
       singleLine = true
-      ellipsize = TextUtils.TruncateAt.END
+      //ellipsize = TextUtils.TruncateAt.END
+      isHorizontalFadingEdgeEnabled = true
+
       typeface = MainApplication.chordTypefaceBold
       elevation = 5f
     }.lparams(width = wrapContent, height = wrapContent) {

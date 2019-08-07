@@ -24,6 +24,7 @@ import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.palette.PaletteUI
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import com.jonlatane.beatpad.view.palette.PartHolder
+import com.jonlatane.beatpad.view.palette.filemanagement.PaletteManagementDialog
 import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder
 import org.jetbrains.anko.constraint.layout.applyConstraintSet
@@ -115,9 +116,9 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
       viewModel.harmonyViewModel.importHarmony(intentHarmony)
     }
     // Open palette from intent
-    MainApplication.intentHarmony?.let { intentHarmony ->
-      MainApplication.intentHarmony = null
-      viewModel.harmonyViewModel.importHarmony(intentHarmony)
+    MainApplication.intentPalette?.let { _ ->
+      viewModel.beatScratchToolbar.paletteManagement.createFromIntentCheckbox.isChecked = true
+      viewModel.beatScratchToolbar.paletteManagement.show(mode = PaletteManagementDialog.Mode.NEW)
     }
   }
 
@@ -152,10 +153,10 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
       )
     }
     if (savedInstanceState.getBoolean("keyboardOpen", false)) {
-      viewModel.keyboardView.show(false)
+      viewModel.showKeyboard(false)
     }
     if (savedInstanceState.getBoolean("colorboardOpen", false)) {
-      viewModel.colorboardView.show(false)
+      viewModel.showColorboard(false)
     }
     if (savedInstanceState.getBoolean("orbifoldOpen", false)) {
       viewModel.showOrbifold(false)

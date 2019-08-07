@@ -16,39 +16,36 @@ import org.jetbrains.anko.constraint.layout._ConstraintLayout
 import org.jetbrains.anko.constraint.layout.applyConstraintSet
 
 class PartHolderView(ctx: Context): _ConstraintLayout(ctx), PartHolderLayout {
-  val partName: TextView
-  val melodyReferenceRecycler: HideableRecyclerView
-  val volumeSlider: SeekBar
+  val partName: TextView = textView {
+    id = R.id.part_name
+    textSize = 20f
+    singleLine = true
+    ellipsize = TextUtils.TruncateAt.MARQUEE
+    marqueeRepeatLimit = -1
+    isSelected = true
+    typeface = MainApplication.chordTypeface
+    textScaleX = 0.9f
+    gravity = Gravity.CENTER_HORIZONTAL
+    backgroundResource = R.drawable.part_background
+    elevation = 2f
+    //partNamePadding()
+  }.lparams(0, wrapContent)
+
+  val melodyReferenceRecycler: HideableRecyclerView = hideableRecyclerView {
+    id = R.id.part_patterns
+    elevation = 1f
+    setHasFixedSize(true)
+  }.lparams(0, 0)
+
+  val volumeSlider: SeekBar = seekBar {
+    id = R.id.part_volume
+    elevation = 2f
+    alpha = 0f
+    max = 127
+
+  }.lparams(0, 0)
 
   init {
-    partName = textView {
-      id = R.id.part_name
-      textSize = 20f
-      singleLine = true
-      ellipsize = TextUtils.TruncateAt.MARQUEE
-      marqueeRepeatLimit = -1
-      isSelected = true
-      typeface = MainApplication.chordTypeface
-      gravity = Gravity.CENTER_HORIZONTAL
-      backgroundResource = R.drawable.part_background
-      elevation = 2f
-      //partNamePadding()
-    }.lparams(0, wrapContent)
-
-    melodyReferenceRecycler = hideableRecyclerView {
-      id = R.id.part_patterns
-      elevation = 1f
-      setHasFixedSize(true)
-    }.lparams(0, 0)
-
-    volumeSlider = seekBar {
-      id = R.id.part_volume
-      elevation = 2f
-      alpha = 0f
-      max = 127
-
-    }.lparams(0, 0)
-
     applyConstraintSet {
       partName {
         connect(

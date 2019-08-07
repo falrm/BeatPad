@@ -35,7 +35,7 @@ object HarmonyStorage : AnkoLogger {
 		}
 	}
 	object Deserializer: StdDeserializer<Harmony>(Harmony::class.java) {
-		override fun deserialize(jp: JsonParser, context: DeserializationContext): Harmony {
+		override fun deserialize(jp: JsonParser, storageContext: DeserializationContext): Harmony {
 			val mapper = jp.codec as ObjectMapper
 			val root = mapper.readTree<ObjectNode>(jp)
 			/*send you own condition*/

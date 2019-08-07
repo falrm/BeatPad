@@ -9,12 +9,14 @@ import android.widget.RelativeLayout
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.smartrecycler.firstVisibleItemPosition
 import com.jonlatane.beatpad.view.colorboard.colorboardView
 import com.jonlatane.beatpad.view.harmony.harmonyView
 import com.jonlatane.beatpad.view.keyboard.keyboardView
 import com.jonlatane.beatpad.view.melody.BeatAdapter
 import com.jonlatane.beatpad.view.melody.melodyView
+import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
@@ -40,33 +42,36 @@ class PaletteUI constructor(
 
       keyboardsLayout()
 
-      viewModel.orbifold.onChordChangedListener = { chord ->
-        val keyboardDrumTrack = (viewModel.keyboardPart?.instrument as? MIDIInstrument)?.drumTrack == true
-        if(!viewModel.harmonyViewModel.isChoosingHarmonyChord) {
-          viewModel.colorboardView.chord = chord
-          if(!keyboardDrumTrack)
-            viewModel.keyboardView.ioHandler.highlightChord(chord)
-          //viewModel.melodyViewModel.verticalAxis?.chord = chord
-          viewModel.splatController?.tones = chord.getTones()
-          viewModel.palette.chord = chord
-          viewModel.melodyViewModel.redraw()
-          //BeatClockPaletteConsumer.chord = chord
-        } else {
-          viewModel.colorboardView.chord = chord
-          if(!keyboardDrumTrack)
-            viewModel.keyboardView.ioHandler.highlightChord(chord)
-          //viewModel.melodyViewModel.verticalAxis?.chord = chord
-          viewModel.splatController?.tones = chord.getTones()
-          viewModel.harmonyViewModel.editingChord = chord
+      viewModel.apply {
+        orbifold.onChordChangedListener = { chord ->
+          toolbarView.orbifoldText.text = chord.name
+          toolbarView.orbifoldText.textColor = context.color(OrbifoldView.colorResourceFor(chord))
+          val keyboardDrumTrack = (keyboardPart?.instrument as? MIDIInstrument)?.drumTrack == true
+          if(!harmonyViewModel.isChoosingHarmonyChord) {
+            colorboardView.chord = chord
+            if(!keyboardDrumTrack)
+              keyboardView.ioHandler.highlightChord(chord)
+            //viewModel.melodyViewModel.verticalAxis?.chord = chord
+            splatController?.tones = chord.getTones()
+            palette.chord = chord
+            melodyViewModel.redraw()
+            //BeatClockPaletteConsumer.chord = chord
+          } else {
+            colorboardView.chord = chord
+            if(!keyboardDrumTrack) {
+              keyboardView.ioHandler.highlightChord(chord)
+            }
+            //viewModel.melodyViewModel.verticalAxis?.chord = chord
+            splatController?.tones = chord.getTones()
+            harmonyViewModel.editingChord = chord
+          }
         }
+        orbifold.onOrbifoldChangeListener = { viewModel.palette.orbifold = it }
+        orbifold.keyboard = viewModel.keyboardView
+        hideOrbifold(false)
+        keyboardView.hide(false)
+        colorboardView.hide(false)
       }
-
-      viewModel.orbifold.onOrbifoldChangeListener = { viewModel.palette.orbifold = it }
-      viewModel.orbifold.keyboard = viewModel.keyboardView
-
-      viewModel.hideOrbifold(false)
-      viewModel.keyboardView.hide(false)
-      viewModel.colorboardView.hide(false)
 
       onLayoutChange { _, _, _, _, _, _, _, _, _ ->
         if (viewModel.editingMelody == null) {
@@ -144,7 +149,7 @@ class PaletteUI constructor(
       alignParentTop()
     }
 
-    viewModel.sectionListView = sectionListView(viewModel = viewModel) {
+    viewModel.sectionListRecyclerHorizontal = sectionListView(viewModel = viewModel) {
       id = R.id.chord_list
     }.lparams {
       below(viewModel.beatScratchToolbar)
@@ -156,7 +161,7 @@ class PaletteUI constructor(
     viewModel.harmonyView = harmonyView(viewModel = viewModel) {
       id = R.id.harmony
     }.lparams {
-      below(viewModel.sectionListView)
+      below(viewModel.sectionListRecyclerHorizontal)
       width = matchParent
       height = wrapContent
     }
@@ -200,7 +205,7 @@ class PaletteUI constructor(
 
   private fun _RelativeLayout.landscapeLayout() {
 
-    viewModel.sectionListView = sectionListView(viewModel = viewModel, orientation = LinearLayoutManager.VERTICAL) {
+    viewModel.sectionListRecyclerVertical = sectionListView(viewModel = viewModel, orientation = LinearLayoutManager.VERTICAL) {
       id = R.id.chord_list
     }.lparams {
       width = dip(200f)
@@ -217,7 +222,7 @@ class PaletteUI constructor(
       width = dip(48)
 //      width = 0
       height = matchParent
-      rightOf(viewModel.sectionListView)
+      rightOf(viewModel.sectionListRecyclerVertical)
       alignParentTop()
     }
 

@@ -43,7 +43,7 @@ interface Storage : AnkoLogger {
     private fun storePalette(palette: Palette, context: Context, file: File) = try {
       File(context.paletteDir).mkdirs()
       FileOutputStream(file.apply { createNewFile() }).use { fileOutputStream ->
-        //context.openFileOutput("$paletteDir$separator$filename", Context.MODE_PRIVATE).use { fileOutputStream ->
+        //storageContext.openFileOutput("$paletteDir$separator$filename", Context.MODE_PRIVATE).use { fileOutputStream ->
         AppObjectMapper.writeValue(fileOutputStream, palette)
       }
       info {
@@ -56,12 +56,12 @@ interface Storage : AnkoLogger {
     private fun loadPalette(context: Context, file: File): Palette {
       File(context.paletteDir).mkdirs()
       val palette = FileInputStream(file).use { fileInputStream ->
-        //val palette = context.openFileInput("$paletteDir$separator$filename").use { fileInputStream ->
+        //val palette = storageContext.openFileInput("$paletteDir$separator$filename").use { fileInputStream ->
         AppObjectMapper.readValue(fileInputStream, Palette::class.java)
       }
-      info {
-        "Loaded palette: ${stringify(palette)}"
-      }
+//      info {
+//        "Loaded palette: ${stringify(palette)}"
+//      }
       return palette
     }
 

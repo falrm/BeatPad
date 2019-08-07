@@ -5,6 +5,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.PorterDuff
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -25,7 +26,7 @@ class BeatScratchToolbar(
   override val storageContext: Context,
   val viewModel: PaletteViewModel
 ) : _LinearLayout(storageContext), AnkoLogger, Storage {
-  private val paletteManagement = PaletteManagementDialog(context, viewModel)
+  val paletteManagement = PaletteManagementDialog(context, viewModel)
 
   init {
     backgroundColor = context.color(R.color.colorPrimaryDark)
@@ -48,6 +49,7 @@ class BeatScratchToolbar(
     }
   }.beatScratchToolbarStyle()
 
+  val paletteTitleMenuItem: MenuItem get() = appMenu.menu.findItem(R.id.paletteName)
   private val appMenu = PopupMenu(context, appButton).apply {
     inflate(R.menu.beatscratch_app_menu)
 
@@ -66,6 +68,12 @@ class BeatScratchToolbar(
         else             -> context.toast("TODO!")
       }
       true
+    }
+    post {
+      paletteTitleMenuItem.apply {
+        isEnabled = false
+        title = Storage.openPaletteFile
+      }
     }
     appButton.setOnTouchListener(dragToOpenListener)
 
@@ -137,11 +145,11 @@ class BeatScratchToolbar(
 //    scaleType = ImageView.ScaleType.FIT_CENTER
 //    onClick {
 //      val text = BeatClockPaletteConsumer.palette?.toURI()?.toString() ?: ""
-//      val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+//      val clipboard = storageContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 //      val clip = ClipData.newPlainText("BeatScratch Palette", text)
 //      clipboard.primaryClip = clip
 //
-//      context.toast("Copied BeatScratch Palette data to clipboard!")
+//      storageContext.toast("Copied BeatScratch Palette data to clipboard!")
 //    }
 //  }.beatScratchToolbarStyle()
 }

@@ -228,22 +228,7 @@ class OrbifoldView @JvmOverloads constructor(
     fun TextView.chordify(c: Chord) {
       text = c.name
       val p = arrayOf(paddingLeft, paddingTop, paddingRight, paddingBottom)
-      /*backgroundResource = when {
-        c.isDominant -> R.drawable.orbifold_chord_dominant
-        c.isDiminished -> R.drawable.orbifold_chord_diminished
-        c.isMinor -> R.drawable.orbifold_chord_minor
-        c.isAugmented -> R.drawable.orbifold_chord_augmented
-        c.isMajor -> R.drawable.orbifold_chord_major
-        else -> R.drawable.orbifold_chord
-      }*/
-      textColor = when {
-        c.isDominant   -> color(R.color.dominant)
-        c.isDiminished -> color(R.color.diminished)
-        c.isMinor      -> color(R.color.minor)
-        c.isAugmented  -> color(R.color.augmented)
-        c.isMajor      -> color(R.color.major)
-        else           -> color(android.R.color.white)
-      }
+      textColor = color(colorResourceFor(c))
       setPadding(p[0], p[1], p[2], p[3])
     }
 
@@ -264,6 +249,7 @@ class OrbifoldView @JvmOverloads constructor(
     } as TextView
     return result.apply {
       typeface = MainApplication.chordTypeface
+      textScaleX = 0.9f
     }
   }
 
@@ -379,5 +365,16 @@ class OrbifoldView @JvmOverloads constructor(
   }
   fun disableNextTransitionAnimation() {
     selectedChord = null
+  }
+
+  companion object {
+    fun colorResourceFor(c: Chord) = when {
+      c.isDominant   -> R.color.dominant
+      c.isDiminished -> R.color.diminished
+      c.isMinor      -> R.color.minor
+      c.isAugmented  -> R.color.augmented
+      c.isMajor      -> R.color.major
+      else           -> android.R.color.white
+    }
   }
 }

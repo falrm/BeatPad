@@ -38,7 +38,7 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 //		marqueeRepeatLimit = -1
 //		isSelected = true
 		onClick {
-			//context.toast("TODO")
+			//storageContext.toast("TODO")
       try {
         lengthDialog.show()
       } catch(t: Throwable) {

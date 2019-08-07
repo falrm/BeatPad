@@ -25,7 +25,7 @@ interface Patterns {
     toSubdivisionsPerBeat: Int,
     toLength: Int = Int.MAX_VALUE
   ): Int {
-    // In the context of the "from" melody, in, say, sixteenth notes (subdivisionsPerBeat=4),
+    // In the storageContext of the "from" melody, in, say, sixteenth notes (subdivisionsPerBeat=4),
     // if this is 5, then currentBeat is 1.25.
     val fromBeat: Double = this.toDouble() / fromSubdivisionsPerBeat
 

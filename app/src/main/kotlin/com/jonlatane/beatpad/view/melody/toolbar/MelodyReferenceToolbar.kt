@@ -93,7 +93,7 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 		}
 		onLongClick(returnValue = true) {
 			//			melodyViewModel.openedMelody?.transposeInPlace(-12)
-//			context.toast("Octave Down")
+//			storageContext.toast("Octave Down")
 //			updateMelody()
 		}
 	}.squareButtonStyle()
@@ -108,7 +108,7 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 //		}
 //		onLongClick(returnValue = true) {
 //      melodyViewModel.openedMelody?.transposeInPlace(12)
-//			context.toast("Octave Up")
+//			storageContext.toast("Octave Up")
 //			updateMelody()
 //		}
 //	}.squareButtonStyle()
@@ -122,7 +122,7 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 //		}
 //		onLongClick(returnValue = true) {
 //			melodyViewModel.openedMelody?.transposeInPlace(-12)
-//			context.toast("Octave Down")
+//			storageContext.toast("Octave Down")
 //			updateMelody()
 //		}
 //	}.squareButtonStyle()

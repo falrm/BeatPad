@@ -3,9 +3,12 @@ package com.jonlatane.beatpad.view.palette
 import BeatClockPaletteConsumer
 import android.content.Context
 import android.content.Intent
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import android.widget.*
 import com.jonlatane.beatpad.MainApplication
+import com.jonlatane.beatpad.MainApplication.Companion.chordTypeface
 import com.jonlatane.beatpad.MainApplication.Companion.chordTypefaceBold
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.service.PlaybackService
@@ -87,6 +90,7 @@ class PaletteToolbar(
       textSize = 18f
       textColor = 0xFF000000.toInt()
       typeface = chordTypefaceBold
+      textScaleX = 0.9f
       //textColor = android.R.color.black
     }.lparams(wrapContent, wrapContent) {
       alignParentTop()
@@ -147,21 +151,41 @@ class PaletteToolbar(
     orbifoldButton.padding = dip(10)
   }
 
-  val orbifoldButton = imageButton {
-    imageResource = R.drawable.icons8_molecule_filled_100
-    backgroundResource = R.drawable.toolbar_button
-    padding = dip(10)
-    backgroundResource = R.drawable.toolbar_button
-    scaleType = ImageView.ScaleType.FIT_CENTER
-    onClick {
-      if (viewModel.orbifold.isHidden) {
-        viewModel.showOrbifold()
-      } else {
-        viewModel.hideOrbifold()
+  lateinit var orbifoldButton: ImageButton private set
+  lateinit var orbifoldText: TextView private set
+  private val orbifoldArea = relativeLayout {
+    orbifoldButton = imageButton {
+      //imageResource = R.drawable.metronome_thin//noun_metronome_415494_000000
+      backgroundResource = R.drawable.toolbar_button
+      padding = dip(10)
+      imageAlpha = 127
+      scaleType = ImageView.ScaleType.FIT_CENTER
+      onClick {
+        if (viewModel.orbifold.isHidden) {
+          viewModel.showOrbifold()
+        } else {
+          viewModel.hideOrbifold()
+        }
       }
-    }
-    onLongClick(returnValue = true) {
-      orbifoldConfigurationAlert.show()
+      onLongClick(returnValue = true) {
+        orbifoldConfigurationAlert.show()
+      }
+    }.lparams(matchParent, matchParent)
+    orbifoldText = textView {
+      text = "C Chrom."
+      setTextSize(TypedValue.COMPLEX_UNIT_DIP, 8f)
+      singleLine = true
+      typeface = chordTypeface
+      textScaleX = 0.9f
+      backgroundResource = R.drawable.orbifold_button_bg
+      padding = dip(3)
+      textColor = color(R.color.major)
+      minimumWidth = dip(24)
+      gravity = Gravity.CENTER
+    }.lparams(wrapContent, wrapContent) {
+      centerInParent()
+      leftMargin = dip(2)
+      rightMargin = dip(2)
     }
   }.palletteToolbarStyle()
 
@@ -187,11 +211,11 @@ class PaletteToolbar(
 //    scaleType = ImageView.ScaleType.FIT_CENTER
 //    onClick {
 //      val text = BeatClockPaletteConsumer.palette?.toURI()?.toString() ?: ""
-//      val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+//      val clipboard = storageContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 //      val clip = ClipData.newPlainText("BeatScratch Palette", text)
 //      clipboard.primaryClip = clip
 //
-//      context.toast("Copied BeatScratch Palette data to clipboard!")
+//      storageContext.toast("Copied BeatScratch Palette data to clipboard!")
 //    }
 //  }.palletteToolbarStyle()
 

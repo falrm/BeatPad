@@ -3,7 +3,6 @@ package com.jonlatane.beatpad.view.palette
 //import com.jonlatane.beatpad.util.syncPositionTo
 import BeatClockPaletteConsumer
 import android.content.Context
-import android.os.Build
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
@@ -17,7 +16,6 @@ import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.*
-import com.jonlatane.beatpad.util.smartrecycler.updateSmartHolders
 import com.jonlatane.beatpad.util.smartrecycler.viewHolders
 import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
 import com.jonlatane.beatpad.view.harmony.HarmonyView
@@ -26,10 +24,7 @@ import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.backgroundResource
-import org.jetbrains.anko.configuration
-import org.jetbrains.anko.portrait
+import org.jetbrains.anko.*
 import java.util.*
 import kotlin.properties.Delegates.observable
 
@@ -45,6 +40,20 @@ class PaletteViewModel(
   }
 
   fun save(showSuccessToast: Boolean = false) = storageContext.storePalette(palette, showSuccessToast = showSuccessToast)
+  private var lastSaveTime = System.currentTimeMillis()
+  private var lastSaveRequestTime = System.currentTimeMillis()
+  fun saveAfterDelay(delay: Long = 7000) {
+    lastSaveRequestTime = System.currentTimeMillis()
+    doAsync {
+      Thread.sleep(delay)
+      synchronized(::lastSaveTime) {
+        if(lastSaveTime < lastSaveRequestTime && System.currentTimeMillis() - lastSaveRequestTime >= delay) {
+          lastSaveTime = System.currentTimeMillis()
+          save()
+        }
+      }
+    }
+  }
 
   var playbackTick by observable<Int?>(null) { _, old, new ->
     arrayOf(old, new).filterNotNull().map { tickPosition ->
@@ -128,14 +137,14 @@ class PaletteViewModel(
        editMelodyMode()
     } else {
       if(old != new) {
-        save()
+        saveAfterDelay()
       }
       partListMode(old)
     }
   }
 
-  lateinit var sectionListView: View
-  lateinit var sectionListRecycler: RecyclerView
+  lateinit var sectionListRecyclerHorizontal: RecyclerView
+  lateinit var sectionListRecyclerVertical: RecyclerView
   var partListAdapter: PartListAdapter? = null
   var sectionListAdapter: SectionListAdapter? = null
   lateinit var partListView: PartListView

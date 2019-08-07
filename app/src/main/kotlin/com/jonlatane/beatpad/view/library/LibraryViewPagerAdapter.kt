@@ -26,7 +26,7 @@ class LibraryViewPagerAdapter(
 
   override fun instantiateItem(collection: ViewGroup, position: Int): Any {
 //    val customPagerEnum = ViewType.values()[position]
-//    val inflater = LayoutInflater.from(context)
+//    val inflater = LayoutInflater.from(storageContext)
 //    val layout = inflater.inflate(customPagerEnum.getLayoutResId(), collection, false) as ViewGroup
 //    collection.addView(layout)
     return when(position) {
