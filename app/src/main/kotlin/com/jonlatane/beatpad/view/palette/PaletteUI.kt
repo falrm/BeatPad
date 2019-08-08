@@ -9,6 +9,7 @@ import android.widget.RelativeLayout
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.util.HideAnimation
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.smartrecycler.firstVisibleItemPosition
 import com.jonlatane.beatpad.view.colorboard.colorboardView
@@ -88,6 +89,7 @@ class PaletteUI constructor(
         viewModel.melodyView.animate()
           .translationX(viewModel.melodyView.width.toFloat())
           .withEndAction { viewModel.melodyView.alpha = 1f }
+          .withEndAction { viewModel.melodyView.translationX = 10.27f * viewModel.melodyView.width }
           .start()
 
 //        viewModel.keyboardView.hide(false)
@@ -113,11 +115,19 @@ class PaletteUI constructor(
           }
         })
         if(configuration.portrait) {
-          //viewModel.sectionListRecyclerVertical.hide(animation = HideAnimation.HORIZONTAL, animated = false)
-          //viewModel.sectionListRecyclerHorizontalRotator.show(animation = HideAnimation.VERTICAL, animated = false)
+          viewModel.sectionListRecyclerVerticalRotator.hide(
+            animation = HideAnimation.HORIZONTAL,
+            animated = false
+          )
         } else {
-//          viewModel.sectionListRecyclerHorizontal.hide(animation = HideAnimation.HORIZONTAL, animated = false)
-//          viewModel.sectionListRecyclerVertical.show(animation = HideAnimation.HORIZONTAL, animated = false)
+          viewModel.sectionListRecyclerHorizontalRotator.hide(
+            animation = if(configuration.portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL,
+            animated = false
+          )
+          viewModel.sectionListRecyclerHorizontalSpacer?.hide(
+            animation = if(configuration.portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL,
+            animated = false
+          )
         }
         harmonyRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -197,13 +207,11 @@ class PaletteUI constructor(
     }
 
     viewModel.partListView = partListView(viewModel = viewModel) {
-      id = R.id.part_list
-    }.lparams {
+      id = View.generateViewId()
+    }.lparams(matchParent, wrapContent) {
       //rightOf(viewModel.sectionListRecyclerVertical)
       below(viewModel.harmonyView)
       rightOf(viewModel.sectionListRecyclerVerticalRotator)
-      width = matchParent
-      height = wrapContent
       alignParentBottom()
     }
 
@@ -212,20 +220,16 @@ class PaletteUI constructor(
       textSize = 25f
       background = context.getDrawable(R.drawable.orbifold_chord)
     }.lparams(dip(30), dip(40)) {
-      //rightOf(viewModel.sectionListRecyclerVertical)
-      below(viewModel.toolbarView)
+      below(viewModel.harmonyView)
       rightOf(viewModel.sectionListRecyclerVerticalRotator)
     }
 
     viewModel.melodyView = melodyView(viewModel = viewModel) {
-      id = R.id.melody
+      id = View.generateViewId()
       alpha = 0f
-    }.lparams {
-      //rightOf(viewModel.sectionListRecyclerVertical)
-      below(viewModel.toolbarView)
+    }.lparams(matchParent, wrapContent) {
+      below(viewModel.harmonyView)
       rightOf(viewModel.sectionListRecyclerVerticalRotator)
-      width = matchParent
-      height = wrapContent
       alignParentBottom()
     }
 

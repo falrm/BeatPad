@@ -382,6 +382,7 @@ class PaletteViewModel(
     melodyView.animate()
       .translationX(melodyView.width.toFloat())
       .alpha(0f)
+      .withEndAction { melodyView.translationX = 10.27f * melodyView.width }
       .start()
     partListView.animate().alpha(1f)
     partListTransitionView.apply {
