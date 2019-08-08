@@ -22,7 +22,7 @@ class PartListAdapter(
 	}
 
 	init {
-		viewModel.partListAdapter = this
+		viewModel.partListAdapters.add(this)
 	}
 
 

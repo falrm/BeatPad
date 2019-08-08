@@ -17,6 +17,9 @@ import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.*
 import com.jonlatane.beatpad.util.smartrecycler.viewHolders
+import com.jonlatane.beatpad.view.HideableLinearLayout
+import com.jonlatane.beatpad.view.HideableRecyclerView
+import com.jonlatane.beatpad.view.RotateLayout
 import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
 import com.jonlatane.beatpad.view.harmony.HarmonyView
 import com.jonlatane.beatpad.view.harmony.HarmonyViewModel
@@ -98,16 +101,17 @@ class PaletteViewModel(
     orbifold.orbifold = new.orbifold
     orbifold.chord = new.chord
     toolbarView.updateTempoDisplay()
-    partListAdapter?.notifyDataSetChanged()
-    sectionListAdapter?.notifyDataSetChanged()
+    partListAdapters.forEach { it.notifyDataSetChanged() }
+    sectionListAdapters.forEach { it.notifyDataSetChanged() }
     if(!new.sections.contains(BeatClockPaletteConsumer.section)) {
       BeatClockPaletteConsumer.section = new.sections.first()
     }
   }
 
   var editingMix: Boolean by observable(false) { _, _, editingVolume ->
-    partListAdapter?.boundViewHolders
-      ?.forEach { it.editingVolume = editingVolume }
+    partListAdapters.forEach { partListAdapter ->
+      partListAdapter.boundViewHolders.forEach { it.editingVolume = editingVolume }
+    }
     if (editingVolume) {
       backStack.push {
         if (editingMix) {
@@ -143,10 +147,13 @@ class PaletteViewModel(
     }
   }
 
+  lateinit var sectionListRecyclerHorizontalRotator: RotateLayout
   lateinit var sectionListRecyclerHorizontal: RecyclerView
-  lateinit var sectionListRecyclerVertical: RecyclerView
-  var partListAdapter: PartListAdapter? = null
-  var sectionListAdapter: SectionListAdapter? = null
+  var sectionListRecyclerHorizontalSpacer: HideableLinearLayout? = null
+  lateinit var sectionListRecyclerVerticalRotator: RotateLayout
+  lateinit var sectionListRecyclerVertical: HideableRecyclerView
+  var partListAdapters: MutableList<PartListAdapter> = mutableListOf()
+  var sectionListAdapters: MutableList<SectionListAdapter> = mutableListOf()
   lateinit var partListView: PartListView
   lateinit var partListTransitionView: TextView
   lateinit var beatScratchToolbar: BeatScratchToolbar
@@ -385,9 +392,11 @@ class PaletteViewModel(
   }
 
   fun updateMelodyReferences() {
-    partListAdapter?.boundViewHolders?.forEach {
-      it.melodyReferenceAdapter.boundViewHolders.forEach {
-        it.onPositionChanged()
+    partListAdapters.forEach {  partAdapter ->
+      partAdapter.boundViewHolders.forEach { partHolder ->
+        partHolder.melodyReferenceAdapter.boundViewHolders.forEach { melodyHolder ->
+          melodyHolder.onPositionChanged()
+        }
       }
     }
   }

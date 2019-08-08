@@ -71,7 +71,7 @@ class SectionListAdapter(
     override fun isLongPressDragEnabled(): Boolean = true
   }).also { it.attachToRecyclerView(recyclerView) }
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SectionHolder {
-		return SectionHolder(orientation, parent, viewModel)
+		return SectionHolder(orientation, parent, viewModel, this)
 	}
 
 	override fun onBindViewHolder(holder: SectionHolder, position: Int) {

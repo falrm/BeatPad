@@ -225,7 +225,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
                 selectedPart.melodies.add(melody)
                 viewModel.palette.parts.indexOfFirst { it == selectedPart }
                   .takeIf { it >= 0 }?.let {index ->
-                  viewModel.partListAdapter?.notifyItemChanged(index)
+                  viewModel.partListAdapters.forEach { it.notifyItemChanged(index) }
                 }
 
               }()

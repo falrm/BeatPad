@@ -61,3 +61,6 @@ fun ViewManager.zoomableRecyclerView(theme: Int = 0)
 
 inline fun ViewManager.zoomableRecyclerView(theme: Int = 0, init: ZoomableRecyclerView.() -> Unit)
 	= ankoView({ ZoomableRecyclerView(it) }, theme, init)
+
+inline fun ViewManager.rotateLayout(theme: Int = 0, init: RotateLayout.() -> Unit)
+	= ankoView({ RotateLayout(it) }, theme, init)

@@ -26,7 +26,6 @@
 	<item name="melody" type="id"/>
 	<item name="harmony" type="id"/>
 	<item name="orbifold_background" type="id"/>
-	<item name="chord_list" type="id"/>
 	<item name="toolbar" type="id"/>
 	<item name="part_list" type="id"/>
 	<item name="keyboard" type="id"/>

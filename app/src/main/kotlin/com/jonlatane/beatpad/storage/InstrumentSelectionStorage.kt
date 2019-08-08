@@ -16,7 +16,7 @@ object InstrumentSelectionStorage: AnkoLogger {
       add(0, instrument)
     }
     val outputStreamWriter = OutputStreamWriter(context.openFileOutput("gm1_choices.json", Context.MODE_PRIVATE))
-    val json = Storage.stringify(newVersion)
+    val json = Storage.stringify(newVersion, pretty = false)
     info("Stored GM1 instrument choices: $json")
     outputStreamWriter.write(json)
     outputStreamWriter.close()

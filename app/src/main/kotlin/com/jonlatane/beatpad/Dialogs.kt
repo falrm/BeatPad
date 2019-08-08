@@ -158,7 +158,7 @@ fun showInstrumentPicker2(
                 instrument.drumTrack = false
                 instrument.sendSelectInstrument()
                 adapter.notifyDataSetChanged()
-                BeatClockPaletteConsumer.viewModel?.partListAdapter?.notifyDataSetChanged()
+                BeatClockPaletteConsumer.viewModel?.partListAdapters?.forEach { it.notifyDataSetChanged() }
               }
             }
           }

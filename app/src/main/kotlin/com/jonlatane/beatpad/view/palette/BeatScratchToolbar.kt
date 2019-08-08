@@ -13,8 +13,11 @@ import android.widget.PopupMenu
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.storage.Storage
+import com.jonlatane.beatpad.util.HideAnimation
 import com.jonlatane.beatpad.util.applyTypeface
 import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.util.isHidden
+import com.jonlatane.beatpad.util.smartrecycler.updateSmartHolders
 import com.jonlatane.beatpad.view.palette.filemanagement.PaletteManagementDialog
 import io.multifunctions.let
 import org.jetbrains.anko.*
@@ -85,6 +88,34 @@ class BeatScratchToolbar(
     backgroundResource = R.drawable.toolbar_button_beatscratch
     padding = dip(9)
     scaleType = ImageView.ScaleType.FIT_CENTER
+    onClick {
+      val portrait = context.resources.configuration.portrait
+      val verticalSectionsVisible = !viewModel.sectionListRecyclerVerticalRotator.isHidden
+      val horizontalSectionsVisible = !viewModel.sectionListRecyclerHorizontalRotator.isHidden
+//      viewModel.sectionListRecyclerHorizontalRotator.hide(animation = HideAnimation.VERTICAL)
+      when {
+//        verticalSectionsVisible &&
+        !horizontalSectionsVisible -> {
+          viewModel.sectionListRecyclerHorizontalRotator.show(
+            animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
+          )
+          viewModel.sectionListRecyclerHorizontalSpacer?.show(
+            animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
+          )
+          viewModel.sectionListRecyclerVerticalRotator.hide(animation = HideAnimation.HORIZONTAL)
+        }
+        //horizontalSectionsVisible && !verticalSectionsVisible
+        else -> {
+          viewModel.sectionListRecyclerHorizontalRotator.hide(
+            animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
+          )
+          viewModel.sectionListRecyclerHorizontalSpacer?.hide(
+            animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
+          )
+          viewModel.sectionListRecyclerVerticalRotator.show(animation = HideAnimation.HORIZONTAL)
+        }
+      }
+    }
   }.beatScratchToolbarStyle()
 
   fun updateButtonColors() {

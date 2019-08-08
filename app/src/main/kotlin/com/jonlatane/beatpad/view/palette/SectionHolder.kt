@@ -26,7 +26,8 @@ import java.util.*
 class SectionHolder(
   val orientation: Int,
   parent: ViewGroup,
-  val viewModel: PaletteViewModel
+  val viewModel: PaletteViewModel,
+  val adapter: SectionListAdapter
 ) : RecyclerView.ViewHolder(
   _LinearLayout(parent.context).apply {
     isClickable = true
@@ -69,7 +70,10 @@ class SectionHolder(
         LinearLayoutManager.HORIZONTAL -> wrapContent
         else                           -> matchParent
       },
-      height = wrapContent
+      height = when (orientation) {
+        LinearLayoutManager.HORIZONTAL -> matchParent
+        else                           -> wrapContent
+      }
     ) {
       setMargins(
         dip(10),
@@ -103,7 +107,6 @@ class SectionHolder(
   override val storageContext: Context = parent.context
   val nameTextView: TextView get() = itemView.findViewById(R.id.section_name)
   //val dragHandle: ImageView get() = itemView.findViewById(R.id.section_drag_handle)
-  val adapter: SectionListAdapter get() = viewModel.sectionListAdapter!!
   val section: Section?
     get() = when (adapterPosition) {
       viewModel.palette.sections.size -> null
@@ -136,11 +139,13 @@ class SectionHolder(
                 val originalPosition = adapterPosition
                 val originalSection = section
                 viewModel.palette.sections.removeAt(adapterPosition)
-                viewModel.sectionListAdapter?.notifyItemRemoved(adapterPosition)
-                viewModel.sectionListAdapter?.notifyItemRangeChanged(
-                  adapterPosition,
-                  viewModel.palette.sections.size - adapterPosition
-                )
+                viewModel.sectionListAdapters.forEach {
+                  it.notifyItemRemoved(adapterPosition)
+                  it.notifyItemRangeChanged(
+                    adapterPosition,
+                    viewModel.palette.sections.size - adapterPosition
+                  )
+                }
                 if (originalSection == BeatClockPaletteConsumer.section) {
                   BeatClockPaletteConsumer.section = viewModel.palette.sections.getOrElse(originalPosition - 1) {
                     _ -> viewModel.palette.sections[0]
@@ -194,12 +199,12 @@ class SectionHolder(
     itemView.padding = itemView.dip(3)
     pasteHarmony.isEnabled = viewModel.harmonyViewModel.getClipboardHarmony() != null
 
-    if (adapterPosition < viewModel.palette.sections.size) {
-      makeEditableSection()
-    } else {
-      makeAddButton()
+    when {
+      adapterPosition < 0 -> {}
+      adapterPosition < viewModel.palette.sections.size -> makeEditableSection()
+      adapterPosition >= viewModel.palette.sections.size -> makeAddButton()
     }
-    //sectionName.requestLayout()
+    sectionName.requestLayout()
   }
 
 
@@ -213,7 +218,7 @@ class SectionHolder(
     itemView.apply {
       setOnClickListener {
         BeatClockPaletteConsumer.section = section
-        viewModel.sectionListRecyclerHorizontal.updateSmartHolders()
+        viewModel.sectionListAdapters.forEach { it.recyclerView.updateSmartHolders() }
       }
       setOnLongClickListener {
         menu.show()

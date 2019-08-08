@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewManager
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.view.HideableRecyclerView
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
@@ -19,18 +20,18 @@ inline fun ViewManager.sectionListView(
 	theme: Int = 0,
 	viewModel: PaletteViewModel,
   orientation: Int = LinearLayoutManager.HORIZONTAL,
-	init: _RecyclerView.() -> Unit
+	init: HideableRecyclerView.() -> Unit
 ) = ankoView({
-	_RecyclerView(it).apply {
+	HideableRecyclerView(it).apply {
 		viewModel.sectionListRecyclerHorizontal = this
-		viewModel.sectionListAdapter = SectionListAdapter(viewModel, this)
+		adapter = SectionListAdapter(viewModel, this)
+		viewModel.sectionListAdapters.add(adapter as SectionListAdapter)
 
 		backgroundColor = context.color(R.color.colorPrimaryDark)
 		layoutManager = LinearLayoutManager(context, orientation, false).apply {
 			isItemPrefetchEnabled = false
 		}
 		overScrollMode = View.OVER_SCROLL_NEVER
-		adapter = viewModel.sectionListAdapter
 		adapter.registerAdapterDataObserver(
 			object : RecyclerView.AdapterDataObserver() {
 				override fun onItemRangeInserted(start: Int, count: Int) {

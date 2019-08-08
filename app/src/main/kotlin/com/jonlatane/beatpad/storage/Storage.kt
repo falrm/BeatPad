@@ -47,7 +47,7 @@ interface Storage : AnkoLogger {
         AppObjectMapper.writeValue(fileOutputStream, palette)
       }
       info {
-        "Stored palette: ${stringify(palette)}"
+        "Stored palette: ${stringify(palette, pretty = true)}"
       }
     } catch (e: IOException) {
       error("File send failed: ", e)
@@ -65,7 +65,10 @@ interface Storage : AnkoLogger {
       return palette
     }
 
-    fun stringify(o: Any): String = AppObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(o)
+    fun stringify(o: Any, pretty: Boolean = false): String = if (pretty)
+      AppObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(o)
+    else
+      AppObjectMapper.writeValueAsString(o)
   }
 
   val File.newTmpVersion get() = File("$path.tmp")

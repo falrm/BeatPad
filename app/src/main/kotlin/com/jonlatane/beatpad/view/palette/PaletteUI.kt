@@ -13,11 +13,13 @@ import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.smartrecycler.firstVisibleItemPosition
 import com.jonlatane.beatpad.view.colorboard.colorboardView
 import com.jonlatane.beatpad.view.harmony.harmonyView
+import com.jonlatane.beatpad.view.hideableLinearLayout
 import com.jonlatane.beatpad.view.keyboard.keyboardView
 import com.jonlatane.beatpad.view.melody.BeatAdapter
 import com.jonlatane.beatpad.view.melody.melodyView
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
+import com.jonlatane.beatpad.view.rotateLayout
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
 import java.util.concurrent.atomic.AtomicBoolean
@@ -110,6 +112,13 @@ class PaletteUI constructor(
             }
           }
         })
+        if(configuration.portrait) {
+          //viewModel.sectionListRecyclerVertical.hide(animation = HideAnimation.HORIZONTAL, animated = false)
+          //viewModel.sectionListRecyclerHorizontalRotator.show(animation = HideAnimation.VERTICAL, animated = false)
+        } else {
+//          viewModel.sectionListRecyclerHorizontal.hide(animation = HideAnimation.HORIZONTAL, animated = false)
+//          viewModel.sectionListRecyclerVertical.show(animation = HideAnimation.HORIZONTAL, animated = false)
+        }
         harmonyRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
@@ -141,43 +150,58 @@ class PaletteUI constructor(
       id = View.generateViewId()
       orientation = LinearLayout.HORIZONTAL
     }.lparams {
-      elevation = 5f
       width = matchParent
-      //TODO: re-enable the toolbar
       height = wrapContent
-//      height = 0
       alignParentTop()
-    }
-
-    viewModel.sectionListRecyclerHorizontal = sectionListView(viewModel = viewModel) {
-      id = R.id.chord_list
-    }.lparams {
-      below(viewModel.beatScratchToolbar)
-      elevation = 5f
-      width = matchParent
-      height = wrapContent
-    }
-
-    viewModel.harmonyView = harmonyView(viewModel = viewModel) {
-      id = R.id.harmony
-    }.lparams {
-      below(viewModel.sectionListRecyclerHorizontal)
-      width = matchParent
-      height = wrapContent
     }
 
     viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
       id = R.id.toolbar
-    }.lparams {
-      below(viewModel.harmonyView)
-      width = matchParent
-      height = wrapContent
+    }.lparams(matchParent, wrapContent) {
+      below(viewModel.beatScratchToolbar)
+    }
+
+    viewModel.sectionListRecyclerVerticalRotator = rotateLayout {
+      id = View.generateViewId()
+      angle = 0
+      viewModel.sectionListRecyclerVertical = sectionListView(viewModel = viewModel, orientation = LinearLayoutManager.VERTICAL) {
+        id = View.generateViewId()
+      }.lparams(dip(200), matchParent)
+    }.lparams(dip(200), matchParent) {
+      below(viewModel.toolbarView)
+      alignParentLeft()
+      alignParentBottom()
+    }
+
+    viewModel.sectionListRecyclerHorizontalRotator = rotateLayout {
+      id = View.generateViewId()
+      angle = 0
+      viewModel.sectionListRecyclerHorizontal = sectionListView(viewModel = viewModel) {
+        id = View.generateViewId()
+        //translationX = dip(48).toFloat()
+        //translationY = dip(48).toFloat()
+      }.lparams(matchParent, dip(48))
+    }.lparams(matchParent, dip(48)) {
+      below(viewModel.toolbarView)
+      alignParentLeft()
+      alignParentRight()
+    }
+
+
+    viewModel.harmonyView = harmonyView(viewModel = viewModel) {
+      id = R.id.harmony
+    }.lparams(matchParent, wrapContent) {
+      //rightOf(viewModel.sectionListRecyclerVertical)
+      below(viewModel.sectionListRecyclerHorizontalRotator)
+      rightOf(viewModel.sectionListRecyclerVerticalRotator)
     }
 
     viewModel.partListView = partListView(viewModel = viewModel) {
       id = R.id.part_list
     }.lparams {
-      below(viewModel.toolbarView)
+      //rightOf(viewModel.sectionListRecyclerVertical)
+      below(viewModel.harmonyView)
+      rightOf(viewModel.sectionListRecyclerVerticalRotator)
       width = matchParent
       height = wrapContent
       alignParentBottom()
@@ -188,31 +212,64 @@ class PaletteUI constructor(
       textSize = 25f
       background = context.getDrawable(R.drawable.orbifold_chord)
     }.lparams(dip(30), dip(40)) {
+      //rightOf(viewModel.sectionListRecyclerVertical)
       below(viewModel.toolbarView)
-      alignParentLeft()
+      rightOf(viewModel.sectionListRecyclerVerticalRotator)
     }
 
     viewModel.melodyView = melodyView(viewModel = viewModel) {
       id = R.id.melody
       alpha = 0f
     }.lparams {
+      //rightOf(viewModel.sectionListRecyclerVertical)
       below(viewModel.toolbarView)
+      rightOf(viewModel.sectionListRecyclerVerticalRotator)
       width = matchParent
       height = wrapContent
       alignParentBottom()
     }
+
   }
 
   private fun _RelativeLayout.landscapeLayout() {
 
-    viewModel.sectionListRecyclerVertical = sectionListView(viewModel = viewModel, orientation = LinearLayoutManager.VERTICAL) {
-      id = R.id.chord_list
-    }.lparams {
-      width = dip(200f)
-      height = matchParent
+    viewModel.sectionListRecyclerHorizontalSpacer = hideableLinearLayout {
+      id = View.generateViewId()
+    }.lparams(dip(48), matchParent) {
       alignParentLeft()
       alignParentTop()
+      alignParentBottom()
     }
+
+
+
+    viewModel.sectionListRecyclerVerticalRotator = rotateLayout {
+      id = View.generateViewId()
+      angle = 0
+      viewModel.sectionListRecyclerVertical = sectionListView(viewModel = viewModel, orientation = LinearLayoutManager.VERTICAL) {
+        id = View.generateViewId()
+      }.lparams(dip(200f), matchParent)
+    }.lparams(dip(200f), matchParent) {
+      rightOf(viewModel.sectionListRecyclerHorizontalSpacer!!)
+      alignParentTop()
+      alignParentBottom()
+    }
+
+
+    viewModel.sectionListRecyclerHorizontalRotator = rotateLayout {
+      id = View.generateViewId()
+      angle = 270
+      viewModel.sectionListRecyclerHorizontal = sectionListView(viewModel = viewModel) {
+        id = View.generateViewId()
+        //translationX = dip(48).toFloat()
+        //translationY = dip(48).toFloat()
+      }.lparams(matchParent, dip(48))
+    }.lparams(dip(48), matchParent) {
+      alignParentLeft()
+      alignParentTop()
+      alignParentBottom()
+    }
+
 
     viewModel.beatScratchToolbar = beatScratchToolbar(viewModel = viewModel) {
       id = View.generateViewId()
@@ -222,7 +279,8 @@ class PaletteUI constructor(
       width = dip(48)
 //      width = 0
       height = matchParent
-      rightOf(viewModel.sectionListRecyclerVertical)
+      //rightOf(viewModel.sectionListRecyclerHorizontalRotator!!)
+      rightOf(viewModel.sectionListRecyclerVerticalRotator)
       alignParentTop()
     }
 
