@@ -35,6 +35,9 @@ class MelodyEditingModifiers @JvmOverloads constructor(
 	var modifier: Modifier = Modifier.None
 	  private set(value) {
 		  if(field != value) {
+				if(value == Modifier.Articulating || value == Modifier.Transposing) {
+					context.toast("TODO: ${value.javaClass.simpleName}!")
+				}
 			  when {
 				  field == Modifier.None -> { onHeldDownChanged(true) }
 				  value == Modifier.None -> { onHeldDownChanged(false) }

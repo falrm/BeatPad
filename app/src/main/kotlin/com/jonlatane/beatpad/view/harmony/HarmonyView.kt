@@ -43,7 +43,7 @@ class HarmonyView(
       typeface = MainApplication.chordTypefaceBold
       elevation = 5f
     }.lparams(width = wrapContent, height = wrapContent) {
-      topMargin = dip(10)
+      topMargin = dip(5)
       marginStart = dip(40)
       alignParentLeft()
       alignParentTop()
@@ -111,7 +111,8 @@ class HarmonyView(
       viewModel.harmonyViewModel.harmonyElementRecycler?.lparams {
         width = ViewGroup.LayoutParams.MATCH_PARENT
         height = textView1.height + dip(10f)
-        topMargin = dip(5)
+        //topMargin = dip(5)
+        bottomMargin = dip(5)
         marginStart = dip(30)
         alignParentRight()
         alignParentTop()

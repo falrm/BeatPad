@@ -72,8 +72,23 @@ class PaletteUI constructor(
         orbifold.onOrbifoldChangeListener = { viewModel.palette.orbifold = it }
         orbifold.keyboard = viewModel.keyboardView
         hideOrbifold(false)
-        keyboardView.hide(false)
-        colorboardView.hide(false)
+        hideKeyboard(false)
+        hideColorboard(false)
+        if(configuration.portrait) {
+          viewModel.sectionListRecyclerVerticalRotator.hide(
+            animation = HideAnimation.HORIZONTAL,
+            animated = false
+          )
+        } else {
+          viewModel.sectionListRecyclerHorizontalRotator.hide(
+            animation = if(configuration.portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL,
+            animated = false
+          )
+          viewModel.sectionListRecyclerHorizontalSpacer?.hide(
+            animation = if(configuration.portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL,
+            animated = false
+          )
+        }
       }
 
       onLayoutChange { _, _, _, _, _, _, _, _, _ ->
@@ -91,9 +106,6 @@ class PaletteUI constructor(
           .withEndAction { viewModel.melodyView.alpha = 1f }
           .withEndAction { viewModel.melodyView.translationX = 10.27f * viewModel.melodyView.width }
           .start()
-
-//        viewModel.keyboardView.hide(false)
-//        viewModel.colorboardView.hide(false)
 
         // Some tasty un-threadsafe spaghetti for syncing the two RecyclerViews for Harmony and Melody
         val inScrollingStack = AtomicBoolean(false)
@@ -114,21 +126,6 @@ class PaletteUI constructor(
             }
           }
         })
-        if(configuration.portrait) {
-          viewModel.sectionListRecyclerVerticalRotator.hide(
-            animation = HideAnimation.HORIZONTAL,
-            animated = false
-          )
-        } else {
-          viewModel.sectionListRecyclerHorizontalRotator.hide(
-            animation = if(configuration.portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL,
-            animated = false
-          )
-          viewModel.sectionListRecyclerHorizontalSpacer?.hide(
-            animation = if(configuration.portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL,
-            animated = false
-          )
-        }
         harmonyRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
@@ -198,8 +195,10 @@ class PaletteUI constructor(
     }
 
 
-    viewModel.harmonyView = harmonyView(viewModel = viewModel) {
-      id = R.id.harmony
+    viewModel.harmonyView = harmonyView(
+      viewModel = viewModel
+    ) {
+      id = View.generateViewId()
     }.lparams(matchParent, wrapContent) {
       //rightOf(viewModel.sectionListRecyclerVertical)
       below(viewModel.sectionListRecyclerHorizontalRotator)
@@ -301,8 +300,7 @@ class PaletteUI constructor(
     }
 
     viewModel.harmonyView = harmonyView(
-      viewModel = viewModel,
-      recyclerLayoutParams = { bottomMargin = dip(10) }
+      viewModel = viewModel
     ) {
       id = R.id.harmony
     }.lparams {

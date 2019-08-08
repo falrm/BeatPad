@@ -68,6 +68,7 @@ class BeatScratchToolbar(
           viewModel.save(showSuccessToast = true)
         }
         R.id.copyPalette -> copyPalette()
+        R.id.exportMusicXml, R.id.exportMidi -> context.toast("TODO for subscription $!")
         else             -> context.toast("TODO!")
       }
       true
@@ -142,6 +143,8 @@ class BeatScratchToolbar(
     imageResource = R.drawable.view_score
     padding = dip(7)
     scaleType = ImageView.ScaleType.FIT_CENTER
+    isClickable = true
+    onClick { context.toast("TODO!") }
   }.beatScratchToolbarStyle()
   val editModeButton: ImageButton = imageButton {
     imageResource = R.drawable.edit_black
