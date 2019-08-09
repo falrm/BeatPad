@@ -16,6 +16,8 @@
           android:id="@+id/exportMidi"/>
     <item android:title="Export MusicXML..."
           android:id="@+id/exportMusicXml"/>
+    <item android:title="MIDI Output Settings"
+          android:id="@+id/configureMidiSynthesizers"/>
     <item android:title="About BeatScratch"
           android:id="@+id/aboutBeatScratch"/>
 </menu>

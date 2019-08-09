@@ -13,10 +13,7 @@ import android.widget.PopupMenu
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.storage.Storage
-import com.jonlatane.beatpad.util.HideAnimation
-import com.jonlatane.beatpad.util.applyTypeface
-import com.jonlatane.beatpad.util.color
-import com.jonlatane.beatpad.util.isHidden
+import com.jonlatane.beatpad.util.*
 import com.jonlatane.beatpad.util.smartrecycler.updateSmartHolders
 import com.jonlatane.beatpad.view.palette.filemanagement.PaletteManagementDialog
 import io.multifunctions.let
@@ -97,6 +94,7 @@ class BeatScratchToolbar(
       when {
 //        verticalSectionsVisible &&
         !horizontalSectionsVisible -> {
+          viewModel.sectionListRecyclerHorizontal.adapter.notifyDataSetChanged()
           viewModel.sectionListRecyclerHorizontalRotator.show(
             animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
           )
@@ -107,6 +105,7 @@ class BeatScratchToolbar(
         }
         //horizontalSectionsVisible && !verticalSectionsVisible
         else -> {
+          viewModel.sectionListRecyclerVertical.adapter.notifyDataSetChanged()
           viewModel.sectionListRecyclerHorizontalRotator.hide(
             animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
           )

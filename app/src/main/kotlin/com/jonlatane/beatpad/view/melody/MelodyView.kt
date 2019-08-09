@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewManager
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.view.*
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
@@ -22,6 +23,7 @@ inline fun ViewManager.melodyView(
 	= with(viewModel.melodyViewModel) {
 	ankoView({
 		melodyView = HideableRelativeLayout(it).apply {
+			backgroundColor = context.color(R.color.white)
 			melodyReferenceToolbar = melodyReferenceToolbar(viewModel) {
 				id = R.id.melody_reference_toolbar
 			}.lparams(matchParent, wrapContent) {
