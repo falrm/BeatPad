@@ -3,6 +3,7 @@ package com.jonlatane.beatpad.view.palette
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.ViewGroup
+import com.jonlatane.beatpad.BuildConfig
 import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
@@ -18,7 +19,10 @@ class PartListAdapter(
 	internal val recyclerView: _RecyclerView
 ) : SmartAdapter<PartHolder>() {
 	companion object {
-		const val MAX_PARTS = 8
+		val MAX_PARTS: Int = when(BuildConfig.FLAVOR) {
+			"full" -> 8
+			else -> 5
+		}
 	}
 
 	init {

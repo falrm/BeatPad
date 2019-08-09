@@ -45,8 +45,8 @@ android {
 		applicationId "com.jonlatane.beatpad"
 		minSdkVersion 23
 		targetSdkVersion 29
-		versionCode 80
-		versionName "0.50.0"
+		versionCode 81
+		versionName "0.50.1"
 		multiDexEnabled false
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 	}
@@ -57,6 +57,17 @@ android {
 		release {
 			minifyEnabled false
 			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		}
+	}
+	flavorDimensions "version"
+	productFlavors {
+		full {
+			dimension "version"
+		}
+		free {
+			dimension "version"
+			applicationIdSuffix ".free"
+			versionNameSuffix "-free"
 		}
 	}
 	sourceSets {

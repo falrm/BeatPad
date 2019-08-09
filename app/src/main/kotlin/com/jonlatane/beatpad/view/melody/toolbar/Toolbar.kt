@@ -7,11 +7,10 @@ import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.model.dsl.Patterns
 import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.util.tablet
 import com.jonlatane.beatpad.view.HideableLinearLayout
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.dip
-import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.*
 
 abstract class Toolbar(context: Context, val viewModel: PaletteViewModel)
   : HideableLinearLayout(context), Patterns
@@ -25,28 +24,37 @@ abstract class Toolbar(context: Context, val viewModel: PaletteViewModel)
   val melodyReference get() = melodyViewModel.melodyReference
   fun <T: View> T.flexStyle() = this.lparams {
     width = matchParent
-    height = dip(48)
+    height = squareSize
     weight = 1f
   }
 
 
+  val squareSize: Int = context.configuration.run {
+    when {
+      portrait -> dip(48)
+      else -> when {
+        tablet -> dip(48)
+        else -> dip(40)
+      }
+    }
+  }
   fun <T: View> T.hidden() = this.lparams {
     width = dip(0)
-    height = dip(48)
+    height = squareSize
     weight = 0f
   }
 
 
   fun <T: View> T.squareButtonStyle() = this.lparams {
-    width = dip(48)
-    height = dip(48)
+    width = squareSize
+    height = squareSize
     weight = 0f
   }
 
 
   fun <T: View> T.longSquareButtonStyle() = this.lparams {
-    width = dip(96)
-    height = dip(48)
+    width = 2 * squareSize
+    height = squareSize
     weight = 0f
   }
 }

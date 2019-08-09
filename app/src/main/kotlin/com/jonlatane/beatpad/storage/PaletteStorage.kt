@@ -175,6 +175,12 @@ object PaletteStorage : AnkoLogger {
             melody.id = UUID.randomUUID()
           }
         }
+
+        parts.forEach { part ->
+          part.melodies.forEach {
+            it.drumPart = (part.instrument as? MIDIInstrument)?.drumTrack == true
+          }
+        }
       }
     }
   }

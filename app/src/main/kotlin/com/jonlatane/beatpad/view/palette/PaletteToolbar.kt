@@ -42,7 +42,7 @@ class PaletteToolbar(
 //    }
   }
 
-  fun <T: View> T.palletteToolbarStyle(): T = this.lparams(matchParent, dip(48)) {
+  fun <T: View> T.palletteToolbarStyle(): T = this.lparams(matchParent, matchParent) {
     weight = 1f
   }
 

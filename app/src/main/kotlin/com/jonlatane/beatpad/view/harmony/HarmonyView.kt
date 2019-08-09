@@ -24,11 +24,10 @@ import java.util.*
 class HarmonyView(
   context: Context,
   val viewModel: PaletteViewModel,
-  recyclerLayoutParams: RelativeLayout.LayoutParams.() -> Unit = {},
   init: HideableRelativeLayout.() -> Unit = {}
 ) : HideableRelativeLayout(context), AnkoLogger {
-  companion object {
-  }
+  val marginForKey = dip(30)
+
   // We will render these at the top level on scroll
   val chordChangeLabels: MutableMap<Int, TextView> = mutableMapOf()
   private val chordChangeLabelPool: DefaultPool<TextView> = object : DefaultPool<TextView>(16) {
@@ -39,14 +38,12 @@ class HarmonyView(
       singleLine = true
       //ellipsize = TextUtils.TruncateAt.END
       isHorizontalFadingEdgeEnabled = true
-
       typeface = MainApplication.chordTypefaceBold
       elevation = 5f
     }.lparams(width = wrapContent, height = wrapContent) {
-      topMargin = dip(5)
-      marginStart = dip(40)
       alignParentLeft()
-      alignParentTop()
+      centerVertically()
+      marginStart = marginForKey
     }
 
     override fun validateInstance(instance: TextView) {
@@ -104,20 +101,13 @@ class HarmonyView(
             //updateEmptyViewVisibility(this@recyclerView)
           }
         })*/
-    }.lparams(0, 0)
+    }.lparams(matchParent, matchParent) {
+      marginStart = marginForKey - dip(5)
+    }
 
-
+    init()
     post {
-      viewModel.harmonyViewModel.harmonyElementRecycler?.lparams {
-        width = ViewGroup.LayoutParams.MATCH_PARENT
-        height = textView1.height + dip(10f)
-        //topMargin = dip(5)
-        bottomMargin = dip(5)
-        marginStart = dip(30)
-        alignParentRight()
-        alignParentTop()
-        recyclerLayoutParams()
-      }
+      syncScrollingChordText()
     }
   }
 

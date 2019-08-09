@@ -101,7 +101,9 @@ class BeatScratchToolbar(
           viewModel.sectionListRecyclerHorizontalSpacer?.show(
             animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
           )
-          viewModel.sectionListRecyclerVerticalRotator.hide(animation = HideAnimation.HORIZONTAL)
+          viewModel.sectionListRecyclerVerticalRotator.hide(animation = HideAnimation.HORIZONTAL) {
+            post { viewModel.melodyViewModel.onZoomFinished() }
+          }
         }
         //horizontalSectionsVisible && !verticalSectionsVisible
         else -> {
@@ -112,7 +114,9 @@ class BeatScratchToolbar(
           viewModel.sectionListRecyclerHorizontalSpacer?.hide(
             animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
           )
-          viewModel.sectionListRecyclerVerticalRotator.show(animation = HideAnimation.HORIZONTAL)
+          viewModel.sectionListRecyclerVerticalRotator.show(animation = HideAnimation.HORIZONTAL) {
+            post { viewModel.melodyViewModel.onZoomFinished() }
+          }
         }
       }
     }

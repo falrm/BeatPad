@@ -74,7 +74,7 @@ class OrbifoldView @JvmOverloads constructor(
   set(value) {
     field = value
     if(value) {
-      listOf(customButton, modeButton, slashButton).forEach {
+      listOf(customButton, modeButton/*, slashButton*/).forEach {
         it.isEnabled = true
         it.animate().alpha(1f)
       }

@@ -12,6 +12,7 @@ import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.HideAnimation
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.smartrecycler.firstVisibleItemPosition
+import com.jonlatane.beatpad.util.tablet
 import com.jonlatane.beatpad.view.colorboard.colorboardView
 import com.jonlatane.beatpad.view.harmony.harmonyView
 import com.jonlatane.beatpad.view.hideableLinearLayout
@@ -29,12 +30,11 @@ class PaletteUI constructor(
   val viewModel: PaletteViewModel
 ) : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
   var leftSideWidth: Int = 0
-  var isTablet: Boolean = false
   lateinit var layout: RelativeLayout
 
   override fun createView(ui: AnkoContext<PaletteEditorActivity>): RelativeLayout = with(ui) {
     layout = relativeLayout {
-      isTablet = ui.configuration.smallestScreenWidthDp > 600
+      backgroundColorResource = R.color.colorPrimaryDark
 
       if (configuration.portrait) {
         portraitLayout()
@@ -164,7 +164,7 @@ class PaletteUI constructor(
 
     viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
       id = R.id.toolbar
-    }.lparams(matchParent, wrapContent) {
+    }.lparams(matchParent, dip(48)) {
       below(viewModel.beatScratchToolbar)
     }
 
@@ -199,10 +199,10 @@ class PaletteUI constructor(
       viewModel = viewModel
     ) {
       id = View.generateViewId()
-    }.lparams(matchParent, wrapContent) {
-      //rightOf(viewModel.sectionListRecyclerVertical)
+    }.lparams(matchParent, dip(36)) {
       below(viewModel.sectionListRecyclerHorizontalRotator)
       rightOf(viewModel.sectionListRecyclerVerticalRotator)
+      bottomMargin = dip(5)
     }
 
     viewModel.partListView = partListView(viewModel = viewModel) {
@@ -264,8 +264,6 @@ class PaletteUI constructor(
       angle = 270
       viewModel.sectionListRecyclerHorizontal = sectionListView(viewModel = viewModel) {
         id = View.generateViewId()
-        //translationX = dip(48).toFloat()
-        //translationY = dip(48).toFloat()
       }.lparams(matchParent, dip(48))
     }.lparams(dip(48), matchParent) {
       alignParentLeft()
@@ -289,13 +287,11 @@ class PaletteUI constructor(
 
     viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
       id = R.id.toolbar
-      orientation = LinearLayout.VERTICAL
-    }.lparams {
-      width = dip(48)
-      height = matchParent
+      orientation = LinearLayout.HORIZONTAL
+    }.lparams(matchParent, if(context.configuration.tablet) dip(48) else dip(36)) {
       rightOf(viewModel.beatScratchToolbar)
       alignParentTop()
-      alignParentBottom()
+      alignParentRight()
 
     }
 
@@ -303,12 +299,11 @@ class PaletteUI constructor(
       viewModel = viewModel
     ) {
       id = R.id.harmony
-    }.lparams {
-      width = matchParent
-      height = wrapContent
-      rightOf(viewModel.toolbarView)
-      alignParentTop()
+    }.lparams(matchParent, dip(36)) {
+      rightOf(viewModel.beatScratchToolbar)
+      below(viewModel.toolbarView)
       alignParentRight()
+      bottomMargin = dip(4)
     }
 
     viewModel.partListView = partListView(viewModel = viewModel) {
@@ -317,7 +312,7 @@ class PaletteUI constructor(
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      rightOf(viewModel.toolbarView)
+      rightOf(viewModel.beatScratchToolbar)
       below(viewModel.harmonyView)
       alignParentRight()
     }
@@ -327,7 +322,7 @@ class PaletteUI constructor(
       textSize = 25f
       background = context.getDrawable(R.drawable.orbifold_chord)
     }.lparams(0, dip(40)) {
-      rightOf(viewModel.toolbarView)
+      rightOf(viewModel.beatScratchToolbar)
       below(viewModel.harmonyView)
     }
 
@@ -338,7 +333,7 @@ class PaletteUI constructor(
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      rightOf(viewModel.toolbarView)
+      rightOf(viewModel.beatScratchToolbar)
       below(viewModel.harmonyView)
       alignParentRight()
     }

@@ -13,6 +13,7 @@ import org.jetbrains.anko.allCaps
 import org.jetbrains.anko.singleLine
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.content.res.Configuration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import com.jonlatane.beatpad.MainApplication
@@ -141,6 +142,9 @@ fun View.animateHeight(height: Int, duration: Long = defaultDuration, endAction:
   }
 	anim.setDuration(duration).start()
 }
+
+inline val Configuration.tablet: Boolean
+  get() = smallestScreenWidthDp > 600
 
 enum class HideAnimation: AnkoLogger {
   VERTICAL {

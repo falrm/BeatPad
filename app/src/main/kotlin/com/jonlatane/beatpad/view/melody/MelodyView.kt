@@ -42,11 +42,9 @@ inline fun ViewManager.melodyView(
 					melodyRecyclerView.scrollingEnabled = !heldDown
 					melodyVerticalScrollView.scrollingEnabled = !heldDown
 				}
-			}.lparams {
+			}.lparams(matchParent, melodyReferenceToolbar.squareSize) {
 				alignParentBottom()
 				alignParentRight()
-				width = ViewGroup.LayoutParams.MATCH_PARENT
-				height = dimen(R.dimen.subdivision_controller_size)
 				leftMargin = dip(30)
 			}
 			melodyLeftScroller = nonDelayedScrollView {
@@ -59,9 +57,7 @@ inline fun ViewManager.melodyView(
 				}
 				scrollingEnabled = false
 				isVerticalScrollBarEnabled = false
-			}.lparams {
-				width = dip(30)
-				height = ViewGroup.LayoutParams.MATCH_PARENT
+			}.lparams(dip(30), matchParent) {
 				below(melodyEditingToolbar)
 				above(melodyEditingModifiers)
 				alignParentLeft()

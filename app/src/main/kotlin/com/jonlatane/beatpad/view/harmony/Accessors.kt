@@ -9,6 +9,5 @@ import org.jetbrains.anko.custom.ankoView
 fun ViewManager.harmonyView(
   viewModel: PaletteViewModel,
   theme: Int = 0,
-  recyclerLayoutParams: RelativeLayout.LayoutParams.() -> Unit = {},
   init: HarmonyView.() -> Unit = {}
-): HarmonyView = ankoView({ HarmonyView(it, viewModel, recyclerLayoutParams) }, theme, init)
+): HarmonyView = ankoView({ HarmonyView(it, viewModel) }, theme, init)
