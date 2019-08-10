@@ -8,16 +8,14 @@ import android.graphics.Matrix
 import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewParent
+import android.view.*
 
 import com.jonlatane.beatpad.view.RotateLayout
 
 import android.view.View.MeasureSpec.UNSPECIFIED
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.HideableView
+import org.jetbrains.anko.custom.ankoView
 import java.lang.Math.PI
 import java.lang.Math.abs
 import java.lang.Math.ceil

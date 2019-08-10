@@ -15,6 +15,7 @@ import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.*
 import com.jonlatane.beatpad.util.smartrecycler.updateSmartHolders
+import com.jonlatane.beatpad.view.midi.MidiOutputConfiguration
 import com.jonlatane.beatpad.view.palette.filemanagement.PaletteManagementDialog
 import io.multifunctions.let
 import org.jetbrains.anko.*
@@ -24,8 +25,9 @@ import java.net.URI
 
 class BeatScratchToolbar(
   override val storageContext: Context,
-  val viewModel: PaletteViewModel
-) : _LinearLayout(storageContext), AnkoLogger, Storage {
+  override val viewModel: PaletteViewModel
+) : _LinearLayout(storageContext), AnkoLogger, Storage, MidiOutputConfiguration {
+  override val configurationContext: Context = storageContext
   val paletteManagement = PaletteManagementDialog(context, viewModel)
 
   init {
@@ -65,7 +67,8 @@ class BeatScratchToolbar(
           viewModel.save(showSuccessToast = true)
         }
         R.id.copyPalette -> copyPalette()
-        R.id.exportMusicXml, R.id.exportMidi -> context.toast("TODO for subscription $!")
+        R.id.exportMusicXml, R.id.exportMidi -> context.toast("TODO for subscription 💸!")
+        R.id.configureMidiSynthesizers -> midiOutputConfigurationAlert.show()
         else             -> context.toast("TODO!")
       }
       true
