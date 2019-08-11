@@ -106,6 +106,7 @@ class PaletteUI constructor(
           .withEndAction { viewModel.melodyView.alpha = 1f }
           .withEndAction { viewModel.melodyView.translationX = 10.27f * viewModel.melodyView.width }
           .start()
+        viewModel.melodyViewModel.onZoomFinished(false)
 
         // Some tasty un-threadsafe spaghetti for syncing the two RecyclerViews for Harmony and Melody
         val inScrollingStack = AtomicBoolean(false)

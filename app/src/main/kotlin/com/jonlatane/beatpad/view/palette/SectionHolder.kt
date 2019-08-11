@@ -197,8 +197,6 @@ class SectionHolder(
       else -> R.drawable.orbifold_chord
     }
     itemView.padding = itemView.dip(3)
-    pasteHarmony.isEnabled = viewModel.harmonyViewModel.getClipboardHarmony() != null
-
     when {
       adapterPosition < 0 -> {}
       adapterPosition < viewModel.palette.sections.size -> makeEditableSection()
@@ -221,6 +219,7 @@ class SectionHolder(
         viewModel.sectionListAdapters.forEach { it.recyclerView.updateSmartHolders() }
       }
       setOnLongClickListener {
+        pasteHarmony.isEnabled = viewModel.harmonyViewModel.getClipboardHarmony() != null
         menu.show()
         true
       }

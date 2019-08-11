@@ -87,7 +87,7 @@ class HarmonyView(
         }
       }
 
-      zoomFinishedHandler = viewModel.melodyViewModel::onZoomFinished
+      zoomFinishedHandler = { viewModel.melodyViewModel.onZoomFinished() }
       overScrollMode = View.OVER_SCROLL_NEVER
       viewModel.harmonyViewModel.beatAdapter = HarmonyBeatAdapter(viewModel, this)
       adapter = viewModel.harmonyViewModel.beatAdapter

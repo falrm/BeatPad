@@ -45,7 +45,7 @@ inline fun ViewManager.melodyView(
 			}.lparams(matchParent, melodyReferenceToolbar.squareSize) {
 				alignParentBottom()
 				alignParentRight()
-				leftMargin = dip(30)
+				alignParentLeft()
 			}
 			melodyLeftScroller = nonDelayedScrollView {
 				id = R.id.left_scroller
@@ -103,7 +103,7 @@ inline fun ViewManager.melodyView(
 						}
 					}
 
-					zoomFinishedHandler = ::onZoomFinished
+					zoomFinishedHandler = { onZoomFinished() }
 					layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
 						isItemPrefetchEnabled = false
 					}

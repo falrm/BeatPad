@@ -67,7 +67,7 @@ object MidiDevices : AnkoLogger {
 		if (info.inputPortCount > 0) {
 			MidiSynthesizers.setupSynthesizer(info)
 		} else {
-			MainApplication.instance.toast("${info.name} doesn't support MIDI input :(")
+//			MainApplication.instance.toast("${info.name} doesn't support MIDI input :(")
 		}
 		if (info.outputPortCount > 0) {
 			//MidiControllers.setupController(info)

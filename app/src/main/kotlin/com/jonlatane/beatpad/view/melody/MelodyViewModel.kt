@@ -19,6 +19,7 @@ import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.info
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.ceil
 import kotlin.math.round
 import kotlin.properties.Delegates.observable
 
@@ -121,10 +122,13 @@ class MelodyViewModel(
 	/**
 	 * Exposed for access by [HarmonyView]
 	 */
-	fun onZoomFinished() = with(beatAdapter) {
+	fun onZoomFinished(animated: Boolean = true) = with(beatAdapter) {
 		val targetWidth = if(layoutType == LayoutType.GRID) {
-			round(melodyVerticalScrollView.width.toFloat() / recommendedSpanCount).toInt()
-				.also { animateElementWidth(it) }
+			ceil(melodyVerticalScrollView.width.toFloat() / recommendedSpanCount).toInt()
+				.also {
+					if(animated) animateElementWidth(it)
+					else elementWidth =  it
+				}
 		} else elementWidth
 
 		// Align height for notation against target width
@@ -134,7 +138,8 @@ class MelodyViewModel(
 				elementHeight < 0.5f * targetWidth -> (0.5f * targetWidth).toInt()
 				else -> elementHeight
 			}
-			animateElementHeight(targetHeight)
+			if(animated) animateElementHeight(targetHeight)
+			else elementHeight = targetHeight
 		}
 	}
 
