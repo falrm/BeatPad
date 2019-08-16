@@ -186,14 +186,14 @@ class PaletteManagementDialog(
           padding = dip(16)
           id = View.generateViewId()
 
-          createFromIntentCheckbox = checkBox{
+          createFromIntentCheckbox = checkBox {
             id = View.generateViewId()
             onCheckedChange { _, isChecked ->
               if(isChecked) createFromClipboardCheckbox.isChecked = false
             }
           }.lparams(wrapContent, wrapContent)
 
-          createFromIntentText = textView{
+          createFromIntentText = textView {
             id = View.generateViewId()
             text = "Create from the opened URL"
             typeface = MainApplication.chordTypeface
@@ -212,7 +212,7 @@ class PaletteManagementDialog(
             }
           }.lparams(wrapContent, wrapContent)
 
-          createFromClipboardText = textView{
+          createFromClipboardText = textView {
             id = View.generateViewId()
             text = "Create from the clipboard"
             typeface = MainApplication.chordTypeface

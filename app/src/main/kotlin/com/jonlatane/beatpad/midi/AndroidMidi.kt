@@ -4,6 +4,7 @@ import android.content.pm.PackageManager
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.util.booleanPref
 import org.billthefarmer.mididriver.MidiDriver
+import java.io.ByteArrayOutputStream
 
 /**
  * Singleton interface to native MIDI android devices (via [PackageManager.FEATURE_MIDI]).
@@ -25,6 +26,17 @@ object AndroidMidi {
 			field = value
 			sendToInternalSynthSetting = value
 		}
+
+	val sendStream = ByteArrayOutputStream(2048)
+	fun flushSendStream() {
+		send (
+			synchronized(sendStream) {
+				sendStream.toByteArray().copyOf().also {
+					sendStream.reset()
+				}
+			}
+		)
+	}
 	fun send(bytes: ByteArray) {
 		if(sendToInternalSynth) {
 			ONBOARD_DRIVER.write(bytes)

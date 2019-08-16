@@ -10,6 +10,7 @@ import android.widget.CheckBox
 import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.midi.AndroidMidi
+import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.view.BaseConfiguration
 import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
@@ -42,10 +43,11 @@ interface MidiOutputConfiguration: BaseConfiguration {
           isChecked = AndroidMidi.sendToInternalSynth
           onCheckedChange { _, isChecked ->
             AndroidMidi.sendToInternalSynth = isChecked
+            MidiDevices.refreshInstruments()
           }
         }.lparams(wrapContent, wrapContent)
 
-        playToSonivoxText = textView{
+        playToSonivoxText = textView {
           id = View.generateViewId()
           text = "Output to onboard Sonivox (ringtone) synth"
           typeface = MainApplication.chordTypeface
@@ -62,10 +64,11 @@ interface MidiOutputConfiguration: BaseConfiguration {
           isEnabled = systemHasMidiSupport
           onCheckedChange { _, isChecked ->
             AndroidMidi.sendToExternalSynth = isChecked
+            MidiDevices.refreshInstruments()
           }
         }.lparams(wrapContent, wrapContent)
 
-        playToExternalSynthsText = textView{
+        playToExternalSynthsText = textView {
           id = View.generateViewId()
           text = "Output to external synths (FluidSynth, MainStage, MIDI keyboards, etc.)"
           typeface = MainApplication.chordTypeface

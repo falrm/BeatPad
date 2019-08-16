@@ -5,6 +5,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.model.Instrument
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
@@ -121,6 +122,7 @@ class KeyboardIOHandler(
 			}
 		}
 		instrument.stop(n)
+		AndroidMidi.flushSendStream()
 	}
 
 	private fun pressNote(n: Int) {
@@ -131,6 +133,7 @@ class KeyboardIOHandler(
       }
 		}
 		instrument.play(n, 127)
+		AndroidMidi.flushSendStream()
 	}
 
 	// Utility method in case the keyboard is scrolled when keys are pressed.

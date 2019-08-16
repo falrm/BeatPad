@@ -9,6 +9,7 @@ import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import kotlinx.io.pool.DefaultPool
+import org.jetbrains.anko.dip
 import org.jetbrains.anko.info
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
@@ -128,7 +129,10 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
   ) {
     val maxSubdivisonsPerBeat = (sectionMelodiesOfPartType + melody)
       .map { it.subdivisionsPerBeat }.max()!!
-    val maxBoundsWidth = (overallBounds.right - overallBounds.left) / maxSubdivisonsPerBeat
+    val maxBoundsWidth = min(
+      (overallBounds.right - overallBounds.left) / maxSubdivisonsPerBeat,
+      round(letterStepSize * 10).toInt()
+    )
     iterateSubdivisions(melody) { elementPosition ->
       bounds.right = bounds.left + maxBoundsWidth
       colorGuideAlpha = (when {
@@ -213,7 +217,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
       if (tones.isNotEmpty()) {
         val boundsWidth = bounds.width()
         val maxFittableNoteheadWidth = ceil(boundsWidth / 2.6f).toInt()
-        val noteheadWidth = Math.min((letterStepSize * 2).toInt(), maxFittableNoteheadWidth)
+        val noteheadWidth = min((letterStepSize * 2).toInt(), maxFittableNoteheadWidth)
         val noteheadHeight = noteheadWidth//(bounds.right - bounds.left)
 
         val playbackNotes = tones.map {

@@ -1,6 +1,7 @@
 //import com.jonlatane.beatpad.output.service.let
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.model.*
 import com.jonlatane.beatpad.model.chord.Chord
@@ -36,7 +37,7 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
   set(value) {
     field = value
     viewModel?.notifySectionChange()
-    MidiDevices.refreshInstruments()
+    //MidiDevices.refreshInstruments()
   }
   val currentSectionDrawable: Int get() = palette?.sections
     ?.indexOf(section)?.let { sectionIndex ->
@@ -145,6 +146,7 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
       }
     }
 
+    AndroidMidi.flushSendStream()
     viewModel?.harmonyView?.post { viewModel?.playbackTick = tickPosition }
   }
 

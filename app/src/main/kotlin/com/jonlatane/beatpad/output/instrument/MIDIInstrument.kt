@@ -26,7 +26,7 @@ class MIDIInstrument constructor(
 	override val type get() = "midi"
 	@Transient override val tones: MutableList<Int> = Collections.synchronizedList(mutableListOf<Int>())
 
-	override fun send(data: ByteArray) = AndroidMidi.send(data)
+	override fun send(data: ByteArray) = AndroidMidi.sendStream.write(data)
 
 	override val instrumentName: String
 		@JsonIgnore get() = if(gm2Configuration.msb != null) GM2Effects.all.find {

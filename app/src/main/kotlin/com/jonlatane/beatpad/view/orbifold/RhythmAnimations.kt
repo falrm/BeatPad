@@ -5,6 +5,7 @@ import android.view.MotionEvent.*
 import android.view.View
 import android.view.ViewPropertyAnimator
 import android.view.animation.DecelerateInterpolator
+import com.jonlatane.beatpad.midi.AndroidMidi
 
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 import org.jetbrains.anko.AnkoLogger
@@ -23,6 +24,7 @@ object RhythmAnimations: AnkoLogger {
 					ACTION_DOWN, ACTION_POINTER_DOWN -> {
 						pointerCount.incrementAndGet()
 						instrument.play()
+						AndroidMidi.flushSendStream()
 						v.centralChordThrobber.alpha = 0.1f
 						v.centralChordThrobber.scaleX = 0.5f
 						v.centralChordThrobber.scaleY = 0.5f
@@ -37,6 +39,7 @@ object RhythmAnimations: AnkoLogger {
 					ACTION_UP, ACTION_POINTER_UP -> {
 						if (pointerCount.decrementAndGet() == 0) {
 							instrument.stop()
+							AndroidMidi.flushSendStream()
 							v.centralChordThrobber.z = Float.MIN_VALUE
 							if (animator != null) {
 								animator!!.cancel()
