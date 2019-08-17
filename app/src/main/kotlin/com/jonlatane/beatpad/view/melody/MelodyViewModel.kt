@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.util.smartrecycler.applyToHolders
@@ -26,7 +27,14 @@ import kotlin.properties.Delegates.observable
 class MelodyViewModel(
   val paletteViewModel: PaletteViewModel
 ): AnkoLogger {
-	var openedMelody by observable<Melody<*>?>(PaletteStorage.baseMelody) { _, _, _ ->
+	var openedMelody: Melody<*>? by observable<Melody<*>?>(null) { _, _, _ ->
+		updateToolbarsAndMelody()
+	}
+	var openedPart: Part? by observable<Part?>(null) { _, _, _ ->
+		updateToolbarsAndMelody()
+	}
+	enum class SectionLayoutType { SINGLE_SECTION, FULL_PALETTE }
+	var sectionLayoutType: SectionLayoutType by observable(SectionLayoutType.SINGLE_SECTION) { _, _, _ ->
 		updateToolbarsAndMelody()
 	}
 	val melodyReference get() = openedMelody?.let { melody ->

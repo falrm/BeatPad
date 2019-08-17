@@ -193,8 +193,17 @@ class MelodyBeatAdapter(
 
   val Pattern<*>.itemCount get() = ceil(length.toDouble()/subdivisionsPerBeat).toInt()
 
-  override fun getItemCount(): Int = viewModel.harmony?.itemCount
-    ?: viewModel.openedMelody?.itemCount
-    ?: 1 // Always render at least one item, for layout sanity
+  override fun getItemCount(): Int = viewModel.run {
+    when(sectionLayoutType) {
+      MelodyViewModel.SectionLayoutType.SINGLE_SECTION ->
+        harmony?.itemCount
+          ?: openedMelody?.itemCount
+          ?: 0
+      MelodyViewModel.SectionLayoutType.FULL_PALETTE ->
+        paletteViewModel.palette.sections.fold(0) { sum, section ->
+          sum + section.harmony.itemCount
+        }
+    }
+  }
 
 }

@@ -63,11 +63,13 @@ android {
 	productFlavors {
 		full {
 			dimension "version"
+			resValue "string", "app_name", "BeatScratch Pro"
 		}
 		free {
 			dimension "version"
 			applicationIdSuffix ".free"
 			versionNameSuffix "-free"
+			resValue "string", "app_name", "BeatScratch Free"
 		}
 	}
 	sourceSets {
