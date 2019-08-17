@@ -40,4 +40,20 @@ class ChordTest : Test({
 		assertThat(Chord(5, Maj7).closestTone(7)).isEqualTo(5) // Closest to G in an FMaj7 is F.
 		assertThat(Chord(5, Maj7).closestTone(10)).isEqualTo(9) // Closest to Bb in an FMaj7 is A.
 	}
+
+	describe("Unique chord names") {
+		val possibleChords = (0..2047).map { chordSeed ->
+			val extension = (1..11).fold(setOf<Int>()) { result, step ->
+
+				if(((chordSeed shr (11 - step)) % 2) == 1) {
+					result + step
+				} else result
+			}
+			println("$chordSeed -> $extension")
+			Chord(0, extension.sorted().toIntArray())
+		}
+
+		println("${possibleChords.size} possible chords")
+		println("${possibleChords.map { it.name }.toSet().size } possible names")
+	}
 })

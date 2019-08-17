@@ -12,7 +12,9 @@ import com.jonlatane.beatpad.model.chord.*
 
  * The method getColorString()
  */
-class Heptatonics(private val colors: Set<Int>) {
+data class Heptatonics(
+  private val colors: Set<Int>
+) {
 	val isMinor get() = !isMajor && colors.contains(3)
 	val isDominant get() = isMajor && hasMinor7
 	val isMajor get() = colors.contains(4)
