@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.PopupMenu
+import com.jonlatane.beatpad.BuildConfig
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.storage.Storage
@@ -42,7 +43,10 @@ class BeatScratchToolbar(
   }
 
   val appButton: ImageButton = imageButton {
-    imageResource = R.drawable.beatscratch_icon_toolbar
+    imageResource = when(BuildConfig.FLAVOR) {
+      "full" -> R.drawable.beatscratch_icon_toolbar
+      else -> R.drawable.beatscratch_icon_free_toolbar
+    }
     backgroundResource = R.drawable.toolbar_button_beatscratch
     padding = dip(0)
     scaleType = ImageView.ScaleType.FIT_CENTER

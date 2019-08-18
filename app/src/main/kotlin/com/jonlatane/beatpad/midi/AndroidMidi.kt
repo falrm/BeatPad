@@ -7,7 +7,8 @@ import org.billthefarmer.mididriver.MidiDriver
 import java.io.ByteArrayOutputStream
 
 /**
- * Singleton interface to native MIDI android devices (via [PackageManager.FEATURE_MIDI]).
+ * Singleton interface to both the Sonivox synthesizer ([ONBOARD_DRIVER])
+ * and native MIDI android devices (via [PackageManager.FEATURE_MIDI]).
  */
 object AndroidMidi {
 	internal var isPlayingFromExternalDevice = false
@@ -20,11 +21,13 @@ object AndroidMidi {
 		set(value) {
 			field = value
 			sendToExternalSynthSetting = value
+			if(!value) deactivateUnusedDevices()
 		}
 	var sendToInternalSynth = sendToInternalSynthSetting
 		set(value) {
 			field = value
 			sendToInternalSynthSetting = value
+			if(!value) deactivateUnusedDevices()
 		}
 
 	val sendStream = ByteArrayOutputStream(2048)
@@ -46,6 +49,20 @@ object AndroidMidi {
 				&& sendToExternalSynth
 		) {
 			MidiSynthesizers.send(bytes)
+		}
+	}
+
+	private fun deactivateUnusedDevices() {
+		if(!sendToInternalSynth) {
+			ONBOARD_DRIVER.write(byteArrayOf(123.toByte())) // All notes off
+			ONBOARD_DRIVER.write(byteArrayOf(0xFF.toByte())) // Midi reset
+		}
+		if (
+			MainApplication.instance.packageManager.hasSystemFeature(PackageManager.FEATURE_MIDI)
+			&& !sendToExternalSynth
+		) {
+			MidiSynthesizers.send(byteArrayOf(123.toByte())) // All notes off
+			MidiSynthesizers.send(byteArrayOf(0xFF.toByte())) // Midi reset
 		}
 	}
 }

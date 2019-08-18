@@ -14,6 +14,7 @@ import com.jonlatane.beatpad.SplashActivity
 import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
+import com.jonlatane.beatpad.storage.Storage
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 
@@ -133,8 +134,8 @@ class PlaybackService : Service(), AnkoLogger {
     val sectionName = BeatClockPaletteConsumer.section?.name ?: "..."
     val notification = NotificationCompat.Builder(this, channelId)
       .setSmallIcon(R.drawable.beatscratch_icon_inset_slight_transparent_keys)
-      .setContentTitle("MIDI Playback")
-      .setTicker("MIDI Playback")
+      .setContentTitle(Storage.openPaletteFile)
+      .setTicker(Storage.openPaletteFile)
       .setPriority(PRIORITY_DEFAULT)
       .setVibrate(null)
       .setSound(null)

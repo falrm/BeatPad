@@ -3,6 +3,7 @@ package com.jonlatane.beatpad.output.service
 import BeatClockPaletteConsumer.tickPosition
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.midi.AndroidMidi
+import com.jonlatane.beatpad.midi.MidiSynthesizers
 import org.jetbrains.anko.*
 import java.util.*
 
@@ -29,6 +30,9 @@ internal class PlaybackThread : Thread(), AnkoLogger {
           BeatClockPaletteConsumer.viewModel?.toolbarView?.playButton?.imageResource = R.drawable.icons8_play_100
           BeatClockPaletteConsumer.clearActiveAttacks()
           AndroidMidi.flushSendStream()
+          if(MidiSynthesizers.synthesizers.size > 0) {
+
+          }
           synchronized(PlaybackThread) {
             (PlaybackThread as java.lang.Object).wait()
           }

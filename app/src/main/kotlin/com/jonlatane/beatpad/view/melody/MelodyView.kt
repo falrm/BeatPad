@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.view.melody
 
+import android.animation.ValueAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -21,8 +22,8 @@ inline fun ViewManager.melodyView(
 	init: HideableRelativeLayout.() -> Unit
 )
 	= with(viewModel.melodyViewModel) {
-	ankoView({
-		melodyView = HideableRelativeLayout(it).apply {
+	ankoView({ context ->
+		melodyView = HideableRelativeLayout(context).apply {
 			backgroundColor = context.color(R.color.white)
 			melodyReferenceToolbar = melodyReferenceToolbar(viewModel) {
 				id = R.id.melody_reference_toolbar
@@ -37,8 +38,16 @@ inline fun ViewManager.melodyView(
 			melodyEditingModifiers = melodyEditingModifiers {
 				id = R.id.bottom_scroller
 				onHeldDownChanged = { heldDown ->
-					//if (heldDown) holdToEdit?.animate()?.alpha(0f)?.translationY(100f)
-					//else holdToEdit?.animate()?.alpha(1f)?.translationY(0f)
+					if(displayType == MelodyViewModel.DisplayType.NOTATION) {
+						val anim = ValueAnimator.ofFloat(
+							beatAdapter.colorblockAlpha,
+							if(heldDown) 0.43f else 0f
+						)
+						anim.addUpdateListener { valueAnimator ->
+							beatAdapter.colorblockAlpha = valueAnimator.animatedValue as Float
+						}
+						anim.start()
+					}
 					melodyRecyclerView.scrollingEnabled = !heldDown
 					melodyVerticalScrollView.scrollingEnabled = !heldDown
 				}
