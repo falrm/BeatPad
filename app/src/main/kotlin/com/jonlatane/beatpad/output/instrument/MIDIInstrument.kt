@@ -7,6 +7,8 @@ import com.jonlatane.beatpad.midi.GM1Effects.MIDI_INSTRUMENT_NAMES
 import com.jonlatane.beatpad.midi.GM2Effects
 import com.jonlatane.beatpad.model.Instrument
 import com.jonlatane.beatpad.model.Instrument.Midi.GM2Configuration
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 import java.util.*
 
 class MIDIInstrument constructor(
@@ -14,7 +16,7 @@ class MIDIInstrument constructor(
 	override var instrument: Byte = 0,
 	override var drumTrack: Boolean = false,
 	override val gm2Configuration: GM2Configuration = GM2Configuration()
-) : Instrument.Midi {
+) : Instrument.Midi, AnkoLogger {
 	override var volume: Float = 1f
 		set(value) {
 			field = when {
@@ -26,7 +28,10 @@ class MIDIInstrument constructor(
 	override val type get() = "midi"
 	@Transient override val tones: MutableList<Int> = Collections.synchronizedList(mutableListOf<Int>())
 
-	override fun send(data: ByteArray) = AndroidMidi.sendStream.write(data)
+	override fun send(data: ByteArray) {
+		info("MIDI send: $data")
+		AndroidMidi.sendStream.write(data)
+	}
 
 	override val instrumentName: String
 		@JsonIgnore get() = if(gm2Configuration.msb != null) GM2Effects.all.find {

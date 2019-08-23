@@ -19,6 +19,7 @@ import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.*
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.withAlpha
+import kotlin.math.floor
 
 
 @SuppressLint("ViewConstructor")
@@ -104,7 +105,7 @@ class HarmonyBeatView constructor(
           val newPlaybackTick = position.convertPatternIndex(
             fromSubdivisionsPerBeat = harmony.subdivisionsPerBeat,
             toSubdivisionsPerBeat = 24,
-            toLength = Math.floor(harmony.length.toDouble() / harmony.subdivisionsPerBeat)
+            toLength = floor(harmony.length.toDouble() / harmony.subdivisionsPerBeat)
               .toInt() * 24
           )
           BeatClockPaletteConsumer.tickPosition = newPlaybackTick

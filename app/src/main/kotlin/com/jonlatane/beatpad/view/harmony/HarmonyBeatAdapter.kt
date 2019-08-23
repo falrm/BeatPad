@@ -60,4 +60,8 @@ class HarmonyBeatAdapter(
 	override fun getItemCount(): Int = viewModel.harmonyViewModel.harmony?.let { harmony ->
 		Math.ceil(harmony.length.toDouble() / harmony.subdivisionsPerBeat).toInt()
 	}?: 16 // Always render at least one item, for layout sanity. 16 is kind of a hack though.
+
+	override fun invalidate(beatPosition: Int) {
+		recyclerView.layoutManager.findViewByPosition(beatPosition)?.invalidate()
+	}
 }

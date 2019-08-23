@@ -6,13 +6,17 @@ import android.animation.ValueAnimator
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
+import android.widget.LinearLayout
 import com.jonlatane.beatpad.model.Pattern
 import com.jonlatane.beatpad.util.*
 import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import com.jonlatane.beatpad.util.smartrecycler.applyToHolders
+import com.jonlatane.beatpad.view.harmony.HarmonyBeatView
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko._LinearLayout
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.verbose
@@ -60,7 +64,7 @@ class MelodyBeatAdapter(
         }
         verbose("Setting width to $field")
         recyclerView.applyToHolders<MelodyBeatHolder> {
-          it.element.layoutWidth = field
+          it.melodyBeatView.layoutWidth = field
         }
         if(
           viewModel.layoutType == MelodyViewModel.LayoutType.GRID
@@ -88,7 +92,7 @@ class MelodyBeatAdapter(
 
         verbose("Setting height to $field")
         recyclerView.applyToHolders<MelodyBeatHolder> {
-          it.element.layoutHeight = field
+          it.melodyBeatView.layoutHeight = field
         }
         axis.layoutHeight = field
       }
@@ -155,7 +159,7 @@ class MelodyBeatAdapter(
     set(value) {
       field = value
       recyclerView.applyToHolders<MelodyBeatHolder> {
-        it.element.apply {
+        it.melodyBeatView.apply {
           invalidate()
         }
       }
@@ -165,31 +169,53 @@ class MelodyBeatAdapter(
     set(value) {
       field = value
       recyclerView.applyToHolders<MelodyBeatHolder> {
-        it.element.apply {
+        it.melodyBeatView.apply {
           invalidate()
         }
       }
     }
 
+  val RecyclerView.harmonyViewHeight     get() = min(dip(45),elementHeight/10)
+  val MelodyBeatHolder.harmonyViewHeight get() = min(harmonyBeatView.dip(45),elementHeight/10)
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyBeatHolder {
     return with(recyclerView) {
+      val melodyBeatView = MelodyBeatView(context, viewModel = viewModel)
+        .lparams(elementWidth, elementHeight)
+      val harmonyBeatView = HarmonyBeatView(
+        context,
+        viewModel = viewModel.paletteViewModel.harmonyViewModel
+      ).lparams(elementWidth, harmonyViewHeight)
+      val element: View = _LinearLayout(
+        melodyBeatView.context
+      ).apply {
+        orientation = LinearLayout.VERTICAL
+        addView(harmonyBeatView)
+        addView(melodyBeatView)
+      }.lparams(elementWidth, elementHeight + harmonyViewHeight)
       MelodyBeatHolder(
         viewModel = viewModel,
-        element = MelodyBeatView(context, viewModel = viewModel).lparams {
-          width = elementWidth
-          height = elementHeight
-        },
+        harmonyBeatView = harmonyBeatView,
+        melodyBeatView = melodyBeatView,
+        element = element,
         adapter = this@MelodyBeatAdapter
       )
     }
   }
 
-  override fun onBindViewHolder(holder: MelodyBeatHolder, elementPosition: Int) {
-    holder.element.beatPosition = elementPosition
-    holder.element.layoutWidth = elementWidth
-    holder.element.layoutHeight = elementHeight
-    holder.element.invalidate()
+  override fun onBindViewHolder(holder: MelodyBeatHolder, elementPosition: Int) = with(holder) {
+
+    element.layoutWidth = elementWidth
+    element.layoutHeight = elementHeight + harmonyViewHeight
+    melodyBeatView.beatPosition = elementPosition
+    melodyBeatView.layoutWidth = elementWidth
+    melodyBeatView.layoutHeight = elementHeight
+    melodyBeatView.invalidate()
+    harmonyBeatView.beatPosition = elementPosition
+    harmonyBeatView.layoutWidth = elementWidth
+    harmonyBeatView.layoutHeight = harmonyViewHeight
+    harmonyBeatView.invalidate()
   }
+
 
   val Pattern<*>.itemCount get() = ceil(length.toDouble()/subdivisionsPerBeat).toInt()
 
@@ -203,6 +229,16 @@ class MelodyBeatAdapter(
         paletteViewModel.palette.sections.fold(0) { sum, section ->
           sum + section.harmony.itemCount
         }
+    }
+  }
+
+  override fun invalidate(beatPosition: Int) {
+    boundViewHolders.find { it.adapterPosition == beatPosition }?.apply {
+      harmonyBeatView.invalidate()
+      melodyBeatView.invalidate()
+    }
+    (recyclerView.layoutManager.findViewByPosition(beatPosition) as? ViewGroup)?.apply {
+      (0 until childCount).map { getChildAt(it) }.forEach { it.invalidate() }
     }
   }
 

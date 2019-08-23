@@ -4,13 +4,15 @@ import android.content.pm.PackageManager
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.util.booleanPref
 import org.billthefarmer.mididriver.MidiDriver
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 import java.io.ByteArrayOutputStream
 
 /**
  * Singleton interface to both the Sonivox synthesizer ([ONBOARD_DRIVER])
  * and native MIDI android devices (via [PackageManager.FEATURE_MIDI]).
  */
-object AndroidMidi {
+object AndroidMidi : AnkoLogger {
 	internal var isPlayingFromExternalDevice = false
 	internal var lastMidiSyncTime: Long? = null
 	val ONBOARD_DRIVER = MidiDriver()
@@ -41,6 +43,7 @@ object AndroidMidi {
 		)
 	}
 	fun send(bytes: ByteArray) {
+		info("MIDI send: $bytes")
 		if(sendToInternalSynth) {
 			ONBOARD_DRIVER.write(bytes)
 		}
