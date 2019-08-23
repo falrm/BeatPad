@@ -91,7 +91,7 @@ class SectionHolder(
       R.drawable.orbifold_chord_dominant,
       R.drawable.orbifold_chord_augmented,
       R.drawable.orbifold_chord_diminished
-    )[sectionIndex % 5]
+    )[(sectionIndex + 5) % 5]
     fun sectionColor(sectionIndex: Int) = arrayOf(
       R.color.major,
       R.color.minor,
@@ -189,6 +189,9 @@ class SectionHolder(
   private val duplicateSection: MenuItem get() = menu.menu.findItem(R.id.duplicateSection)
   private val copyHarmony: MenuItem get() = menu.menu.findItem(R.id.copySectionHarmony)
   private val pasteHarmony: MenuItem get() = menu.menu.findItem(R.id.pasteSectionHarmony)
+  private val copyPartLevels: MenuItem get() = menu.menu.findItem(R.id.copySectionPartLevels)
+  private val pastePartLevels: MenuItem get() = menu.menu.findItem(R.id.pasteSectionPartLevels)
+  private val matchPartLevels: MenuItem get() = menu.menu.findItem(R.id.matchClipboardPartLevels)
 
   override fun updateSmartHolder() {
     deleteSection.isEnabled = viewModel.palette.sections.size > 1
@@ -215,11 +218,26 @@ class SectionHolder(
     }
     itemView.apply {
       setOnClickListener {
-        BeatClockPaletteConsumer.section = section
-        viewModel.sectionListAdapters.forEach { it.recyclerView.updateSmartHolders() }
+        if(BeatClockPaletteConsumer.section == section) {
+          val previouslyEditingMelody = viewModel.editingMelody
+          viewModel.backStack.push {
+            when {
+              previouslyEditingMelody != null -> viewModel.editingMelody = previouslyEditingMelody
+              else                            -> viewModel.hideMelodyView()
+            }
+            true
+          }
+          viewModel.editingMelody = null
+          viewModel.showMelodyView()
+        } else {
+          BeatClockPaletteConsumer.section = section
+          viewModel.sectionListAdapters.forEach { it.recyclerView.updateSmartHolders() }
+        }
       }
       setOnLongClickListener {
         pasteHarmony.isEnabled = viewModel.harmonyViewModel.getClipboardHarmony() != null
+        pastePartLevels.isEnabled = false
+        matchPartLevels.isEnabled = false
         menu.show()
         true
       }

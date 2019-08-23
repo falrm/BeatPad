@@ -138,7 +138,6 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 				}
 				onSeekBarChangeListener {
 					onProgressChanged { _, progress, _ ->
-						info("Setting melody volume to ${progress.toFloat() / 127f}")
 						melodyReference?.volume = progress.toFloat() / 127f
 					}
 				}

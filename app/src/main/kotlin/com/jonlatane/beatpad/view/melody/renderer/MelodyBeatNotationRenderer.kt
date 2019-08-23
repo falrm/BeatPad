@@ -111,7 +111,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     get() = arrayOf(melody).filterNotNull() +
       sectionMelodies.filter {
         when (melody?.limitedToNotesInHarmony) {
-          null  -> false
+          null  -> true //Section mode
           true  -> it.limitedToNotesInHarmony
           false -> !it.limitedToNotesInHarmony
         }
@@ -179,7 +179,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
       .subSet(lastDownbeat * melody.subdivisionsPerBeat, true, melodyPosition, true)
       .reversed()
       .any { changeIndex ->
-        val chordAtTheTime = chordAt(changeIndex)!!
+        val chordAtTheTime = chordAt(changeIndex, melody)
         val change = melody.changes[changeIndex]
         val tones: Set<Int> = (change.let {
           (it as? RationalMelody.Element)?.tones

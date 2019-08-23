@@ -69,11 +69,7 @@ class MelodyBeatView constructor(
 
 
   override fun melodyOffsetAt(elementPosition: Int): Int
-    = (
-      chordAt(elementPosition)
-        ?: viewModel.paletteViewModel.orbifold.chord
-        ?: DEFAULT_CHORD
-    ).let { chord ->
+    = chordAt(elementPosition, viewModel.openedMelody!!).let { chord ->
     info("Computing edit under $chord")
       viewModel.let { it.openedMelody?.offsetUnder(chord) } ?: 0
     }

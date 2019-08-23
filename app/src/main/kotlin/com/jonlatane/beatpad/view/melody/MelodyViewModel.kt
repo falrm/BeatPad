@@ -17,6 +17,7 @@ import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingToolbar
 import com.jonlatane.beatpad.view.melody.toolbar.MelodyReferenceToolbar
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.childrenRecursiveSequence
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.info
 import java.util.concurrent.atomic.AtomicBoolean
@@ -60,8 +61,17 @@ class MelodyViewModel(
 	lateinit var beatAdapter: MelodyBeatAdapter
 	fun updateToolbarsAndMelody() {
 		updateMelodyDisplay()
-		melodyReferenceToolbar.updateButtonText()
-		melodyEditingToolbar.updateButtonText()
+		if(openedMelody != null) {
+			melodyReferenceToolbar.show()
+			melodyReferenceToolbar.updateButtonText()
+			melodyEditingToolbar.updateButtonText()
+		} else {
+			melodyView.post {
+//				melodyReferenceToolbar.hide()
+			}
+//			melodyEditingToolbar.hide()
+//			melodyEditingModifiers.hide()
+		}
 	}
 
 	enum class DisplayType { COLORBLOCK, NOTATION }
@@ -187,7 +197,8 @@ class MelodyViewModel(
 	}
 
 	fun updateMelodyDisplay() {
-		melodyRecyclerView
-			.applyToHolders<RecyclerView.ViewHolder> { it.itemView.invalidate() }
+		melodyRecyclerView.applyToHolders<RecyclerView.ViewHolder> {
+			it.itemView.childrenRecursiveSequence().forEach { it.invalidate() }
+		}
 	}
 }

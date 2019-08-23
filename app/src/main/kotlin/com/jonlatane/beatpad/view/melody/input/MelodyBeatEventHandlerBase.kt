@@ -27,14 +27,13 @@ interface MelodyBeatEventHandlerBase: Patterns, AnkoLogger {
 	val melody: Melody<*>?
   val harmony: Harmony
   val changes: NavigableMap<Int, out Transposable<*>>? get() = melody?.changes
-  fun chordAt(elementPosition: Int, melody: Melody<*>? = this.melody) = melody?.let { melody ->
+  fun chordAt(elementPosition: Int, melody: Melody<*>) =
     harmony.let { harmony ->
       val harmonyPosition = elementPosition.convertPatternIndex(melody, harmony)
       val result = harmony.changeBefore(harmonyPosition)
       //info("Chord at $elementPosition is $result")
       result
     }
-  }
 
   fun updateMelodyDisplay()
 

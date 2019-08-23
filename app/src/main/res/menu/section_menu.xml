@@ -6,8 +6,14 @@
           android:id="@+id/deleteSection"/>
     <item android:title="Duplicate Section"
           android:id="@+id/duplicateSection"/>
-    <item android:title="Copy Harmony from Section"
+    <item android:title="Copy Harmony"
           android:id="@+id/copySectionHarmony"/>
-    <item android:title="Paste Harmony into Section"
+    <item android:title="Paste Harmony"
           android:id="@+id/pasteSectionHarmony"/>
+    <item android:title="Copy Melodies"
+          android:id="@+id/copySectionPartLevels"/>
+    <item android:title="Paste Melodies"
+          android:id="@+id/pasteSectionPartLevels"/>
+    <item android:title="Match Part Volumes To Melodies"
+          android:id="@+id/matchClipboardPartLevels"/>
 </menu>

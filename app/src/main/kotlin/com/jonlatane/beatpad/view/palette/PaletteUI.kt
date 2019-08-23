@@ -231,6 +231,7 @@ class PaletteUI constructor(
       below(viewModel.harmonyView)
       rightOf(viewModel.sectionListRecyclerVerticalRotator)
       alignParentBottom()
+      alignParentRight()
     }
 
   }

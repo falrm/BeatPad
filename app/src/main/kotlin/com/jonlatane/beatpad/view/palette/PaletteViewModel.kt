@@ -4,7 +4,6 @@ package com.jonlatane.beatpad.view.palette
 import BeatClockPaletteConsumer
 import android.content.Context
 import android.support.v7.widget.RecyclerView
-import android.view.View
 import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Melody
@@ -88,7 +87,9 @@ class PaletteViewModel(
   lateinit var orbifold: OrbifoldView
 
   var palette: Palette by observable(initialValue = Palette()) { _, _, new ->
+    hideMelodyView(editingMelody)
     editingMelody = null
+    hideMelodyView(editingMelody)
     if (new.parts.isEmpty()) {
       new.parts.add(Part())
     }
@@ -122,10 +123,9 @@ class PaletteViewModel(
     }
   }
 
-
   var editingMelody: Melody<*>? by observable<Melody<*>?>(null) { _, old, new ->
+    melodyViewModel.openedMelody = new
     if (new != null) {
-      melodyViewModel.openedMelody = new
       colorboardView.hide()
       keyboardView.hide()
       harmonyViewModel.beatAdapter
@@ -133,17 +133,18 @@ class PaletteViewModel(
 
       backStack.push {
         if(editingMelody != null) {
+          hideMelodyView(editingMelody)
           editingMelody = null
           true
         } else false
       }
-      // Fancy animation of the thing if possible
-       editMelodyMode()
+      // Fancy animation of the thing if possible, otherwise boring
+      showMelodyView()
+      //showMelodyViewBoring()
     } else {
       if(old != new) {
         saveAfterDelay()
       }
-      partListMode(old)
     }
   }
 
@@ -215,13 +216,11 @@ class PaletteViewModel(
     PlaybackService.instance?.showNotification()
   }
 
-  private fun editMelodyMode() {
+  fun showMelodyView() {
     partListView.viewHolders<PartHolder>().mapNotNull { partHolder ->
       partHolder.layout.melodyReferenceRecycler.viewHolders<MelodyReferenceHolder>()
-        .firstOrNull { it.melody == editingMelody }
-    }/*.let { listOf<MelodyReferenceHolder?>(null) }*/.firstOrNull()?.let { melodyReferenceHolder ->
-//      melodyReferenceHolder.enableMelodyReference()
-//      melodyReferenceHolder.onPositionChanged()
+        .firstOrNull { it.melody != null && it.melody == editingMelody }
+    }.firstOrNull()?.let { melodyReferenceHolder ->
       val name = melodyReferenceHolder.layout.name
       val partListLocation = intArrayOf(-1, -1)
       val nameLocation = intArrayOf(-1, -1)
@@ -236,39 +235,46 @@ class PaletteViewModel(
         layoutHeight = name.height
         //animate().alpha(1f).withEndAction {
         post {
-          animateWidth(partListView.width)
-          animateHeight(partListView.height + orbifold.height)
-          animate().translationX(0f).translationY(0f)
+          partListTransitionView.animateWidth(partListView.width)
+          partListTransitionView.animateHeight(partListView.height + orbifold.height)
+          partListTransitionView.animate().translationX(0f).translationY(0f)
             .withEndAction {
               melodyViewModel.melodyView.let { melodyView ->
                 melodyView.alpha = 0f
                 melodyView.translationX = 0f
                 melodyView.animate().alpha(1f).withEndAction {
+                  partListTransitionView.alpha = 0f
                 }.start()
               }
             }.start()
         }
         //}.start()
       }
-    } ?: editMelodyModeBoring()
+    } ?: showMelodyViewBoring()
   }
 
-  private fun editMelodyModeBoring() {
-    partListTransitionView.apply {
-      translationX = partListView.width.toFloat()
-      translationY = 0f
-      layoutWidth = partListView.width
-      layoutHeight = partListView.height
-      animate().translationX(0f).start()
+  private fun showMelodyViewBoring() {
+//    partListTransitionView.apply {
+//      translationX = partListView.width.toFloat()
+//      translationY = 0f
+//      layoutWidth = partListView.width
+//      layoutHeight = partListView.height
+//      animate().translationX(0f).start()
+//    }
+    if(melodyViewModel.melodyView.translationX > melodyViewModel.melodyView.width.toFloat()) {
+      melodyViewModel.melodyView.translationX = melodyViewModel.melodyView.width.toFloat()
     }
     melodyViewModel.melodyView.animate()
       .translationX(0f)
       .alpha(1f)
+      .withEndAction {
+        //partListTransitionView.animate().alpha(0f).start()
+      }
       .start()
-    partListView.animate().alpha(0f).start()
+    //partListView.animate().alpha(0f).start()
   }
 
-  private fun partListMode(oldValue: Melody<*>?) {
+  fun hideMelodyView(oldValue: Melody<*>? = null) {
     partListView.viewHolders<PartHolder>().mapNotNull { partHolder ->
       partHolder.layout.melodyReferenceRecycler.viewHolders<MelodyReferenceHolder>()
         .firstOrNull { !it.isAddButton && it.melody == oldValue }
@@ -277,11 +283,12 @@ class PaletteViewModel(
       val partListLocation = intArrayOf(-1, -1)
       val nameLocation = intArrayOf(-1, -1)
       name.getLocationOnScreen(nameLocation)
-      partListView.animate().alpha(1f)
+      //partListView.animate().alpha(1f)
       partListView.getLocationOnScreen(partListLocation)
       //partListView.animate().alpha(0f).start()
       melodyReferenceHolder.onPositionChanged()
       partListTransitionView.apply {
+        alpha = 1f
         translationX = 0f
         translationY = 0f
         layoutWidth = partListView.width
@@ -292,7 +299,7 @@ class PaletteViewModel(
         melodyView.alpha = 0f
         animateWidth(name.width)
         animateHeight(name.height)
-        animate().translationX(targetTranslateX).translationY(targetTranslateY)//.alpha(0f)
+        animate().translationXY(targetTranslateX, targetTranslateY)//.alpha(0f)
           .withEndAction {
             animate().alpha(0f).withEndAction {
               layoutWidth = 0
@@ -301,7 +308,21 @@ class PaletteViewModel(
             }.start()
           }.start()
       }
-    } ?: partListModeBoring()
+    } ?: hideMelodyViewBoring()
+  }
+
+  private fun hideMelodyViewBoring() {
+    melodyView.animate()
+      .translationX(melodyView.width.toFloat())
+      .alpha(0f)
+      .withEndAction { melodyView.translationX = 10.27f * melodyView.width }
+      .start()
+    partListView.animate().alpha(1f)
+    partListTransitionView.apply {
+      translationX = 0f
+      translationY = 0f
+      layoutWidth = 0
+    }
   }
 
   fun showOrbifold(animated: Boolean = true) {
@@ -376,20 +397,6 @@ class PaletteViewModel(
     toolbarView.colorsButton.backgroundResource = R.drawable.toolbar_button
     toolbarView.updateInstrumentButtonPaddings()
     colorboardView.hide(animated)
-  }
-
-  private fun partListModeBoring() {
-    melodyView.animate()
-      .translationX(melodyView.width.toFloat())
-      .alpha(0f)
-      .withEndAction { melodyView.translationX = 10.27f * melodyView.width }
-      .start()
-    partListView.animate().alpha(1f)
-    partListTransitionView.apply {
-      translationX = 0f
-      translationY = 0f
-      layoutWidth = 0
-    }
   }
 
   fun updateMelodyReferences() {

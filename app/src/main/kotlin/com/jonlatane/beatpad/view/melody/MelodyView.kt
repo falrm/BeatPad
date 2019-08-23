@@ -29,11 +29,15 @@ inline fun ViewManager.melodyView(
 				id = R.id.melody_reference_toolbar
 			}.lparams(matchParent, wrapContent) {
 				alignParentTop()
+				alignParentRight()
+				alignParentLeft()
 			}
 			melodyEditingToolbar = melodyEditingToolbar(viewModel) {
 				id = R.id.melody_editing_toolbar
 			}.lparams(matchParent, wrapContent) {
 				below(melodyReferenceToolbar)
+				alignParentRight()
+				alignParentLeft()
 			}
 			melodyEditingModifiers = melodyEditingModifiers {
 				id = R.id.bottom_scroller
@@ -133,9 +137,7 @@ inline fun ViewManager.melodyView(
 					height = wrapContent
 					width = matchParent
 				}
-			}.lparams {
-				width = ViewGroup.LayoutParams.MATCH_PARENT
-				height = ViewGroup.LayoutParams.MATCH_PARENT
+			}.lparams(matchParent, matchParent) {
 				alignParentRight()
 				above(melodyEditingModifiers)
 				rightOf(melodyLeftScroller)
