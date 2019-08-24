@@ -169,7 +169,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
       }?.let { melodyUUID ->
         viewModel.palette.parts.flatMap { it.melodies }.firstOrNull { it.id == melodyUUID }
           ?.let { melody ->
-            viewModel.melodyView.post { viewModel.editingMelody = melody }
+            viewModel.melodyViewModel.melodyView.post { viewModel.editingMelody = melody }
           }
       }
     }

@@ -219,16 +219,7 @@ class SectionHolder(
     itemView.apply {
       setOnClickListener {
         if(BeatClockPaletteConsumer.section == section) {
-          val previouslyEditingMelody = viewModel.editingMelody
-          viewModel.backStack.push {
-            when {
-              previouslyEditingMelody != null -> viewModel.editingMelody = previouslyEditingMelody
-              else                            -> viewModel.hideMelodyView()
-            }
-            true
-          }
-          viewModel.editingMelody = null
-          viewModel.showMelodyView()
+          openSectionInMelodyView()
         } else {
           BeatClockPaletteConsumer.section = section
           viewModel.sectionListAdapters.forEach { it.recyclerView.updateSmartHolders() }
@@ -242,6 +233,22 @@ class SectionHolder(
         true
       }
     }
+  }
+
+  private fun openSectionInMelodyView() {
+    // Check if section is already opened
+    if(viewModel.editingMelody == null && viewModel.melodyView.translationX == 0f)
+      return
+    val previouslyEditingMelody = viewModel.editingMelody
+    viewModel.backStack.push {
+      when {
+        previouslyEditingMelody != null -> viewModel.editingMelody = previouslyEditingMelody
+        else                            -> viewModel.hideMelodyView()
+      }
+      true
+    }
+    viewModel.editingMelody = null
+    viewModel.showMelodyView()
   }
 
   private fun makeAddButton() {

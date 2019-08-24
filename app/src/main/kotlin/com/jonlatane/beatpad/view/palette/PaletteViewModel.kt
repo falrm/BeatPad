@@ -67,11 +67,11 @@ class PaletteViewModel(
   }
 
   val melodyViewModel = MelodyViewModel(this)
-  var melodyView
+  val melodyView
     get() = melodyViewModel.melodyView
-    set(value) {
-      melodyViewModel.melodyView = value
-    }
+//    set(value) {
+//      melodyViewModel.melodyView = value
+//    }
   var melodyBeatAdapter
     get() = melodyViewModel.beatAdapter
     set(value) {
@@ -132,7 +132,7 @@ class PaletteViewModel(
         .syncPositionTo(melodyViewModel.melodyRecyclerView)
 
       backStack.push {
-        if(editingMelody != null) {
+        if(melodyView.translationX == 0f) {
           hideMelodyView(editingMelody)
           editingMelody = null
           true
@@ -225,30 +225,32 @@ class PaletteViewModel(
       val partListLocation = intArrayOf(-1, -1)
       val nameLocation = intArrayOf(-1, -1)
       name.getLocationOnScreen(nameLocation)
-      partListView.getLocationOnScreen(partListLocation)
-      //partListView.animate().alpha(0f).start()
-      partListTransitionView.apply {
-        alpha = 1f
-        translationX = nameLocation[0].toFloat() - partListLocation[0]
-        translationY = nameLocation[1].toFloat() - partListLocation[1]
-        layoutWidth = name.width
-        layoutHeight = name.height
-        //animate().alpha(1f).withEndAction {
-        post {
-          partListTransitionView.animateWidth(partListView.width)
-          partListTransitionView.animateHeight(partListView.height + orbifold.height)
-          partListTransitionView.animate().translationX(0f).translationY(0f)
-            .withEndAction {
-              melodyViewModel.melodyView.let { melodyView ->
-                melodyView.alpha = 0f
-                melodyView.translationX = 0f
-                melodyView.animate().alpha(1f).withEndAction {
-                  partListTransitionView.alpha = 0f
-                }.start()
-              }
-            }.start()
+      if(melodyView.translationX != 0f) {
+        partListView.getLocationOnScreen(partListLocation)
+        //partListView.animate().alpha(0f).start()
+        partListTransitionView.apply {
+          alpha = 1f
+          translationX = nameLocation[0].toFloat() - partListLocation[0]
+          translationY = nameLocation[1].toFloat() - partListLocation[1]
+          layoutWidth = name.width
+          layoutHeight = name.height
+          //animate().alpha(1f).withEndAction {
+          post {
+            partListTransitionView.animateWidth(partListView.width)
+            partListTransitionView.animateHeight(partListView.height + orbifold.height)
+            partListTransitionView.animate().translationX(0f).translationY(0f)
+              .withEndAction {
+                melodyViewModel.melodyView.let { melodyView ->
+                  melodyView.alpha = 0f
+                  melodyView.translationX = 0f
+                  melodyView.animate().alpha(1f).withEndAction {
+                    partListTransitionView.alpha = 0f
+                  }.start()
+                }
+              }.start()
+          }
+          //}.start()
         }
-        //}.start()
       }
     } ?: showMelodyViewBoring()
   }
@@ -297,6 +299,7 @@ class PaletteViewModel(
         val targetTranslateY = nameLocation[1].toFloat() - partListLocation[1]
 
         melodyView.alpha = 0f
+        melodyView.translationX = melodyView.width.toFloat()
         animateWidth(name.width)
         animateHeight(name.height)
         animate().translationXY(targetTranslateX, targetTranslateY)//.alpha(0f)
@@ -368,7 +371,7 @@ class PaletteViewModel(
         true
       } else false
     }
-    keyboardView.show()
+    keyboardView.show(animated)
     toolbarView.keysButton.backgroundResource = R.drawable.toolbar_button_active_instrument
     toolbarView.updateInstrumentButtonPaddings()
 
@@ -388,7 +391,7 @@ class PaletteViewModel(
         true
       } else false
     }
-    colorboardView.show()
+    colorboardView.show(animated)
     toolbarView.colorsButton.backgroundResource = R.drawable.toolbar_button_active_instrument
     toolbarView.updateInstrumentButtonPaddings()
   }

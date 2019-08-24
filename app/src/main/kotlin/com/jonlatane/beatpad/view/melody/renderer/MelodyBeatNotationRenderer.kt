@@ -53,11 +53,13 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     }
 
     paint.color = color(android.R.color.black).withAlpha((255 * notationAlpha / 3f).toInt())
-    sectionMelodiesOfPartType.filter { it != melody }.forEach { melody ->
+    sectionMelodiesOfPartType.filter { it != melody }.forEach { otherMelody ->
       canvas.drawNotationMelody(
-        melody,
-        drawAlpha = notationAlpha / 3f,
+        otherMelody,
+        drawAlpha = melody?.let { notationAlpha / 3f } ?: notationAlpha,
         drawColorGuide = false,
+        forceDrawColorGuideForCurrentBeat = melody == null,
+        forceDrawColorGuideForSelectedBeat = melody == null,
         stemsUp = false
       )
     }
@@ -110,10 +112,10 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
   val sectionMelodiesOfPartType
     get() = arrayOf(melody).filterNotNull() +
       sectionMelodies.filter {
-        when (melody?.limitedToNotesInHarmony) {
-          null  -> true //Section mode
-          true  -> it.limitedToNotesInHarmony
-          false -> !it.limitedToNotesInHarmony
+        when (melody?.drumPart) {
+          null  -> !it.drumPart //Section mode, just show harmonic stuff
+          true  -> it.drumPart
+          false -> !it.drumPart
         }
       }
 

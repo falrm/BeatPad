@@ -23,7 +23,7 @@ inline fun ViewManager.melodyView(
 )
 	= with(viewModel.melodyViewModel) {
 	ankoView({ context ->
-		melodyView = HideableRelativeLayout(context).apply {
+		HideableRelativeLayout(context).apply {
 			backgroundColor = context.color(R.color.white)
 			melodyReferenceToolbar = melodyReferenceToolbar(viewModel) {
 				id = R.id.melody_reference_toolbar
@@ -151,7 +151,6 @@ inline fun ViewManager.melodyView(
 				melodyEditingModifiers.hide(false)
 			}
 		}
-		viewModel.melodyView
 	}, theme, init)
 }
 //}

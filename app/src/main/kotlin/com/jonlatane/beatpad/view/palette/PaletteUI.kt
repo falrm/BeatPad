@@ -92,15 +92,15 @@ class PaletteUI constructor(
       }
 
       onLayoutChange { _, _, _, _, _, _, _, _, _ ->
-        if (viewModel.editingMelody == null) {
-          viewModel.melodyView.translationX = viewModel.melodyView.width.toFloat()
+        if (viewModel.melodyView.translationX != 0f) {
+          viewModel.melodyView.translationX = 10.27f * viewModel.melodyView.width.toFloat()
         }
       }
 
       post {
-        viewModel.partListView.animate()
-          .alpha(1f)
-          .start()
+//        viewModel.partListView.animate()
+//          .alpha(1f)
+//          .start()
         viewModel.melodyView.animate()
           .translationX(viewModel.melodyView.width.toFloat())
           .withEndAction { viewModel.melodyView.alpha = 1f }
@@ -224,7 +224,7 @@ class PaletteUI constructor(
       rightOf(viewModel.sectionListRecyclerVerticalRotator)
     }
 
-    viewModel.melodyView = melodyView(viewModel = viewModel) {
+    viewModel.melodyViewModel.melodyView = melodyView(viewModel = viewModel) {
       id = View.generateViewId()
       alpha = 0f
     }.lparams(matchParent, wrapContent) {
@@ -328,7 +328,7 @@ class PaletteUI constructor(
       below(viewModel.harmonyView)
     }
 
-    viewModel.melodyView = melodyView(viewModel = viewModel) {
+    viewModel.melodyViewModel.melodyView = melodyView(viewModel = viewModel) {
       id = R.id.melody
       alpha = 0f
     }.lparams {

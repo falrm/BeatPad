@@ -15,11 +15,8 @@ import com.jonlatane.beatpad.util.*
 import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import com.jonlatane.beatpad.util.smartrecycler.applyToHolders
 import com.jonlatane.beatpad.view.harmony.HarmonyBeatView
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko._LinearLayout
-import org.jetbrains.anko.dip
+import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
-import org.jetbrains.anko.verbose
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
@@ -191,7 +188,7 @@ class MelodyBeatAdapter(
         orientation = LinearLayout.VERTICAL
         addView(harmonyBeatView)
         addView(melodyBeatView)
-      }.lparams(elementWidth, elementHeight + harmonyViewHeight)
+      }.lparams(wrapContent, wrapContent)
       MelodyBeatHolder(
         viewModel = viewModel,
         harmonyBeatView = harmonyBeatView,
@@ -202,15 +199,14 @@ class MelodyBeatAdapter(
     }
   }
 
-  override fun onBindViewHolder(holder: MelodyBeatHolder, elementPosition: Int) = with(holder) {
-
-    element.layoutWidth = elementWidth
-    element.layoutHeight = elementHeight + harmonyViewHeight
-    melodyBeatView.beatPosition = elementPosition
+  override fun onBindViewHolder(holder: MelodyBeatHolder, position: Int) = with(holder) {
+//    element.layoutWidth = elementWidth
+//    element.layoutHeight = elementHeight + harmonyViewHeight
+    melodyBeatView.beatPosition = position
     melodyBeatView.layoutWidth = elementWidth
     melodyBeatView.layoutHeight = elementHeight
     melodyBeatView.invalidate()
-    harmonyBeatView.beatPosition = elementPosition
+    harmonyBeatView.beatPosition = position
     harmonyBeatView.layoutWidth = elementWidth
     harmonyBeatView.layoutHeight = harmonyViewHeight
     harmonyBeatView.invalidate()

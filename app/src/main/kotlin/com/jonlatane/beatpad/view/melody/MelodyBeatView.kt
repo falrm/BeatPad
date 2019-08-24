@@ -64,7 +64,11 @@ class MelodyBeatView constructor(
   override val overallBounds = Rect()
   override fun onDraw(canvas: Canvas) {
     super.onDraw(canvas)
-    renderMelodyBeat(canvas)
+    try {
+      renderMelodyBeat(canvas)
+    } catch(t: Throwable) {
+      error("Failed to render MelodyBeatView", t)
+    }
   }
 
 

@@ -66,11 +66,9 @@ class MelodyViewModel(
 			melodyReferenceToolbar.updateButtonText()
 			melodyEditingToolbar.updateButtonText()
 		} else {
-			melodyView.post {
-//				melodyReferenceToolbar.hide()
-			}
-//			melodyEditingToolbar.hide()
-//			melodyEditingModifiers.hide()
+			melodyReferenceToolbar.hide()
+			melodyEditingToolbar.hide()
+			melodyEditingModifiers.hide()
 		}
 	}
 
