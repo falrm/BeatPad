@@ -25,6 +25,7 @@ inline fun ViewManager.melodyView(
 	ankoView({ context ->
 		HideableRelativeLayout(context).apply {
 			backgroundColor = context.color(R.color.white)
+
 			melodyReferenceToolbar = melodyReferenceToolbar(viewModel) {
 				id = R.id.melody_reference_toolbar
 			}.lparams(matchParent, wrapContent) {
@@ -36,6 +37,14 @@ inline fun ViewManager.melodyView(
 				id = R.id.melody_editing_toolbar
 			}.lparams(matchParent, wrapContent) {
 				below(melodyReferenceToolbar)
+				alignParentRight()
+				alignParentLeft()
+			}
+
+			sectionToolbar = sectionToolbar(viewModel) {
+				id = View.generateViewId()
+			}.lparams(matchParent, wrapContent) {
+				alignParentBottom()
 				alignParentRight()
 				alignParentLeft()
 			}
@@ -56,7 +65,7 @@ inline fun ViewManager.melodyView(
 					melodyVerticalScrollView.scrollingEnabled = !heldDown
 				}
 			}.lparams(matchParent, melodyReferenceToolbar.squareSize) {
-				alignParentBottom()
+				above(sectionToolbar)
 				alignParentRight()
 				alignParentLeft()
 			}
@@ -91,20 +100,20 @@ inline fun ViewManager.melodyView(
 						when {
 							(xDelta.toInt() != 0 || yDelta.toInt() != 0) -> {
 								viewModel.melodyBeatAdapter.apply {
-                  when(layoutType) {
-                    MelodyViewModel.LayoutType.GRID -> {
-											if (elementHeight + (10f * yDelta).toInt() >= maximumRecommendedElementHeightForOverview) {
-												layoutType = MelodyViewModel.LayoutType.LINEAR
-												//onZoomFinished()
-											}
-										}
-                    MelodyViewModel.LayoutType.LINEAR -> {
-                      if(elementHeight + (10f * yDelta).toInt() <= minimumRecommendedElementHeightForEditing) {
-												layoutType = MelodyViewModel.LayoutType.GRID
-												//onZoomFinished()
-											}
-                    }
-                  }
+//                  when(layoutType) {
+//                    MelodyViewModel.LayoutType.GRID -> {
+//											if (elementHeight + (10f * yDelta).toInt() >= maximumRecommendedElementHeightForOverview) {
+//												layoutType = MelodyViewModel.LayoutType.LINEAR
+//												//onZoomFinished()
+//											}
+//										}
+//                    MelodyViewModel.LayoutType.LINEAR -> {
+//                      if(elementHeight + (10f * yDelta).toInt() <= minimumRecommendedElementHeightForEditing) {
+//												layoutType = MelodyViewModel.LayoutType.GRID
+//												//onZoomFinished()
+//											}
+//                    }
+//                  }
 									elementWidth += xDelta.toInt()
 									elementHeight += (10f * yDelta).toInt()
 //									viewModel.melodyViewModel.updateMelodyDisplay()

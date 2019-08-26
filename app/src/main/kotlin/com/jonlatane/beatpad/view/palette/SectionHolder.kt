@@ -20,16 +20,18 @@ import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.applyTypeface
 import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import com.jonlatane.beatpad.util.smartrecycler.updateSmartHolders
+import com.jonlatane.beatpad.util.vibrate
 import org.jetbrains.anko.*
+import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import java.util.*
 
-class SectionHolder(
+class SectionHolder constructor(
   val orientation: Int,
-  parent: ViewGroup,
+  recycler: _RecyclerView,
   val viewModel: PaletteViewModel,
   val adapter: SectionListAdapter
 ) : RecyclerView.ViewHolder(
-  _LinearLayout(parent.context).apply {
+  _LinearLayout(recycler.context).apply {
     isClickable = true
     isLongClickable = true
     relativeLayout {
@@ -98,13 +100,13 @@ class SectionHolder(
       R.color.dominant,
       R.color.augmented,
       R.color.diminished
-    )[sectionIndex % 5]
+    )[(sectionIndex + 5) % 5]
     fun sectionColor(section: Section?) = sectionColor(
       section?.let { BeatClockPaletteConsumer.palette?.sections?.indexOf(section) } ?: 0
     )
   }
 
-  override val storageContext: Context = parent.context
+  override val storageContext: Context = recycler.context
   val nameTextView: TextView get() = itemView.findViewById(R.id.section_name)
   //val dragHandle: ImageView get() = itemView.findViewById(R.id.section_drag_handle)
   val section: Section?
@@ -114,7 +116,7 @@ class SectionHolder(
     }
   val sectionName: TextView by lazy { itemView.findViewById<TextView>(R.id.section_name) }
   val menu: PopupMenu by lazy {
-    PopupMenu(parent.context, sectionName).also { popupMenu ->
+    PopupMenu(recycler.context, sectionName).also { popupMenu ->
       popupMenu.inflate(R.menu.section_menu)
       popupMenu.applyTypeface()
       popupMenu.setOnMenuItemClickListener { item ->
@@ -129,7 +131,7 @@ class SectionHolder(
           }
           deleteSection -> {
             if(viewModel.palette.sections.size <= 1) {
-              parent.context.toast("Cannot delete the final section!")
+              recycler.context.toast("Cannot delete the final section!")
             } else {
               showConfirmDialog(
                 sectionName.context,
@@ -171,14 +173,14 @@ class SectionHolder(
           }
           copyHarmony -> {
               val text = section?.harmony?.toURI()?.toString() ?: ""
-              val clipboard = parent.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+              val clipboard = recycler.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
               val clip = ClipData.newPlainText("BeatScratch Harmony", text)
               clipboard.setPrimaryClip(clip)
               //clipboard.primaryClip = clip
-              parent.context.toast("Copied BeatScratch Harmony data to clipboard!")
+            recycler.context.toast("Copied BeatScratch Harmony data to clipboard!")
           }
           pasteHarmony -> viewModel.harmonyViewModel.pasteHarmony(section)
-          else -> parent.context.toast("TODO")
+          else -> recycler.context.toast("TODO")
         }
         true
       }
@@ -199,7 +201,7 @@ class SectionHolder(
       BeatClockPaletteConsumer.section -> sectionDrawableResource(adapterPosition)
       else -> R.drawable.orbifold_chord
     }
-    itemView.padding = itemView.dip(3)
+    //itemView.padding = itemView.dip(3)
     when {
       adapterPosition < 0 -> {}
       adapterPosition < viewModel.palette.sections.size -> makeEditableSection()
@@ -223,6 +225,7 @@ class SectionHolder(
         } else {
           BeatClockPaletteConsumer.section = section
           viewModel.sectionListAdapters.forEach { it.recyclerView.updateSmartHolders() }
+          vibrate(10, 100)
         }
       }
       setOnLongClickListener {
@@ -249,6 +252,7 @@ class SectionHolder(
     }
     viewModel.editingMelody = null
     viewModel.showMelodyView()
+    vibrate(10, 100)
   }
 
   private fun makeAddButton() {

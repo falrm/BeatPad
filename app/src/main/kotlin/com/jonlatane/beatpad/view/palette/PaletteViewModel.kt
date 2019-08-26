@@ -207,8 +207,9 @@ class PaletteViewModel(
     }
     beatScratchToolbar.updateButtonColors()
 
-    melodyViewModel.beatAdapter.updateSmartHolders()
-    melodyViewModel.melodyReferenceToolbar.updateButtonText()
+    melodyViewModel.updateToolbarsAndMelody()
+//    melodyViewModel.beatAdapter.updateSmartHolders()
+//    melodyViewModel.melodyReferenceToolbar.updateButtonText()
     if(editingMix) { // Trigger an update of the mix state.
       editingMix = editingMix
     }
@@ -217,6 +218,7 @@ class PaletteViewModel(
   }
 
   fun showMelodyView() {
+    harmonyView.hide()
     partListView.viewHolders<PartHolder>().mapNotNull { partHolder ->
       partHolder.layout.melodyReferenceRecycler.viewHolders<MelodyReferenceHolder>()
         .firstOrNull { it.melody != null && it.melody == editingMelody }
@@ -277,6 +279,7 @@ class PaletteViewModel(
   }
 
   fun hideMelodyView(oldValue: Melody<*>? = null) {
+    harmonyView.show()
     partListView.viewHolders<PartHolder>().mapNotNull { partHolder ->
       partHolder.layout.melodyReferenceRecycler.viewHolders<MelodyReferenceHolder>()
         .firstOrNull { !it.isAddButton && it.melody == oldValue }

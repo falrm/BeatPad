@@ -186,10 +186,8 @@ class PaletteUI constructor(
       angle = 0
       viewModel.sectionListRecyclerHorizontal = sectionListView(viewModel = viewModel) {
         id = View.generateViewId()
-        //translationX = dip(48).toFloat()
-        //translationY = dip(48).toFloat()
-      }.lparams(matchParent, dip(48))
-    }.lparams(matchParent, dip(48)) {
+      }.lparams(matchParent, dip(40))
+    }.lparams(matchParent, dip(40)) {
       below(viewModel.toolbarView)
       alignParentLeft()
       alignParentRight()
@@ -203,6 +201,7 @@ class PaletteUI constructor(
     }.lparams(matchParent, dip(36)) {
       below(viewModel.sectionListRecyclerHorizontalRotator)
       rightOf(viewModel.sectionListRecyclerVerticalRotator)
+      topMargin = dip(5)
       bottomMargin = dip(5)
     }
 
@@ -266,8 +265,8 @@ class PaletteUI constructor(
       angle = 270
       viewModel.sectionListRecyclerHorizontal = sectionListView(viewModel = viewModel) {
         id = View.generateViewId()
-      }.lparams(matchParent, dip(48))
-    }.lparams(dip(48), matchParent) {
+      }.lparams(matchParent, dip(40))
+    }.lparams(dip(40), matchParent) {
       alignParentLeft()
       alignParentTop()
       alignParentBottom()
@@ -305,7 +304,6 @@ class PaletteUI constructor(
       rightOf(viewModel.beatScratchToolbar)
       below(viewModel.toolbarView)
       alignParentRight()
-      bottomMargin = dip(4)
     }
 
     viewModel.partListView = partListView(viewModel = viewModel) {
@@ -313,6 +311,7 @@ class PaletteUI constructor(
     }.lparams {
       width = matchParent
       height = wrapContent
+      topMargin = dip(4)
       alignParentBottom()
       rightOf(viewModel.beatScratchToolbar)
       below(viewModel.harmonyView)

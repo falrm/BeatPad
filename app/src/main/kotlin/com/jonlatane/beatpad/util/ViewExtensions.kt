@@ -16,6 +16,7 @@ import android.animation.AnimatorListenerAdapter
 import android.content.res.Configuration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.ViewGroup
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 
@@ -25,6 +26,10 @@ val defaultDuration get() = 300L
 interface HideableView {
 	var initialHeight: Int?
 	var initialWidth: Int?
+  var initialTopMargin: Int?
+  var initialBottomMargin: Int?
+  var initialLeftMargin: Int?
+  var initialRightMargin: Int?
 
   fun show(
     animated: Boolean = true,
@@ -112,9 +117,31 @@ var View.layoutWidth get() = this.layoutParams.width
 	}
 
 var View.layoutHeight get() = this.layoutParams.height
-	set(value) {
-		layoutParams = layoutParams.apply { height = value }
-	}
+  set(value) {
+    layoutParams = layoutParams.apply { height = value }
+  }
+
+var View.marginLayoutParams get() = this.layoutParams as ViewGroup.MarginLayoutParams
+set(value) {
+  this.layoutParams = value
+}
+
+var View.topMargin get() = this.marginLayoutParams.topMargin
+  set(value) {
+    layoutParams = marginLayoutParams.apply { topMargin = value }
+  }
+var View.bottomMargin get() = this.marginLayoutParams.bottomMargin
+  set(value) {
+    layoutParams = marginLayoutParams.apply { bottomMargin = value }
+  }
+var View.leftMargin get() = this.marginLayoutParams.leftMargin
+  set(value) {
+    layoutParams = marginLayoutParams.apply { leftMargin = value }
+  }
+var View.rightMargin get() = this.marginLayoutParams.rightMargin
+  set(value) {
+    layoutParams = marginLayoutParams.apply { rightMargin = value }
+  }
 
 fun View.animateWidth(width: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
 	val anim = ValueAnimator.ofInt(measuredWidth, width)
@@ -143,6 +170,62 @@ fun View.animateHeight(height: Int, duration: Long = defaultDuration, endAction:
 	anim.setDuration(duration).start()
 }
 
+fun View.animateTopMargin(margin: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
+  val anim = ValueAnimator.ofInt(this.topMargin, margin)
+  anim.interpolator = LinearInterpolator()
+  anim.addUpdateListener { valueAnimator ->
+    this.topMargin = valueAnimator.animatedValue as Int
+  }
+  endAction?.let {
+    anim.addListener(object : AnimatorListenerAdapter() {
+      override fun onAnimationEnd(animation: Animator) = it()
+    })
+  }
+  anim.setDuration(duration).start()
+}
+
+fun View.animateBottomMargin(margin: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
+  val anim = ValueAnimator.ofInt(this.bottomMargin, margin)
+  anim.interpolator = LinearInterpolator()
+  anim.addUpdateListener { valueAnimator ->
+    this.bottomMargin = valueAnimator.animatedValue as Int
+  }
+  endAction?.let {
+    anim.addListener(object : AnimatorListenerAdapter() {
+      override fun onAnimationEnd(animation: Animator) = it()
+    })
+  }
+  anim.setDuration(duration).start()
+}
+
+fun View.animateLeftMargin(margin: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
+  val anim = ValueAnimator.ofInt(this.leftMargin, margin)
+  anim.interpolator = LinearInterpolator()
+  anim.addUpdateListener { valueAnimator ->
+    this.leftMargin = valueAnimator.animatedValue as Int
+  }
+  endAction?.let {
+    anim.addListener(object : AnimatorListenerAdapter() {
+      override fun onAnimationEnd(animation: Animator) = it()
+    })
+  }
+  anim.setDuration(duration).start()
+}
+
+fun View.animateRightMargin(margin: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
+  val anim = ValueAnimator.ofInt(this.rightMargin, margin)
+  anim.interpolator = LinearInterpolator()
+  anim.addUpdateListener { valueAnimator ->
+    this.rightMargin = valueAnimator.animatedValue as Int
+  }
+  endAction?.let {
+    anim.addListener(object : AnimatorListenerAdapter() {
+      override fun onAnimationEnd(animation: Animator) = it()
+    })
+  }
+  anim.setDuration(duration).start()
+}
+
 inline val Configuration.tablet: Boolean
   get() = smallestScreenWidthDp > 600
 
@@ -152,8 +235,12 @@ enum class HideAnimation: AnkoLogger {
       setupHiding()
       if (animated) {
         animateHeight((this as HideableView).initialHeight!!, endAction = endAction)
+        animateTopMargin((this as HideableView).initialTopMargin!!, endAction = endAction)
+        animateBottomMargin((this as HideableView).initialBottomMargin!!, endAction = endAction)
       } else {
         layoutHeight = (this as HideableView).initialHeight!!
+        topMargin = (this as HideableView).initialTopMargin!!
+        bottomMargin = (this as HideableView).initialBottomMargin!!
         endAction?.invoke()
       }
     }
@@ -162,8 +249,12 @@ enum class HideAnimation: AnkoLogger {
       setupHiding()
       if (animated) {
         animateHeight(0, endAction = endAction)
+        animateTopMargin(0, endAction = endAction)
+        animateBottomMargin(0, endAction = endAction)
       } else {
         layoutHeight = 0
+        topMargin = 0
+        bottomMargin = 0
         endAction?.invoke()
       }
     }
@@ -199,6 +290,10 @@ enum class HideAnimation: AnkoLogger {
       measure(width, height)
       initialWidth = if (measuredWidth > 0) measuredWidth else layoutWidth
       initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
+      initialTopMargin = topMargin
+      initialBottomMargin = bottomMargin
+      initialLeftMargin = leftMargin
+      initialRightMargin = rightMargin
 
       if(this is OrbifoldView) {
         info("HideAnimation Orbifold initialWidth=$initialWidth")

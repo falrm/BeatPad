@@ -4,6 +4,7 @@ import android.view.ViewManager
 import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingModifiers
 import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingToolbar
 import com.jonlatane.beatpad.view.melody.toolbar.MelodyReferenceToolbar
+import com.jonlatane.beatpad.view.melody.toolbar.SectionToolbar
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.custom.ankoView
 
@@ -17,3 +18,5 @@ inline fun ViewManager.melodyEditingToolbar(viewModel: PaletteViewModel, theme: 
 	= ankoView({ MelodyEditingToolbar(it, viewModel) }, theme, init)
 inline fun ViewManager.melodyReferenceToolbar(viewModel: PaletteViewModel, theme: Int = 0, init: MelodyReferenceToolbar.() -> Unit = {})
 	= ankoView({ MelodyReferenceToolbar(it, viewModel) }, theme, init)
+inline fun ViewManager.sectionToolbar(viewModel: PaletteViewModel, theme: Int = 0, init: SectionToolbar.() -> Unit = {})
+	= ankoView({ SectionToolbar(it, viewModel) }, theme, init)

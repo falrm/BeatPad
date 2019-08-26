@@ -2,7 +2,6 @@ package com.jonlatane.beatpad.view
 
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Rect
@@ -10,17 +9,14 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.*
 
-import com.jonlatane.beatpad.view.RotateLayout
-
 import android.view.View.MeasureSpec.UNSPECIFIED
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.HideableView
-import org.jetbrains.anko.custom.ankoView
 import java.lang.Math.PI
-import java.lang.Math.abs
-import java.lang.Math.ceil
-import java.lang.Math.cos
-import java.lang.Math.sin
+import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.cos
+import kotlin.math.sin
 
 /**
  * Rotates first view in this layout by specified angle.
@@ -37,6 +33,10 @@ class RotateLayout @JvmOverloads constructor(context: Context, attrs: AttributeS
   ViewGroup(context, attrs), HideableView {
   override var initialHeight: Int? = null
   override var initialWidth: Int? = null
+  override var initialTopMargin: Int? = null
+  override var initialBottomMargin: Int? = null
+  override var initialLeftMargin: Int? = null
+  override var initialRightMargin: Int? = null
 
   var angle: Int = 0
   set(value) {
@@ -47,6 +47,10 @@ class RotateLayout @JvmOverloads constructor(context: Context, attrs: AttributeS
       invalidate()
     }
   }
+  /**
+   * Circle angle, from 0 to TAU
+   */
+  private val angleC: Double get() = (2 * PI).let { tau -> tau * angle / 360}
 
   private val rotateMatrix = Matrix()
 
@@ -82,28 +86,31 @@ class RotateLayout @JvmOverloads constructor(context: Context, attrs: AttributeS
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     val child = view
     if (child != null) {
-      if (abs(angle % 180) == 90) {
+      when {
+        abs(angle % 180) == 90 -> {
+          measureChild(child, heightMeasureSpec, widthMeasureSpec)
+          setMeasuredDimension(
+            View.resolveSize(child.measuredHeight, widthMeasureSpec),
+            View.resolveSize(child.measuredWidth, heightMeasureSpec))
+        }
+        abs(angle % 180) == 0  -> {
+          measureChild(child, widthMeasureSpec, heightMeasureSpec)
+          setMeasuredDimension(
+            View.resolveSize(child.measuredWidth, widthMeasureSpec),
+            View.resolveSize(child.measuredHeight, heightMeasureSpec))
+        }
+        else                   -> {
+          val childWithMeasureSpec = MeasureSpec.makeMeasureSpec(0, UNSPECIFIED)
+          val childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(0, UNSPECIFIED)
+          measureChild(child, childWithMeasureSpec, childHeightMeasureSpec)
 
-        measureChild(child, heightMeasureSpec, widthMeasureSpec)
-        setMeasuredDimension(
-          View.resolveSize(child.measuredHeight, widthMeasureSpec),
-          View.resolveSize(child.measuredWidth, heightMeasureSpec))
-      } else if (abs(angle % 180) == 0) {
-        measureChild(child, widthMeasureSpec, heightMeasureSpec)
-        setMeasuredDimension(
-          View.resolveSize(child.measuredWidth, widthMeasureSpec),
-          View.resolveSize(child.measuredHeight, heightMeasureSpec))
-      } else {
-        val childWithMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, UNSPECIFIED)
-        val childHeightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, UNSPECIFIED)
-        measureChild(child, childWithMeasureSpec, childHeightMeasureSpec)
+          val measuredWidth = ceil(child.measuredWidth * abs(cos(angleC)) + child.measuredHeight * abs(sin(angleC))).toInt()
+          val measuredHeight = ceil(child.measuredWidth * abs(sin(angleC)) + child.measuredHeight * abs(cos(angleC))).toInt()
 
-        val measuredWidth = ceil(child.measuredWidth * abs(cos(angle_c())) + child.measuredHeight * abs(sin(angle_c()))).toInt()
-        val measuredHeight = ceil(child.measuredWidth * abs(sin(angle_c())) + child.measuredHeight * abs(cos(angle_c()))).toInt()
-
-        setMeasuredDimension(
-          View.resolveSize(measuredWidth, widthMeasureSpec),
-          View.resolveSize(measuredHeight, heightMeasureSpec))
+          setMeasuredDimension(
+            View.resolveSize(measuredWidth, widthMeasureSpec),
+            View.resolveSize(measuredHeight, heightMeasureSpec))
+        }
       }
     } else {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
@@ -158,14 +165,4 @@ class RotateLayout @JvmOverloads constructor(context: Context, attrs: AttributeS
 
     return result
   }
-
-  /**
-   * Circle angle, from 0 to TAU
-   */
-  private fun angle_c(): Double {
-    // True circle constant, not that petty imposter known as "PI"
-    val TAU = 2 * PI
-    return TAU * angle / 360
-  }
-
 }

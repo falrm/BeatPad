@@ -38,11 +38,16 @@ class MelodyBeatAdapter(
   val minimumElementWidth get() = recyclerView.run { dip(minimumBeatWidthDp) }
   val maximumElementWidth
     get() = viewModel.melodyVerticalScrollView.width * 4
-  val minimumElementHeight
-    get() = recyclerView.run { dip(100) }
+  val minimumElementHeight get() = when(viewModel.layoutType) {
+    MelodyViewModel.LayoutType.LINEAR -> minimumRecommendedElementHeightForEditing
+    MelodyViewModel.LayoutType.GRID   -> recyclerView.run { dip(100) }
+  }
+  val maximumElementHeight: Int get() = when(viewModel.layoutType) {
+    MelodyViewModel.LayoutType.LINEAR -> recyclerView.run { dip(maximumBeatHeightDp) }
+    MelodyViewModel.LayoutType.GRID   -> maximumRecommendedElementHeightForOverview
+  }
   val minimumRecommendedElementHeightForEditing
     get() = (viewModel.melodyVerticalScrollView.height * 5f/12f).toInt()
-  val maximumElementHeight: Int get() = recyclerView.run { dip(maximumBeatHeightDp) }
   val maximumRecommendedElementHeightForOverview
     get() = (viewModel.melodyVerticalScrollView.height * 7f/12f).toInt()
 
@@ -89,8 +94,10 @@ class MelodyBeatAdapter(
 
         verbose("Setting height to $field")
         recyclerView.applyToHolders<MelodyBeatHolder> {
+          it.harmonyBeatView.layoutHeight = recyclerView.harmonyViewHeight
           it.melodyBeatView.layoutHeight = field
         }
+        axis.topMargin = recyclerView.harmonyViewHeight
         axis.layoutHeight = field
       }
     }

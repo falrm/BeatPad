@@ -7,11 +7,12 @@ import android.view.ViewGroup
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.storage.PaletteStorage.blankHarmony
 import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
+import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import java.util.*
 
 class SectionListAdapter(
 	val viewModel: PaletteViewModel,
-  val recyclerView: RecyclerView
+  val recyclerView: _RecyclerView
 ) : SmartAdapter<SectionHolder>() {
   val orientation: Int get() = (recyclerView.layoutManager as? LinearLayoutManager)?.orientation
     ?: LinearLayoutManager.HORIZONTAL
@@ -71,7 +72,7 @@ class SectionListAdapter(
     override fun isLongPressDragEnabled(): Boolean = true
   }).also { it.attachToRecyclerView(recyclerView) }
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SectionHolder {
-		return SectionHolder(orientation, parent, viewModel, this)
+		return SectionHolder(orientation, recyclerView, viewModel, this)
 	}
 
 	override fun onBindViewHolder(holder: SectionHolder, position: Int) {

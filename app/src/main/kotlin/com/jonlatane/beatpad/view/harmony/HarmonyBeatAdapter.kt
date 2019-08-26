@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.jonlatane.beatpad.util.smartrecycler.applyToHolders
 import com.jonlatane.beatpad.util.layoutWidth
+import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import com.jonlatane.beatpad.view.melody.BeatAdapter
 import com.jonlatane.beatpad.view.melody.MelodyBeatAdapter.Companion.initialBeatWidthDp
 import com.jonlatane.beatpad.view.melody.MelodyBeatAdapter.Companion.minimumBeatWidthDp
@@ -16,7 +17,7 @@ import org.jetbrains.anko.recyclerview.v7._RecyclerView
 class HarmonyBeatAdapter(
 	val viewModel: PaletteViewModel,
 	override val recyclerView: _RecyclerView
-) : RecyclerView.Adapter<HarmonyBeatHolder>(), AnkoLogger, BeatAdapter {
+) : SmartAdapter<HarmonyBeatHolder>(), AnkoLogger, BeatAdapter {
   private val minimumElementWidth: Int = recyclerView.run { dip(minimumBeatWidthDp) }
 
 //  @Volatile

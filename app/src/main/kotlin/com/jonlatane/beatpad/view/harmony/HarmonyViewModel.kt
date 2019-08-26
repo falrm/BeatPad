@@ -24,10 +24,10 @@ open class HarmonyViewModel(
   lateinit var beatAdapter: HarmonyBeatAdapter
   //var selectedChord: Chord? = null
   var harmonyElementRecycler: ZoomableRecyclerView? = null
-  set(value) {
-    field = value
-    notifyHarmonyChanged()
-  }
+//  set(value) {
+//    field = value
+//    notifyHarmonyChanged()
+//  }
   val section: Section? get() = BeatClockPaletteConsumer.section
   val harmony: Harmony? get() = BeatClockPaletteConsumer.harmony
   override var isChoosingHarmonyChord: Boolean = false
@@ -56,7 +56,6 @@ open class HarmonyViewModel(
   internal set(value) {
     field = value
     notifyHarmonyChanged()
-    beatAdapter.notifyDataSetChanged()
   }
   /**
    * Get: get the current chord being edited (per [isChoosingHarmonyChord]/[selectedHarmonyElements]),
@@ -77,7 +76,8 @@ open class HarmonyViewModel(
     paletteViewModel?.melodyBeatAdapter?.notifyDataSetChanged()
   }
   fun notifyHarmonyChanged() {
-    beatAdapter.notifyDataSetChanged()
+    beatAdapter.updateSmartHolders()
+    paletteViewModel?.melodyViewModel?.beatAdapter?.updateSmartHolders()
     harmonyView?.syncScrollingChordText()
   }
   fun pasteHarmony(section: Section? = this@HarmonyViewModel.section) {

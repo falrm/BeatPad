@@ -6,6 +6,7 @@ import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
+import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
 import com.jonlatane.beatpad.view.melody.MelodyBeatView
 import org.jetbrains.anko.warn
@@ -28,21 +29,37 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
       )
     }
 
+    if(melody == null) {
+      canvas.drawColorblockMelody(
+        oneBeatMelody.apply { subdivisionsPerBeat = harmony.subdivisionsPerBeat},
+        stepNoteAlpha = 0,
+        drawColorGuide = true,
+        alphaSource = colorblockAlpha
+      )
+    }
+
     BeatClockPaletteConsumer.section?.let { section ->
       section.melodies.filter { !it.isDisabled }.filter {
         when(melody?.limitedToNotesInHarmony) {
-          null -> false
+          null -> it.melody.limitedToNotesInHarmony
           true -> it.melody.limitedToNotesInHarmony
           false -> !it.melody.limitedToNotesInHarmony
         }
-      }.map { it.melody }.forEach { melody ->
+      }.map { it.melody }.forEach { otherMelody ->
         canvas.drawColorblockMelody(
-          melody,
-          stepNoteAlpha = 66,
+          otherMelody,
+          stepNoteAlpha = if(melody == null) 255 else 66,
           drawColorGuide = false,
           alphaSource = colorblockAlpha
         )
       }
+    }
+  }
+
+  companion object {
+    val oneBeatMelody = PaletteStorage.baseMelody.apply {
+      subdivisionsPerBeat = 1
+      length = 1
     }
   }
 
