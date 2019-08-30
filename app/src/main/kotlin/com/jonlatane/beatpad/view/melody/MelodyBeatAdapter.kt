@@ -132,6 +132,7 @@ class MelodyBeatAdapter(
 
   fun linearLayout() {
     val state = (recyclerView.layoutManager as LinearLayoutManager).onSaveInstanceState()
+    viewModel.melodyVerticalScrollView.removeView(recyclerView)
     viewModel.melodyView.removeView(recyclerView)
     with(viewModel.melodyVerticalScrollView) {
       addView(recyclerView)
@@ -145,6 +146,7 @@ class MelodyBeatAdapter(
   fun gridLayout() {
     val state = (recyclerView.layoutManager as LinearLayoutManager).onSaveInstanceState()
     viewModel.melodyVerticalScrollView.removeView(recyclerView)
+    viewModel.melodyView.removeView(recyclerView)
     with(viewModel.melodyView) {
       addView(recyclerView)
       recyclerView.lparams(matchParent, matchParent) {
