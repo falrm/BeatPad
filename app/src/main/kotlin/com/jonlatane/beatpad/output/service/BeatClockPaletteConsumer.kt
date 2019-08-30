@@ -29,6 +29,7 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
   set(value) {
     field = value
     MidiDevices.refreshInstruments()
+    tickPosition = 0
   }
   var viewModel: PaletteViewModel? by observable(null) { _, _, _ ->
 

@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.view.harmony
 
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.TypedValue
@@ -58,7 +59,7 @@ interface ChordTextPositioner: AnkoLogger {
     }
   }
 
-  fun syncScrollingChordText() = recycler.post {
+  fun syncScrollingChordText(postAgainAfter: Boolean = true) {
     val (firstBeatPosition, lastBeatPosition) = (recycler.layoutManager as LinearLayoutManager).run {
       findFirstVisibleItemPosition() to findLastVisibleItemPosition()
     } ?: 0 to 0
@@ -121,16 +122,18 @@ interface ChordTextPositioner: AnkoLogger {
                 maxWidth = (beatView.width * 0.85f * length.toFloat() / harmony.subdivisionsPerBeat).toInt()
               }
 
-              (lastTranslationX to lastView).letCheckNull { lastTranslationX, lastView ->
-                if(chordTranslationX - lastTranslationX <= lastView.width) {
-                  val newAlpha = ((chordTranslationX - lastTranslationX) / lastView.width)
-                    .takeIf { it.isFinite() } ?: 0f
-                  verbose { "Setting alpha of ${lastView.text} to $newAlpha"}
-                  lastView.alpha = newAlpha
+              if(recycler.layoutManager !is GridLayoutManager) {
+                (lastTranslationX to lastView).letCheckNull { lastTranslationX, lastView ->
+                  if (chordTranslationX - lastTranslationX <= lastView.width) {
+                    val newAlpha = ((chordTranslationX - lastTranslationX) / lastView.width)
+                      .takeIf { it.isFinite() } ?: 0f
+                    verbose { "Setting alpha of ${lastView.text} to $newAlpha" }
+                    lastView.alpha = newAlpha
+                  }
                 }
+                lastView = this@textView
+                lastTranslationX = chordTranslationX
               }
-              lastView = this@textView
-              lastTranslationX = chordTranslationX
             }
         }
       }
@@ -152,6 +155,9 @@ interface ChordTextPositioner: AnkoLogger {
           maxWidth = Int.MAX_VALUE
         }
       }
+    }
+    if(postAgainAfter) {
+      recycler.post { syncScrollingChordText(postAgainAfter = false) }
     }
   }
 }

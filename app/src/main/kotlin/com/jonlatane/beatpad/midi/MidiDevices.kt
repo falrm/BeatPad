@@ -24,11 +24,14 @@ object MidiDevices : AnkoLogger {
 		Handler(looper)
 	}
 
-	fun refreshInstruments() = BeatClockPaletteConsumer.palette?.parts
-		?.mapNotNull { it.instrument as? MIDIInstrument }
-		?.forEach {
-			it.sendSelectInstrument()
-		} ?: Unit
+	fun refreshInstruments(){
+		BeatClockPaletteConsumer.palette?.parts
+			?.mapNotNull { it.instrument as? MIDIInstrument }
+			?.forEach {
+				it.sendSelectInstrument()
+			} ?: Unit
+		AndroidMidi.flushSendStream()
+	}
 
 	@RequiresApi(Build.VERSION_CODES.M)
 	fun initialize(context: Context) {

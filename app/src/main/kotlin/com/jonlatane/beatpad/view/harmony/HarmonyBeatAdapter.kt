@@ -13,12 +13,15 @@ import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
+import kotlin.math.round
 
 class HarmonyBeatAdapter(
 	val viewModel: PaletteViewModel,
 	override val recyclerView: _RecyclerView
 ) : SmartAdapter<HarmonyBeatHolder>(), AnkoLogger, BeatAdapter {
-  private val minimumElementWidth: Int = recyclerView.run { dip(minimumBeatWidthDp) }
+  private val minimumElementWidth: Int get() = recyclerView.run {
+    (recyclerView.width.toFloat() / itemCount).toInt()
+  }
 
 //  @Volatile
   override var elementWidth = recyclerView.run { dip(initialBeatWidthDp) }
@@ -34,7 +37,7 @@ class HarmonyBeatAdapter(
 				recyclerView.applyToHolders<HarmonyBeatHolder> {
 					it.element.layoutWidth = field
 				}
-				(viewModel as? PaletteViewModel)?.melodyViewModel?.beatAdapter?.elementWidth = field
+//				(viewModel as? PaletteViewModel)?.melodyViewModel?.beatAdapter?.elementWidth = field
       }
 			viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
     }

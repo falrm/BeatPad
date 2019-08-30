@@ -19,7 +19,7 @@ class HarmonyView(
   override val viewModel: PaletteViewModel,
   init: HideableRelativeLayout.() -> Unit = {}
 ) : HideableRelativeLayout(context), ChordTextPositioner, AnkoLogger {
-  override val marginForKey = dip(30)
+  override val marginForKey = dip(5)
 
   // We will render these at the top level on scroll
   override val chordChangeLabels: MutableMap<Int, TextView> = mutableMapOf()

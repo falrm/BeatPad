@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewManager
+import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.color
@@ -29,12 +30,19 @@ class MelodyView(
 	override val chordChangeLabelPool: DefaultPool<TextView> = defaultChordChangeLabelPool
 	override val recycler: RecyclerView get() = viewModel.melodyViewModel.melodyRecyclerView
 	override val supportGridLayout = true
+	fun LayoutParams.melodyPosition() = with(viewModel.melodyViewModel){
+		alignParentRight()
+		above(melodyEditingModifiers)
+		rightOf(melodyLeftScroller)
+		below(melodyEditingToolbar)
+	}
 	init {
 		with(viewModel.melodyViewModel) {
 			backgroundColor = context.color(R.color.white)
 
 			melodyReferenceToolbar = melodyReferenceToolbar(viewModel) {
 				id = R.id.melody_reference_toolbar
+				elevation = 6f
 			}.lparams(matchParent, wrapContent) {
 				alignParentTop()
 				alignParentRight()
@@ -42,6 +50,7 @@ class MelodyView(
 			}
 			melodyEditingToolbar = melodyEditingToolbar(viewModel) {
 				id = R.id.melody_editing_toolbar
+				elevation = 6f
 			}.lparams(matchParent, wrapContent) {
 				below(melodyReferenceToolbar)
 				alignParentRight()
@@ -107,24 +116,8 @@ class MelodyView(
 						when {
 							(xDelta.toInt() != 0 || yDelta.toInt() != 0) -> {
 								viewModel.melodyBeatAdapter.apply {
-									//                  when(layoutType) {
-//                    MelodyViewModel.LayoutType.GRID -> {
-//											if (elementHeight + (10f * yDelta).toInt() >= maximumRecommendedElementHeightForOverview) {
-//												layoutType = MelodyViewModel.LayoutType.LINEAR
-//												//onZoomFinished()
-//											}
-//										}
-//                    MelodyViewModel.LayoutType.LINEAR -> {
-//                      if(elementHeight + (10f * yDelta).toInt() <= minimumRecommendedElementHeightForEditing) {
-//												layoutType = MelodyViewModel.LayoutType.GRID
-//												//onZoomFinished()
-//											}
-//                    }
-//                  }
 									elementWidth += xDelta.toInt()
 									elementHeight += (10f * yDelta).toInt()
-//									viewModel.melodyViewModel.updateMelodyDisplay()
-//									notifyDataSetChanged()
 								}
 								true
 							}
@@ -154,10 +147,7 @@ class MelodyView(
 					width = matchParent
 				}
 			}.lparams(matchParent, matchParent) {
-				alignParentRight()
-				above(melodyEditingModifiers)
-				rightOf(melodyLeftScroller)
-				below(melodyEditingToolbar)
+				melodyPosition()
 			}
 
 			onTouch(returnValue = true) { _, _ -> Unit }

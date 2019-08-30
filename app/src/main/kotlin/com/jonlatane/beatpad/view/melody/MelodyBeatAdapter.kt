@@ -3,6 +3,8 @@ package com.jonlatane.beatpad.view.melody
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
+import android.os.Bundle
+import android.os.Parcelable
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -47,9 +49,15 @@ class MelodyBeatAdapter(
     MelodyViewModel.LayoutType.GRID   -> maximumRecommendedElementHeightForOverview
   }
   val minimumRecommendedElementHeightForEditing
-    get() = (viewModel.melodyVerticalScrollView.height * 5f/12f).toInt()
+    get() = when {
+      viewModel.paletteViewModel.storageContext.configuration.tablet -> (viewModel.melodyVerticalScrollView.height * 5f / 12f).toInt()
+      else -> (viewModel.melodyVerticalScrollView.height * 7f / 12f).toInt()
+    }
   val maximumRecommendedElementHeightForOverview
-    get() = (viewModel.melodyVerticalScrollView.height * 7f/12f).toInt()
+    get() = when {
+      viewModel.paletteViewModel.storageContext.configuration.tablet -> (viewModel.melodyVerticalScrollView.height * 7f / 12f).toInt()
+      else -> (viewModel.melodyVerticalScrollView.height * 5f / 12f).toInt()
+    }
 
 
   override var elementWidth: Int = recyclerView.run { dip(initialBeatWidthDp) }
@@ -77,7 +85,7 @@ class MelodyBeatAdapter(
         }
         viewModel.melodyView.syncScrollingChordText()
       }
-      viewModel.paletteViewModel.harmonyViewModel.beatAdapter.elementWidth = field
+      //viewModel.paletteViewModel.harmonyViewModel.beatAdapter.elementWidth = field
     }
 
   var elementHeight = recyclerView.run { dip(initialBeatHeightDp) }
@@ -123,13 +131,30 @@ class MelodyBeatAdapter(
   }
 
   fun linearLayout() {
+    val state = (recyclerView.layoutManager as LinearLayoutManager).onSaveInstanceState()
+    viewModel.melodyView.removeView(recyclerView)
+    with(viewModel.melodyVerticalScrollView) {
+      addView(recyclerView)
+      recyclerView.lparams(matchParent, wrapContent)
+    }
     recyclerView.layoutManager = linearLayoutManager
+    (recyclerView.layoutManager as LinearLayoutManager).onRestoreInstanceState(state)
     viewModel.melodyVerticalScrollView.scrollingEnabled = true
   }
 
   fun gridLayout() {
+    val state = (recyclerView.layoutManager as LinearLayoutManager).onSaveInstanceState()
+    viewModel.melodyVerticalScrollView.removeView(recyclerView)
+    with(viewModel.melodyView) {
+      addView(recyclerView)
+      recyclerView.lparams(matchParent, matchParent) {
+        melodyPosition()
+      }
+    }
     recyclerView.layoutManager = recommendedGridLayoutManager()
+    (recyclerView.layoutManager as LinearLayoutManager).onRestoreInstanceState(state)
     viewModel.melodyVerticalScrollView.scrollingEnabled = false
+    viewModel.melodyVerticalScrollView.verticalScrollbarPosition = 0
   }
 
   fun animateElementHeight(height: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {

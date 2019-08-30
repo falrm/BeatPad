@@ -46,32 +46,56 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     if(isFinalBeat) {
       canvas.drawHorizontalLineInBounds(
         leftSide = false,
-        strokeWidth = paint.strokeWidth * 2,
+        strokeWidth = paint.strokeWidth * 3,
         startY = canvas.pointFor(clefs.flatMap { it.notes }.maxBy { it.heptatonicValue }!!),
         stopY = canvas.pointFor(clefs.flatMap { it.notes }.minBy { it.heptatonicValue }!!)
       )
     }
 
     paint.color = color(android.R.color.black).withAlpha((255 * notationAlpha / 3f).toInt())
-    sectionMelodiesOfPartType.filter { it != melody }.forEach { otherMelody ->
+    var melodiesToRender = sectionMelodiesOfPartType.filter { it != melody }
+    if(melody == null) {
+      melodiesToRender = melodiesToRender.sortedByDescending { otherMelody ->
+        otherMelody.averageTone!!
+      }
+    }
+    // Render queue is accessed from two directions; in order from highest to lowest Melody
+    val renderQueue = melodiesToRender.toMutableList()
+    var index = 0
+    while(renderQueue.isNotEmpty()) {
+      // Draw highest Melody stems up, lowest stems down, second lowest stems up, second highest
+      // down. And repeat.
+      val (otherMelody, stemsUp) = when (index % 4) {
+        0    -> renderQueue.removeAt(0) to true
+        1    -> renderQueue.removeAt(renderQueue.size - 1) to false
+        2    -> renderQueue.removeAt(renderQueue.size - 1) to true
+        else -> renderQueue.removeAt(0) to false
+      }
       canvas.drawNotationMelody(
         otherMelody,
         drawAlpha = melody?.let { notationAlpha / 3f } ?: notationAlpha,
         drawColorGuide = false,
         forceDrawColorGuideForCurrentBeat = melody == null,
         forceDrawColorGuideForSelectedBeat = melody == null,
-        stemsUp = false
+        stemsUp = if(melody == null) {
+          if (renderQueue.isEmpty())
+            otherMelody.averageTone!! <= melodiesToRender.flatMap {
+              (it as RationalMelody).changes.values.flatMap { change -> change.tones }
+            }.average()
+          else stemsUp
+        } else false
       )
+      index++
     }
     flushNotationDrawableCache()
   }
 
+  val Melody<*>.averageTone
+    get() = (this as? RationalMelody)?.changes?.values?.flatMap { it.tones }?.average()
+
   override val harmony: Harmony get() = viewModel.harmony!!
   val meter: Harmony.Meter get() = harmony.meter
-  val isFinalBeat: Boolean get() = viewModel.harmony?.meter?.let { meter ->
-      //TODO make this reflect all the possibilities of [Harmony.Meter]
-      (beatPosition + 1) % meter.defaultBeatsPerMeasure == 0
-    } ?: false
+  val isFinalBeat: Boolean get() = (beatPosition + 1) % meter.defaultBeatsPerMeasure == 0
 
   fun flushNotationDrawableCache() {
     listOf(filledNoteheadPool, sharpPool, xNoteheadPool)
@@ -109,7 +133,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
       section.melodies.filter { !it.isDisabled }
     }?.map { it.melody } ?: emptyList()
 
-  val sectionMelodiesOfPartType
+  val sectionMelodiesOfPartType: List<Melody<*>>
     get() = arrayOf(melody).filterNotNull() +
       sectionMelodies.filter {
         when (melody?.drumPart) {

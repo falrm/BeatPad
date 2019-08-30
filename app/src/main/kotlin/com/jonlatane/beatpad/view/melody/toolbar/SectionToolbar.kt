@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.util.*
@@ -34,6 +36,7 @@ class SectionToolbar(context: Context, viewModel: PaletteViewModel)
 			}
 		}
 	}.squareButtonStyle()
+
 	val layoutTypeButton = imageButton {
 		imageResource = R.drawable.line
 		backgroundResource = R.drawable.toolbar_melody_button
@@ -47,8 +50,28 @@ class SectionToolbar(context: Context, viewModel: PaletteViewModel)
 			melodyViewModel.restoreLayoutTypeDimensions()
 		}
 	}.squareButtonStyle()
-	private val relativeToButton: Button = button {
-		text = ""
+
+	private val meterButton: Button = button {
+		text = "4\n4"
+		setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12f)
+		backgroundResource = R.drawable.toolbar_melody_button
+		padding = dip(0)
+		typeface = MainApplication.chordTypefaceBold
+//		singleLine = true
+//		ellipsize = TextUtils.TruncateAt.MARQUEE
+//		marqueeRepeatLimit = -1
+//		isSelected = true
+		onClick {
+			context.toast("TODO!")
+		}
+	}.lparams {
+		width = squareSize
+		height = matchParent
+		weight = 0f
+	}
+
+	private val keyButton: Button = button {
+		text = "C Major"
 		backgroundResource = R.drawable.toolbar_melody_button
 		setPadding(dip(15), dip(10), dip(10), dip(10))
 		gravity = Gravity.LEFT or Gravity.CENTER_VERTICAL
@@ -57,36 +80,36 @@ class SectionToolbar(context: Context, viewModel: PaletteViewModel)
 		}
 		toolbarTextStyle()
 	}.flexStyle()
+	private val lengthButton: Button = button {
+		text = "64/4\n4 bars"
+		setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12f)
+		backgroundResource = R.drawable.toolbar_melody_button
+		padding = dip(0)
+		typeface = MainApplication.chordTypefaceBold
+//		singleLine = true
+//		ellipsize = TextUtils.TruncateAt.MARQUEE
+//		marqueeRepeatLimit = -1
+//		isSelected = true
+		onClick {
+			context.toast("TODO!")
+		}
+	}.longSquareButtonStyle().lparams { height = matchParent }
 
-	private val upButton = imageButton {
-		imageResource = R.drawable.icons8_sort_up_100
+	private val editButton = imageButton {
+		imageResource = R.drawable.edit_black
 		backgroundResource = R.drawable.toolbar_melody_button
 		padding = dip(10)
 		scaleType = ImageView.ScaleType.FIT_CENTER
 		onClick {
 //			melodyViewModel.openedMelody?.transposeInPlace(1)
 //			updateMelody()
+			context.toast("TODO!")
 		}
 		onLongClick(returnValue = true) {
 //			melodyViewModel.openedMelody?.transposeInPlace(12)
 //			context.toast("Octave Up")
 //			updateMelody()
-		}
-	}.squareButtonStyle()
-
-	private val downButton = imageButton {
-		imageResource = R.drawable.icons8_sort_down_100
-		backgroundResource = R.drawable.toolbar_melody_button
-		padding = dip(10)
-		scaleType = ImageView.ScaleType.FIT_CENTER
-		onClick {
-//			melodyViewModel.openedMelody?.transposeInPlace(-1)
-//			updateMelody()
-		}
-		onLongClick(returnValue = true) {
-//			melodyViewModel.openedMelody?.transposeInPlace(-12)
-//			context.toast("Octave Down")
-//			updateMelody()
+			context.toast("TODO!")
 		}
 	}.squareButtonStyle()
 }
