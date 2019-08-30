@@ -75,6 +75,7 @@ class MelodyBeatAdapter(
         ) {
           recyclerView.layoutManager = recommendedGridLayoutManager()
         }
+        viewModel.melodyView.syncScrollingChordText()
       }
       viewModel.paletteViewModel.harmonyViewModel.beatAdapter.elementWidth = field
     }
@@ -96,9 +97,11 @@ class MelodyBeatAdapter(
         recyclerView.applyToHolders<MelodyBeatHolder> {
           it.harmonyBeatView.layoutHeight = recyclerView.harmonyViewHeight
           it.melodyBeatView.layoutHeight = field
+          it.melodyBeatView.requestLayout()
         }
         axis.topMargin = recyclerView.harmonyViewHeight
         axis.layoutHeight = field
+        viewModel.melodyView.syncScrollingChordText()
       }
     }
   val recommendedSpanCount: Int

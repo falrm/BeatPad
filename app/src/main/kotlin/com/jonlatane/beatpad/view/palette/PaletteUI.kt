@@ -118,9 +118,7 @@ class PaletteUI constructor(
             if (!inScrollingStack.getAndSet(true)) {
               verbose { "onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}" }
               (melodyRecycler.adapter as BeatAdapter).syncPositionTo(harmonyRecycler)
-              viewModel.harmonyViewModel.harmonyView?.post {
-                viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
-              }
+              viewModel.melodyViewModel.melodyView.syncScrollingChordText()
             }
             post {
               inScrollingStack.set(false)
@@ -139,9 +137,7 @@ class PaletteUI constructor(
               if(viewModel.editingMelody != null) {
                 (harmonyRecycler.adapter as BeatAdapter).syncPositionTo(melodyRecycler)
               }
-              viewModel.harmonyViewModel.harmonyView?.post {
-                viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
-              }
+              viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
             }
             post {
               inScrollingStack.set(false)
@@ -304,6 +300,7 @@ class PaletteUI constructor(
       rightOf(viewModel.beatScratchToolbar)
       below(viewModel.toolbarView)
       alignParentRight()
+      bottomMargin = dip(4)
     }
 
     viewModel.partListView = partListView(viewModel = viewModel) {
@@ -311,7 +308,6 @@ class PaletteUI constructor(
     }.lparams {
       width = matchParent
       height = wrapContent
-      topMargin = dip(4)
       alignParentBottom()
       rightOf(viewModel.beatScratchToolbar)
       below(viewModel.harmonyView)

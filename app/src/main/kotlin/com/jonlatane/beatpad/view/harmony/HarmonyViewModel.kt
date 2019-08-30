@@ -79,6 +79,7 @@ open class HarmonyViewModel(
     beatAdapter.updateSmartHolders()
     paletteViewModel?.melodyViewModel?.beatAdapter?.updateSmartHolders()
     harmonyView?.syncScrollingChordText()
+    paletteViewModel?.melodyViewModel?.melodyView?.syncScrollingChordText()
   }
   fun pasteHarmony(section: Section? = this@HarmonyViewModel.section) {
     getClipboardHarmony()?.let { newHarmony ->

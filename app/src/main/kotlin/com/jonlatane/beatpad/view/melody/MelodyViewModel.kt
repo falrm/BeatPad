@@ -52,7 +52,7 @@ class MelodyViewModel(
 	lateinit var sectionToolbar: SectionToolbar
 	lateinit var melodyReferenceToolbar: MelodyReferenceToolbar
 	lateinit var melodyEditingToolbar: MelodyEditingToolbar
-	lateinit var melodyView: HideableRelativeLayout
+	lateinit var melodyView: MelodyView
 	lateinit var melodyLeftScroller: NonDelayedScrollView
 	lateinit var melodyEditingModifiers: MelodyEditingModifiers
 	lateinit var melodyVerticalScrollView: NonDelayedScrollView
