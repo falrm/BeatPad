@@ -199,7 +199,7 @@ class PaletteToolbar(
       viewModel.editingMix = !viewModel.editingMix
       if(viewModel.editingMix) {
         post {
-          viewModel.hideMelodyView(viewModel.editingMelody)
+          viewModel.melodyViewVisible = false
           viewModel.editingMelody = null
         }
       }

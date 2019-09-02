@@ -110,6 +110,7 @@ dependencies {
 	//implementation 'commons-codec:commons-codec:1.12'
 	implementation 'net.iharder:base64:2.3.9'
 	implementation 'com.github.stupacki:MultiFunctions:1.2.1'
+	implementation 'org.nield:kotlin-statistics:1.2.1'
 
 
 

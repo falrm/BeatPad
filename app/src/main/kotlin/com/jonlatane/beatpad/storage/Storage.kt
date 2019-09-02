@@ -6,7 +6,9 @@ import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Palette
+import com.jonlatane.beatpad.util.booleanPref
 import com.jonlatane.beatpad.util.stringPref
+import com.jonlatane.beatpad.view.palette.filemanagement.PresetPalettes
 import net.iharder.Base64
 import org.jetbrains.anko.*
 import java.io.*
@@ -29,6 +31,7 @@ interface Storage : AnkoLogger {
     private const val basePaletteDir = "palettes"
     private const val baseMelodyDir = "melodies"
     private const val baseHarmonyDir = "harmonies"
+    var startWithPresetPalette by booleanPref("startWithPresetPalette", true)
     var openPaletteFile: String by stringPref("openPaletteFile", "palette")
     private val openPaletteFileName get() = "$openPaletteFile.json"
 
@@ -80,15 +83,27 @@ interface Storage : AnkoLogger {
   ): Palette? = try {
     loadPalette(this, file)
   } catch (t: Throwable) {
-    error("Failed to load palette data", t)
+    if(!startWithPresetPalette) {
+      error("Failed to load palette data", t)
+    }
     if (fallbackToBackup) {
-      toast("Failed to load data, attempting to load backup...")
+      if(!startWithPresetPalette) {
+        toast("Failed to load data, attempting to load backup...")
+      }
       try {
         loadPalette(this, file.backup)
       } catch (t: Throwable) {
-        error("Failed to load any palette data, starting from scratch...", t)
-        toast("Failed to load data from backup, starting from scratch...")
-        null
+        if(startWithPresetPalette) {
+          val preset = PresetPalettes.values().random()
+          toast("Welcome! Starting you off with ${preset.title}.")
+          openPaletteFile = preset.title
+          startWithPresetPalette = false
+          preset.palette
+        } else {
+          error("Failed to load any palette data, starting from scratch...", t)
+          toast("Failed to load data from backup, starting from scratch...")
+          null
+        }
       }
     } else null
   }

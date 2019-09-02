@@ -87,9 +87,7 @@ class PaletteViewModel(
   lateinit var orbifold: OrbifoldView
 
   var palette: Palette by observable(initialValue = Palette()) { _, _, new ->
-    hideMelodyView(editingMelody)
     editingMelody = null
-    hideMelodyView(editingMelody)
     if (new.parts.isEmpty()) {
       new.parts.add(Part())
     }
@@ -125,22 +123,20 @@ class PaletteViewModel(
 
   var editingMelody: Melody<*>? by observable<Melody<*>?>(null) { _, old, new ->
     melodyViewModel.openedMelody = new
-    if (new != null) {
+    if (new != null && !melodyViewVisible) {
       colorboardView.hide()
       keyboardView.hide()
       harmonyViewModel.beatAdapter
         .syncPositionTo(melodyViewModel.melodyRecyclerView)
 
       backStack.push {
-        if(melodyView.translationX == 0f) {
-          hideMelodyView(editingMelody)
+        if(melodyViewVisible) {
+          melodyViewVisible = false
           editingMelody = null
           true
         } else false
       }
-      // Fancy animation of the thing if possible, otherwise boring
-      showMelodyView()
-      //showMelodyViewBoring()
+      melodyViewVisible = true
     } else {
       if(old != new) {
         saveAfterDelay()
@@ -217,7 +213,19 @@ class PaletteViewModel(
     PlaybackService.instance?.showNotification()
   }
 
-  fun showMelodyView() {
+  var melodyViewVisible: Boolean = false
+    set(visible) {
+      if(field != visible) {
+        field = visible
+        if(visible) {
+          showMelodyView()
+        } else {
+          hideMelodyView()
+        }
+      }
+    }
+
+  private fun showMelodyView() {
     harmonyView.hide()
     partListView.viewHolders<PartHolder>().mapNotNull { partHolder ->
       partHolder.layout.melodyReferenceRecycler.viewHolders<MelodyReferenceHolder>()
@@ -278,12 +286,12 @@ class PaletteViewModel(
     //partListView.animate().alpha(0f).start()
   }
 
-  fun hideMelodyView(oldValue: Melody<*>? = null) {
+  private fun hideMelodyView(oldValue: Melody<*>? = editingMelody) {
     harmonyView.show()
     partListView.viewHolders<PartHolder>().mapNotNull { partHolder ->
       partHolder.layout.melodyReferenceRecycler.viewHolders<MelodyReferenceHolder>()
         .firstOrNull { !it.isAddButton && it.melody == oldValue }
-    }/*let { listOf<MelodyReferenceHolder?>(null) }.*/.firstOrNull()?.let { melodyReferenceHolder ->
+    }.firstOrNull()?.let { melodyReferenceHolder ->
       val name = melodyReferenceHolder.layout.name
       val partListLocation = intArrayOf(-1, -1)
       val nameLocation = intArrayOf(-1, -1)

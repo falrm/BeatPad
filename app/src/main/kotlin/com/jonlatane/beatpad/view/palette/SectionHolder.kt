@@ -240,18 +240,18 @@ class SectionHolder constructor(
 
   private fun openSectionInMelodyView() {
     // Check if section is already opened
-    if(viewModel.editingMelody == null && viewModel.melodyView.translationX == 0f)
+    if(viewModel.editingMelody == null && viewModel.melodyViewVisible)
       return
     val previouslyEditingMelody = viewModel.editingMelody
     viewModel.backStack.push {
       when {
         previouslyEditingMelody != null -> viewModel.editingMelody = previouslyEditingMelody
-        else                            -> viewModel.hideMelodyView()
+        else                            -> viewModel.melodyViewVisible = false
       }
       true
     }
     viewModel.editingMelody = null
-    viewModel.showMelodyView()
+    viewModel.melodyViewVisible = true
     vibrate(10, 100)
   }
 

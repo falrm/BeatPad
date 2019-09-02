@@ -29,9 +29,10 @@ class MelodyView(
 	override val chordChangeLabels: MutableMap<Int, TextView> = mutableMapOf()
 	override val chordChangeLabelPool: DefaultPool<TextView> = defaultChordChangeLabelPool
 	override val recycler: RecyclerView get() = viewModel.melodyViewModel.melodyRecyclerView
+	val rightSpacer: View
 	override val supportGridLayout = true
 	fun LayoutParams.melodyPosition() = with(viewModel.melodyViewModel){
-		alignParentRight()
+		leftOf(rightSpacer)
 		above(melodyEditingModifiers)
 		rightOf(melodyLeftScroller)
 		below(melodyEditingToolbar)
@@ -59,6 +60,7 @@ class MelodyView(
 
 			sectionToolbar = sectionToolbar(viewModel) {
 				id = View.generateViewId()
+				elevation = 6f
 			}.lparams(matchParent, wrapContent) {
 				alignParentBottom()
 				alignParentRight()
@@ -66,6 +68,7 @@ class MelodyView(
 			}
 			melodyEditingModifiers = melodyEditingModifiers {
 				id = R.id.bottom_scroller
+				elevation = 6f
 				onHeldDownChanged = { heldDown ->
 					if (displayType == MelodyViewModel.DisplayType.NOTATION) {
 						val anim = ValueAnimator.ofFloat(
@@ -99,6 +102,13 @@ class MelodyView(
 				below(melodyEditingToolbar)
 				above(melodyEditingModifiers)
 				alignParentLeft()
+			}
+			rightSpacer = view {
+				id = View.generateViewId()
+			}.lparams(0, matchParent) {
+				alignParentRight()
+				above(melodyEditingModifiers)
+				below(melodyEditingToolbar)
 			}
 			melodyVerticalScrollView = nonDelayedScrollView {
 				id = R.id.center_v_scroller

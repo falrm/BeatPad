@@ -161,16 +161,30 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
     if (savedInstanceState.getBoolean("orbifoldOpen", false)) {
       viewModel.showOrbifold(false)
     }
-    savedInstanceState.getString("editingMelodyId")?.let { melodyId: String ->
+    val preservedOpenedMelody = savedInstanceState.getString("editingMelodyId")?.let { melodyId: String ->
       try {
         UUID.fromString(melodyId)
       } catch(_: Throwable) {
         null
       }?.let { melodyUUID ->
         viewModel.palette.parts.flatMap { it.melodies }.firstOrNull { it.id == melodyUUID }
-          ?.let { melody ->
+          ?.also { melody ->
             viewModel.melodyViewModel.melodyView.post { viewModel.editingMelody = melody }
           }
+      }
+    }
+    if(preservedOpenedMelody == null) {
+      if (savedInstanceState.getBoolean("melodyOpen", false)) {
+        viewModel.melodyView.post {
+          viewModel.backStack.push {
+            if (viewModel.melodyViewVisible) {
+              viewModel.melodyViewVisible = false
+              true
+            } else false
+          }
+
+          viewModel.melodyViewVisible = true
+        }
       }
     }
 
@@ -190,6 +204,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
     outState.putBoolean("keyboardOpen", !viewModel.keyboardView.isHidden)
     outState.putBoolean("colorboardOpen", !viewModel.colorboardView.isHidden)
     outState.putBoolean("orbifoldOpen", !viewModel.orbifold.isHidden)
+    outState.putBoolean("melodyOpen", viewModel.melodyViewModel.melodyView.translationX == 0f)
     outState.putString("editingMelodyId", viewModel.editingMelody?.id.toString())
     outState.putInt("beatWidth", viewModel.melodyBeatAdapter.elementWidth)
     outState.putInt("beatHeight", viewModel.melodyBeatAdapter.elementHeight)

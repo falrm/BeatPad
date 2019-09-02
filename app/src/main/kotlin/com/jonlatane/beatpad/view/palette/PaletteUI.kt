@@ -212,6 +212,8 @@ class PaletteUI constructor(
 
     viewModel.partListTransitionView = textView {
       id = View.generateViewId()
+      alpha = 0f
+      translationX = 10000f
       textSize = 25f
       background = context.getDrawable(R.drawable.orbifold_chord)
     }.lparams(dip(30), dip(40)) {
@@ -222,6 +224,7 @@ class PaletteUI constructor(
     viewModel.melodyViewModel.melodyView = melodyView(viewModel = viewModel) {
       id = View.generateViewId()
       alpha = 0f
+      translationX = 10000f
     }.lparams(matchParent, wrapContent) {
       below(viewModel.harmonyView)
       rightOf(viewModel.sectionListRecyclerVerticalRotator)
@@ -316,6 +319,8 @@ class PaletteUI constructor(
 
     viewModel.partListTransitionView = textView {
       id = View.generateViewId()
+      alpha = 0f
+      translationX = 10000f
       textSize = 25f
       background = context.getDrawable(R.drawable.orbifold_chord)
     }.lparams(0, dip(40)) {
@@ -326,6 +331,7 @@ class PaletteUI constructor(
     viewModel.melodyViewModel.melodyView = melodyView(viewModel = viewModel) {
       id = R.id.melody
       alpha = 0f
+      translationX = 10000f
     }.lparams {
       width = matchParent
       height = wrapContent

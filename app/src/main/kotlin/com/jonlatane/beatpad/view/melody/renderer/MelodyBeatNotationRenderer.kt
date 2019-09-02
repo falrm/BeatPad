@@ -6,13 +6,12 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
-import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import kotlinx.io.pool.DefaultPool
-import org.jetbrains.anko.dip
-import org.jetbrains.anko.info
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
+import org.nield.kotlinstatistics.standardDeviation
+import org.nield.kotlinstatistics.variance
 import java.util.*
 import kotlin.math.*
 
@@ -52,7 +51,10 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
       )
     }
 
-    paint.color = color(android.R.color.black).withAlpha((255 * notationAlpha / 3f).toInt())
+    paint.color = color(android.R.color.black).withAlpha(
+      if (melody != null) (255 * notationAlpha / 3f).toInt()
+      else (255 * notationAlpha).toInt()
+    )
     var melodiesToRender = sectionMelodiesOfPartType.filter { it != melody }
     if(melody == null) {
       melodiesToRender = melodiesToRender.sortedByDescending { otherMelody ->
@@ -143,7 +145,6 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
         }
       }
 
-
   fun Canvas.drawNotationMelody(
     melody: Melody<*>,
     drawAlpha: Float = notationAlpha,
@@ -153,14 +154,20 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     forceDrawColorGuideForSelectedBeat: Boolean = false,
     stemsUp: Boolean = true
   ) {
+    val avgSubdivisionsPerBeat = sectionMelodiesOfPartType.map { it.subdivisionsPerBeat }.average()
+    val stdDevSubdivisionsPerBeat = sectionMelodiesOfPartType.map { it.subdivisionsPerBeat }.standardDeviation()
+    val aLotOfSubdivisions = 6.0
     val maxSubdivisonsPerBeat = (sectionMelodiesOfPartType + melody)
+      .filter { it.subdivisionsPerBeat <= min(aLotOfSubdivisions,avgSubdivisionsPerBeat + stdDevSubdivisionsPerBeat) }
       .map { it.subdivisionsPerBeat }.max()!!
     val maxBoundsWidth = min(
       (overallBounds.right - overallBounds.left) / maxSubdivisonsPerBeat,
       round(letterStepSize * 10).toInt()
     )
     iterateSubdivisions(melody) { elementPosition ->
-      bounds.right = bounds.left + maxBoundsWidth
+      if(melody.subdivisionsPerBeat <= min(aLotOfSubdivisions, avgSubdivisionsPerBeat + stdDevSubdivisionsPerBeat)) {
+        bounds.right = bounds.left + maxBoundsWidth
+      }
       colorGuideAlpha = (when {
         !drawColorGuide                -> when {
           forceDrawColorGuideForCurrentBeat && isCurrentlyPlayingBeat -> 119

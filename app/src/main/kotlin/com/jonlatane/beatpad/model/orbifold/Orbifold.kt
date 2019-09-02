@@ -45,7 +45,7 @@ enum class Orbifold(val title: String, vararg sequences: Orbit)
     AlternatingMajorMinorSeconds
   ),
   funk(
-    "Funk",
+    "Minor Funk",
     FunkDominantStepUp,
     MinorFunk,
     FunkDominantSevens
