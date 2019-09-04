@@ -25,7 +25,7 @@ fun applyTypefaceToAll(view: View, typeface: Typeface): Unit = when (view) {
   else -> {}
 }
 
-fun MenuItem.applyTypeface(
+internal fun MenuItem.applyTypeface(
   typeface: Typeface = MainApplication.chordTypefaceRegular
 ) {
   val newTitle = SpannableStringBuilder(title)
@@ -40,10 +40,10 @@ fun MenuItem.applyTypeface(
 
 fun PopupMenu.applyTypeface(
   typeface: Typeface = MainApplication.chordTypefaceRegular
-) {
+) = try {
 
   for (i in 0 until menu.size()) {
     val item = menu.getItem(i)
     item.applyTypeface(typeface)
   }
-}
+} catch(_: Throwable) {}

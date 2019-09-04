@@ -24,7 +24,7 @@ internal class PlaybackThread : Thread(), AnkoLogger {
           verbose { "Tick @${BeatClockPaletteConsumer.tickPosition} (T:${System.currentTimeMillis()}" }
           tryWithRetries { BeatClockPaletteConsumer.tick() }
           while(System.currentTimeMillis() < start + tickTime) {
-            Thread.sleep(3L)
+            sleep(3L)
           }
         } else {
           BeatClockPaletteConsumer.viewModel?.toolbarView?.playButton?.imageResource = R.drawable.icons8_play_100

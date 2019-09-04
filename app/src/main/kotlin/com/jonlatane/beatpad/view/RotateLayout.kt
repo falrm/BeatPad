@@ -148,7 +148,7 @@ class RotateLayout @JvmOverloads constructor(context: Context, attrs: AttributeS
     canvas.restore()
   }
 
-  override fun invalidateChildInParent(location: IntArray, dirty: Rect): ViewParent {
+  override fun invalidateChildInParent(location: IntArray, dirty: Rect): ViewParent? {
     invalidate()
     return super.invalidateChildInParent(location, dirty)
   }

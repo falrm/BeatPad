@@ -80,10 +80,8 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
         forceDrawColorGuideForCurrentBeat = melody == null,
         forceDrawColorGuideForSelectedBeat = melody == null,
         stemsUp = if(melody == null) {
-          if (renderQueue.isEmpty())
-            otherMelody.averageTone!! <= melodiesToRender.flatMap {
-              (it as RationalMelody).changes.values.flatMap { change -> change.tones }
-            }.average()
+          if (melodiesToRender.size > 2 && renderQueue.isEmpty())
+            otherMelody.averageTone!! < melodiesToRender.mapNotNull{ it.averageTone }.average()
           else stemsUp
         } else false
       )
@@ -154,19 +152,31 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     forceDrawColorGuideForSelectedBeat: Boolean = false,
     stemsUp: Boolean = true
   ) {
-    val avgSubdivisionsPerBeat = sectionMelodiesOfPartType.map { it.subdivisionsPerBeat }.average()
-    val stdDevSubdivisionsPerBeat = sectionMelodiesOfPartType.map { it.subdivisionsPerBeat }.standardDeviation()
-    val aLotOfSubdivisions = 6.0
+    val maxSubdivisonsPerBeatUnder7 = (sectionMelodiesOfPartType + melody)
+      .filter { it.subdivisionsPerBeat <= 7 }
+      .map { it.subdivisionsPerBeat }.max() ?: 7
+    val maxSubdivisonsPerBeatUnder13 = (sectionMelodiesOfPartType + melody)
+      .filter { it.subdivisionsPerBeat <= 13 }
+      .map { it.subdivisionsPerBeat }.max() ?: 13
     val maxSubdivisonsPerBeat = (sectionMelodiesOfPartType + melody)
-      .filter { it.subdivisionsPerBeat <= min(aLotOfSubdivisions,avgSubdivisionsPerBeat + stdDevSubdivisionsPerBeat) }
-      .map { it.subdivisionsPerBeat }.max()!!
+      .map { it.subdivisionsPerBeat }.max() ?: 24
+    val maxBoundsWidthUnder7 = min(
+      (overallBounds.right - overallBounds.left) / maxSubdivisonsPerBeatUnder7,
+      round(letterStepSize * 10).toInt()
+    )
+    val maxBoundsWidthUnder13 = min(
+      (overallBounds.right - overallBounds.left) / maxSubdivisonsPerBeatUnder13,
+      round(letterStepSize * 10).toInt()
+    )
     val maxBoundsWidth = min(
       (overallBounds.right - overallBounds.left) / maxSubdivisonsPerBeat,
       round(letterStepSize * 10).toInt()
     )
     iterateSubdivisions(melody) { elementPosition ->
-      if(melody.subdivisionsPerBeat <= min(aLotOfSubdivisions, avgSubdivisionsPerBeat + stdDevSubdivisionsPerBeat)) {
-        bounds.right = bounds.left + maxBoundsWidth
+      bounds.right = bounds.left + when {
+        melody.subdivisionsPerBeat <= 7 -> maxBoundsWidthUnder7
+        melody.subdivisionsPerBeat <= 13 -> maxBoundsWidthUnder13
+        else -> maxBoundsWidth
       }
       colorGuideAlpha = (when {
         !drawColorGuide                -> when {
@@ -224,9 +234,14 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
           val playbackTone = melody.playbackToneUnder(it, chordAtTheTime)
           Note.nameNoteUnderChord(playbackTone, chordAtTheTime)
         }
-        playbackNotes.firstOrNull { it.heptatonicValue == note.heptatonicValue }?.also {
-          result = it.sign
-        } != null
+        val matchingNotes = playbackNotes.filter {
+          it.heptatonicValue == note.heptatonicValue && it.octave == note.octave
+        }
+
+        if(matchingNotes.toSet().size == 1) {
+           result = matchingNotes.first().sign
+        }
+        matchingNotes.isNotEmpty()
       }
     return result
   }
@@ -353,7 +368,10 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
         } else {
           val stemX = if (hadStaggeredNotes) bounds.right - 0.95f * noteheadWidth
           else bounds.right - 1.85f * noteheadWidth
-          val startY = minCenter + noteheadHeight * (if (minWasStaggered) -.2f else .2f)
+          val startY = minCenter + noteheadHeight * when {
+            minWasStaggered || hadStaggeredNotes -> -.2f
+            else -> .2f
+          }
           val stopY = maxCenter + 3 * noteheadHeight
           drawLine(stemX, startY, stemX, stopY, paint)
         }

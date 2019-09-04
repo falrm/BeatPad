@@ -81,10 +81,11 @@ class MelodyBeatAdapter(
         }
         if(
           viewModel.layoutType == MelodyViewModel.LayoutType.GRID
-          && (recyclerView.layoutManager as? GridLayoutManager)?.spanCount
-          != recommendedSpanCount
+          && (recyclerView.layoutManager as? GridLayoutManager)?.spanCount != recommendedSpanCount
         ) {
+          val state = (recyclerView.layoutManager as LinearLayoutManager).onSaveInstanceState()
           recyclerView.layoutManager = recommendedGridLayoutManager()
+          (recyclerView.layoutManager as LinearLayoutManager).onRestoreInstanceState(state)
         }
         viewModel.melodyView.syncScrollingChordText()
       }

@@ -38,7 +38,7 @@ class PlaybackService : Service(), AnkoLogger {
       private set
   }
 
-  private lateinit var playbackThread: PlaybackThread
+  internal lateinit var playbackThread: PlaybackThread private set
   val isStopped get() = playbackThread.stopped
 
   override fun onCreate() {

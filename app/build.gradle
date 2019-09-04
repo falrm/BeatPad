@@ -45,8 +45,8 @@ android {
 		applicationId "com.jonlatane.beatpad"
 		minSdkVersion 23
 		targetSdkVersion 29
-		versionCode 91
-		versionName "0.62.0"
+		versionCode 93
+		versionName "0.64.0"
 		multiDexEnabled false
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 	}
