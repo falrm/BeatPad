@@ -10,8 +10,6 @@ import com.jonlatane.beatpad.model.melody.RationalMelody
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
-import org.nield.kotlinstatistics.standardDeviation
-import org.nield.kotlinstatistics.variance
 import java.util.*
 import kotlin.math.*
 
