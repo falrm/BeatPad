@@ -5,6 +5,7 @@ import BeatClockPaletteConsumer
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.widget.TextView
+import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Palette
@@ -34,8 +35,9 @@ import kotlin.properties.Delegates.observable
  * The PaletteViewModel still assumes we'll only be editing
  * one Melody at a time.
  */
-class PaletteViewModel(
-  override val storageContext: Context
+class PaletteViewModel constructor(
+  override val storageContext: Context,
+  val activity: PaletteEditorActivity
 ) : AnkoLogger, Storage {
   init {
     //BeatClockPaletteConsumer.viewModel = this

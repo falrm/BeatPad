@@ -10,7 +10,9 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.PopupMenu
+import com.firebase.ui.auth.AuthUI
 import com.jonlatane.beatpad.BuildConfig
+import com.jonlatane.beatpad.PaletteEditorActivity.Companion.RC_SIGN_IN
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.storage.Storage
@@ -73,6 +75,7 @@ class BeatScratchToolbar(
         R.id.copyPalette -> copyPalette()
         R.id.exportMusicXml, R.id.exportMidi -> context.toast("TODO for subscription 💸!")
         R.id.configureMidiSynthesizers -> midiOutputConfigurationAlert.show()
+        R.id.signIn -> viewModel.activity.signIn()
         else             -> context.toast("TODO!")
       }
       true
@@ -101,7 +104,7 @@ class BeatScratchToolbar(
       when {
 //        verticalSectionsVisible &&
         !horizontalSectionsVisible -> {
-          viewModel.sectionListRecyclerHorizontal.adapter.notifyDataSetChanged()
+          viewModel.sectionListRecyclerHorizontal.adapter!!.notifyDataSetChanged()
           viewModel.sectionListRecyclerHorizontalRotator.show(
             animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
           )
@@ -114,7 +117,7 @@ class BeatScratchToolbar(
         }
         //horizontalSectionsVisible && !verticalSectionsVisible
         else -> {
-          viewModel.sectionListRecyclerVertical.adapter.notifyDataSetChanged()
+          viewModel.sectionListRecyclerVertical.adapter!!.notifyDataSetChanged()
           viewModel.sectionListRecyclerHorizontalRotator.hide(
             animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
           )

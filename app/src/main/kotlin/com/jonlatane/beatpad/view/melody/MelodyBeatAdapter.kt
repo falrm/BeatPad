@@ -290,7 +290,7 @@ class MelodyBeatAdapter(
       harmonyBeatView.invalidate()
       melodyBeatView.invalidate()
     }
-    (recyclerView.layoutManager.findViewByPosition(beatPosition) as? ViewGroup)?.apply {
+    (recyclerView.layoutManager!!.findViewByPosition(beatPosition) as? ViewGroup)?.apply {
       (0 until childCount).map { getChildAt(it) }.forEach { it.invalidate() }
     }
   }

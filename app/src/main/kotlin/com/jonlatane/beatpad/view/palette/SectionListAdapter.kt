@@ -21,7 +21,7 @@ class SectionListAdapter(
     init {
     }
     override fun getMovementFlags(
-      recyclerView: RecyclerView?,
+      recyclerView: RecyclerView,
       viewHolder: RecyclerView.ViewHolder
     ): Int {
       val dragFlags = when(orientation) {
@@ -32,9 +32,9 @@ class SectionListAdapter(
     }
 
     override fun onMove(
-      recyclerView: RecyclerView?,
-      viewHolder: RecyclerView.ViewHolder?,
-      target: RecyclerView.ViewHolder?
+      recyclerView: RecyclerView,
+      viewHolder: RecyclerView.ViewHolder,
+      target: RecyclerView.ViewHolder
     ): Boolean {
       if(viewHolder == null || target == null) return false
       val fromPosition = viewHolder.adapterPosition
@@ -65,7 +65,7 @@ class SectionListAdapter(
       return true
     }
 
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) {
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
       // TODO("not implemented")
     }
 

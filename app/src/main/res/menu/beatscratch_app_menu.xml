@@ -20,6 +20,8 @@
           android:id="@+id/configureMidiSynthesizers"/>
     <item android:title="Presets..."
           android:id="@+id/openPreset"/>
+    <item android:title="Sign In..."
+          android:id="@+id/signIn"/>
     <item android:title="About BeatScratch"
           android:id="@+id/aboutBeatScratch"/>
 </menu>

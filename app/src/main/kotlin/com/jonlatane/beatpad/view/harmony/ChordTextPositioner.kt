@@ -89,7 +89,7 @@ interface ChordTextPositioner: AnkoLogger {
           (recycler.layoutManager as LinearLayoutManager)
             .run {
               findViewByPosition(beatPosition)?.let { it to false } ?:
-              if(beatPosition < firstBeatPosition)findViewByPosition(firstBeatPosition) to true
+              if(beatPosition < firstBeatPosition)findViewByPosition(firstBeatPosition)!! to true
               else null
             }?.let { (beatView: View, isFakeFirstBeat) ->
               beatView.getLocationOnScreen(locationOnScreen)

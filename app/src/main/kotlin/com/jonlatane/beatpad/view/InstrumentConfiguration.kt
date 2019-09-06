@@ -79,7 +79,7 @@ interface InstrumentConfiguration: BaseConfiguration {
         }
       }
     )
-    adapter = recycler.adapter
+    adapter = recycler.adapter!!
     recycler.scrollToPosition(initialPosition)
 
     applyConstraintSet {

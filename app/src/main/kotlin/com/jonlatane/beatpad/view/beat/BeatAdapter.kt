@@ -71,7 +71,7 @@ class BeatAdapter<ViewModelType, ViewType>
 
 
   fun invalidate(position: Int) {
-    recyclerView.layoutManager.findViewByPosition(position)?.invalidate()
+    recyclerView.layoutManager!!.findViewByPosition(position)?.invalidate()
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BeatHolder<ViewType> {

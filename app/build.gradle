@@ -80,6 +80,8 @@ android {
 	}
 }
 
+apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin
+
 repositories {
 	jcenter()
 	maven { url 'https://jitpack.io' }
@@ -111,8 +113,7 @@ dependencies {
 	implementation 'net.iharder:base64:2.3.9'
 	implementation 'com.github.stupacki:MultiFunctions:1.2.1'
 	//implementation 'org.nield:kotlin-statistics:1.2.1'
-
-
+	implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
 
 	implementation("org.jetbrains.kotlinx:kotlinx-io-jvm:$kotlinx_io_version") {
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-common'
