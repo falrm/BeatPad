@@ -47,8 +47,8 @@ class PaletteUI constructor(
 
       viewModel.apply {
         orbifold.onChordChangedListener = { chord ->
-          toolbarView.orbifoldText.text = chord.name
-          toolbarView.orbifoldText.textColor = context.color(OrbifoldView.colorResourceFor(chord))
+          paletteToolbar.orbifoldText.text = chord.name
+          paletteToolbar.orbifoldText.textColor = context.color(OrbifoldView.colorResourceFor(chord))
           val keyboardDrumTrack = (keyboardPart?.instrument as? MIDIInstrument)?.drumTrack == true
           if(!harmonyViewModel.isChoosingHarmonyChord) {
             colorboardView.chord = chord
@@ -159,7 +159,7 @@ class PaletteUI constructor(
       alignParentTop()
     }
 
-    viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
+    viewModel.paletteToolbar = paletteToolbar(viewModel = viewModel) {
       id = R.id.toolbar
     }.lparams(matchParent, dip(48)) {
       below(viewModel.beatScratchToolbar)
@@ -172,7 +172,7 @@ class PaletteUI constructor(
         id = View.generateViewId()
       }.lparams(dip(200), matchParent)
     }.lparams(dip(200), matchParent) {
-      below(viewModel.toolbarView)
+      below(viewModel.paletteToolbar)
       alignParentLeft()
       alignParentBottom()
     }
@@ -184,7 +184,7 @@ class PaletteUI constructor(
         id = View.generateViewId()
       }.lparams(matchParent, dip(40))
     }.lparams(matchParent, dip(40)) {
-      below(viewModel.toolbarView)
+      below(viewModel.paletteToolbar)
       alignParentLeft()
       alignParentRight()
     }
@@ -285,7 +285,7 @@ class PaletteUI constructor(
       alignParentTop()
     }
 
-    viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
+    viewModel.paletteToolbar = paletteToolbar(viewModel = viewModel) {
       id = R.id.toolbar
       orientation = LinearLayout.HORIZONTAL
     }.lparams(matchParent, if(context.configuration.tablet) dip(48) else dip(36)) {
@@ -301,7 +301,7 @@ class PaletteUI constructor(
       id = R.id.harmony
     }.lparams(matchParent, dip(36)) {
       rightOf(viewModel.beatScratchToolbar)
-      below(viewModel.toolbarView)
+      below(viewModel.paletteToolbar)
       alignParentRight()
       bottomMargin = dip(4)
     }

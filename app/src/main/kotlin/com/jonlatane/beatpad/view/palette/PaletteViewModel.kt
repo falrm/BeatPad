@@ -43,6 +43,26 @@ class PaletteViewModel constructor(
     //BeatClockPaletteConsumer.viewModel = this
   }
 
+  val interactionMode get() = beatScratchToolbar.interactionMode
+  fun notifyInteractionModeChanged() {
+    when(interactionMode) {
+      BeatScratchToolbar.InteractionMode.EDIT -> {
+        melodyViewVisible = false
+        listOf<HideableView>(
+          paletteToolbar,
+          sectionListRecyclerHorizontalRotator
+        ).forEach { it.show() }
+      }
+      BeatScratchToolbar.InteractionMode.VIEW -> {
+        melodyViewVisible = true
+        listOf<HideableView>(
+          paletteToolbar,
+          sectionListRecyclerHorizontalRotator
+        ).forEach { it.hide() }
+        sectionListRecyclerVerticalRotator.hide(animation = HideAnimation.HORIZONTAL)
+      }
+    }
+  }
   fun save(showSuccessToast: Boolean = false) = storageContext.storePalette(palette, showSuccessToast = showSuccessToast)
   private var lastSaveTime = System.currentTimeMillis()
   private var lastSaveRequestTime = System.currentTimeMillis()
@@ -101,7 +121,7 @@ class PaletteViewModel constructor(
     splatPart = new.splatPart ?: new.parts[0]
     orbifold.orbifold = new.orbifold
     orbifold.chord = new.chord
-    toolbarView.updateTempoDisplay()
+    paletteToolbar.updateTempoDisplay()
     partListAdapters.forEach { it.notifyDataSetChanged() }
     sectionListAdapters.forEach { it.notifyDataSetChanged() }
     if(!new.sections.contains(BeatClockPaletteConsumer.section)) {
@@ -156,7 +176,7 @@ class PaletteViewModel constructor(
   lateinit var partListView: PartListView
   lateinit var partListTransitionView: TextView
   lateinit var beatScratchToolbar: BeatScratchToolbar
-  lateinit var toolbarView: PaletteToolbar
+  lateinit var paletteToolbar: PaletteToolbar
   lateinit var keyboardView: KeyboardView
   lateinit var colorboardView: ColorboardInputView
   var keyboardPart by observable<Part?>(null) { _, _, new ->
@@ -350,8 +370,8 @@ class PaletteViewModel constructor(
         } else false
       }
     }
-    toolbarView.orbifoldButton.backgroundResource = R.drawable.toolbar_button_active_instrument
-    toolbarView.updateInstrumentButtonPaddings()
+    paletteToolbar.orbifoldButton.backgroundResource = R.drawable.toolbar_button_active_instrument
+    paletteToolbar.updateInstrumentButtonPaddings()
     orbifold.conditionallyAnimateToSelectionState()
     orbifold.show(
       animation = if (orbifold.context.configuration.portrait) {
@@ -365,8 +385,8 @@ class PaletteViewModel constructor(
   }
 
   fun hideOrbifold(animated: Boolean = true) {
-    toolbarView.orbifoldButton.backgroundResource = R.drawable.toolbar_button
-    toolbarView.updateInstrumentButtonPaddings()
+    paletteToolbar.orbifoldButton.backgroundResource = R.drawable.toolbar_button
+    paletteToolbar.updateInstrumentButtonPaddings()
     harmonyViewModel.isChoosingHarmonyChord = false
     harmonyViewModel.selectedHarmonyElements = null
     orbifold.hide(
@@ -385,14 +405,14 @@ class PaletteViewModel constructor(
       } else false
     }
     keyboardView.show(animated)
-    toolbarView.keysButton.backgroundResource = R.drawable.toolbar_button_active_instrument
-    toolbarView.updateInstrumentButtonPaddings()
+    paletteToolbar.keysButton.backgroundResource = R.drawable.toolbar_button_active_instrument
+    paletteToolbar.updateInstrumentButtonPaddings()
 
   }
 
   fun hideKeyboard(animated: Boolean = true) {
-    toolbarView.keysButton.backgroundResource = R.drawable.toolbar_button
-    toolbarView.updateInstrumentButtonPaddings()
+    paletteToolbar.keysButton.backgroundResource = R.drawable.toolbar_button
+    paletteToolbar.updateInstrumentButtonPaddings()
     orbifold.customChordMode = false
     keyboardView.hide(animated)
   }
@@ -405,13 +425,13 @@ class PaletteViewModel constructor(
       } else false
     }
     colorboardView.show(animated)
-    toolbarView.colorsButton.backgroundResource = R.drawable.toolbar_button_active_instrument
-    toolbarView.updateInstrumentButtonPaddings()
+    paletteToolbar.colorsButton.backgroundResource = R.drawable.toolbar_button_active_instrument
+    paletteToolbar.updateInstrumentButtonPaddings()
   }
 
   fun hideColorboard(animated: Boolean = true) {
-    toolbarView.colorsButton.backgroundResource = R.drawable.toolbar_button
-    toolbarView.updateInstrumentButtonPaddings()
+    paletteToolbar.colorsButton.backgroundResource = R.drawable.toolbar_button
+    paletteToolbar.updateInstrumentButtonPaddings()
     colorboardView.hide(animated)
   }
 

@@ -133,7 +133,7 @@ class PaletteManagementDialog(
       val name = editPaletteName.text.toString()
       mode.run { onSubmit(name) }
       paletteRecycler.adapter!!.notifyDataSetChanged()
-      paletteViewModel.beatScratchToolbar.paletteTitleMenuItem.title = name
+      paletteViewModel.beatScratchToolbar.updateAppMenu()
       //(paletteRecycler.adapter as SmartAdapter).updateSmartHolders()
     }
 

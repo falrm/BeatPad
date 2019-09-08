@@ -288,8 +288,16 @@ enum class HideAnimation: AnkoLogger {
   fun View.setupHiding() {
     if ((this as HideableView).initialWidth == null || (this as HideableView).initialHeight == null) {
       measure(width, height)
-      initialWidth = if (measuredWidth > 0) measuredWidth else layoutWidth
-      initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
+      initialWidth = when {
+        layoutWidth >= 1  -> layoutWidth
+        measuredWidth > 0 -> measuredWidth
+        else              -> layoutWidth
+      }
+      initialHeight = when {
+        layoutHeight >= 1  -> layoutHeight
+        measuredHeight > 0 -> measuredHeight
+        else               -> layoutHeight
+      }
       initialTopMargin = topMargin
       initialBottomMargin = bottomMargin
       initialLeftMargin = leftMargin

@@ -13,6 +13,7 @@ import com.jonlatane.beatpad.MainApplication.Companion.chordTypefaceBold
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.storage.Storage
+import com.jonlatane.beatpad.util.HideableView
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.view.colorboard.ColorboardConfiguration
@@ -28,7 +29,13 @@ import org.jetbrains.anko.sdk25.coroutines.onLongClick
 class PaletteToolbar(
   override val configurationContext: Context,
   override val viewModel: PaletteViewModel
-) : _LinearLayout(configurationContext), AnkoLogger, TempoConfiguration, OrbifoldConfiguration, ColorboardConfiguration, KeyboardConfiguration, Storage {
+) : _LinearLayout(configurationContext), AnkoLogger, TempoConfiguration, OrbifoldConfiguration, ColorboardConfiguration, KeyboardConfiguration, Storage, HideableView {
+  override var initialHeight: Int? = null
+  override var initialWidth: Int? = null
+  override var initialTopMargin: Int? = null
+  override var initialBottomMargin: Int? = null
+  override var initialLeftMargin: Int? = null
+  override var initialRightMargin: Int? = null
   override val storageContext: Context get() = configurationContext
   private val metronomeImage = context.resources.getDrawable(R.drawable.noun_metronome_415494_000000, null).apply {
     setBounds(0, 0, 60, 60)

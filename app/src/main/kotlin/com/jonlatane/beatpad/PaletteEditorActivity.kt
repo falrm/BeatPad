@@ -210,7 +210,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
     outState.putBoolean("keyboardOpen", !viewModel.keyboardView.isHidden)
     outState.putBoolean("colorboardOpen", !viewModel.colorboardView.isHidden)
     outState.putBoolean("orbifoldOpen", !viewModel.orbifold.isHidden)
-    outState.putBoolean("melodyOpen", viewModel.melodyViewModel.melodyView.translationX == 0f)
+    outState.putBoolean("melodyOpen", viewModel.melodyViewVisible)
     outState.putString("editingMelodyId", viewModel.editingMelody?.id.toString())
     outState.putInt("beatWidth", viewModel.melodyBeatAdapter.elementWidth)
     outState.putInt("beatHeight", viewModel.melodyBeatAdapter.elementHeight)
@@ -231,6 +231,15 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
         .build(),
       RC_SIGN_IN)
   }
+
+  fun signOut() {
+    AuthUI.getInstance()
+      .signOut(this)
+      .addOnCompleteListener {
+        viewModel.beatScratchToolbar.updateAppMenu()
+      }
+  }
+
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
 
@@ -240,6 +249,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
       if (resultCode == Activity.RESULT_OK) {
         // Successfully signed in
         val user = FirebaseAuth.getInstance().currentUser
+        viewModel.beatScratchToolbar.updateAppMenu()
         // ...
       } else {
         // Sign in failed. If response is null the user canceled the
