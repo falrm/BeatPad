@@ -4,22 +4,12 @@ import BeatClockPaletteConsumer
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.WindowManager
-import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.sensors.ShakeDetector
-import com.jonlatane.beatpad.storage.Storage
-import com.jonlatane.beatpad.util.formatted
-import com.jonlatane.beatpad.util.hide
-import com.jonlatane.beatpad.util.isHidden
-import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.library.LibraryUI
-import com.jonlatane.beatpad.view.palette.PaletteUI
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.setContentView
-import org.jetbrains.anko.toast
-import java.util.*
 
 
 class LibraryActivity : Activity(), AnkoLogger {

@@ -27,5 +27,7 @@
 -keep class org.jetbrains.annotations.** { *; }
 -keep class java.lang.reflect.** { *; }
 -keep class jp.kshoji.javax.sound.** { *; }
+-keep class com.jonlatane.beatpad.storage.** { *; }
+-keep class org.apache.commons.codec.binary.Base64
 -renamesourcefileattribute SourceFile
 -keepattributes SourceFile,LineNumberTable

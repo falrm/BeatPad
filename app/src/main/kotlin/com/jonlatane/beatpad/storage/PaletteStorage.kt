@@ -9,12 +9,9 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.fasterxml.jackson.module.kotlin.treeToValue
-import com.jonlatane.beatpad.model.Harmony
-import com.jonlatane.beatpad.model.Palette
-import com.jonlatane.beatpad.model.Part
-import com.jonlatane.beatpad.model.Section
-import com.jonlatane.beatpad.model.harmony.Orbifold
-import com.jonlatane.beatpad.model.harmony.chord.*
+import com.jonlatane.beatpad.model.*
+import com.jonlatane.beatpad.model.orbifold.Orbifold
+import com.jonlatane.beatpad.model.chord.*
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import org.jetbrains.anko.AnkoLogger
@@ -25,12 +22,25 @@ import java.util.concurrent.atomic.AtomicInteger
 object PaletteStorage : AnkoLogger {
   const val paletteModelVersion = 5
 
-  val basePalette
-    get() = Palette(
-      sections = mutableListOf(Section()),
-      parts = mutableListOf(Part())
-    )
+  /**
+   * Generates and returns a new [Palette] with a drum [Part] and a tonal [Part].
+   */
+  val basePalette: Palette
+    get() {
+      val drumPart = Part(instrument = MIDIInstrument(channel = 9, drumTrack = true))
+      val tonalPart = Part()
+      return Palette(
+        sections = mutableListOf(Section()),
+        parts = mutableListOf(drumPart, tonalPart),
+        keyboardPart = drumPart,
+        colorboardPart = tonalPart,
+        splatPart = tonalPart
+      )
+    }
 
+  /**
+   * Generates and returns a new base melody of 4 empty bars in 16th notes.
+   */
   val baseMelody
     get() = RationalMelody(
       changes = TreeMap((0..63).map { it to RationalMelody.Element() }.toMap()),
@@ -98,7 +108,7 @@ object PaletteStorage : AnkoLogger {
       val parts: MutableList<Part> = root["parts"].asIterable()
         .map { mapper.treeToValue<Part>(it) }
         .toMutableList()
-      if (parts.isEmpty()) {
+      if (parts.isEmpty() || parts.all { (it.instrument as? MIDIInstrument)?.drumTrack == true }) {
         parts.add(Part())
       }
 
@@ -121,9 +131,9 @@ object PaletteStorage : AnkoLogger {
       val keyboardPart = parts.firstOrNull { it.id == UUID.fromString(mapper.treeToValue(root["keyboardPart"])) }
         ?: parts[0]
       val colorboardPart = parts.firstOrNull { it.id == UUID.fromString(mapper.treeToValue(root["colorboardPart"])) }
-        ?: parts[0]
+        ?: parts.first { (it.instrument as? MIDIInstrument)?.drumTrack == false } ?: parts[0]
       val splatPart = parts.firstOrNull { it.id == UUID.fromString(mapper.treeToValue(root["splatPart"])) }
-        ?: parts[0]
+        ?: parts.first { (it.instrument as? MIDIInstrument)?.drumTrack == false } ?: parts[0]
 
 
       return Palette(
@@ -153,6 +163,22 @@ object PaletteStorage : AnkoLogger {
           )
           if(section.harmony == null) {
             section.harmony = blankHarmony
+          }
+        }
+
+        // Deduplicate melody ids
+        val melodies: List<Melody<*>> = parts.flatMap { it.melodies }
+        melodies.forEach { melody: Melody<*> ->
+          val others: List<Melody<*>> = melodies.toMutableList().also{ it.remove(melody) }
+          while(others.map { it.id }.contains(melody.id)) {
+            melody.relatedMelodies.add(melody.id)
+            melody.id = UUID.randomUUID()
+          }
+        }
+
+        parts.forEach { part ->
+          part.melodies.forEach {
+            it.drumPart = (part.instrument as? MIDIInstrument)?.drumTrack == true
           }
         }
       }

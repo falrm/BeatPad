@@ -15,8 +15,8 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.jonlatane.beatpad.model.*
-import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.model.harmony.chord.Maj7
+import com.jonlatane.beatpad.model.chord.Chord
+import com.jonlatane.beatpad.model.chord.Maj7
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.model.melody.RecordedMIDIMelody
 import org.jetbrains.anko.AnkoLogger
@@ -35,7 +35,7 @@ object HarmonyStorage : AnkoLogger {
 		}
 	}
 	object Deserializer: StdDeserializer<Harmony>(Harmony::class.java) {
-		override fun deserialize(jp: JsonParser, context: DeserializationContext): Harmony {
+		override fun deserialize(jp: JsonParser, storageContext: DeserializationContext): Harmony {
 			val mapper = jp.codec as ObjectMapper
 			val root = mapper.readTree<ObjectNode>(jp)
 			/*send you own condition*/

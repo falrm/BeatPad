@@ -1,0 +1,13 @@
+<inset
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:drawable="@drawable/launcher_icon_foreground"
+  android:insetBottom="2.88dp"
+  android:insetLeft="1.44dp"
+  android:insetRight="1.44dp"
+  android:insetTop="0dp"
+  />
+
+  <!--android:insetBottom="12%"-->
+  <!--android:insetLeft="6%"-->
+  <!--android:insetRight="6%"-->
+  <!--android:insetTop="0%"-->

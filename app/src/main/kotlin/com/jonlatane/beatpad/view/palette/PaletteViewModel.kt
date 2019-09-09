@@ -2,16 +2,23 @@ package com.jonlatane.beatpad.view.palette
 
 //import com.jonlatane.beatpad.util.syncPositionTo
 import BeatClockPaletteConsumer
-import android.animation.ValueAnimator
-import android.view.View
-import android.view.animation.LinearInterpolator
+import android.content.Context
+import android.support.v7.widget.RecyclerView
 import android.widget.TextView
+import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.output.service.PlaybackService
+import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.*
+import com.jonlatane.beatpad.util.smartrecycler.viewHolders
+import com.jonlatane.beatpad.view.HideableLinearLayout
+import com.jonlatane.beatpad.view.HideableRecyclerView
+import com.jonlatane.beatpad.view.RotateLayout
 import com.jonlatane.beatpad.view.colorboard.ColorboardInputView
 import com.jonlatane.beatpad.view.harmony.HarmonyView
 import com.jonlatane.beatpad.view.harmony.HarmonyViewModel
@@ -19,16 +26,35 @@ import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
-import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.*
+import java.util.*
 import kotlin.properties.Delegates.observable
 
 /**
  * The PaletteViewModel still assumes we'll only be editing
  * one Melody at a time.
  */
-class PaletteViewModel: AnkoLogger {
+class PaletteViewModel(
+  override val storageContext: Context
+) : AnkoLogger, Storage {
   init {
     //BeatClockPaletteConsumer.viewModel = this
+  }
+
+  fun save(showSuccessToast: Boolean = false) = storageContext.storePalette(palette, showSuccessToast = showSuccessToast)
+  private var lastSaveTime = System.currentTimeMillis()
+  private var lastSaveRequestTime = System.currentTimeMillis()
+  fun saveAfterDelay(delay: Long = 7000) {
+    lastSaveRequestTime = System.currentTimeMillis()
+    doAsync {
+      Thread.sleep(delay)
+      synchronized(::lastSaveTime) {
+        if(lastSaveTime < lastSaveRequestTime && System.currentTimeMillis() - lastSaveRequestTime >= delay) {
+          lastSaveTime = System.currentTimeMillis()
+          save()
+        }
+      }
+    }
   }
 
   var playbackTick by observable<Int?>(null) { _, old, new ->
@@ -41,24 +67,23 @@ class PaletteViewModel: AnkoLogger {
   }
 
   val melodyViewModel = MelodyViewModel(this)
-  var melodyView
+  val melodyView
     get() = melodyViewModel.melodyView
-    set(value) {
-      melodyViewModel.melodyView = value
-    }
+//    set(value) {
+//      melodyViewModel.melodyView = value
+//    }
   var melodyBeatAdapter
     get() = melodyViewModel.beatAdapter
     set(value) {
       melodyViewModel.beatAdapter = value
     }
 
-  val harmonyViewModel = HarmonyViewModel()
+  val harmonyViewModel = HarmonyViewModel(storageContext)
     .apply { paletteViewModel = this@PaletteViewModel }
   var harmonyView: HarmonyView
     get() = harmonyViewModel.harmonyView!!
     set(value) { harmonyViewModel.harmonyView = value }
 
-  var wasOrbifoldShowingBeforeEditingChord: Boolean? = null
   lateinit var orbifold: OrbifoldView
 
   var palette: Palette by observable(initialValue = Palette()) { _, _, new ->
@@ -74,52 +99,73 @@ class PaletteViewModel: AnkoLogger {
     splatPart = new.splatPart ?: new.parts[0]
     orbifold.orbifold = new.orbifold
     orbifold.chord = new.chord
-    toolbarView.updateTempoButton()
-    partListAdapter?.notifyDataSetChanged()
-    sectionListAdapter?.notifyDataSetChanged()
+    toolbarView.updateTempoDisplay()
+    partListAdapters.forEach { it.notifyDataSetChanged() }
+    sectionListAdapters.forEach { it.notifyDataSetChanged() }
     if(!new.sections.contains(BeatClockPaletteConsumer.section)) {
       BeatClockPaletteConsumer.section = new.sections.first()
     }
   }
 
-  var editingMix by observable(false) { _, _, editingVolume ->
-    partListAdapter?.boundViewHolders
-      ?.forEach {
-//        info("Configuring volume for ${it.partName.text}")
-//        partListAdapter?.recyclerView?.post {
-          it.editingVolume = editingVolume
-//        }
+  var editingMix: Boolean by observable(false) { _, _, editingVolume ->
+    partListAdapters.forEach { partListAdapter ->
+      partListAdapter.boundViewHolders.forEach { it.editingVolume = editingVolume }
+    }
+    if (editingVolume) {
+      backStack.push {
+        if (editingMix) {
+          editingMix = false
+          true
+        } else false
       }
-//    partListAdapter?.notifyDataSetChanged()
-  }
-
-
-  var editingMelody: Melody<*>? by observable<Melody<*>?>(null) { _, old, new ->
-    if (new != null) {
-      melodyViewModel.openedMelody = new
-      colorboardView.hide()
-      keyboardView.hide()
-      harmonyViewModel.beatAdapter
-        .syncPositionTo(melodyViewModel.melodyCenterHorizontalScroller)
-
-      // Fancy animation of the thing if possible
-       editMelodyMode()
-    } else {
-      partListMode(old)
     }
   }
 
-  lateinit var sectionListView: View
-  var partListAdapter: PartListAdapter? = null
-  var sectionListAdapter: SectionListAdapter? = null
+  var editingMelody: Melody<*>? by observable<Melody<*>?>(null) { _, old, new ->
+    melodyViewModel.openedMelody = new
+    if (new != null && !melodyViewVisible) {
+      colorboardView.hide()
+      keyboardView.hide()
+      harmonyViewModel.beatAdapter
+        .syncPositionTo(melodyViewModel.melodyRecyclerView)
+
+      backStack.push {
+        if(melodyViewVisible) {
+          melodyViewVisible = false
+          editingMelody = null
+          true
+        } else false
+      }
+      melodyViewVisible = true
+    } else {
+      if(old != new) {
+        saveAfterDelay()
+      }
+    }
+  }
+
+  lateinit var sectionListRecyclerHorizontalRotator: RotateLayout
+  lateinit var sectionListRecyclerHorizontal: RecyclerView
+  var sectionListRecyclerHorizontalSpacer: HideableLinearLayout? = null
+  lateinit var sectionListRecyclerVerticalRotator: RotateLayout
+  lateinit var sectionListRecyclerVertical: HideableRecyclerView
+  var partListAdapters: MutableList<PartListAdapter> = mutableListOf()
+  var sectionListAdapters: MutableList<SectionListAdapter> = mutableListOf()
   lateinit var partListView: PartListView
   lateinit var partListTransitionView: TextView
+  lateinit var beatScratchToolbar: BeatScratchToolbar
   lateinit var toolbarView: PaletteToolbar
   lateinit var keyboardView: KeyboardView
   lateinit var colorboardView: ColorboardInputView
   var keyboardPart by observable<Part?>(null) { _, _, new ->
     if (new != null) keyboardView.ioHandler.instrument = new.instrument
     palette.keyboardPart = new
+    val keyboardDrumTrack = (new?.instrument as? MIDIInstrument)?.drumTrack == true
+    if(keyboardDrumTrack) {
+      keyboardView.ioHandler.highlightChord(null)
+    } else {
+      keyboardView.ioHandler.highlightChord(orbifold.chord)
+    }
   }
   var colorboardPart: Part? by observable<Part?>(null) { _, _, new ->
     if (new != null) colorboardView.instrument = new.instrument
@@ -137,122 +183,125 @@ class PaletteViewModel: AnkoLogger {
     palette.splatPart = new
   }
 
+  val backStack: Deque<() -> Boolean> = LinkedList<() -> Boolean>()
   fun onBackPressed(): Boolean = when {
-    orbifold.customChordMode                -> {
-      orbifold.customChordMode = false
-      true
-    }
-    harmonyViewModel.isChoosingHarmonyChord -> {
-      harmonyViewModel.isChoosingHarmonyChord = false
-      harmonyViewModel.selectedHarmonyElements = null
-      true
-    }
-    editingMelody != null                   -> {
-      editingMelody = null
-      true
-    }
-    editingMix                              -> {
-      editingMix = false
-      true
+    backStack.isNotEmpty() -> {
+      var result = false
+      while(backStack.isNotEmpty() && !result) {
+        result = backStack.removeFirst()()
+      }
+      result
     }
     else                                    -> false
   }
 
-//  fun onBackPressed(): Boolean {
-//    val result = harmonyViewModel.isChoosingHarmonyChord || editingMix || editingMelody != null
-//    if(harmonyViewModel.isChoosingHarmonyChord) {
-//      harmonyViewModel.isChoosingHarmonyChord = false
-//      harmonyViewModel.selectedHarmonyElements = null
-//    } else if(editingMix) {
-//      editingMix = false
-//    } else {
-//      editingMelody = null
-//    }
-//    return result
-//  }
-
   fun notifySectionChange() {
-    harmonyViewModel.notifyHarmonyChanged()
-    sectionListAdapter?.notifyDataSetChanged()
-    melodyViewModel.beatAdapter.notifyDataSetChanged()
+    harmonyViewModel.apply {
+      notifyHarmonyChanged()
+      isChoosingHarmonyChord = false
+      selectedHarmonyElements = null
+    }
+    beatScratchToolbar.updateButtonColors()
+
+    melodyViewModel.updateToolbarsAndMelody()
+//    melodyViewModel.beatAdapter.updateSmartHolders()
+//    melodyViewModel.melodyReferenceToolbar.updateButtonText()
     if(editingMix) { // Trigger an update of the mix state.
       editingMix = editingMix
     }
-    if(
-      BeatClockPaletteConsumer.section?.melodies?.filter { !it.isDisabled }
-        ?.map { it.melody }?.contains(editingMelody) != true
-    ) {
-      editingMelody = null
-    }
-    partListAdapter?.notifyDataSetChanged()
+    updateMelodyReferences()
+    PlaybackService.instance?.showNotification()
   }
 
-  private fun editMelodyMode() {
+  var melodyViewVisible: Boolean = false
+    set(visible) {
+      if(field != visible) {
+        field = visible
+        if(visible) {
+          showMelodyView()
+        } else {
+          hideMelodyView()
+        }
+      }
+    }
+
+  private fun showMelodyView() {
+    harmonyView.hide()
     partListView.viewHolders<PartHolder>().mapNotNull { partHolder ->
-      partHolder.melodyRecycler.viewHolders<MelodyReferenceHolder>()
-        .firstOrNull { it.melody == editingMelody }
-    }/*.let { listOf<MelodyReferenceHolder?>(null) }*/.firstOrNull()?.let { melodyReferenceHolder ->
-      melodyReferenceHolder.enableMelodyReference()
-      melodyReferenceHolder.onPositionChanged()
+      partHolder.layout.melodyReferenceRecycler.viewHolders<MelodyReferenceHolder>()
+        .firstOrNull { it.melody != null && it.melody == editingMelody }
+    }.firstOrNull()?.let { melodyReferenceHolder ->
       val name = melodyReferenceHolder.layout.name
       val partListLocation = intArrayOf(-1, -1)
       val nameLocation = intArrayOf(-1, -1)
       name.getLocationOnScreen(nameLocation)
-      partListView.getLocationOnScreen(partListLocation)
-      //partListView.animate().alpha(0f).start()
-      partListTransitionView.apply {
-        alpha = 1f
-        translationX = nameLocation[0].toFloat() - partListLocation[0]
-        translationY = nameLocation[1].toFloat() - partListLocation[1]
-        layoutWidth = name.width
-        layoutHeight = name.height
-        //animate().alpha(1f).withEndAction {
-        post {
-          animateWidth(partListView.width)
-          animateHeight(partListView.height + orbifold.height)
-          animate().translationX(0f).translationY(0f)
-            .withEndAction {
-              melodyViewModel.melodyView.let { melodyView ->
-                melodyView.alpha = 0f
-                melodyView.translationX = 0f
-                melodyView.animate().alpha(1f).withEndAction {
-                }.start()
-              }
-            }.start()
+      if(melodyView.translationX != 0f) {
+        partListView.getLocationOnScreen(partListLocation)
+        //partListView.animate().alpha(0f).start()
+        partListTransitionView.apply {
+          alpha = 1f
+          translationX = nameLocation[0].toFloat() - partListLocation[0]
+          translationY = nameLocation[1].toFloat() - partListLocation[1]
+          layoutWidth = name.width
+          layoutHeight = name.height
+          //animate().alpha(1f).withEndAction {
+          post {
+            partListTransitionView.animateWidth(partListView.width)
+            partListTransitionView.animateHeight(partListView.height + orbifold.height)
+            partListTransitionView.animate().translationX(0f).translationY(0f)
+              .withEndAction {
+                melodyViewModel.melodyView.let { melodyView ->
+                  melodyView.alpha = 0f
+                  melodyView.translationX = 0f
+                  melodyView.animate().alpha(1f).withEndAction {
+                    partListTransitionView.alpha = 0f
+                  }.start()
+                }
+              }.start()
+          }
+          //}.start()
         }
-        //}.start()
       }
-    } ?: editMelodyModeBoring()
+    } ?: showMelodyViewBoring()
   }
 
-  private fun editMelodyModeBoring() {
-    partListTransitionView.apply {
-      translationX = partListView.width.toFloat()
-      translationY = 0f
-      layoutWidth = partListView.width
-      layoutHeight = partListView.height
-      animate().translationX(0f).start()
+  private fun showMelodyViewBoring() {
+//    partListTransitionView.apply {
+//      translationX = partListView.width.toFloat()
+//      translationY = 0f
+//      layoutWidth = partListView.width
+//      layoutHeight = partListView.height
+//      animate().translationX(0f).start()
+//    }
+    if(melodyViewModel.melodyView.translationX > melodyViewModel.melodyView.width.toFloat()) {
+      melodyViewModel.melodyView.translationX = melodyViewModel.melodyView.width.toFloat()
     }
     melodyViewModel.melodyView.animate()
       .translationX(0f)
       .alpha(1f)
+      .withEndAction {
+        //partListTransitionView.animate().alpha(0f).start()
+      }
       .start()
-    partListView.animate().alpha(0f).start()
+    //partListView.animate().alpha(0f).start()
   }
 
-  private fun partListMode(oldValue: Melody<*>?) {
+  private fun hideMelodyView(oldValue: Melody<*>? = editingMelody) {
+    harmonyView.show()
     partListView.viewHolders<PartHolder>().mapNotNull { partHolder ->
-      partHolder.melodyRecycler.viewHolders<MelodyReferenceHolder>()
+      partHolder.layout.melodyReferenceRecycler.viewHolders<MelodyReferenceHolder>()
         .firstOrNull { !it.isAddButton && it.melody == oldValue }
-    }/*let { listOf<MelodyReferenceHolder?>(null) }.*/.firstOrNull()?.let { melodyReferenceHolder ->
+    }.firstOrNull()?.let { melodyReferenceHolder ->
       val name = melodyReferenceHolder.layout.name
       val partListLocation = intArrayOf(-1, -1)
       val nameLocation = intArrayOf(-1, -1)
       name.getLocationOnScreen(nameLocation)
-      partListView.animate().alpha(1f)
+      //partListView.animate().alpha(1f)
       partListView.getLocationOnScreen(partListLocation)
       //partListView.animate().alpha(0f).start()
+      melodyReferenceHolder.onPositionChanged()
       partListTransitionView.apply {
+        alpha = 1f
         translationX = 0f
         translationY = 0f
         layoutWidth = partListView.width
@@ -261,9 +310,10 @@ class PaletteViewModel: AnkoLogger {
         val targetTranslateY = nameLocation[1].toFloat() - partListLocation[1]
 
         melodyView.alpha = 0f
+        melodyView.translationX = melodyView.width.toFloat()
         animateWidth(name.width)
         animateHeight(name.height)
-        animate().translationX(targetTranslateX).translationY(targetTranslateY)//.alpha(0f)
+        animate().translationXY(targetTranslateX, targetTranslateY)//.alpha(0f)
           .withEndAction {
             animate().alpha(0f).withEndAction {
               layoutWidth = 0
@@ -272,36 +322,104 @@ class PaletteViewModel: AnkoLogger {
             }.start()
           }.start()
       }
-    } ?: partListModeBoring()
+    } ?: hideMelodyViewBoring()
   }
 
-  fun showOrbifold() {
-    orbifold.show()
-  }
-
-  fun hideOrbifold() {
-    val orbifoldHeight = orbifold.height
-    orbifold.hide()
-    if(melodyBeatAdapter.elementHeight < partListView.height + orbifoldHeight) {
-      val anim = ValueAnimator.ofInt(melodyBeatAdapter.elementHeight, partListView.height + orbifoldHeight)
-      anim.interpolator = LinearInterpolator()
-      anim.addUpdateListener { valueAnimator ->
-        melodyBeatAdapter.elementHeight = valueAnimator.animatedValue as Int
-      }
-      anim.start()
-    }
-  }
-
-  private fun partListModeBoring() {
+  private fun hideMelodyViewBoring() {
     melodyView.animate()
       .translationX(melodyView.width.toFloat())
       .alpha(0f)
+      .withEndAction { melodyView.translationX = 10.27f * melodyView.width }
       .start()
     partListView.animate().alpha(1f)
     partListTransitionView.apply {
       translationX = 0f
       translationY = 0f
       layoutWidth = 0
+    }
+  }
+
+  fun showOrbifold(animated: Boolean = true) {
+    if(orbifold.isHidden) {
+      backStack.push {
+        if (!orbifold.isHidden) {
+          hideOrbifold()
+          true
+        } else false
+      }
+    }
+    toolbarView.orbifoldButton.backgroundResource = R.drawable.toolbar_button_active_instrument
+    toolbarView.updateInstrumentButtonPaddings()
+    orbifold.conditionallyAnimateToSelectionState()
+    orbifold.show(
+      animation = if (orbifold.context.configuration.portrait) {
+        HideAnimation.VERTICAL
+      } else HideAnimation.HORIZONTAL,
+      animated = animated,
+      endAction = {
+        orbifold.conditionallyAnimateToSelectionState()
+      }
+    )
+  }
+
+  fun hideOrbifold(animated: Boolean = true) {
+    toolbarView.orbifoldButton.backgroundResource = R.drawable.toolbar_button
+    toolbarView.updateInstrumentButtonPaddings()
+    harmonyViewModel.isChoosingHarmonyChord = false
+    harmonyViewModel.selectedHarmonyElements = null
+    orbifold.hide(
+      animation = if (orbifold.context.configuration.portrait) {
+        HideAnimation.VERTICAL
+      } else HideAnimation.HORIZONTAL,
+      animated = animated
+    )
+  }
+
+  fun showKeyboard(animated: Boolean = true) {
+    backStack.push {
+      if(!keyboardView.isHidden) {
+        hideKeyboard()
+        true
+      } else false
+    }
+    keyboardView.show(animated)
+    toolbarView.keysButton.backgroundResource = R.drawable.toolbar_button_active_instrument
+    toolbarView.updateInstrumentButtonPaddings()
+
+  }
+
+  fun hideKeyboard(animated: Boolean = true) {
+    toolbarView.keysButton.backgroundResource = R.drawable.toolbar_button
+    toolbarView.updateInstrumentButtonPaddings()
+    orbifold.customChordMode = false
+    keyboardView.hide(animated)
+  }
+
+  fun showColorboard(animated: Boolean = true) {
+    backStack.push {
+      if(!colorboardView.isHidden) {
+        hideColorboard()
+        true
+      } else false
+    }
+    colorboardView.show(animated)
+    toolbarView.colorsButton.backgroundResource = R.drawable.toolbar_button_active_instrument
+    toolbarView.updateInstrumentButtonPaddings()
+  }
+
+  fun hideColorboard(animated: Boolean = true) {
+    toolbarView.colorsButton.backgroundResource = R.drawable.toolbar_button
+    toolbarView.updateInstrumentButtonPaddings()
+    colorboardView.hide(animated)
+  }
+
+  fun updateMelodyReferences() {
+    partListAdapters.forEach {  partAdapter ->
+      partAdapter.boundViewHolders.forEach { partHolder ->
+        partHolder.melodyReferenceAdapter.boundViewHolders.forEach { melodyHolder ->
+          melodyHolder.onPositionChanged()
+        }
+      }
     }
   }
 }

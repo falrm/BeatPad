@@ -5,7 +5,7 @@ import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
 import android.view.MenuItem
-import com.jonlatane.beatpad.model.harmony.Orbifold.*
+import com.jonlatane.beatpad.model.orbifold.Orbifold.*
 import com.jonlatane.beatpad.output.controller.DeviceOrientationInstrument
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
@@ -123,7 +123,7 @@ class ConductorActivity : OldBaseActivity(), AnkoLogger {
     }
 
     companion object {
-        val SERVICE_NAME = "Topologica Conductor"
-        val SERVICE_TYPE = "_topologica._tcp."
+        val SERVICE_NAME = "BeatScratch Conductor"
+        val SERVICE_TYPE = "_beatscratch._tcp."
     }
 }

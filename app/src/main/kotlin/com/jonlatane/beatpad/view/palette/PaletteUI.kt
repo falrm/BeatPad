@@ -1,92 +1,116 @@
 package com.jonlatane.beatpad.view.palette
 
-import android.content.res.Configuration
+//import com.jonlatane.beatpad.util.syncPositionTo
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
+import com.jonlatane.beatpad.util.HideAnimation
 import com.jonlatane.beatpad.util.color
-import com.jonlatane.beatpad.util.firstVisibleItemPosition
-import com.jonlatane.beatpad.util.hide
-//import com.jonlatane.beatpad.util.syncPositionTo
+import com.jonlatane.beatpad.util.smartrecycler.firstVisibleItemPosition
+import com.jonlatane.beatpad.util.tablet
 import com.jonlatane.beatpad.view.colorboard.colorboardView
 import com.jonlatane.beatpad.view.harmony.harmonyView
+import com.jonlatane.beatpad.view.hideableLinearLayout
 import com.jonlatane.beatpad.view.keyboard.keyboardView
 import com.jonlatane.beatpad.view.melody.BeatAdapter
 import com.jonlatane.beatpad.view.melody.melodyView
+import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import com.jonlatane.beatpad.view.orbifold.orbifoldView
+import com.jonlatane.beatpad.view.rotateLayout
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
 import java.util.concurrent.atomic.AtomicBoolean
 
-class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
-  val viewModel = PaletteViewModel()
+class PaletteUI constructor(
+  val viewModel: PaletteViewModel
+) : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
+  var leftSideWidth: Int = 0
   lateinit var layout: RelativeLayout
 
-  override fun createView(ui: AnkoContext<PaletteEditorActivity>) = with(ui) {
-
+  override fun createView(ui: AnkoContext<PaletteEditorActivity>): RelativeLayout = with(ui) {
     layout = relativeLayout {
+      backgroundColorResource = R.color.colorPrimaryDark
+
       if (configuration.portrait) {
         portraitLayout()
       } else {
-        landscapeLayout(this@with)
+        leftSideWidth = dip(350f)
+        landscapeLayout()
       }
 
       keyboardsLayout()
 
-      viewModel.orbifold.onChordChangedListener = { chord ->
-        val keyboardDrumTrack = (viewModel.keyboardPart?.instrument as? MIDIInstrument)?.drumTrack == true
-        if(!viewModel.harmonyViewModel.isChoosingHarmonyChord) {
-          viewModel.colorboardView.chord = chord
-          if(!keyboardDrumTrack)
-            viewModel.keyboardView.ioHandler.highlightChord(chord)
-          //viewModel.melodyViewModel.verticalAxis?.chord = chord
-          viewModel.splatController?.tones = chord.getTones()
-          viewModel.palette.chord = chord
-          viewModel.melodyViewModel.redraw()
-          BeatClockPaletteConsumer.chord = chord
+      viewModel.apply {
+        orbifold.onChordChangedListener = { chord ->
+          toolbarView.orbifoldText.text = chord.name
+          toolbarView.orbifoldText.textColor = context.color(OrbifoldView.colorResourceFor(chord))
+          val keyboardDrumTrack = (keyboardPart?.instrument as? MIDIInstrument)?.drumTrack == true
+          if(!harmonyViewModel.isChoosingHarmonyChord) {
+            colorboardView.chord = chord
+            if(!keyboardDrumTrack)
+              keyboardView.ioHandler.highlightChord(chord)
+            //viewModel.melodyViewModel.verticalAxis?.chord = chord
+            splatController?.tones = chord.getTones()
+            palette.chord = chord
+            melodyViewModel.redraw()
+            //BeatClockPaletteConsumer.chord = chord
+          } else {
+            colorboardView.chord = chord
+            if(!keyboardDrumTrack) {
+              keyboardView.ioHandler.highlightChord(chord)
+            }
+            //viewModel.melodyViewModel.verticalAxis?.chord = chord
+            splatController?.tones = chord.getTones()
+            harmonyViewModel.editingChord = chord
+          }
+        }
+        orbifold.onOrbifoldChangeListener = { viewModel.palette.orbifold = it }
+        orbifold.keyboard = viewModel.keyboardView
+        hideOrbifold(false)
+        hideKeyboard(false)
+        hideColorboard(false)
+        if(configuration.portrait) {
+          viewModel.sectionListRecyclerVerticalRotator.hide(
+            animation = HideAnimation.HORIZONTAL,
+            animated = false
+          )
         } else {
-          viewModel.colorboardView.chord = chord
-          if(!keyboardDrumTrack)
-            viewModel.keyboardView.ioHandler.highlightChord(chord)
-          //viewModel.melodyViewModel.verticalAxis?.chord = chord
-          viewModel.splatController?.tones = chord.getTones()
-          viewModel.harmonyViewModel.editingChord = chord
+          viewModel.sectionListRecyclerHorizontalRotator.hide(
+            animation = if(configuration.portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL,
+            animated = false
+          )
+          viewModel.sectionListRecyclerHorizontalSpacer?.hide(
+            animation = if(configuration.portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL,
+            animated = false
+          )
         }
       }
 
-      viewModel.orbifold.onOrbifoldChangeListener = { viewModel.palette.orbifold = it }
-      viewModel.orbifold.keyboard = viewModel.keyboardView
-
-      if(configuration.portrait) {
-        viewModel.orbifold.hide(false)
-      }
-      viewModel.keyboardView.hide(false)
-      viewModel.colorboardView.hide(false)
-
       onLayoutChange { _, _, _, _, _, _, _, _, _ ->
-        if (viewModel.editingMelody == null) {
-          viewModel.melodyView.translationX = viewModel.melodyView.width.toFloat()
+        if (viewModel.melodyView.translationX != 0f) {
+          viewModel.melodyView.translationX = 10.27f * viewModel.melodyView.width.toFloat()
         }
       }
 
       post {
-        viewModel.partListView.animate()
-          .alpha(1f)
-          .start()
+//        viewModel.partListView.animate()
+//          .alpha(1f)
+//          .start()
         viewModel.melodyView.animate()
           .translationX(viewModel.melodyView.width.toFloat())
           .withEndAction { viewModel.melodyView.alpha = 1f }
+          .withEndAction { viewModel.melodyView.translationX = 10.27f * viewModel.melodyView.width }
           .start()
-
-//        viewModel.keyboardView.hide(false)
-//        viewModel.colorboardView.hide(false)
+        viewModel.melodyViewModel.onZoomFinished(false)
 
         // Some tasty un-threadsafe spaghetti for syncing the two RecyclerViews for Harmony and Melody
         val inScrollingStack = AtomicBoolean(false)
-        val melodyRecycler = viewModel.melodyViewModel.melodyCenterHorizontalScroller
+        val melodyRecycler = viewModel.melodyViewModel.melodyRecyclerView
         val harmonyRecycler = viewModel.harmonyViewModel.harmonyElementRecycler!!
         melodyRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -94,9 +118,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
             if (!inScrollingStack.getAndSet(true)) {
               verbose { "onScrolled in melody: ${recyclerView.firstVisibleItemPosition}, ${recyclerView.computeHorizontalScrollOffset()}" }
               (melodyRecycler.adapter as BeatAdapter).syncPositionTo(harmonyRecycler)
-              viewModel.harmonyViewModel.harmonyView?.post {
-                viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
-              }
+              viewModel.melodyViewModel.melodyView.syncScrollingChordText()
             }
             post {
               inScrollingStack.set(false)
@@ -115,9 +137,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
               if(viewModel.editingMelody != null) {
                 (harmonyRecycler.adapter as BeatAdapter).syncPositionTo(melodyRecycler)
               }
-              viewModel.harmonyViewModel.harmonyView?.post {
-                viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
-              }
+              viewModel.harmonyViewModel.harmonyView?.syncScrollingChordText()
             }
             post {
               inScrollingStack.set(false)
@@ -130,121 +150,160 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
   }
 
   private fun _RelativeLayout.portraitLayout() {
-
-    viewModel.sectionListView = sectionListView(viewModel = viewModel) {
-      id = R.id.chord_list
+    viewModel.beatScratchToolbar = beatScratchToolbar(viewModel = viewModel) {
+      id = View.generateViewId()
+      orientation = LinearLayout.HORIZONTAL
     }.lparams {
-      elevation = 5f
       width = matchParent
       height = wrapContent
       alignParentTop()
     }
 
-    viewModel.harmonyView = harmonyView(viewModel = viewModel) {
-      id = R.id.harmony
-    }.lparams {
-      below(viewModel.sectionListView)
-      width = matchParent
-      height = wrapContent
-    }
-
     viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
       id = R.id.toolbar
-    }.lparams {
-      below(viewModel.harmonyView)
-      width = matchParent
-      height = wrapContent
+    }.lparams(matchParent, dip(48)) {
+      below(viewModel.beatScratchToolbar)
+    }
+
+    viewModel.sectionListRecyclerVerticalRotator = rotateLayout {
+      id = View.generateViewId()
+      angle = 0
+      viewModel.sectionListRecyclerVertical = sectionListView(viewModel = viewModel, orientation = LinearLayoutManager.VERTICAL) {
+        id = View.generateViewId()
+      }.lparams(dip(200), matchParent)
+    }.lparams(dip(200), matchParent) {
+      below(viewModel.toolbarView)
+      alignParentLeft()
+      alignParentBottom()
+    }
+
+    viewModel.sectionListRecyclerHorizontalRotator = rotateLayout {
+      id = View.generateViewId()
+      angle = 0
+      viewModel.sectionListRecyclerHorizontal = sectionListView(viewModel = viewModel) {
+        id = View.generateViewId()
+      }.lparams(matchParent, dip(40))
+    }.lparams(matchParent, dip(40)) {
+      below(viewModel.toolbarView)
+      alignParentLeft()
+      alignParentRight()
+    }
+
+
+    viewModel.harmonyView = harmonyView(
+      viewModel = viewModel
+    ) {
+      id = View.generateViewId()
+    }.lparams(matchParent, dip(36)) {
+      below(viewModel.sectionListRecyclerHorizontalRotator)
+      rightOf(viewModel.sectionListRecyclerVerticalRotator)
+      topMargin = dip(5)
+      bottomMargin = dip(5)
     }
 
     viewModel.partListView = partListView(viewModel = viewModel) {
-      id = R.id.part_list
-    }.lparams {
-      below(viewModel.toolbarView)
-      width = matchParent
-      height = wrapContent
+      id = View.generateViewId()
+    }.lparams(matchParent, wrapContent) {
+      //rightOf(viewModel.sectionListRecyclerVertical)
+      below(viewModel.harmonyView)
+      rightOf(viewModel.sectionListRecyclerVerticalRotator)
       alignParentBottom()
     }
 
     viewModel.partListTransitionView = textView {
       id = View.generateViewId()
+      alpha = 0f
+      translationX = 10000f
       textSize = 25f
       background = context.getDrawable(R.drawable.orbifold_chord)
     }.lparams(dip(30), dip(40)) {
-      below(viewModel.toolbarView)
-      alignParentLeft()
+      below(viewModel.harmonyView)
+      rightOf(viewModel.sectionListRecyclerVerticalRotator)
     }
 
-    viewModel.melodyView = melodyView(viewModel = viewModel) {
-      id = R.id.melody
+    viewModel.melodyViewModel.melodyView = melodyView(viewModel = viewModel) {
+      id = View.generateViewId()
       alpha = 0f
-    }.lparams {
-      below(viewModel.toolbarView)
-      width = matchParent
-      height = wrapContent
+      translationX = 10000f
+    }.lparams(matchParent, wrapContent) {
+      below(viewModel.harmonyView)
+      rightOf(viewModel.sectionListRecyclerVerticalRotator)
       alignParentBottom()
+      alignParentRight()
     }
+
   }
 
-  private fun _RelativeLayout.landscapeLayout(ui: AnkoContext<PaletteEditorActivity>) {
-    val leftSideWidth = dip(350f)
+  private fun _RelativeLayout.landscapeLayout() {
 
-    viewModel.sectionListView = sectionListView(viewModel = viewModel) {
-      id = R.id.chord_list
-    }.lparams {
-      width = leftSideWidth
-      height = wrapContent
+    viewModel.sectionListRecyclerHorizontalSpacer = hideableLinearLayout {
+      id = View.generateViewId()
+    }.lparams(dip(48), matchParent) {
       alignParentLeft()
       alignParentTop()
+      alignParentBottom()
     }
 
-    val isTablet = ui.configuration.smallestScreenWidthDp > 600
 
-    viewModel.orbifold = orbifoldView {
-      id = R.id.orbifold
-    }.lparams {
+
+    viewModel.sectionListRecyclerVerticalRotator = rotateLayout {
+      id = View.generateViewId()
+      angle = 0
+      viewModel.sectionListRecyclerVertical = sectionListView(viewModel = viewModel, orientation = LinearLayoutManager.VERTICAL) {
+        id = View.generateViewId()
+      }.lparams(dip(200f), matchParent)
+    }.lparams(dip(200f), matchParent) {
+      rightOf(viewModel.sectionListRecyclerHorizontalSpacer!!)
+      alignParentTop()
+      alignParentBottom()
+    }
+
+
+    viewModel.sectionListRecyclerHorizontalRotator = rotateLayout {
+      id = View.generateViewId()
+      angle = 270
+      viewModel.sectionListRecyclerHorizontal = sectionListView(viewModel = viewModel) {
+        id = View.generateViewId()
+      }.lparams(matchParent, dip(40))
+    }.lparams(dip(40), matchParent) {
       alignParentLeft()
-      below(viewModel.sectionListView)
-      width = leftSideWidth
-      height = if (isTablet) {
-        Math.round(leftSideWidth * 1.5f)
-      } else {
-        matchParent
-      }
-      elevation = 5f
+      alignParentTop()
+      alignParentBottom()
     }
 
-    if (isTablet) {
-      view {
-        id = R.id.spacer
-        backgroundColor = context.color(R.color.colorPrimaryDark)
-      }.lparams {
-        alignParentLeft()
-        below(viewModel.orbifold)
-        width = leftSideWidth
-        height = matchParent
-        elevation = 5f
-      }
+
+    viewModel.beatScratchToolbar = beatScratchToolbar(viewModel = viewModel) {
+      id = View.generateViewId()
+      orientation = LinearLayout.VERTICAL
+    }.lparams {
+      //TODO: re-enable the toolbar
+      width = dip(48)
+//      width = 0
+      height = matchParent
+      //rightOf(viewModel.sectionListRecyclerHorizontalRotator!!)
+      rightOf(viewModel.sectionListRecyclerVerticalRotator)
+      alignParentTop()
     }
 
     viewModel.toolbarView = paletteToolbar(viewModel = viewModel) {
       id = R.id.toolbar
-    }.lparams {
-      width = matchParent
-      height = wrapContent
-      rightOf(viewModel.orbifold)
+      orientation = LinearLayout.HORIZONTAL
+    }.lparams(matchParent, if(context.configuration.tablet) dip(48) else dip(36)) {
+      rightOf(viewModel.beatScratchToolbar)
       alignParentTop()
       alignParentRight()
 
     }
 
-    viewModel.harmonyView = harmonyView(viewModel = viewModel) {
+    viewModel.harmonyView = harmonyView(
+      viewModel = viewModel
+    ) {
       id = R.id.harmony
-    }.lparams {
-      width = matchParent
-      height = wrapContent
-      rightOf(viewModel.orbifold)
+    }.lparams(matchParent, dip(36)) {
+      rightOf(viewModel.beatScratchToolbar)
       below(viewModel.toolbarView)
       alignParentRight()
+      bottomMargin = dip(4)
     }
 
     viewModel.partListView = partListView(viewModel = viewModel) {
@@ -253,34 +312,49 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      rightOf(viewModel.orbifold)
+      rightOf(viewModel.beatScratchToolbar)
       below(viewModel.harmonyView)
       alignParentRight()
     }
 
     viewModel.partListTransitionView = textView {
       id = View.generateViewId()
+      alpha = 0f
+      translationX = 10000f
       textSize = 25f
       background = context.getDrawable(R.drawable.orbifold_chord)
     }.lparams(0, dip(40)) {
-      rightOf(viewModel.orbifold)
+      rightOf(viewModel.beatScratchToolbar)
       below(viewModel.harmonyView)
     }
 
-    viewModel.melodyView = melodyView(viewModel = viewModel) {
+    viewModel.melodyViewModel.melodyView = melodyView(viewModel = viewModel) {
       id = R.id.melody
       alpha = 0f
+      translationX = 10000f
     }.lparams {
       width = matchParent
       height = wrapContent
       alignParentBottom()
-      rightOf(viewModel.orbifold)
+      rightOf(viewModel.beatScratchToolbar)
       below(viewModel.harmonyView)
       alignParentRight()
     }
   }
 
   private fun _RelativeLayout.keyboardsLayout() = with(context) {
+    if(configuration.landscape) {
+      viewModel.orbifold = orbifoldView {
+        id = R.id.orbifold
+      }.lparams {
+        alignParentLeft()
+        alignParentBottom()
+
+        width = leftSideWidth
+        height = dip(300)
+        elevation = 5f
+      }
+    }
 
     viewModel.keyboardView = keyboardView {
       id = R.id.keyboard
@@ -288,6 +362,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       //alpha = 0f
       //translationY = dimen(R.dimen.key_height_white).toFloat()
     }.lparams {
+      if(configuration.landscape) rightOf(viewModel.orbifold)
       height = dimen(R.dimen.key_height_white)
       width = matchParent
       alignParentBottom()
@@ -300,6 +375,7 @@ class PaletteUI : AnkoComponent<PaletteEditorActivity>, AnkoLogger {
       backgroundColor = color(android.R.color.white)
       //translationY = dimen(R.dimen.key_height_white).toFloat()
     }.lparams {
+      if(configuration.landscape) rightOf(viewModel.orbifold)
       height = dimen(R.dimen.key_height_white)
       width = matchParent
       above(viewModel.keyboardView)

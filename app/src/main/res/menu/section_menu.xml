@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Rename Section"
+          android:id="@+id/renameSection"/>
     <item android:title="Delete Section"
           android:id="@+id/deleteSection"/>
-    <item android:title="Add Harmony"
-        android:id="@+id/addHarmonyToSection"/>
-    <item android:title="Remove Harmony"
-          android:id="@+id/removeHarmonyFromSection"/>
+    <item android:title="Duplicate Section"
+          android:id="@+id/duplicateSection"/>
+    <item android:title="Copy Harmony"
+          android:id="@+id/copySectionHarmony"/>
+    <item android:title="Paste Harmony"
+          android:id="@+id/pasteSectionHarmony"/>
+    <item android:title="Copy Melodies"
+          android:id="@+id/copySectionPartLevels"/>
+    <item android:title="Paste Melodies"
+          android:id="@+id/pasteSectionPartLevels"/>
+    <item android:title="Match Part Volumes To Melodies"
+          android:id="@+id/matchClipboardPartLevels"/>
 </menu>

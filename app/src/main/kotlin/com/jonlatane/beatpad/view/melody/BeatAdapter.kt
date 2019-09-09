@@ -2,15 +2,13 @@ package com.jonlatane.beatpad.view.melody
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import com.jonlatane.beatpad.util.firstVisibleItemPosition
+import com.jonlatane.beatpad.util.smartrecycler.firstVisibleItemPosition
 
 interface BeatAdapter {
   var elementWidth: Int
   val recyclerView: RecyclerView
 
-  fun invalidate(beatPosition: Int) {
-    recyclerView.layoutManager.findViewByPosition(beatPosition)?.invalidate()
-  }
+  fun invalidate(beatPosition: Int)
 
   fun syncPositionTo(to: RecyclerView) {
     val from = recyclerView

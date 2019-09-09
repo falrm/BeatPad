@@ -1,10 +1,7 @@
 package com.jonlatane.beatpad.view.tempo
 
-import android.view.MotionEvent
 import android.view.View
-import org.jetbrains.anko.sdk25.coroutines.onClick
-
-import java.util.Arrays
+import java.util.*
 
 /**
  * Created by jonlatane on 5/10/17.
@@ -23,8 +20,8 @@ object TempoTracking {
 	) {
 		v.setOnClickListener(object : View.OnClickListener {
 
-			internal var samples = LongArray(sampleWindowSize)
-			internal var samplesTaken = 0
+			var samples = LongArray(sampleWindowSize)
+			var samplesTaken = 0
 			override fun onClick(v: View?) {
 				samples[samplesTaken % sampleWindowSize] = System.currentTimeMillis()
 				if (++samplesTaken >= sampleWindowSize) {

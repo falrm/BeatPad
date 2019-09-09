@@ -1,0 +1,8 @@
+<inset
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:drawable="@drawable/launcher_icon_foreground"
+  android:insetBottom="6.96dp"
+  android:insetLeft="4.8dp"
+  android:insetRight="4.8dp"
+  android:insetTop="2.64dp"
+  />

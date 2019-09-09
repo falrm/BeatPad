@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view
 
 import android.content.Context
+import android.support.v7.widget.AppCompatSpinner
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -21,7 +22,7 @@ import java.lang.reflect.Method
  *
  * Limitations: does not display prompt if the entry list is empty.
  */
-class NoDefaultSpinner : Spinner {
+class NoDefaultSpinner : AppCompatSpinner {
 
 	constructor(context: Context) : super(context)
 

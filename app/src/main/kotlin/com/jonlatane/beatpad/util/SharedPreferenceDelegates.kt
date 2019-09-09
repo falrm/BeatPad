@@ -12,7 +12,7 @@ import kotlin.reflect.KProperty
  *
  * Usage:
  *
- * PrefDelegate.init(context)
+ * PrefDelegate.init(storageContext)
  * ...
  * var accessToken by stringPref(PREFS_ID, "access_token")
  * var appLaunchCount by intPref(PREFS_ID, "app_launch_count", 0)
@@ -32,11 +32,10 @@ abstract class PrefDelegate<T>(val prefName: String?, val prefKey: String) {
 	abstract operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T)
 }
 
-fun stringPref(prefKey: String, defaultValue: String? = null) = StringPrefDelegate(null, prefKey, defaultValue)
-fun stringPref(prefName: String, prefKey: String, defaultValue: String? = null) = StringPrefDelegate(prefName, prefKey, defaultValue)
-class StringPrefDelegate(prefName: String?, prefKey: String, val defaultValue: String?) : PrefDelegate<String?>(prefName, prefKey) {
-	override fun getValue(thisRef: Any?, property: KProperty<*>) = prefs.getString(prefKey, defaultValue)
-	override fun setValue(thisRef: Any?, property: KProperty<*>, value: String?) = prefs.edit().putString(prefKey, value).apply()
+fun stringPref(prefKey: String, defaultValue: String) = StringPrefDelegate(prefKey, defaultValue)
+class StringPrefDelegate(prefKey: String, val defaultValue: String?) : PrefDelegate<String>(null, prefKey) {
+	override fun getValue(thisRef: Any?, property: KProperty<*>) = prefs.getString(prefKey, defaultValue)!!
+	override fun setValue(thisRef: Any?, property: KProperty<*>, value: String) = prefs.edit().putString(prefKey, value).apply()
 }
 
 fun intPref(prefKey: String, defaultValue: Int = 0) = IntPrefDelegate(null, prefKey, defaultValue)
@@ -67,9 +66,9 @@ class LongPrefDelegate(prefName: String?, prefKey: String, val defaultValue: Lon
 	override fun setValue(thisRef: Any?, property: KProperty<*>, value: Long) = prefs.edit().putLong(prefKey, value).apply()
 }
 
-fun stringSetPref(prefKey: String, defaultValue: Set<String> = HashSet<String>()) = StringSetPrefDelegate(null, prefKey, defaultValue)
-fun stringSetPref(prefName: String, prefKey: String, defaultValue: Set<String> = HashSet<String>()) = StringSetPrefDelegate(prefName, prefKey, defaultValue)
-class StringSetPrefDelegate(prefName: String?, prefKey: String, val defaultValue: Set<String>) : PrefDelegate<Set<String>>(prefName, prefKey) {
-	override fun getValue(thisRef: Any?, property: KProperty<*>) = prefs.getStringSet(prefKey, defaultValue)
-	override fun setValue(thisRef: Any?, property: KProperty<*>, value: Set<String>) = prefs.edit().putStringSet(prefKey, value).apply()
-}
+//fun stringSetPref(prefKey: String, defaultValue: Set<String> = HashSet<String>()) = StringSetPrefDelegate(null, prefKey, defaultValue)
+//fun stringSetPref(prefName: String, prefKey: String, defaultValue: Set<String> = HashSet<String>()) = StringSetPrefDelegate(prefName, prefKey, defaultValue)
+//class StringSetPrefDelegate(prefName: String?, prefKey: String, val defaultValue: Set<String>) : PrefDelegate<Set<String>>(prefName, prefKey) {
+//	override fun getValue(thisRef: Any?, property: KProperty<*>): MutableSet<String> = prefs.getStringSet(prefKey, defaultValue)
+//	override fun setValue(thisRef: Any?, property: KProperty<*>, value: Set<String>) = prefs.edit().putStringSet(prefKey, value).apply()
+//}

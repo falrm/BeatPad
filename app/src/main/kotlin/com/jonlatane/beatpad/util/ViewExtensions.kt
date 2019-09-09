@@ -1,33 +1,55 @@
 package com.jonlatane.beatpad.util
 
 import android.animation.ValueAnimator
-import android.os.Build
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.*
 import android.view.ViewPropertyAnimator
 import android.view.animation.LinearInterpolator
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import java.util.concurrent.atomic.AtomicInteger
-import android.view.animation.Transformation
-import android.view.animation.Animation
 import android.widget.TextView
 import org.jetbrains.anko.allCaps
 import org.jetbrains.anko.singleLine
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.content.res.Configuration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import com.jonlatane.beatpad.view.melody.BeatAdapter
+import android.view.ViewGroup
+import com.jonlatane.beatpad.MainApplication
+import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 
 
-private val defaultDuration get() = 300L
+val defaultDuration get() = 300L
 
 interface HideableView {
 	var initialHeight: Int?
+	var initialWidth: Int?
+  var initialTopMargin: Int?
+  var initialBottomMargin: Int?
+  var initialLeftMargin: Int?
+  var initialRightMargin: Int?
+
+  fun show(
+    animated: Boolean = true,
+    animation: HideAnimation = HideAnimation.VERTICAL,
+    endAction: (() -> Unit)? = null
+  ) {
+    animation.apply {
+      (this@HideableView as View).show(animated, endAction)
+    }
+  }
+
+  fun hide(
+    animated: Boolean = true,
+    animation: HideAnimation = HideAnimation.VERTICAL,
+    endAction: (() -> Unit)? = null
+  ) {
+    animation.apply {
+      (this@HideableView as View).hide(animated, endAction)
+    }
+  }
 }
 
 fun TextView.toolbarTextStyle() {
@@ -36,6 +58,7 @@ fun TextView.toolbarTextStyle() {
 	marqueeRepeatLimit = -1
 	isSelected = true
 	allCaps = true
+  typeface = MainApplication.chordTypefaceBold
 }
 
 var nextViewId: Int = 10001
@@ -94,9 +117,31 @@ var View.layoutWidth get() = this.layoutParams.width
 	}
 
 var View.layoutHeight get() = this.layoutParams.height
-	set(value) {
-		layoutParams = layoutParams.apply { height = value }
-	}
+  set(value) {
+    layoutParams = layoutParams.apply { height = value }
+  }
+
+var View.marginLayoutParams get() = this.layoutParams as ViewGroup.MarginLayoutParams
+set(value) {
+  this.layoutParams = value
+}
+
+var View.topMargin get() = this.marginLayoutParams.topMargin
+  set(value) {
+    layoutParams = marginLayoutParams.apply { topMargin = value }
+  }
+var View.bottomMargin get() = this.marginLayoutParams.bottomMargin
+  set(value) {
+    layoutParams = marginLayoutParams.apply { bottomMargin = value }
+  }
+var View.leftMargin get() = this.marginLayoutParams.leftMargin
+  set(value) {
+    layoutParams = marginLayoutParams.apply { leftMargin = value }
+  }
+var View.rightMargin get() = this.marginLayoutParams.rightMargin
+  set(value) {
+    layoutParams = marginLayoutParams.apply { rightMargin = value }
+  }
 
 fun View.animateWidth(width: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
 	val anim = ValueAnimator.ofInt(measuredWidth, width)
@@ -111,52 +156,151 @@ fun View.animateWidth(width: Int, duration: Long = defaultDuration, endAction: (
 	anim.setDuration(duration).start()
 }
 
-fun View.animateHeight(height: Int, duration: Long = defaultDuration) {
+fun View.animateHeight(height: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
 	val anim = ValueAnimator.ofInt(this.measuredHeight, height)
   anim.interpolator = LinearInterpolator()
 	anim.addUpdateListener { valueAnimator ->
 		this.layoutHeight = valueAnimator.animatedValue as Int
 	}
+  endAction?.let {
+    anim.addListener(object : AnimatorListenerAdapter() {
+      override fun onAnimationEnd(animation: Animator) = it()
+    })
+  }
 	anim.setDuration(duration).start()
 }
 
-val View.isHidden: Boolean get() = layoutHeight == 0
-fun View.show(animated: Boolean = true) {
-	if ((this as HideableView).initialHeight == null) {
-		measure(width, height)
-		initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
-	}
-	if (animated) {
-		animateHeight((this as HideableView).initialHeight!!)
-	} else {
-		layoutHeight = (this as HideableView).initialHeight!!
-	}
+fun View.animateTopMargin(margin: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
+  val anim = ValueAnimator.ofInt(this.topMargin, margin)
+  anim.interpolator = LinearInterpolator()
+  anim.addUpdateListener { valueAnimator ->
+    this.topMargin = valueAnimator.animatedValue as Int
+  }
+  endAction?.let {
+    anim.addListener(object : AnimatorListenerAdapter() {
+      override fun onAnimationEnd(animation: Animator) = it()
+    })
+  }
+  anim.setDuration(duration).start()
 }
 
-fun View.hide(animated: Boolean = true) {
-	if ((this as HideableView).initialHeight == null) {
-		measure(width, height)
-		initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
-	}
-	if (animated) {
-		animateHeight(0)
-	} else {
-		layoutHeight = 0
-	}
+fun View.animateBottomMargin(margin: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
+  val anim = ValueAnimator.ofInt(this.bottomMargin, margin)
+  anim.interpolator = LinearInterpolator()
+  anim.addUpdateListener { valueAnimator ->
+    this.bottomMargin = valueAnimator.animatedValue as Int
+  }
+  endAction?.let {
+    anim.addListener(object : AnimatorListenerAdapter() {
+      override fun onAnimationEnd(animation: Animator) = it()
+    })
+  }
+  anim.setDuration(duration).start()
 }
+
+fun View.animateLeftMargin(margin: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
+  val anim = ValueAnimator.ofInt(this.leftMargin, margin)
+  anim.interpolator = LinearInterpolator()
+  anim.addUpdateListener { valueAnimator ->
+    this.leftMargin = valueAnimator.animatedValue as Int
+  }
+  endAction?.let {
+    anim.addListener(object : AnimatorListenerAdapter() {
+      override fun onAnimationEnd(animation: Animator) = it()
+    })
+  }
+  anim.setDuration(duration).start()
+}
+
+fun View.animateRightMargin(margin: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
+  val anim = ValueAnimator.ofInt(this.rightMargin, margin)
+  anim.interpolator = LinearInterpolator()
+  anim.addUpdateListener { valueAnimator ->
+    this.rightMargin = valueAnimator.animatedValue as Int
+  }
+  endAction?.let {
+    anim.addListener(object : AnimatorListenerAdapter() {
+      override fun onAnimationEnd(animation: Animator) = it()
+    })
+  }
+  anim.setDuration(duration).start()
+}
+
+inline val Configuration.tablet: Boolean
+  get() = smallestScreenWidthDp > 600
+
+enum class HideAnimation: AnkoLogger {
+  VERTICAL {
+    override fun View.show(animated: Boolean, endAction: (() -> Unit)?) {
+      setupHiding()
+      if (animated) {
+        animateHeight((this as HideableView).initialHeight!!, endAction = endAction)
+        animateTopMargin((this as HideableView).initialTopMargin!!, endAction = endAction)
+        animateBottomMargin((this as HideableView).initialBottomMargin!!, endAction = endAction)
+      } else {
+        layoutHeight = (this as HideableView).initialHeight!!
+        topMargin = (this as HideableView).initialTopMargin!!
+        bottomMargin = (this as HideableView).initialBottomMargin!!
+        endAction?.invoke()
+      }
+    }
+
+    override fun View.hide(animated: Boolean, endAction: (() -> Unit)?) {
+      setupHiding()
+      if (animated) {
+        animateHeight(0, endAction = endAction)
+        animateTopMargin(0, endAction = endAction)
+        animateBottomMargin(0, endAction = endAction)
+      } else {
+        layoutHeight = 0
+        topMargin = 0
+        bottomMargin = 0
+        endAction?.invoke()
+      }
+    }
+  },
+  HORIZONTAL {
+    override fun View.show(animated: Boolean, endAction: (() -> Unit)?) {
+      setupHiding()
+      if (animated) {
+        animateWidth((this as HideableView).initialWidth!!, endAction = endAction)
+      } else {
+        layoutWidth = (this as HideableView).initialWidth!!
+        endAction?.invoke()
+      }
+    }
+
+    override fun View.hide(animated: Boolean, endAction: (() -> Unit)?) {
+      setupHiding()
+      if (animated) {
+        animateWidth(0, endAction = endAction)
+      } else {
+        layoutWidth = 0
+        endAction?.invoke()
+      }
+    }
+  };
+
+  abstract fun View.show(animated: Boolean = true, endAction: (() -> Unit)? = null)
+
+  abstract fun View.hide(animated: Boolean = true, endAction: (() -> Unit)? = null)
+
+  fun View.setupHiding() {
+    if ((this as HideableView).initialWidth == null || (this as HideableView).initialHeight == null) {
+      measure(width, height)
+      initialWidth = if (measuredWidth > 0) measuredWidth else layoutWidth
+      initialHeight = if (measuredHeight > 0) measuredHeight else layoutHeight
+      initialTopMargin = topMargin
+      initialBottomMargin = bottomMargin
+      initialLeftMargin = leftMargin
+      initialRightMargin = rightMargin
+
+      if(this is OrbifoldView) {
+        info("HideAnimation Orbifold initialWidth=$initialWidth")
+      }
+    }
+  }
+}
+val View.isHidden: Boolean get() = layoutHeight == 0 || layoutWidth == 0
 
 fun View.color(resId: Int) = context.color(resId)
-
-inline val RecyclerView.firstVisibleItemPosition
-  get() = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-
-fun RecyclerView.syncPositionTo(to: RecyclerView) = syncRecyclerViewPositions(this, to)
-
-private fun syncRecyclerViewPositions(from: RecyclerView, to: RecyclerView) {
-	val otherLayoutManager = to.layoutManager as LinearLayoutManager
-	val offset = -from.computeHorizontalScrollOffset() % (to.adapter as BeatAdapter).elementWidth
-	otherLayoutManager.scrollToPositionWithOffset(
-		from.firstVisibleItemPosition,
-		offset
-	)
-}

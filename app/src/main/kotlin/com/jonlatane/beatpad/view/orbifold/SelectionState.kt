@@ -53,18 +53,12 @@ object SelectionState : NavigationState, AnkoLogger {
       width = Math.max(v.halfStepUp.scaledWidth, v.halfStepDown.scaledWidth) + Math.round(15 * v.density),
       duration = ANIMATION_DURATION
     )
-    v.centralChordTouchPoint.animateWidth(
-      width = v.centralChord.scaledWidth,
-      duration = ANIMATION_DURATION
-    )
-    v.centralChordThrobber.animateWidth(
-      width = v.centralChord.scaledWidth,
-      duration = ANIMATION_DURATION
-    )
-    v.centralChordBackground.animateWidth(
-      width = v.centralChord.scaledWidth,
-      duration = ANIMATION_DURATION
-    )
+    listOf(v.centralChordTouchPoint, v.centralChordThrobber, v.centralChordBackground).forEach {
+      it.animateWidth(
+        width = v.centralChord.scaledWidth,
+        duration = ANIMATION_DURATION
+      )
+    }
     for (i in 0 until v.sequences.size) {
       val sv = v.sequences[i]
       val minTX = (v.halfStepBackground.width + Math.max(sv.forward.width, sv.back.width))/2

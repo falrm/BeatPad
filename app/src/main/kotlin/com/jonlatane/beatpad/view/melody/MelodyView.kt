@@ -1,104 +1,146 @@
 package com.jonlatane.beatpad.view.melody
 
+import android.animation.ValueAnimator
+import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewManager
+import android.widget.RelativeLayout
+import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.view.HideableRelativeLayout
-import com.jonlatane.beatpad.view.nonDelayedRecyclerView
-import com.jonlatane.beatpad.view.nonDelayedScrollView
+import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.view.*
+import com.jonlatane.beatpad.view.harmony.ChordTextPositioner
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
-import com.jonlatane.beatpad.view.zoomableScrollView
+import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.sdk25.coroutines.onScrollChange
+import org.jetbrains.anko.sdk25.coroutines.onTouch
 
 
-inline fun ViewManager.melodyView(
-	theme: Int = 0,
-	viewModel: PaletteViewModel,
+class MelodyView(
+	context: Context,
+	override val viewModel: PaletteViewModel
+): HideableRelativeLayout(context), ChordTextPositioner {
+	override val marginForKey = dip(30)
+	override val chordChangeLabels: MutableMap<Int, TextView> = mutableMapOf()
+	override val chordChangeLabelPool: DefaultPool<TextView> = defaultChordChangeLabelPool
+	override val recycler: RecyclerView get() = viewModel.melodyViewModel.melodyRecyclerView
+	val rightSpacer: View
+	override val supportGridLayout = true
+	fun LayoutParams.melodyPosition() = with(viewModel.melodyViewModel){
+		leftOf(rightSpacer)
+		above(melodyEditingModifiers)
+		rightOf(melodyLeftScroller)
+		below(melodyEditingToolbar)
+	}
+	init {
+		with(viewModel.melodyViewModel) {
+			backgroundColor = context.color(R.color.white)
 
-	//ui: AnkoContext<Any>,
-	init: HideableRelativeLayout.() -> Unit
-)
-	= //with(ui) {
-	ankoView({
-		val melodyViewModel = viewModel.melodyViewModel
-		melodyViewModel.melodyView = HideableRelativeLayout(it).apply {
-			melodyViewModel.melodyToolbar = melodyToolbar(viewModel) {
-				id = R.id.melody_toolbar
-			}.lparams {
-				width = matchParent
-				height = wrapContent
+			melodyReferenceToolbar = melodyReferenceToolbar(viewModel) {
+				id = R.id.melody_reference_toolbar
+				elevation = 6f
+			}.lparams(matchParent, wrapContent) {
 				alignParentTop()
+				alignParentRight()
+				alignParentLeft()
 			}
-			melodyViewModel.melodyEditingModifiers = melodyEditingModifiers {
-				id = R.id.bottom_scroller
-				onHeldDownChanged = { heldDown ->
-					//if (heldDown) holdToEdit?.animate()?.alpha(0f)?.translationY(100f)
-					//else holdToEdit?.animate()?.alpha(1f)?.translationY(0f)
-          melodyViewModel.melodyCenterHorizontalScroller.scrollingEnabled = !heldDown
-          melodyViewModel.melodyCenterVerticalScroller.scrollingEnabled = !heldDown
-				}
-			}.lparams {
+			melodyEditingToolbar = melodyEditingToolbar(viewModel) {
+				id = R.id.melody_editing_toolbar
+				elevation = 6f
+			}.lparams(matchParent, wrapContent) {
+				below(melodyReferenceToolbar)
+				alignParentRight()
+				alignParentLeft()
+			}
+
+			sectionToolbar = sectionToolbar(viewModel) {
+				id = View.generateViewId()
+				elevation = 6f
+			}.lparams(matchParent, wrapContent) {
 				alignParentBottom()
 				alignParentRight()
-				width = ViewGroup.LayoutParams.MATCH_PARENT
-				height = dimen(R.dimen.subdivision_controller_size)
-				leftMargin = dip(30)
+				alignParentLeft()
 			}
-      melodyViewModel.melodyLeftScroller = nonDelayedScrollView {
+			melodyEditingModifiers = melodyEditingModifiers {
+				id = R.id.bottom_scroller
+				elevation = 6f
+				onHeldDownChanged = { heldDown ->
+					if (displayType == MelodyViewModel.DisplayType.NOTATION) {
+						val anim = ValueAnimator.ofFloat(
+							beatAdapter.colorblockAlpha,
+							if (heldDown) 0.43f else 0f
+						)
+						anim.addUpdateListener { valueAnimator ->
+							beatAdapter.colorblockAlpha = valueAnimator.animatedValue as Float
+						}
+						anim.start()
+					}
+					melodyRecyclerView.scrollingEnabled = !heldDown
+					melodyVerticalScrollView.scrollingEnabled = !heldDown
+				}
+			}.lparams(matchParent, melodyReferenceToolbar.squareSize) {
+				above(sectionToolbar)
+				alignParentRight()
+				alignParentLeft()
+			}
+			melodyLeftScroller = nonDelayedScrollView {
 				id = R.id.left_scroller
 				linearLayout {
-          melodyViewModel.verticalAxis = melodyToneAxis().lparams {
+					verticalAxis = melodyToneAxis().lparams {
 						width = dip(30)
-						height = dip(1000f)
+						height = dip(MelodyBeatAdapter.initialBeatHeightDp)
 					}
 				}
 				scrollingEnabled = false
 				isVerticalScrollBarEnabled = false
-			}.lparams {
-				width = dip(30)
-				height = ViewGroup.LayoutParams.MATCH_PARENT
-				below(melodyViewModel.melodyToolbar)
-				above(melodyViewModel.melodyEditingModifiers)
+			}.lparams(dip(30), matchParent) {
+				below(melodyEditingToolbar)
+				above(melodyEditingModifiers)
 				alignParentLeft()
 			}
-      melodyViewModel.melodyCenterVerticalScroller = zoomableScrollView {
+			rightSpacer = view {
+				id = View.generateViewId()
+			}.lparams(0, matchParent) {
+				alignParentRight()
+				above(melodyEditingModifiers)
+				below(melodyEditingToolbar)
+			}
+			melodyVerticalScrollView = nonDelayedScrollView {
 				id = R.id.center_v_scroller
 				onScrollChange { _, _, scrollY, _, _ ->
-          melodyViewModel.melodyLeftScroller.scrollY = scrollY
+					melodyLeftScroller.scrollY = scrollY
 				}
 
-				zoomHandler = { xDelta, yDelta ->
-					AnkoLogger<MelodyViewModel>().info("Zooming: xDelta=$xDelta, yDelta=$yDelta")
-					when {
-						(xDelta.toInt() != 0 || yDelta.toInt() != 0) -> {
-							viewModel.melodyBeatAdapter?.apply {
-								elementWidth += xDelta.toInt()
-								elementHeight += (10f * yDelta).toInt()
-								notifyDataSetChanged()
-							}
-							true
-						}
-						else -> false
-					}
-				}
-
-        melodyViewModel.melodyCenterHorizontalScroller = nonDelayedRecyclerView {
+				melodyRecyclerView = zoomableRecyclerView {
 					id = R.id.center_h_scroller
 					isFocusableInTouchMode = true
-				}.lparams {
-					height = wrapContent
-					width = matchParent
-				}.apply {
+
+
+					zoomHandler = { xDelta, yDelta ->
+						AnkoLogger<MelodyViewModel>().verbose("Zooming: xDelta=$xDelta, yDelta=$yDelta")
+						when {
+							(xDelta.toInt() != 0 || yDelta.toInt() != 0) -> {
+								viewModel.melodyBeatAdapter.apply {
+									elementWidth += xDelta.toInt()
+									elementHeight += (10f * yDelta).toInt()
+								}
+								true
+							}
+							else                                         -> false
+						}
+					}
+
+					zoomFinishedHandler = { onZoomFinished() }
 					layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false).apply {
 						isItemPrefetchEnabled = false
 					}
 					overScrollMode = View.OVER_SCROLL_NEVER
-					viewModel.melodyBeatAdapter = MelodyBeatAdapter(melodyViewModel, this)
+					viewModel.melodyBeatAdapter = MelodyBeatAdapter(this@with, this)
 					adapter = viewModel.melodyBeatAdapter
 					adapter.registerAdapterDataObserver(
 						object : RecyclerView.AdapterDataObserver() {
@@ -110,18 +152,22 @@ inline fun ViewManager.melodyView(
 								//updateEmptyViewVisibility(this@recyclerView)
 							}
 						})
+				}.lparams {
+					height = wrapContent
+					width = matchParent
 				}
-			}.lparams {
-				width = ViewGroup.LayoutParams.MATCH_PARENT
-				height = ViewGroup.LayoutParams.MATCH_PARENT
-				alignParentRight()
-				above(melodyViewModel.melodyEditingModifiers)
-				rightOf(melodyViewModel.melodyLeftScroller)
-				below(melodyViewModel.melodyToolbar)
+			}.lparams(matchParent, matchParent) {
+				melodyPosition()
 			}
 
-		}
-		viewModel.melodyView
-	}, theme, init)
-//}
+			onTouch(returnValue = true) { _, _ -> Unit }
 
+			post {
+				melodyRecyclerView.minimumHeight = melodyVerticalScrollView.height
+				melodyEditingToolbar.hide(false)
+				melodyEditingModifiers.hide(false)
+				syncScrollingChordText()
+			}
+		}
+	}
+}

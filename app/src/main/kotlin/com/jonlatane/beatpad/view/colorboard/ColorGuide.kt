@@ -3,10 +3,7 @@ package com.jonlatane.beatpad.view.colorboard
 import android.graphics.Canvas
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.sensors.Orientation
 import com.jonlatane.beatpad.util.mod12
-import com.jonlatane.beatpad.view.melody.MelodyBeatView
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.withAlpha
 
@@ -16,7 +13,7 @@ interface ColorGuide : CanvasToneDrawer {
 	val nonRootPadding: Int get() = MainApplication.instance.dip(13)
 	val drawnColorGuideAlpha: Int // In case you want to scale by the View's alpha :)
 
-  fun Canvas.drawColorGuide() {
+  fun Canvas.drawColorGuide(): Unit = paint.preserveColor {
     val halfStepPhysicalDistance = axisLength / halfStepsOnScreen
     for((tone, toneBounds) in visiblePitches) {
       val toneInChord = chord.closestTone(tone)

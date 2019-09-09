@@ -3,54 +3,47 @@ package com.jonlatane.beatpad.view.palette
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.SeekBar
 import android.widget.TextView
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.midi.GM1Effects
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showConfirmDialog
-import com.jonlatane.beatpad.showInstrumentPicker
+import com.jonlatane.beatpad.showInstrumentPicker2
+import com.jonlatane.beatpad.util.applyTypeface
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.vibrate
 import org.jetbrains.anko.*
-import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import org.jetbrains.anko.sdk25.coroutines.onSeekBarChangeListener
-import kotlin.properties.Delegates
 import kotlin.properties.Delegates.observable
 
 class PartHolder(
 	val viewModel: PaletteViewModel,
-	val layout: ViewGroup,
-	internal val melodyRecycler: _RecyclerView,
-	internal val partName: TextView,
-	private val volumeSeekBar: SeekBar,
-	private val adapter: PartListAdapter,
-	initialPart: Int = 0
-) : RecyclerView.ViewHolder(layout), AnkoLogger {
-	var partPosition: Int by Delegates.observable(initialPart) { _, _, _ -> onPartPositionChanged() }
-	val part: Part?  get() = viewModel.palette.parts.getOrNull(partPosition)
-	val context get() = melodyRecycler.context
-	private val melodyReferenceAdapter = MelodyReferenceAdapter(viewModel, melodyRecycler, 0)
+	val layout: PartHolderView,
+	private val adapter: PartListAdapter
+) : RecyclerView.ViewHolder(layout), PartHolderLayout, AnkoLogger {
+	val part: Part?  get() = viewModel.palette.parts.getOrNull(adapterPosition)
+	val context get() = layout.context
+	val melodyReferenceAdapter = MelodyReferenceAdapter(viewModel, layout.melodyReferenceRecycler, this)
+	val volumeSlider: SeekBar get() = layout.volumeSlider
+	val partName: TextView get() = layout.partName
 	var editingVolume: Boolean by observable(false) { _, _, editingVolume: Boolean ->
 		if(editingVolume && isEditablePart) {
-			volumeSeekBar.animate().alpha(1f)
-			volumeSeekBar.isEnabled = true
+			volumeSlider.animate().alpha(1f)
+			volumeSlider.isEnabled = true
 			partName.isClickable = false
 			partName.isLongClickable = false
 			partName.animate().alpha(0.5f)
 		} else {
-			volumeSeekBar.animate().alpha(0f)
-			volumeSeekBar.isEnabled = false
-			partName.isClickable = true
+			volumeSlider.animate().alpha(0f)
+			volumeSlider.isEnabled = false
+			partName.isClickable = (part?.instrument as? MIDIInstrument)?.drumTrack != true
 			partName.isLongClickable = true
 			partName.animate().alpha(1f)
 		}
     melodyReferenceAdapter.boundViewHolders.forEach {
-      info("hihi")
-			if (editingVolume && !it.isAddButton) {
+      if (editingVolume && !it.isAddButton) {
 				it.animateMixOn()
 			} else {
 				it.animateMixOff()
@@ -58,14 +51,14 @@ class PartHolder(
 		}
 	}
 
-	private val editPartMenu = PopupMenu(partName.context, partName)
-	private val newPartMenu = PopupMenu(partName.context, partName)
+	internal val editPartMenu = PopupMenu(partName.context, partName)
+	internal val newPartMenu = PopupMenu(partName.context, partName)
 
 	init {
 		editPartMenu.inflate(R.menu.part_edit_menu)
+		editPartMenu.applyTypeface()
     editPartMenu.setOnMenuItemClickListener { item ->
       when (item.itemId) {
-        //R.id.newDrawnPattern -> adapter.newToneSequence()
         R.id.editPartInstrument -> editInstrument()
         R.id.usePartOnColorboard -> {
           viewModel.colorboardPart = part
@@ -86,8 +79,8 @@ class PartHolder(
           promptText = "Really delete the ${part?.instrument?.instrumentName} part?",
           yesText = "Yes, delete part"
         ) {
-          viewModel.palette.parts.removeAt(partPosition)
-          adapter.notifyItemRemoved(partPosition)
+          viewModel.palette.parts.removeAt(adapterPosition)
+          adapter.notifyItemRemoved(adapterPosition)
           adapter.notifyDataSetChanged()
         }
         else -> context.toast("TODO!")
@@ -95,9 +88,9 @@ class PartHolder(
       true
     }
     newPartMenu.inflate(R.menu.part_new_menu)
+		newPartMenu.applyTypeface()
     newPartMenu.setOnMenuItemClickListener { item ->
       when (item.itemId) {
-        //R.id.newDrawnPattern -> adapter.newToneSequence()
         R.id.newMidiPart -> adapter.addPart()
         R.id.newMidiDrumPart -> {
           adapter.addPart(Part(
@@ -112,40 +105,45 @@ class PartHolder(
       }
       true
     }
-		melodyRecycler.adapter = melodyReferenceAdapter
+		layout.melodyReferenceRecycler.adapter = melodyReferenceAdapter
 	}
 
 	fun editInstrument() {
 		val instrument = part?.instrument
 		when (instrument) {
 			is MIDIInstrument ->
-				showInstrumentPicker(instrument, layout.context) {
-					adapter.notifyItemChanged(partPosition)
-				}
+			showInstrumentPicker2(instrument, layout.context)
 		}
 	}
 
   val isEditablePart: Boolean
-		get() = partPosition < viewModel.palette.parts.size || !adapter.canAddParts()
+		get() = adapterPosition < viewModel.palette.parts.size || !adapter.canAddParts()
 
-	private fun onPartPositionChanged() {
-		melodyReferenceAdapter.partPosition = partPosition
+  fun onPartPositionChanged() {
+    editingVolume = viewModel.editingMix
 		if(isEditablePart) {
-			makeEditablePart(partPosition)
+			makeEditablePart()
 		} else {
 			makeAddButton()
 		}
 	}
 
-	private fun makeEditablePart(partPosition: Int) {
+	private fun makeEditablePart() {
     val drumTrack = (part!!.instrument as? MIDIInstrument)?.drumTrack == true
 		partName.apply {
 			text = part!!.instrument.instrumentName
-			setOnClickListener {
-				vibrate(10)
-				editInstrument()
-			}
-      textColor = if (drumTrack) R.color.colorPrimaryLight else R.color.colorPrimaryDark
+      if((part?.instrument as? MIDIInstrument)?.drumTrack != true) {
+        isClickable = true
+        setOnClickListener {
+          vibrate(10)
+          editInstrument()
+        }
+      } else {
+        setOnClickListener { }
+        isClickable = false
+      }
+
+			textColor = if (drumTrack) R.color.colorPrimaryLight else R.color.colorPrimaryDark
 			setOnLongClickListener {
         arrayOf(R.id.editPartInstrument, R.id.usePartOnColorboard, R.id.usePartOnSplat).forEach {
           editPartMenu.menu.findItem(it).isEnabled = !drumTrack
@@ -156,22 +154,21 @@ class PartHolder(
 			backgroundResource = if ((part!!.instrument as? MIDIInstrument)?.drumTrack == true)
 				R.drawable.part_background_drum
 			else R.drawable.part_background
+			partNamePadding()
 			if(viewModel.editingMix) {
 				alpha = 0.5f
         isClickable = false
         isLongClickable = false
 			}
 		}
-		melodyRecycler.apply {
-			visibility = View.VISIBLE
+    layout.melodyReferenceRecycler.apply {
 			val orientation = LinearLayoutManager.VERTICAL
 			backgroundColor = context.color(R.color.colorPrimaryDark)
 			layoutManager = LinearLayoutManager(context, orientation, false)
 			overScrollMode = View.OVER_SCROLL_NEVER
 		}
-    melodyReferenceAdapter.partPosition = partPosition
     melodyReferenceAdapter.notifyDataSetChanged()
-		volumeSeekBar.apply {
+		volumeSlider.apply {
       if(viewModel.editingMix) {
         alpha = 1f
         isEnabled = true
@@ -179,7 +176,6 @@ class PartHolder(
         alpha = 0f
         isEnabled = false
       }
-			//isIndeterminate = false
 			progress = (part!!.volume * 127).toInt()
 			onSeekBarChangeListener {
 				onProgressChanged { _, progress, _ ->
@@ -205,12 +201,10 @@ class PartHolder(
         newPartMenu.show()
         true
       }
+      backgroundResource = R.drawable.part_background
+      partNamePadding()
 		}
-		melodyRecycler.apply {
-			visibility = View.GONE
-		}
-		volumeSeekBar.apply {
-			//isIndeterminate = true
+		volumeSlider.apply {
 			onSeekBarChangeListener {}
 		}
 	}

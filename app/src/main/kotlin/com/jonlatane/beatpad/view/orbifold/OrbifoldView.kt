@@ -1,26 +1,24 @@
 package com.jonlatane.beatpad.view.orbifold
 
+import BeatClockPaletteConsumer.viewModel
 import android.content.Context
-import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
-import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.harmony.Orbit
-import com.jonlatane.beatpad.model.harmony.Orbifold
-import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.model.harmony.chord.Maj13
-import com.jonlatane.beatpad.model.harmony.chord.Maj7
-import com.jonlatane.beatpad.model.harmony.chordsequence.Chromatic
+import com.jonlatane.beatpad.model.Part
+import com.jonlatane.beatpad.model.orbifold.Orbifold
+import com.jonlatane.beatpad.model.orbifold.Orbit
+import com.jonlatane.beatpad.model.chord.Chord
+import com.jonlatane.beatpad.model.chord.Maj13
+import com.jonlatane.beatpad.model.orbifold.orbit.Chromatic
+import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.showOrbifoldPicker
 import com.jonlatane.beatpad.util.color
-import com.jonlatane.beatpad.util.hide
 import com.jonlatane.beatpad.util.isHidden
-import com.jonlatane.beatpad.util.show
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import org.jetbrains.anko.*
@@ -33,17 +31,6 @@ class OrbifoldView @JvmOverloads constructor(
   attrs: AttributeSet? = null,
   defStyle: Int = 0
 ) : HideableRelativeLayout(context) {
-  /*inline fun <T : View> T.lparams(
-    width: Int = android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
-    height: Int = android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
-    init: RelativeLayout.LayoutParams.() -> Unit
-  ): T {
-    val layoutParams = RelativeLayout.LayoutParams(width, height)
-    layoutParams.init()
-    this@lparams.layoutParams = layoutParams
-    return this
-  }*/
-
   var onChordChangedListener: ((Chord) -> Unit)? by observable<((Chord) -> Unit)?>(null) { _, _, listener ->
     listener?.invoke(chord)
   }
@@ -55,7 +42,7 @@ class OrbifoldView @JvmOverloads constructor(
       animateTo(InitialState)
     } else {
       updateChordText()
-      post { animateTo(SelectionState) }
+      post { conditionallyAnimateToSelectionState() }
     }
     onChordChangedListener?.invoke(chord)
   }
@@ -70,6 +57,7 @@ class OrbifoldView @JvmOverloads constructor(
   }
   var keyboard: KeyboardView? = null
   internal val customButton: Button
+  internal val slashButton: Button
   internal val modeButton: Button
   internal var centralChord: TextView
   internal lateinit var centralChordBackground: View
@@ -80,8 +68,27 @@ class OrbifoldView @JvmOverloads constructor(
   internal lateinit var halfStepBackground: View
   internal var selectedChord: TextView? = null
   internal var sequences: MutableList<SequenceViews> = ArrayList()
+  private var drumPartBeforeCustomMode: Part? = null
   private var orbifoldBeforeCustomMode: Orbifold? = null
-  private var keyboardWasShowingBeforeCustomMode = false
+  var canEditChords: Boolean = false
+  set(value) {
+    field = value
+    if(value) {
+      listOf(customButton, modeButton/*, slashButton*/).forEach {
+        it.isEnabled = true
+        it.animate().alpha(1f)
+      }
+    } else {
+      //TODO: Make this work with animateTo
+      selectedChord = null
+      animateTo(InitialState)
+      listOf(customButton, modeButton, slashButton).forEach {
+        it.isEnabled = false
+        it.animate().alpha(0f)
+      }
+    }
+  }
+  var keyboardWasShowingBeforeCustomMode: Boolean = true
   var customChordMode: Boolean = false
   set(value) {
     field = value
@@ -90,17 +97,40 @@ class OrbifoldView @JvmOverloads constructor(
       orbifoldBeforeCustomMode = orbifold
       keyboardWasShowingBeforeCustomMode = keyboard?.isHidden == false
       this@OrbifoldView.orbifold = Orbifold.custom
-      keyboard?.show()
+      if(keyboard?.isHidden == true) {
+        keyboard?.show()
+      }
       keyboard?.ioHandler?.onEstablishedChordChanged = { notes ->
         disableNextTransitionAnimation()
         chord = Chord(chord.root, notes.map { it - chord.root }.toIntArray())
       }
+      drumPartBeforeCustomMode = viewModel?.keyboardPart
+        ?.takeIf { (it.instrument as? MIDIInstrument)?.drumTrack == true }
+        ?.also {
+          viewModel?.palette?.parts
+            ?.first { (it.instrument as? MIDIInstrument)?.drumTrack == false }
+            ?.let { firstNonDrumPart ->
+              viewModel?.keyboardPart = firstNonDrumPart
+              viewModel?.keyboardView?.ioHandler?.highlightChord(chord)
+            }
+        }
+
+      viewModel?.backStack?.push {
+        if (customChordMode) {
+          customChordMode = false
+          true
+        } else false
+      }
     } else {
       orbifoldBeforeCustomMode?.let { orbifold = it }
-      orbifoldBeforeCustomMode = null
+      drumPartBeforeCustomMode?.let {
+        viewModel?.keyboardPart = it
+        viewModel?.keyboardView?.ioHandler?.highlightChord(null)
+      }
       if(!keyboardWasShowingBeforeCustomMode) {
         keyboard?.hide()
       }
+      orbifoldBeforeCustomMode = null
       keyboard?.ioHandler?.onEstablishedChordChanged = null
     }
   }
@@ -149,11 +179,12 @@ class OrbifoldView @JvmOverloads constructor(
     post {
       skipTo(InitialState)
       this.orbifold = orbifold
-      animateTo(SelectionState)
     }
-    //val orbifold = this
     modeButton = button {
       text = "Mode"
+      isEnabled = false
+      alpha = 0f
+      typeface = MainApplication.chordTypefaceBold
       onClick {
         showOrbifoldPicker(this@OrbifoldView)
       }
@@ -164,12 +195,29 @@ class OrbifoldView @JvmOverloads constructor(
     }
     customButton = button {
       text = "Custom"
+      isEnabled = false
+      alpha = 0f
+      typeface = MainApplication.chordTypefaceBold
       onClick {
         customChordMode = ! customChordMode
       }
     }.lparams {
       alignParentBottom()
       alignParentLeft()
+      elevation = 1f
+    }
+    slashButton = button {
+      text = "/"
+      textScaleX = 5f
+      isEnabled = false
+      alpha = 0f
+      typeface = MainApplication.chordTypefaceBold
+      onClick {
+        //showOrbifoldPicker(this@OrbifoldView)
+      }
+    }.lparams {
+      alignParentTop()
+      alignParentRight()
       elevation = 1f
     }
 
@@ -180,22 +228,7 @@ class OrbifoldView @JvmOverloads constructor(
     fun TextView.chordify(c: Chord) {
       text = c.name
       val p = arrayOf(paddingLeft, paddingTop, paddingRight, paddingBottom)
-      /*backgroundResource = when {
-        c.isDominant -> R.drawable.orbifold_chord_dominant
-        c.isDiminished -> R.drawable.orbifold_chord_diminished
-        c.isMinor -> R.drawable.orbifold_chord_minor
-        c.isAugmented -> R.drawable.orbifold_chord_augmented
-        c.isMajor -> R.drawable.orbifold_chord_major
-        else -> R.drawable.orbifold_chord
-      }*/
-      textColor = when {
-        c.isDominant   -> color(R.color.dominant)
-        c.isDiminished -> color(R.color.diminished)
-        c.isMinor      -> color(R.color.minor)
-        c.isAugmented  -> color(R.color.augmented)
-        c.isMajor      -> color(R.color.major)
-        else           -> color(android.R.color.white)
-      }
+      textColor = color(colorResourceFor(c))
       setPadding(p[0], p[1], p[2], p[3])
     }
 
@@ -216,6 +249,7 @@ class OrbifoldView @JvmOverloads constructor(
     } as TextView
     return result.apply {
       typeface = MainApplication.chordTypeface
+      textScaleX = 0.9f
     }
   }
 
@@ -272,10 +306,11 @@ class OrbifoldView @JvmOverloads constructor(
 
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
     super.onSizeChanged(w, h, oldw, oldh)
-    post { animateTo(SelectionState) }
+    post { conditionallyAnimateToSelectionState() }
   }
 
   fun onResume() {
+    conditionallyAnimateToSelectionState()
     //animateTo(SelectionState)
   }
 
@@ -283,7 +318,7 @@ class OrbifoldView @JvmOverloads constructor(
     if (!containsSequence(sequence)) {
       sequences.add(index, SequenceViews(sequence))
       updateChordText()
-      post { animateTo(SelectionState) }
+      post { conditionallyAnimateToSelectionState() }
     }
   }
 
@@ -297,7 +332,7 @@ class OrbifoldView @JvmOverloads constructor(
         animateViewOut(views.connectForward)
         animateViewOut(views.connectBack)
         sequences.removeAt(index)
-        animateTo(SelectionState)
+        conditionallyAnimateToSelectionState()
         break
       }
     }
@@ -324,7 +359,22 @@ class OrbifoldView @JvmOverloads constructor(
 
   fun skipTo(state: NavigationState) = state.skipTo(this)
   fun animateTo(state: NavigationState) = state.animateTo(this)
+  fun conditionallyAnimateToSelectionState() {
+    if(canEditChords) animateTo(SelectionState)
+    else animateTo(InitialState)
+  }
   fun disableNextTransitionAnimation() {
     selectedChord = null
+  }
+
+  companion object {
+    fun colorResourceFor(c: Chord) = when {
+      c.isDominant   -> R.color.dominant
+      c.isDiminished -> R.color.diminished
+      c.isMinor      -> R.color.minor
+      c.isAugmented  -> R.color.augmented
+      c.isMajor      -> R.color.major
+      else           -> android.R.color.white
+    }
   }
 }

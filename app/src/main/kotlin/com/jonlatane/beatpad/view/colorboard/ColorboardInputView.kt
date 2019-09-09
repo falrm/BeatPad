@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.util.SparseArray
 import android.util.SparseIntArray
 import android.view.MotionEvent
+import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.model.Instrument
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.HideableView
@@ -19,7 +20,15 @@ class ColorboardInputView @JvmOverloads constructor(
 	defStyle: Int = 0
 ) : BaseColorboardView(context, attrs, defStyle), HideableView {
 	override var initialHeight: Int? = null
-	var instrument by observable<Instrument>(MIDIInstrument()) { _, old, _ -> old.stop() }
+	override var initialWidth: Int? = null
+	override var initialTopMargin: Int? = null
+	override var initialBottomMargin: Int? = null
+	override var initialLeftMargin: Int? = null
+	override var initialRightMargin: Int? = null
+	var instrument by observable<Instrument>(MIDIInstrument()) { _, old, _ ->
+		old.stop()
+		AndroidMidi.flushSendStream()
+	}
 	private val density = context.resources.displayMetrics.density
 	private var activePointers: SparseArray<PointF> = SparseArray()
 	private var pointerTones = SparseIntArray()
@@ -69,9 +78,11 @@ class ColorboardInputView @JvmOverloads constructor(
 				pointerVelocities.put(pointerId, velocity)
 				info("playing $tone with velocity $velocity")
 				instrument.play(tone, velocity)
+				AndroidMidi.flushSendStream()
 			}
 			MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> {
 				instrument.stop(pointerTones.get(pointerId))
+				AndroidMidi.flushSendStream()
 				activePointers.remove(pointerId)
 			}
 		}

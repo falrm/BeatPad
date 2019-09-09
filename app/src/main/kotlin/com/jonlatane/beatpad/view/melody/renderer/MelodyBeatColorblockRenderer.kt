@@ -2,104 +2,114 @@ package com.jonlatane.beatpad.view.melody.renderer
 
 import BeatClockPaletteConsumer
 import android.graphics.Canvas
-import android.graphics.Rect
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
-import com.jonlatane.beatpad.output.service.convertPatternIndex
-import com.jonlatane.beatpad.util.size
+import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
-import com.jonlatane.beatpad.view.colorboard.ColorGuide
-import com.jonlatane.beatpad.view.melody.MelodyBeatEventHandlerBase
 import com.jonlatane.beatpad.view.melody.MelodyBeatView
-import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
 
-interface MelodyBeatColorblockRenderer: ColorGuide, MelodyBeatEventHandlerBase {
+interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythmRenderer {
   val colorblockAlpha: Float
-  val viewModel: MelodyViewModel
-  val overallBounds: Rect
   override var chord: Chord
 
-  fun MelodyBeatView.renderColorblockMelodyBeat(canvas: Canvas) {
-    canvas.getClipBounds(overallBounds)
-    bounds.apply {
-      top = overallBounds.top
-      bottom = overallBounds.bottom
-      left = overallBounds.left
-      right = overallBounds.right
-    }
+  fun renderColorblockMelodyBeat(canvas: Canvas) {
+    paint.strokeWidth = 0f
     canvas.renderSteps()
     melody?.let { melody ->
-
-      canvas.drawMelody(
+      val alphaMultiplier = if(viewModel.isMelodyReferenceEnabled) 1f else 2f/3
+      canvas.drawColorblockMelody(
         melody,
-        drawAlpha = 0xAA,
-        drawRhythm = true
+        stepNoteAlpha = (0xAA * colorblockAlpha * alphaMultiplier).toInt(),
+        drawRhythm = true,
+        alphaSource = colorblockAlpha * alphaMultiplier
+      )
+    }
+
+    if(melody == null) {
+      canvas.drawColorblockMelody(
+        oneBeatMelody.apply { subdivisionsPerBeat = harmony.subdivisionsPerBeat},
+        stepNoteAlpha = 0,
+        drawColorGuide = true,
+        alphaSource = colorblockAlpha
       )
     }
 
     BeatClockPaletteConsumer.section?.let { section ->
-      section.melodies.filter { !it.isDisabled }.map { it.melody }.forEach { melody ->
-        canvas.drawMelody(melody, drawAlpha = 66, isBackgroundMelody = true)
+      section.melodies.filter { !it.isDisabled }.filter {
+        when(melody?.limitedToNotesInHarmony) {
+          null -> it.melody.limitedToNotesInHarmony
+          true -> it.melody.limitedToNotesInHarmony
+          false -> !it.melody.limitedToNotesInHarmony
+        }
+      }.map { it.melody }.forEach { otherMelody ->
+        canvas.drawColorblockMelody(
+          otherMelody,
+          stepNoteAlpha = if(melody == null) 255 else 66,
+          drawColorGuide = false,
+          alphaSource = colorblockAlpha
+        )
       }
     }
   }
 
-  fun Canvas.drawMelody(
+  companion object {
+    val oneBeatMelody = PaletteStorage.baseMelody.apply {
+      subdivisionsPerBeat = 1
+      length = 1
+    }
+  }
+
+  fun Canvas.drawColorblockMelody(
     melody: Melody<*>,
-    drawAlpha: Int,
+    stepNoteAlpha: Int,
     drawRhythm: Boolean = false,
-    isBackgroundMelody: Boolean = false
+    drawColorGuide: Boolean = true,
+    alphaSource: Float
   ) {
-    val elementRange: IntRange = elementRangeFor(melody) /*(beatPosition * melody.subdivisionsPerBeat) until
-          Math.min((beatPosition + 1) * melody.subdivisionsPerBeat, melody.length - 1)*/
-    val elementCount = elementRange.size
-    val overallWidth = overallBounds.right - overallBounds.left
-    for((elementIndex, elementPosition) in elementRange.withIndex()) {
-      bounds.apply {
-        left = (overallWidth.toFloat() * elementIndex / elementCount).toInt()
-        right = (overallWidth.toFloat() * (elementIndex+1) / elementCount).toInt()
-      }
-      chord = chordAt(elementPosition)
-        ?: viewModel.paletteViewModel.orbifold.chord
-          ?: MelodyBeatView.DEFAULT_CHORD
-      val isCurrentlyPlayingBeat: Boolean =
-        viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
-          from = BeatClockPaletteConsumer.ticksPerBeat,
-          to = melody
-        ) == elementPosition
+    iterateSubdivisions(melody) { elementPosition ->
       colorGuideAlpha = (when {
-        isBackgroundMelody -> 0
-        melody.limitedToNotesInHarmony -> when {
-          isCurrentlyPlayingBeat -> 255
-          else -> 187
-        }
-        isCurrentlyPlayingBeat -> 119
-        else -> 0
-      } * colorblockAlpha).toInt()
-      if(colorGuideAlpha > 0) drawColorGuide()
-      drawStepNotes(melody, elementPosition, drawAlpha)
-      if(drawRhythm) drawRhythm(melody, elementIndex)
+        !drawColorGuide -> 0
+        isCurrentlyPlayingBeat -> 255
+        isSelectedBeatInHarmony -> 155
+        viewModel.paletteViewModel.harmonyViewModel.isChoosingHarmonyChord
+          && !isSelectedBeatInHarmony -> 69
+        melody.drumPart -> 0
+        else -> 155
+        } * alphaSource).toInt()
+      if(colorGuideAlpha > 0) {
+        drawColorGuide()
+      }
+      drawColorblockNotes(melody, elementPosition, stepNoteAlpha, alphaSource)
+      if(drawRhythm) drawRhythm(melody, elementPosition, alphaSource)
     }
 
+    val overallWidth = overallBounds.right - overallBounds.left
     bounds.apply {
       left = overallWidth
       right = overallWidth
     }
-    if(drawRhythm) drawRhythm(melody, melody.subdivisionsPerBeat)
+    if(drawRhythm) drawRhythm(melody, melody.subdivisionsPerBeat, alphaSource)
   }
 
-  fun Canvas.drawStepNotes(melody: Melody<*>, elementPosition: Int, drawAlpha: Int = 0xAA) {
-    val element: Transposable<*>? = melody.changes[elementPosition]
-    val nextElement: Transposable<*>? = melody.changes[elementPosition]
+
+
+  fun Canvas.drawColorblockNotes(
+    melody: Melody<*>,
+    elementPosition: Int,
+    drawAlpha: Int = 0xAA,
+    alphaSource: Float
+  ) {
+    val element: Transposable<*>? = melody.changes[elementPosition % melody.length]
+    val nextElement: Transposable<*>? = melody.changes[elementPosition % melody.length]
     val isChange = element != null
-    paint.color = (if (isChange) 0xAA212121.toInt() else 0xAA424242.toInt()).withAlpha((colorblockAlpha * drawAlpha).toInt())
+    paint.color = (if (isChange) 0xAA212121.toInt() else 0xAA424242.toInt()).withAlpha((alphaSource * drawAlpha).toInt())
 
     try {
-      val tones: Set<Int> = melody.changeBefore(elementPosition).let {
+      val tones: Set<Int> = element?.let {
         (it as? RationalMelody.Element)?.tones
       } ?: emptySet()
 
@@ -124,23 +134,4 @@ interface MelodyBeatColorblockRenderer: ColorGuide, MelodyBeatEventHandlerBase {
       invalidateDrawingLayer()
     }
   }
-
-  fun Canvas.drawRhythm(melody: Melody<*>, elementIndex: Int) {
-    paint.color = 0xAA212121.toInt().withAlpha((colorblockAlpha * 255).toInt())
-    val halfWidth = if (elementIndex % melody.subdivisionsPerBeat == 0) 5f else 1f
-    drawRect(
-      bounds.left.toFloat() - halfWidth,
-      bounds.top.toFloat(),
-      bounds.left.toFloat() + halfWidth,
-      bounds.bottom.toFloat(),
-      paint
-    )
-  }
-
-
-  fun elementRangeFor(melody: Melody<*>) =
-    (beatPosition * melody.subdivisionsPerBeat) until
-      Math.min((beatPosition + 1) * melody.subdivisionsPerBeat, melody.length)
-
-  fun invalidateDrawingLayer()
 }

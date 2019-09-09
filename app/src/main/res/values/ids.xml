@@ -16,7 +16,8 @@
 -->
 <resources>
 	<item name="bottom_scroller" type="id"/>
-	<item name="melody_toolbar" type="id"/>
+	<item name="melody_editing_toolbar" type="id"/>
+	<item name="melody_reference_toolbar" type="id"/>
 	<item name="left_scroller" type="id"/>
 	<item name="center_v_scroller" type="id"/>
 	<item name="center_h_scroller" type="id"/>
@@ -25,7 +26,6 @@
 	<item name="melody" type="id"/>
 	<item name="harmony" type="id"/>
 	<item name="orbifold_background" type="id"/>
-	<item name="chord_list" type="id"/>
 	<item name="toolbar" type="id"/>
 	<item name="part_list" type="id"/>
 	<item name="keyboard" type="id"/>
@@ -34,5 +34,6 @@
 	<item name="part_patterns" type="id"/>
 	<item name="part_volume" type="id"/>
 	<item name="section_name" type="id"/>
+	<item name="section_drag_handle" type="id"/>
 
 </resources>

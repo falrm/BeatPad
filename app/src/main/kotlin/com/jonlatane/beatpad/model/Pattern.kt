@@ -1,5 +1,7 @@
 package com.jonlatane.beatpad.model
 
+import com.jonlatane.beatpad.model.chord.Chord
+import com.jonlatane.beatpad.model.dsl.Patterns
 import java.util.*
 import kotlin.NoSuchElementException
 
@@ -12,10 +14,10 @@ import kotlin.NoSuchElementException
  * and the value [subdivisionsPerBeat] is much more practical for interfacing with iOS, Android
  * and JavaScript APIs for rendering large collections efficiently.
  */
-interface Pattern<T : Transposable<T>> : Transposable<Pattern<T>> {
+interface Pattern<T : Transposable<T>> : Transposable<Pattern<T>>, Patterns {
   val changes: NavigableMap<Int, T>
-  val subdivisionsPerBeat: Int
-  val length: Int
+  var subdivisionsPerBeat: Int
+  var length: Int
   var tonic: Int
 
   fun beat(beatPosition: Int): NavigableMap<Int, T> = changes.subMap(
@@ -28,7 +30,14 @@ interface Pattern<T : Transposable<T>> : Transposable<Pattern<T>> {
   fun floorKey(position: Int) = changes.floorKey(position) ?: changes.lastKey()
   fun lowerKey(position:Int) = changes.lowerKey(position) ?: changes.lastKey()
 
-  fun changeBefore(position: Int) = changes[floorKey(position)]!!
+  fun changeBefore(position: Int): T = changes[floorKey(position)] ?: changes.firstEntry().value
   fun isChangeAt(position: Int) = changes.containsKey(position)
   fun isSustainAt(position: Int) = !isChangeAt(position)
+
+  fun changeAt(otherChangePosition: Int, otherPattern: Pattern<*>): T {
+    val position = otherChangePosition.convertPatternIndex(otherPattern, this)
+    val result = changeBefore(position)
+    //info("Chord at $elementPosition is $result")
+    return result
+  }
 }

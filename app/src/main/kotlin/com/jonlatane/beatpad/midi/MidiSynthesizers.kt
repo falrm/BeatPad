@@ -11,6 +11,10 @@ import org.jetbrains.anko.error
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.warn
 
+/**
+ * Interface around Android's native MIDI synthesizer support.
+ */
+@RequiresApi(Build.VERSION_CODES.M)
 object MidiSynthesizers: AnkoLogger {
 	private const val maxSendRetries = 1000
 
@@ -18,7 +22,6 @@ object MidiSynthesizers: AnkoLogger {
 	private val outputDevices = mutableMapOf<MidiDeviceInfo, MidiInputPort>()
 	val synthesizers get() = outputDevices.keys
 
-	@RequiresApi(Build.VERSION_CODES.M)
 	internal fun setupSynthesizer(info: MidiDeviceInfo) {
 		val portNumber = info.ports.find {
 			it.type == MidiDeviceInfo.PortInfo.TYPE_INPUT
@@ -42,7 +45,10 @@ object MidiSynthesizers: AnkoLogger {
 	 * "Sending Play ON" section. Send away! Your signals will go to all
 	 * [synthesizers] or you can specify the one it should go to.
 	 */
-	internal fun send(data: ByteArray, device: MidiDeviceInfo? = null) {
+	internal fun send(
+		data: ByteArray,
+		device: MidiDeviceInfo? = null
+	) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			if (device == null) {
 				outputDevices.entries.forEach { (deviceInfo, inputPort) ->

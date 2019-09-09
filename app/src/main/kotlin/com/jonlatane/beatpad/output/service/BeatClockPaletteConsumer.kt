@@ -1,25 +1,35 @@
+//import com.jonlatane.beatpad.output.service.let
+import com.jonlatane.beatpad.MainApplication
+import com.jonlatane.beatpad.R
+import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.model.*
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
+import com.jonlatane.beatpad.model.dsl.Patterns
 import com.jonlatane.beatpad.model.melody.RationalMelody
-import com.jonlatane.beatpad.output.service.convertPatternIndex
-import com.jonlatane.beatpad.output.service.let
+import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.to127Int
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
+import com.jonlatane.beatpad.view.palette.SectionHolder
+import io.multifunctions.letCheckNull
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import org.jetbrains.anko.verbose
-import java.lang.Math.max
 import java.util.*
 import kotlin.math.floor
 import kotlin.properties.Delegates.observable
 
-object BeatClockPaletteConsumer : AnkoLogger {
+/**
+ * A platform-agnostic model for a playback thread that plays back [Section],
+ * [Melody] and [Harmony] data as the end-user would expect.
+ */
+object BeatClockPaletteConsumer : Patterns, AnkoLogger {
   var palette: Palette? = null
   set(value) {
     field = value
     MidiDevices.refreshInstruments()
+    tickPosition = 0
   }
   var viewModel: PaletteViewModel? by observable(null) { _, _, _ ->
 
@@ -28,19 +38,29 @@ object BeatClockPaletteConsumer : AnkoLogger {
   set(value) {
     field = value
     viewModel?.notifySectionChange()
-    MidiDevices.refreshInstruments()
+    //MidiDevices.refreshInstruments()
   }
-  var chord: Chord? = null
+  val currentSectionDrawable: Int get() = palette?.sections
+    ?.indexOf(section)?.let { sectionIndex ->
+      SectionHolder.sectionDrawableResource(sectionIndex)
+    } ?: R.drawable.orbifold_chord
+
+  val currentSectionColor: Int
+    get() = (
+      palette?.sections?.indexOf(section)?.let { SectionHolder.sectionColor(it) }
+        ?: R.color.subDominant
+      ).let { MainApplication.instance.color(it) }
+
+  private var chord: Chord? = null
   val harmony: Harmony? get() = section?.harmony
   private val harmonyPosition: Int?
     get() = harmony?.let { tickPosition.convertPatternIndex(ticksPerBeat, it) }
   private val harmonyChord: Chord?
-    get() = (harmony to harmonyPosition).let { harmony, harmonyPosition ->
+    get() = (harmony to harmonyPosition).letCheckNull { harmony, harmonyPosition ->
       harmony.changeBefore(harmonyPosition)
     }
   var tickPosition: Int = 0 // Always relative to ticksPerBeat
-  var ticksPerBeat = 24 // Mutable so you can use, say, 36, to play beats against
-  // input dotted-quarters
+  const val ticksPerBeat = 24 // MIDI standard is pretty clear about this
 
   private data class Attack(
     var part: Part? = null,
@@ -58,13 +78,10 @@ object BeatClockPaletteConsumer : AnkoLogger {
   private val upcomingAttacks = Vector<Attack>(16)
 
   private fun loadUpcomingAttacks(palette: Palette, section: Section) {
-
-    var currentAttackIndex = 0
     chord = (harmonyChord ?: chord)?.also { chord ->
       viewModel?.orbifold?.post {
         if (
-          section.harmony != null
-          && viewModel?.harmonyViewModel?.isChoosingHarmonyChord != true
+          viewModel?.harmonyViewModel?.isChoosingHarmonyChord != true
           && chord != viewModel?.orbifold?.chord
         ) {
           viewModel?.orbifold?.disableNextTransitionAnimation()
@@ -80,27 +97,16 @@ object BeatClockPaletteConsumer : AnkoLogger {
           && part.melodies.contains(it.melody)
       }.forEach { melodyReference ->
         val melody = melodyReference.melody
-        val attack = attackPool.borrow()
-
-        if (
-          true == (melody as? RationalMelody)
-            ?.populateAttack(part, chord, attack, melodyReference.volume)
-        ) {
-          currentAttackIndex++
-          upcomingAttacks += attack
-        } else {
-          attackPool.recycle(attack)
-        }
+        upcomingAttacks += (melody as? RationalMelody)
+          ?.attacksForCurrentTickPosition(part, chord, melodyReference.volume)
+          ?: emptyList()
       }
     }
   }
 
   fun tick() {
-    (palette to section).let { palette: Palette, section: Section ->
-      val enabledMelodies = section.melodies.map { it.melody }
-      val totalBeats = enabledMelodies
-        .map { it.length.toFloat() / it.subdivisionsPerBeat.toFloat() }
-        .reduce(::max)
+    (palette to section).letCheckNull { palette: Palette, section: Section ->
+      val totalBeats = harmony?.let { it.length.toFloat() / it.subdivisionsPerBeat } ?: 0f
       loadUpcomingAttacks(palette, section)
       for (attack in upcomingAttacks) {
         val instrument = attack.instrument!!
@@ -141,6 +147,7 @@ object BeatClockPaletteConsumer : AnkoLogger {
       }
     }
 
+    AndroidMidi.flushSendStream()
     viewModel?.harmonyView?.post { viewModel?.playbackTick = tickPosition }
   }
 
@@ -162,57 +169,55 @@ object BeatClockPaletteConsumer : AnkoLogger {
   //private fun Melody<*>.
 
   /**
-   * [currentBeat] could be, for instance, 1.2.
-   * That would be be at subdivision 5 (index 4) at 4 subdivisions per beat.
+   * Based on the current [tickPosition], populates the passed [Attack] object.
+   * Returns true if the attack should be played.
    */
-  private fun RationalMelody.populateAttack(
+  private fun RationalMelody.attacksForCurrentTickPosition(
     part: Part,
     chord: Chord?,
-    attack: Attack,
     volume: Float
-  ): Boolean {
-    val offset = chord?.let { offsetUnder(it) } ?: 0
+  ): List<Attack> {
     val currentBeat: Double = tickPosition.toDouble() / ticksPerBeat
     val melodyLength: Double = length.toDouble() / subdivisionsPerBeat
     val positionInMelody: Double = currentBeat % melodyLength
 
     // This candidate for attack is the closest element index to the current tick
-    val indexCandidate = floor(positionInMelody * subdivisionsPerBeat).toInt()
-    val realIndexPosition = indexCandidate.toDouble() / subdivisionsPerBeat
+    val indexCandidates = floor(positionInMelody * subdivisionsPerBeat).toInt().let {
+      listOf(it, it + 1)
+    }
+    val indexHits = indexCandidates.filter { indexCandidate ->
 
-    // Now, is the previous or next tick closer to this element index's real value?
-    fun distance(tickOffset: Double): Double = Math.abs(
-      positionInMelody + (tickOffset / ticksPerBeat) - realIndexPosition
-    )
+      val realIndexPosition = indexCandidate.toDouble() / subdivisionsPerBeat
 
-    val thisTickDistance = distance(0.0)
-    val nextTickDistance = distance(1.0)
-    val previousTickDistance = distance(-1.0)
-    return when {
-      thisTickDistance < nextTickDistance && thisTickDistance < previousTickDistance -> {
-        when {
-          isChangeAt(indexCandidate) -> {
-            val change = changeBefore(indexCandidate)
-            attack.part = part
-            attack.instrument = part.instrument
-            attack.melody = this
-            attack.velocity = change.velocity * volume
+      // Now, is the previous or next tick closer to this element index's real value?
+      fun distance(tickOffset: Double): Double = Math.abs(
+        positionInMelody + (tickOffset / ticksPerBeat) - realIndexPosition
+      )
 
-            change.tones.forEach { tone ->
-              val chosenTone = if(limitedToNotesInHarmony) {
-                val transposedTone = tone + offset
-                chord?.closestTone(transposedTone)
-                  ?: transposedTone
-              } else tone
-              attack.chosenTones.add(chosenTone)
-            }
+      val thisTickDistance = distance(0.0)
+      val nextTickDistance = distance(1.0)
+      val previousTickDistance = distance(-1.0)
+      thisTickDistance <= nextTickDistance && thisTickDistance < previousTickDistance
+    }
 
-            true
+    return indexHits.mapNotNull {
+      val attack = attackPool.borrow()
+      when {
+        isChangeAt(it % length) -> {
+          val change = changeBefore(it % length)
+          attack.part = part
+          attack.instrument = part.instrument
+          attack.melody = this
+          attack.velocity = change.velocity * volume
+
+          change.tones.forEach { tone ->
+            val playbackTone =  chord?.let { chord -> playbackToneUnder(tone, chord) } ?: tone
+            attack.chosenTones.add(playbackTone)
           }
-          else -> false
+          attack
         }
+        else -> null
       }
-      else -> false
     }
   }
 }

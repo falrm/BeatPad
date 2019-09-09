@@ -18,7 +18,7 @@ class PartListView(
 		val orientation = LinearLayoutManager.HORIZONTAL
 		backgroundColor = context.color(R.color.colorPrimaryDark)
 		layoutManager = LinearLayoutManager(context, orientation, false).apply {
-			isItemPrefetchEnabled = false
+			//isItemPrefetchEnabled = false
 		}
 		overScrollMode = View.OVER_SCROLL_NEVER
 		adapter = PartListAdapter(viewModel, this)

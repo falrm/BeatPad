@@ -7,11 +7,23 @@ import org.jetbrains.anko.info
 
 interface MelodyBeatRenderer: MelodyBeatColorblockRenderer, MelodyBeatNotationRenderer, AnkoLogger {
   fun MelodyBeatView.renderMelodyBeat(canvas: Canvas) {
+    canvas.getClipBounds(overallBounds)
     if(colorblockAlpha > 0f) {
+      setupBaseBounds()
       renderColorblockMelodyBeat(canvas)
     }
     if(notationAlpha > 0f) {
+      setupBaseBounds()
       renderNotationMelodyBeat(canvas)
+    }
+  }
+
+  fun setupBaseBounds() {
+    bounds.apply {
+      top = overallBounds.top
+      bottom = overallBounds.bottom
+      left = overallBounds.left
+      right = overallBounds.right
     }
   }
 }

@@ -1,8 +1,8 @@
 package com.jonlatane.beatpad.model
 
-import com.jonlatane.beatpad.model.harmony.Orbifold
-import com.jonlatane.beatpad.model.harmony.chord.Chord
-import com.jonlatane.beatpad.model.harmony.chord.Maj7
+import com.jonlatane.beatpad.model.orbifold.Orbifold
+import com.jonlatane.beatpad.model.chord.Chord
+import com.jonlatane.beatpad.model.chord.Maj7
 import java.util.*
 
 /**

@@ -4,12 +4,14 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.sensors.Orientation
 import kotlinx.io.pool.DefaultPool
 import java.util.*
 
 interface CanvasToneDrawer : AlphaDrawer {
+  fun dip(value: Float): Int
+  fun dip(value: Int): Int
   val showSteps: Boolean
   val chord: Chord
 
@@ -17,7 +19,7 @@ interface CanvasToneDrawer : AlphaDrawer {
   fun Canvas.renderSteps() {
     paint.color = color(R.color.colorPrimaryDark)
     if (showSteps) {
-      val halfStepWidth: Float = axisLength / halfStepsOnScreen
+      //val halfStepWidth: Float = axisLength / halfStepsOnScreen
       var linePosition = startPoint - 12 * halfStepWidth
       while (linePosition < axisLength) {
         if (renderVertically) {
@@ -55,9 +57,9 @@ interface CanvasToneDrawer : AlphaDrawer {
       override fun produceInstance() = VisiblePitch()
     }
 
-    private val visiblePitchListPool: DefaultPool<Vector<VisiblePitch>> = object : DefaultPool<Vector<VisiblePitch>>(16) {
-      override fun produceInstance() = Vector<VisiblePitch>(16)
-      override fun validateInstance(instance: Vector<VisiblePitch>) {
+    private val visiblePitchListPool: DefaultPool<MutableList<VisiblePitch>> = object : DefaultPool<MutableList<VisiblePitch>>(16) {
+      override fun produceInstance() = Collections.synchronizedList(mutableListOf<VisiblePitch>())
+      override fun validateInstance(instance: MutableList<VisiblePitch>) {
         super.validateInstance(instance)
         instance.clear()
       }

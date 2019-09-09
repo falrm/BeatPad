@@ -24,11 +24,14 @@ object MidiDevices : AnkoLogger {
 		Handler(looper)
 	}
 
-	fun refreshInstruments() = BeatClockPaletteConsumer.palette?.parts
-		?.mapNotNull { it.instrument as? MIDIInstrument }
-		?.forEach {
-			it.sendSelectInstrument()
-		} ?: Unit
+	fun refreshInstruments(){
+		BeatClockPaletteConsumer.palette?.parts
+			?.mapNotNull { it.instrument as? MIDIInstrument }
+			?.forEach {
+				it.sendSelectInstrument()
+			} ?: Unit
+		AndroidMidi.flushSendStream()
+	}
 
 	@RequiresApi(Build.VERSION_CODES.M)
 	fun initialize(context: Context) {
@@ -66,13 +69,9 @@ object MidiDevices : AnkoLogger {
 		// Again, kinda weirdly, we'll be using input ports to set up output devices
 		if (info.inputPortCount > 0) {
 			MidiSynthesizers.setupSynthesizer(info)
-		} else {
-			MainApplication.instance.toast("${info.name} doesn't support MIDI input :(")
 		}
 		if (info.outputPortCount > 0) {
-			//MidiControllers.setupController(info)
-		} else {
-			MainApplication.instance.toast("${info.name} doesn't support MIDI output :(")
+			MidiControllers.setupController(info)
 		}
 	}
 

@@ -13,7 +13,7 @@ object InitialState : NavigationState {
    * Animates to the initial state with the target
    */
   override fun animateTo(v: OrbifoldView) {
-    val target = v.selectedChord ?: return
+    val target = v.selectedChord ?: return animateToUntargeted(v)
     val tX = target.translationX
     val tY = target.translationY
     val toTargetChord = mutableListOf<ViewPropertyAnimator>()
@@ -41,7 +41,7 @@ object InitialState : NavigationState {
         )
       }
     }
-    if (v.selectedChord !== v.halfStepDown && v.selectedChord !== v.halfStepUp) {
+    if (target !== v.halfStepDown && target !== v.halfStepUp) {
       v.halfStepBackground.animateHeight(5, ANIMATION_DURATION)
     }
     for (sv in v.sequences) {
@@ -58,7 +58,52 @@ object InitialState : NavigationState {
     afterAll(toTargetChord, ANIMATION_DURATION) {
       v.updateChordText()
       v.skipTo(InitialState)
-      v.post { v.animateTo(SelectionState) }
+      v.post { v.conditionallyAnimateToSelectionState() }
+    }
+  }
+
+  private fun animateToUntargeted(v: OrbifoldView) {
+    v.centralChord.animate()
+      .scale(CENTRAL_CHORD_SCALE)
+      .translationXY(0f)
+      .rotation(0f)
+      .alpha(1f)
+    for (halfStep in arrayOf(v.halfStepUp, v.halfStepDown)) {
+      halfStep.clearAnimation()
+      halfStep.animate()
+        .scale(HALF_STEP_SCALE)
+        .translationXY(0f)
+        .rotation(0f)
+        .alpha(1f)
+      halfStep.elevation = v.halfStepChordElevation
+    }
+    v.halfStepUp.animate().translationZ(0f)
+    v.halfStepDown.animate().translationZ(0f)
+    v.halfStepBackground.animateHeight(5)
+    listOf(v.centralChordTouchPoint, v.centralChordThrobber, v.centralChordBackground).forEach {
+      it.animateWidth(
+        width = v.centralChord.scaledWidth,
+        duration = ANIMATION_DURATION
+      )
+    }
+    for (sv in v.sequences) {
+      if (sv.forward === v.selectedChord || sv.back === v.selectedChord) {
+        skipToSelectionPhase(v, sv)
+      } else {
+        for (chord in arrayOf(sv.forward, sv.back, sv.axis)) {
+          chord.animate()
+            .scale(1f)
+            .translationXY(0f, 0f)
+            .alpha(0f)
+        }
+        sv.axis.layoutWidth = 1
+        for (connector in arrayOf(sv.connectBack, sv.connectForward)) {
+          connector.animate()
+            .translationZ(0f)
+            .translationXY(0f, 0f)
+            .rotation(0f)
+        }
+      }
     }
   }
 
@@ -85,6 +130,7 @@ object InitialState : NavigationState {
     }
     v.halfStepUp.translationZ = 0f
     v.halfStepDown.translationZ = 0f
+    v.halfStepBackground.layoutHeight = 5
     for (sv in v.sequences) {
       if (sv.forward === v.selectedChord || sv.back === v.selectedChord) {
         skipToSelectionPhase(v, sv)

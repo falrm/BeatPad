@@ -1,13 +1,15 @@
 package com.jonlatane.beatpad.storage
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.jonlatane.beatpad.model.*
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 
 object AppObjectMapper : ObjectMapper() {
 	init {
+		configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 		val module = SimpleModule().apply {
       //addSerializer(Harmony::class.java, HarmonyStorage.Serializer)
       //addDeserializer(Harmony::class.java, HarmonyStorage.Deserializer)
@@ -33,8 +35,4 @@ object AppObjectMapper : ObjectMapper() {
 		registerModule(module)
 		registerKotlinModule()
 	}
-
-
-	val writer get() = writerWithDefaultPrettyPrinter()
-	val reader get() = reader()
 }

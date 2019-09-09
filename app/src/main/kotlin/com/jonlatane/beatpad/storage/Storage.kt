@@ -1,110 +1,215 @@
 package com.jonlatane.beatpad.storage
 
+
 import android.content.Context
-import android.util.Log
-import com.jonlatane.beatpad.midi.GM1Effects
+import com.jonlatane.beatpad.MainApplication
+import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Palette
-import com.jonlatane.beatpad.storage.AppObjectMapper.writer
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.error
-import org.jetbrains.anko.info
-import org.jetbrains.anko.verbose
+import com.jonlatane.beatpad.util.booleanPref
+import com.jonlatane.beatpad.util.stringPref
+import com.jonlatane.beatpad.view.palette.filemanagement.PresetPalettes
+import net.iharder.Base64
+import org.jetbrains.anko.*
 import java.io.*
 import java.io.File.separator
+import java.net.URI
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
+import kotlin.reflect.KClass
 
-interface Storage: AnkoLogger {
-	fun Context.loadPalette(filename:String = openPaletteFileName) = loadPalette(this, filename)
-	fun Context.storePalette(palette: Palette, filename:String = openPaletteFileName)
-	  = storePalette(palette, this, filename)
 
-  companion object: AnkoLogger {
-		private const val paletteDir = "palettes"
-		private const val melodyDir = "melodies"
-		private const val harmonyDir = "harmonies"
-		private const val openPaletteFileName = "palette.json"
+interface Storage : AnkoLogger {
+  val storageContext: Context
+  val Context.paletteDir: String get() = "$filesDir$separator$basePaletteDir"
+  val Context.melodyDir: String get() = "$filesDir$separator$baseMelodyDir"
+  val Context.harmonyDir: String get() = "$filesDir$separator$baseHarmonyDir"
 
-		private fun createDir(name: String, context: Context) {
-			val dir = context.filesDir
-			val dir2 = File(dir, name)
-			dir2.mkdirs()
-		}
+  companion object : Storage, AnkoLogger {
+    override val storageContext get() = MainApplication.instance
+    private const val basePaletteDir = "palettes"
+    private const val baseMelodyDir = "melodies"
+    private const val baseHarmonyDir = "harmonies"
+    var startWithPresetPalette by booleanPref("startWithPresetPalette", true)
+    var openPaletteFile: String by stringPref("openPaletteFile", "palette")
+    private val openPaletteFileName get() = "$openPaletteFile.json"
 
-		fun getPalettes(context: Context): List<File> {
-			createDir(paletteDir, context)
-			return File("${context.filesDir}$separator$paletteDir").listFiles()
-				.filter { it.name.endsWith("~") }
-				//.map { it.name }
-		}
+    fun getPalettes(context: Context): List<File> {
+      File(context.paletteDir).mkdirs()
+      return (File(context.paletteDir).listFiles() ?: emptyArray())
+        .toList()
+        .filter { it.name.endsWith(".json") }
+      //.map { it.name }
+    }
 
-		fun storePalette(palette: Palette, context: Context, filename:String = openPaletteFileName) = try {
-			createDir(paletteDir, context)
-      FileOutputStream(
-        File("${context.filesDir}$separator$paletteDir$separator$filename").apply { createNewFile() }
-      ).use { fileOutputStream ->
-			//context.openFileOutput("$paletteDir$separator$filename", Context.MODE_PRIVATE).use { fileOutputStream ->
-				writer.writeValue(fileOutputStream, palette)
-			}
-			info {
-				"Stored palette: ${stringify(palette)}"
-			}
-		} catch (e: IOException) {
-			error("File send failed: ", e)
-		}
+    private fun storePalette(palette: Palette, context: Context, file: File) = try {
+      File(context.paletteDir).mkdirs()
+      FileOutputStream(file.apply { createNewFile() }).use { fileOutputStream ->
+        //storageContext.openFileOutput("$paletteDir$separator$filename", Context.MODE_PRIVATE).use { fileOutputStream ->
+        AppObjectMapper.writeValue(fileOutputStream, palette)
+      }
+      info {
+        "Stored palette: ${stringify(palette, pretty = true)}"
+      }
+    } catch (e: IOException) {
+      error("File send failed: ", e)
+    }
 
-		fun loadPalette(context: Context, filename:String = openPaletteFileName): Palette = try {
-			createDir(paletteDir, context)
-      val palette = FileInputStream(
-        File("${context.filesDir}$separator$paletteDir$separator$filename")
-      ).use { fileInputStream ->
-      //val palette = context.openFileInput("$paletteDir$separator$filename").use { fileInputStream ->
-				AppObjectMapper.readValue(fileInputStream, Palette::class.java)
-			}
-			info {
-				"Loaded palette: ${stringify(palette)}"
-			}
-			palette
-		} catch (t: Throwable) {
-			error("Failed to load stored palette", t)
-			//temporary: fallback to not the palettes directory
-			try {
-				val palette = context.openFileInput(filename).use { fileInputStream ->
-					AppObjectMapper.readValue(fileInputStream, Palette::class.java)
-				}
-				info {
-					"Loaded palette: ${stringify(palette)}"
-				}
-				palette
-			} catch (t: Throwable) {
-				error("Failed to load stored palette", t)
-				PaletteStorage.basePalette
-			}
-		}
+    private fun loadPalette(context: Context, file: File): Palette {
+      File(context.paletteDir).mkdirs()
+      val palette = FileInputStream(file).use { fileInputStream ->
+        //val palette = storageContext.openFileInput("$paletteDir$separator$filename").use { fileInputStream ->
+        AppObjectMapper.readValue(fileInputStream, Palette::class.java)
+      }
+//      info {
+//        "Loaded palette: ${stringify(palette)}"
+//      }
+      return palette
+    }
 
-		fun storeGM1InstrumentSelection(instrument: Int, context: Context) = try {
-			val currentChoices = loadGM1InstrumentRecents(context)
-			val newVersion = (currentChoices - instrument).toMutableList().apply {
-				add(0, instrument)
-			}
-			val outputStreamWriter = OutputStreamWriter(context.openFileOutput("gm1_choices.json", Context.MODE_PRIVATE))
-			val json = stringify(newVersion)
-			info("Stored GM1 instrument choices: $json")
-			outputStreamWriter.write(json)
-			outputStreamWriter.close()
-		} catch (e: IOException) {
-			error("File send failed: " + e.toString())
-		}
+    fun stringify(o: Any, pretty: Boolean = false): String = if (pretty)
+      AppObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(o)
+    else
+      AppObjectMapper.writeValueAsString(o)
+  }
 
-		fun loadGM1InstrumentRecents(context: Context): List<Int> = try {
-			val json: String = InputStreamReader(context.openFileInput("gm1_choices.json")).use { it.readText() }
-			info("Loaded GM1 instrument choices: $json")
-			val data = AppObjectMapper.readValue(json, IntArray::class.java).toList()
-			data
-		} catch (t: Throwable) {
-			//error("Failed to load stored palette", t)
-			GM1Effects.MIDI_INSTRUMENT_NAMES.indices.toList()
-		}
+  val File.newTmpVersion get() = File("$path.tmp")
+  val File.backup: File get() = File("$path.backup")
 
-		fun stringify(o: Any) = writer.writeValueAsString(o)
-	}
+  fun Context.loadPalette(
+    file: File,
+    fallbackToBackup: Boolean = true
+  ): Palette? = try {
+    loadPalette(this, file)
+  } catch (t: Throwable) {
+    if(!startWithPresetPalette) {
+      error("Failed to load palette data", t)
+    }
+    if (fallbackToBackup) {
+      if(!startWithPresetPalette) {
+        toast("Failed to load data, attempting to load backup...")
+      }
+      try {
+        loadPalette(this, file.backup)
+      } catch (t: Throwable) {
+        if(startWithPresetPalette) {
+          val preset = PresetPalettes.values().random()
+          toast("Welcome! Starting you off with ${preset.title}.")
+          openPaletteFile = preset.title
+          startWithPresetPalette = false
+          preset.palette
+        } else {
+          error("Failed to load any palette data, starting from scratch...", t)
+          toast("Failed to load data from backup, starting from scratch...")
+          null
+        }
+      }
+    } else null
+  }
+
+  fun Context.loadPalette(
+    filename: String = openPaletteFileName,
+    fallbackToBackup: Boolean = true
+  ): Palette? = loadPalette(
+    File("$paletteDir$separator$filename"),
+    fallbackToBackup
+  )
+
+  fun Context.storePalette(
+    palette: Palette = BeatClockPaletteConsumer.palette!!,
+    filename: String = openPaletteFileName,
+    showSuccessToast: Boolean = false
+  ) = storePalette(
+    palette,
+    File("$paletteDir$separator$filename"),
+    showSuccessToast
+  )
+
+  fun Context.storePalette(
+    palette: Palette,
+    file: File,
+    showSuccessToast: Boolean = false
+  ) = doAsync {
+    val tmpFile = file.newTmpVersion
+    val backupFile = file.backup
+
+    var success = false
+    var retriesRemaining = 5
+    while (!success && retriesRemaining > 0) {
+      try {
+        tmpFile.delete()
+      } catch (_: Throwable) {
+      }
+      try {
+        storePalette(palette, this.weakRef.get()!!, tmpFile)
+        success = loadPalette(tmpFile, false) != null
+        try {
+          backupFile.delete()
+        } catch (_: Throwable) {
+        }
+        try {
+          file.renameTo(backupFile) || TODO("Rename returned false")
+        } catch (t: Throwable) {
+          warn(t)
+        }
+        try {
+          tmpFile.renameTo(file) || TODO("Rename returned false")
+        } catch (t: Throwable) {
+          error(t); throw t
+        }
+      } catch (t: Throwable) {
+        error(t)
+      }
+      retriesRemaining--
+    }
+
+    if (!success) {
+      uiThread { toast("Failed to save palette!") }
+    } else if(showSuccessToast) {
+      uiThread { toast("Saved Palette!") }
+    }
+  }
+
+  fun Palette.toURI(): URI = toURI("palette")
+  fun Harmony.toURI(): URI = toURI("harmony")
+  fun Melody<*>.toURI(): URI = toURI("melody")
+
+  /**
+   * @return [null] if the schema isn't a valid BeatScratch schema; otherwise will either
+   * successfully decode the entity or throw an exception.
+   */
+  fun <T : Any> URI.toEntity(entity: String, entityVersion: String, klass: KClass<out T>): T? {
+    // Validate the schema
+    when (scheme) {
+      "beatscratch" -> {
+        if (host != entity || path != "/$entityVersion") return null
+      }
+      "https"       -> {
+        if (
+          !listOf("beatscratch.io", "api.beatscratch.io").contains(host)
+          || path != "/$entity/$entityVersion"
+        ) return null
+      }
+      else          -> return null
+    }
+    // Read the entity
+    val bytes = Base64.decode(query)
+    return ZipInputStream(ByteArrayInputStream(bytes)).use { zipInputStream ->
+      zipInputStream.nextEntry
+      AppObjectMapper.readValue(zipInputStream, klass.java)
+    }
+  }
+
+  fun Any.toURI(entity: String, entityVersion: String = "v1"): URI {
+    val bytes = ByteArrayOutputStream().use { bytes ->
+      ZipOutputStream(bytes).use { out ->
+        out.putNextEntry(ZipEntry("object.json"))
+        AppObjectMapper.writer().writeValue(out, this)
+      }
+      bytes.toByteArray()
+    }
+    val encodedString = Base64.encodeBytes(bytes)
+    return URI("https://api.beatscratch.io/$entity/$entityVersion?$encodedString")
+  }
 }

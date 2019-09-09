@@ -1,8 +1,7 @@
 package com.jonlatane.beatpad.model.melody
 
 import com.jonlatane.beatpad.model.Melody
-import com.jonlatane.beatpad.model.Transposable
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.util.between01
 import com.jonlatane.beatpad.util.mod12
 import java.util.*
@@ -12,10 +11,12 @@ data class RationalMelody(
   /** A value of 4 would indicate sixteenth notes in 4/4 time */
   override var subdivisionsPerBeat: Int = 1,
   override var limitedToNotesInHarmony : Boolean = true,
+  override var drumPart : Boolean = !limitedToNotesInHarmony,
   override var shouldConformWithHarmony: Boolean = false,
   override var tonic: Int = 0,
   override var length: Int = 1,
-  override var id: UUID = UUID.randomUUID()
+  override var id: UUID = UUID.randomUUID(),
+  override var relatedMelodies: MutableSet<UUID> = mutableSetOf()
 ) : Melody<RationalMelody.Element> {
   data class Element(
     var tones: MutableSet<Int> = mutableSetOf(),

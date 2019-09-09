@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.view.MenuItem
 import com.jonlatane.beatpad.model.Instrument
-import com.jonlatane.beatpad.model.harmony.chord.Chord
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.view.keyboard.KeyboardIOHandler
 import kotlinx.android.synthetic.main.activity_instrument.*
@@ -85,10 +85,10 @@ class InstrumentActivity : OldBaseActivity(), AnkoLogger {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.color_instrument -> (colorboard.instrument as? MIDIInstrument)?.let {
-                showInstrumentPicker(it, this)
+                showInstrumentPicker2(it, this)
             }
             R.id.keyboard_instrument -> (keyboardInstrument as? MIDIInstrument)?.let {
-                showInstrumentPicker(it, this)
+                showInstrumentPicker2(it, this)
             }
             R.id.choose_conductor -> showConductorPicker(this)
         }

@@ -15,7 +15,12 @@ class MelodyToneAxis @JvmOverloads constructor(
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
 ) : BaseColorboardView(context, attrs, defStyle), HideableView, AnkoLogger {
-	override var initialHeight: Int? = 1
+	override var initialHeight: Int? = null
+	override var initialWidth: Int? = null
+	override var initialTopMargin: Int? = null
+	override var initialBottomMargin: Int? = null
+	override var initialLeftMargin: Int? = null
+	override var initialRightMargin: Int? = null
 	override val renderVertically = true
 	override val halfStepsOnScreen = 88f
 	override var colorGuideAlpha = 100

@@ -1,0 +1,16 @@
+<inset
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:drawable="@drawable/launcher_icon_foreground"
+  android:insetBottom="6.96dp"
+  android:insetLeft="4.8dp"
+  android:insetRight="4.8dp"
+  android:insetTop="2.64dp"
+  />
+<!--<inset-->
+  <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+  <!--android:drawable="@drawable/beatscratch_icon"-->
+  <!--android:insetBottom="29%"-->
+  <!--android:insetLeft="20%"-->
+  <!--android:insetRight="20%"-->
+  <!--android:insetTop="11%"-->
+  <!--/>-->

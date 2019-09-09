@@ -4,6 +4,9 @@ import android.app.Application
 import android.graphics.Typeface
 import android.os.Build
 import com.jonlatane.beatpad.midi.MidiDevices
+import com.jonlatane.beatpad.model.Harmony
+import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.sensors.Orientation
 import com.jonlatane.beatpad.sensors.ShakeDetector
 
@@ -19,15 +22,22 @@ class MainApplication : Application() {
   }
 
   companion object {
+    var intentMelody: Melody<*>? = null
+    var intentHarmony: Harmony? = null
+    var intentPalette: Palette? = null
     lateinit var instance: MainApplication
       private set
 
     val chordTypeface by lazy {
-      Typeface.createFromAsset(instance.assets, "font/gilroy_regular.otf")
+      Typeface.createFromAsset(instance.assets, "font/vulf_sans_light.otf")
+    }
+
+    val chordTypefaceRegular by lazy {
+      Typeface.createFromAsset(instance.assets, "font/vulf_sans_regular.otf")
     }
 
     val chordTypefaceBold by lazy {
-      Typeface.createFromAsset(instance.assets, "font/gilroy_bold.otf")
+      Typeface.createFromAsset(instance.assets, "font/vulf_sans_medium.otf")
     }
   }
 }
