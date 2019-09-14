@@ -1,15 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-       android:shape="rectangle">
-  <!--this is to give gradient effect -->
-  <gradient   android:angle="270"
-              android:startColor="#FFFFFF"
-              android:endColor="#FFFFFF"
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Button Focused-->
+  <item   android:state_focused="true"
+          android:state_pressed="false"
+          android:drawable="@drawable/toolbar_button_hover_inset"
     />
-  <!-- this is make corners of button rounded -->
-  <corners    android:topLeftRadius="10dip"
-              android:bottomRightRadius="10dip"
-              android:topRightRadius="10dip"
-              android:bottomLeftRadius="10dip"/>
+  <!-- Button Focused Pressed-->
+  <item   android:state_focused="true"
+          android:state_pressed="true"
+          android:drawable="@drawable/toolbar_button_hover_inset"
+    />
+  <!-- Button Pressed-->
+  <item   android:state_focused="false"
+          android:state_pressed="true"
+          android:drawable="@drawable/toolbar_button_hover_inset"
+    />
+  <!-- Button Default Image-->
+  <item   android:drawable="@drawable/toolbar_button_bg_active_inset"/>
 
-</shape>
+</selector>

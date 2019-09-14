@@ -4,6 +4,7 @@ import android.graphics.PointF
 import android.util.SparseArray
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.dsl.Patterns
 import com.jonlatane.beatpad.util.vibrate
@@ -22,7 +23,9 @@ interface MelodyBeatEventHandlerBase: Patterns, AnkoLogger {
    */
   val displayType: MelodyViewModel.DisplayType
   fun getPositionAndElement(x: Float): Pair<Int, Transposable<*>?>?
+  val sectionStartBeatPosition: Int
   val beatPosition: Int
+  val palette: Palette
   val downPointers: SparseArray<PointF>
 	val melody: Melody<*>?
   val harmony: Harmony

@@ -24,6 +24,7 @@ import com.jonlatane.beatpad.util.smartrecycler.viewHolders
 //import com.jonlatane.beatpad.util.show
 import com.jonlatane.beatpad.view.InstrumentConfiguration
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
+import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import com.jonlatane.beatpad.view.palette.PaletteUI
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import com.jonlatane.beatpad.view.palette.PartHolder
@@ -183,7 +184,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
       if (savedInstanceState.getBoolean("melodyOpen", false)) {
         viewModel.melodyView.post {
           viewModel.backStack.push {
-            if (viewModel.melodyViewVisible) {
+            if (viewModel.melodyViewVisible && viewModel.isInEditMode) {
               viewModel.melodyViewVisible = false
               true
             } else false

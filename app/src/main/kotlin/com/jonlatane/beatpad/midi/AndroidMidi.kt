@@ -43,7 +43,6 @@ object AndroidMidi : AnkoLogger {
 		)
 	}
 	fun send(bytes: ByteArray) {
-		info("MIDI send: $bytes")
 		if(sendToInternalSynth) {
 			ONBOARD_DRIVER.write(bytes)
 		}

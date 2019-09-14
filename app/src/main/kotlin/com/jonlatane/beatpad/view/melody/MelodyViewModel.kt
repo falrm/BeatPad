@@ -26,9 +26,9 @@ import kotlin.properties.Delegates.observable
 class MelodyViewModel(
   val paletteViewModel: PaletteViewModel
 ): AnkoLogger {
-	var openedMelody: Melody<*>? by observable<Melody<*>?>(null) { _, _, _ ->
+	val openedMelody: Melody<*>? get() = paletteViewModel.editingMelody/* by observable<Melody<*>?>(null) { _, _, _ ->
 		updateToolbarsAndMelody()
-	}
+	}*/
 	var openedPart: Part? by observable<Part?>(null) { _, _, _ ->
 		updateToolbarsAndMelody()
 	}
@@ -122,9 +122,11 @@ class MelodyViewModel(
 			} else {
 				linearLayout()
 			}
-			melodyReferenceToolbar.layoutTypeButton.imageResource = when(value) {
-				LayoutType.GRID -> R.drawable.grid
-				else -> R.drawable.line
+			listOf(melodyReferenceToolbar.layoutTypeButton, sectionToolbar.layoutTypeButton).forEach {
+				it.imageResource = when(value) {
+					LayoutType.GRID -> R.drawable.grid
+					else -> R.drawable.line
+				}
 			}
 		}
 

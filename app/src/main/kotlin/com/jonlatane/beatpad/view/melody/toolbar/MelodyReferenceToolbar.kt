@@ -68,15 +68,19 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 		setPadding(padding,padding,padding,padding)
 	}.flexStyle()
 
-	private val editButton = imageButton {
-		imageResource = R.drawable.edit_black
-		backgroundResource = R.drawable.toolbar_melody_button
-		padding = dip(10)
-		scaleType = ImageView.ScaleType.FIT_CENTER
-		onClick {
-			if (melodyViewModel.melodyEditingToolbar.isHidden) {
-				melodyViewModel.melodyEditingToolbar.show()
-				melodyViewModel.melodyEditingModifiers.show()
+	var editModeActive: Boolean = false
+	set(value) {
+		val changed = field != value
+		field = value
+		editButton.apply {
+			backgroundResource = if(value) R.drawable.toolbar_melody_button_active
+				else R.drawable.toolbar_melody_button
+			padding = dip(10)
+		}
+		if (value) {
+			melodyViewModel.melodyEditingToolbar.show()
+			melodyViewModel.melodyEditingModifiers.show()
+			melodyViewModel.layoutType = MelodyViewModel.LayoutType.LINEAR
 //				viewModel.backStack.push {
 //					if (!melodyViewModel.melodyEditingToolbar.isHidden) {
 //						melodyViewModel.melodyEditingToolbar.hide()
@@ -84,12 +88,18 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 //						true
 //					} else false
 //				}
-			} else {
-				melodyViewModel.melodyEditingToolbar.hide()
-				melodyViewModel.melodyEditingModifiers.hide()
-			}
-			//			melodyViewModel.openedMelody?.transposeInPlace(-1)
-//			updateMelody()
+		} else {
+			melodyViewModel.melodyEditingToolbar.hide()
+			melodyViewModel.melodyEditingModifiers.hide()
+		}
+	}
+	private val editButton = imageButton {
+		imageResource = R.drawable.edit_black
+		backgroundResource = R.drawable.toolbar_melody_button
+		padding = dip(10)
+		scaleType = ImageView.ScaleType.FIT_CENTER
+		onClick {
+			editModeActive = !editModeActive
 		}
 		onLongClick(returnValue = true) {
 			//			melodyViewModel.openedMelody?.transposeInPlace(-12)

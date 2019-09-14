@@ -165,7 +165,7 @@ class BeatScratchToolbar(
       inactiveModeButton?.backgroundResource = R.drawable.toolbar_button_beatscratch
       inactiveModeButton?.image
         ?.setColorFilter(BeatClockPaletteConsumer.currentSectionColor, PorterDuff.Mode.SRC_IN)
-      activeModeButton?.backgroundResource = R.drawable.toolbar_button_active_instrument
+      activeModeButton?.backgroundResource = R.drawable.toolbar_button_active
       activeModeButton?.image?.colorFilter = null
     }
     viewModeButton.padding = dip(9)

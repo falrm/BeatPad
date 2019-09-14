@@ -1,5 +1,6 @@
 package com.jonlatane.beatpad.midi
 
+import android.media.midi.MidiDevice
 import android.media.midi.MidiDeviceInfo
 import android.media.midi.MidiInputPort
 import android.os.Build
@@ -16,64 +17,35 @@ import org.jetbrains.anko.warn
  */
 @RequiresApi(Build.VERSION_CODES.M)
 object MidiSynthesizers: AnkoLogger {
-	private const val maxSendRetries = 1000
-
-	// Counterintuitively, we will be outputting via devices' input ports...
-	private val outputDevices = mutableMapOf<MidiDeviceInfo, MidiInputPort>()
-	val synthesizers get() = outputDevices.keys
-
-	internal fun setupSynthesizer(info: MidiDeviceInfo) {
-		val portNumber = info.ports.find {
-			it.type == MidiDeviceInfo.PortInfo.TYPE_INPUT
-		}!!.portNumber
-		MidiDevices.manager.openDevice(info, { device ->
-			device?.openInputPort(portNumber)?.let { inputPort ->
-				MainApplication.instance.toast("Connected to ${info.name} input!")
-				outputDevices[info] = inputPort
-				MidiDevices.refreshInstruments()
+	internal fun setupSynthesizer(info: MidiDeviceInfo, device: MidiDevice): MidiInputPort? {
+		return if (info.inputPortCount > 0) {
+			val portNumber = info.ports.find {
+				it.type == MidiDeviceInfo.PortInfo.TYPE_INPUT
+			}!!.portNumber
+			device.openInputPort(portNumber)?.let { inputPort ->
+				inputPort.send(byteArrayOf(123.toByte()), 0, 1) //All notes off
+				MainApplication.instance.toast("Synthesizer ${info.name} connected!")
+				inputPort
 			}
-		}, MidiDevices.handler)
-	}
-
-	@RequiresApi(Build.VERSION_CODES.M)
-	internal fun destroySynthesizer(info: MidiDeviceInfo) {
-		outputDevices.remove(info)
+		} else null
 	}
 
 	/**
 	 * Basically, skip everything in the Google guide required to reach the
 	 * "Sending Play ON" section. Send away! Your signals will go to all
-	 * [synthesizers] or you can specify the one it should go to.
+	 * synthesizers or you can specify the one it should go to.
 	 */
-	internal fun send(
-		data: ByteArray,
-		device: MidiDeviceInfo? = null
-	) {
+	internal fun send(data: ByteArray) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (device == null) {
-				outputDevices.entries.forEach { (deviceInfo, inputPort) ->
-					var port = inputPort
-					var retries = 0
-					var success = false
-					var error: Throwable? = null
-					do {
-						retries++
-						try {
-							port.send(data, 0, data.size)
-							success = true
-						} catch (t: Throwable) {
-							port.close()
-							setupSynthesizer(deviceInfo)
-							port = outputDevices[deviceInfo]!!
-							error = t
-						}
-					} while( !success && retries < maxSendRetries)
-					if(!success) {
-						error("Failed to send midi data", error)
-					}
+			MidiDevices.devices.mapNotNull { it.inputPort }.forEach { port ->
+				var error: Throwable? = null
+				try {
+					port.send(data, 0, data.size)
+				} catch (t: Throwable) {
+					port.close()
+					error("Failed to send midi data", error)
+					error = t
 				}
-			} else {
-				outputDevices[device]?.send(data, 0, data.size)
 			}
 		}
 	}

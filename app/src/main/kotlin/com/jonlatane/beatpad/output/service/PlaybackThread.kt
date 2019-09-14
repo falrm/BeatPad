@@ -28,9 +28,6 @@ internal class PlaybackThread : Thread(), AnkoLogger {
           BeatClockPaletteConsumer.viewModel?.paletteToolbar?.playButton?.imageResource = R.drawable.icons8_play_100
           BeatClockPaletteConsumer.clearActiveAttacks()
           AndroidMidi.flushSendStream()
-          if(MidiSynthesizers.synthesizers.size > 0) {
-
-          }
           synchronized(PlaybackThread) {
             (PlaybackThread as java.lang.Object).wait()
           }

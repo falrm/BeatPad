@@ -44,6 +44,8 @@ class PaletteViewModel constructor(
   }
 
   val interactionMode get() = beatScratchToolbar.interactionMode
+  val isInEditMode get() = interactionMode == BeatScratchToolbar.InteractionMode.EDIT
+  val isInViewMode get() = !isInEditMode
   fun notifyInteractionModeChanged() {
     when(interactionMode) {
       BeatScratchToolbar.InteractionMode.EDIT -> {
@@ -52,6 +54,7 @@ class PaletteViewModel constructor(
           paletteToolbar,
           sectionListRecyclerHorizontalRotator
         ).forEach { it.show() }
+        BeatClockPaletteConsumer.section = BeatClockPaletteConsumer.palette?.sections?.first()
       }
       BeatScratchToolbar.InteractionMode.VIEW -> {
         melodyViewVisible = true
@@ -60,6 +63,9 @@ class PaletteViewModel constructor(
           sectionListRecyclerHorizontalRotator
         ).forEach { it.hide() }
         sectionListRecyclerVerticalRotator.hide(animation = HideAnimation.HORIZONTAL)
+        editingMelody = null
+        BeatClockPaletteConsumer.section = null
+        melodyViewModel.layoutType = MelodyViewModel.LayoutType.GRID
       }
     }
   }
@@ -144,7 +150,7 @@ class PaletteViewModel constructor(
   }
 
   var editingMelody: Melody<*>? by observable<Melody<*>?>(null) { _, old, new ->
-    melodyViewModel.openedMelody = new
+    melodyViewModel.updateToolbarsAndMelody()
     if (new != null && !melodyViewVisible) {
       colorboardView.hide()
       keyboardView.hide()
@@ -152,12 +158,13 @@ class PaletteViewModel constructor(
         .syncPositionTo(melodyViewModel.melodyRecyclerView)
 
       backStack.push {
-        if(melodyViewVisible) {
+        if(melodyViewVisible && isInEditMode) {
           melodyViewVisible = false
           editingMelody = null
           true
         } else false
       }
+      melodyViewModel.melodyReferenceToolbar.apply { editModeActive = editModeActive }
       melodyViewVisible = true
     } else {
       if(old != new) {
@@ -370,7 +377,7 @@ class PaletteViewModel constructor(
         } else false
       }
     }
-    paletteToolbar.orbifoldButton.backgroundResource = R.drawable.toolbar_button_active_instrument
+    paletteToolbar.orbifoldButton.backgroundResource = R.drawable.toolbar_button_active
     paletteToolbar.updateInstrumentButtonPaddings()
     orbifold.conditionallyAnimateToSelectionState()
     orbifold.show(
@@ -405,7 +412,7 @@ class PaletteViewModel constructor(
       } else false
     }
     keyboardView.show(animated)
-    paletteToolbar.keysButton.backgroundResource = R.drawable.toolbar_button_active_instrument
+    paletteToolbar.keysButton.backgroundResource = R.drawable.toolbar_button_active
     paletteToolbar.updateInstrumentButtonPaddings()
 
   }
@@ -425,7 +432,7 @@ class PaletteViewModel constructor(
       } else false
     }
     colorboardView.show(animated)
-    paletteToolbar.colorsButton.backgroundResource = R.drawable.toolbar_button_active_instrument
+    paletteToolbar.colorsButton.backgroundResource = R.drawable.toolbar_button_active
     paletteToolbar.updateInstrumentButtonPaddings()
   }
 

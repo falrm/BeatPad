@@ -29,7 +29,6 @@ class MIDIInstrument constructor(
 	@Transient override val tones: MutableList<Int> = Collections.synchronizedList(mutableListOf<Int>())
 
 	override fun send(data: ByteArray) {
-		info("MIDI send: $data")
 		AndroidMidi.sendStream.write(data)
 	}
 

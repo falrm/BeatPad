@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.melody.RationalMelody
+import com.jonlatane.beatpad.view.melody.MelodyBeatAdapter
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
@@ -91,7 +92,8 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
   val Melody<*>.averageTone
     get() = (this as? RationalMelody)?.changes?.values?.flatMap { it.tones }?.average()
 
-  override val harmony: Harmony get() = viewModel.harmony!!
+  override val harmony: Harmony get() = viewModel.harmony ?:
+    MelodyBeatAdapter.sectionAndStartBeat(palette, beatPosition).first!!.harmony
   val meter: Harmony.Meter get() = harmony.meter
   val isFinalBeat: Boolean get() = (beatPosition + 1) % meter.defaultBeatsPerMeasure == 0
 
