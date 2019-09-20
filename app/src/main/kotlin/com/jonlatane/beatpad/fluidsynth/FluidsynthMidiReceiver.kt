@@ -9,9 +9,11 @@ import fluidsynth.AudioDriver
 import fluidsynth.Settings
 import fluidsynth.SoundFontLoader
 import fluidsynth.Synth
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 
 
-class FluidsynthMidiReceiver constructor (context: Context) : MidiReceiver()
+class FluidsynthMidiReceiver constructor (context: Context) : MidiReceiver(), AnkoLogger
 {
     companion object {
         internal fun Byte.toUnsigned() = if (this < 0) 256 + this else this.toInt()
@@ -27,6 +29,7 @@ class FluidsynthMidiReceiver constructor (context: Context) : MidiReceiver()
         System.setProperty ("jna.nosys", "false") // https://github.com/java-native-access/jna/issues/384#issuecomment-441405266
         AndroidLogger.installAndroidLogger()
 
+        info("loading ApplicationModel")
         var am = ApplicationModel.getInstance(context)
         settings = Settings ()
         settings.getEntry (ConfigurationKeys.SynthThreadSafeApi).setIntValue (0)
@@ -38,6 +41,7 @@ class FluidsynthMidiReceiver constructor (context: Context) : MidiReceiver()
         settings.getEntry (ConfigurationKeys.SynthSampleRate).setDoubleValue (am.sampleRate.toDouble())
         settings.getEntry (ConfigurationKeys.AudioPeriodSize).setIntValue (am.framesPerBuffer)
 
+        info("loading assets")
         // We should be able to use this alternatively, but it still has some issue that callbacks are reset in the middle, more GC pinning is likely required.
         //asset_sfloader = AndroidAssetSoundFontLoader(settings, context.assets)
         asset_sfloader = AndroidNativeAssetSoundFontLoader(settings, context.assets)
@@ -49,13 +53,22 @@ class FluidsynthMidiReceiver constructor (context: Context) : MidiReceiver()
                 else -> return false
             }
         }
+
+
+        info("loading soundfontloader")
         syn.addSoundFontLoader (asset_sfloader)
 
-        for (sf in ApplicationModel.getInstance(context).soundFonts)
-            syn.loadSoundFont (sf, false)
+        info("loading soundfonts")
+        for (sf in ApplicationModel.getInstance(context).soundFonts) {
+            info("loading soundfont $sf")
+            syn.loadSoundFont(sf, true)
+        }
 
+        info("loading audiodriver")
         adriver = AudioDriver (syn.getSettings(), syn)
+        info("resetting synthesizer")
         syn.systemReset()
+        info("initialized!")
     }
 
     fun isDisposed() : Boolean{
@@ -103,7 +116,7 @@ class FluidsynthMidiReceiver constructor (context: Context) : MidiReceiver()
                 0xC0 -> syn.programChange(ch, msg[off].toUnsigned())
                 0xD0 -> syn.channelPressure(ch, msg[off].toUnsigned())
                 0xE0 -> syn.pitchBend(ch, msg[off].toUnsigned() + msg[off + 1].toUnsigned() * 0x80)
-                0xF0 -> syn.sysex(msg.copyOfRange(off, off + c - 1), null)
+                0xF0 -> syn.sysex(msg.copyOfRange(off, off + c), null)
             }
             when (stat and 0xF0) {
                 0xC0,0xD0 -> {

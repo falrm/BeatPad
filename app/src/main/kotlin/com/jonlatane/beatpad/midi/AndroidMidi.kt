@@ -17,9 +17,7 @@ object AndroidMidi : AnkoLogger {
 	internal var isPlayingFromExternalDevice = false
 	internal var lastMidiSyncTime: Long? = null
 	val ONBOARD_DRIVER = MidiDriver()
-	val FLUIDSYNTH by lazy {
-		FluidsynthMidiReceiver(MainApplication.instance)
-	}
+	val FLUIDSYNTH by lazy { FluidsynthMidiReceiver(MainApplication.instance) }
 	private var sendToInternalSynthSetting by booleanPref("sendToInternalSynth", false)
 	private var sendToInternalFluidSynthSetting by booleanPref("sendToInternalFluidSynth", true)
 	private var sendToExternalSynthSetting by booleanPref("sendToExternalSynth", true)
@@ -57,7 +55,7 @@ object AndroidMidi : AnkoLogger {
 		if(sendToInternalSynth) {
 			ONBOARD_DRIVER.write(bytes)
 		}
-		if(sendToInternalFluidSynthSetting) {
+		if(sendToInternalFluidSynth) {
 			FLUIDSYNTH.onSend(bytes, 0, bytes.size, System.currentTimeMillis())
 		}
 		if (

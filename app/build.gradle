@@ -40,6 +40,17 @@ android {
 		multiDexEnabled false
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 	}
+	aaptOptions {
+		noCompress 'sf3'
+	}
+	// FIXME: make it conditional, strip for release builds
+	packagingOptions {
+		doNotStrip "*/arm64-v8a/libfluidsynth*.so"
+		doNotStrip "*/armeabi/libfluidsynth*.so"
+		doNotStrip "*/armeabi-v7a/libfluidsynth*.so"
+		doNotStrip "*/x86/libfluidsynth*.so"
+		doNotStrip "*/x86_64/libfluidsynth*.so"
+	}
 	buildTypes {
 		debug {
 			minifyEnabled false
@@ -118,6 +129,9 @@ dependencies {
 
 	implementation 'com.github.billthefarmer:mididriver:v1.17'
 	implementation 'org.apache.commons:commons-lang3:3.5'
+
+
+	implementation 'net.java.dev.jna:jna:5.2.0@aar'
 	implementation project(path: ':fluidsynthjna')
 	implementation project(path: ':ktmidi')
 

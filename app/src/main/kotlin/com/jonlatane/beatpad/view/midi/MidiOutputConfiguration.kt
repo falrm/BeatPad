@@ -44,7 +44,7 @@ interface MidiOutputConfiguration: BaseConfiguration {
           id = View.generateViewId()
           isChecked = AndroidMidi.sendToInternalFluidSynth
           onCheckedChange { _, isChecked ->
-            AndroidMidi.sendToInternalSynth = isChecked
+            AndroidMidi.sendToInternalFluidSynth = isChecked
             MidiDevices.refreshInstruments()
           }
         }.lparams(wrapContent, wrapContent)
@@ -92,7 +92,7 @@ interface MidiOutputConfiguration: BaseConfiguration {
 
         playToExternalSynthsText = textView {
           id = View.generateViewId()
-          text = "Output to external synths (FluidSynth, MainStage, MIDI keyboards, etc.)"
+          text = "Output to external synths (MainStage, MIDI keyboards, etc.)"
           typeface = MainApplication.chordTypeface
           gravity = Gravity.START
           isClickable = true
@@ -142,7 +142,8 @@ interface MidiOutputConfiguration: BaseConfiguration {
           playToExternalSynthsCheckbox {
             connect(
               TOP to BOTTOM of playToSonivoxCheckbox margin dip(15),
-              START to START of PARENT_ID margin dip(15)
+              START to START of PARENT_ID margin dip(15),
+              BOTTOM to BOTTOM of PARENT_ID margin dip(15)
             )
           }
           playToExternalSynthsText {
