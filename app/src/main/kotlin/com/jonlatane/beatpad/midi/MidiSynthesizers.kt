@@ -44,7 +44,6 @@ object MidiSynthesizers: AnkoLogger {
 				} catch (t: Throwable) {
 					port.close()
 					error("Failed to send midi data", error)
-					error = t
 				}
 			}
 		}

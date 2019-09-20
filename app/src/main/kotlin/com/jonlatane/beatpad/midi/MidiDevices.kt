@@ -1,18 +1,18 @@
 package com.jonlatane.beatpad.midi
 
+import BeatClockPaletteConsumer
 import android.content.Context
 import android.content.pm.PackageManager
 import android.media.midi.*
 import android.os.Build
 import android.os.Handler
+import android.os.HandlerThread
 import android.support.annotation.RequiresApi
 import com.jonlatane.beatpad.MainApplication
-import android.os.HandlerThread
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.view.input
-import io.multifunctions.models.Quad
 import kotlinx.io.core.Closeable
-import org.jetbrains.anko.*
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.toast
 
 object MidiDevices : AnkoLogger {
 	data class BSMidiDevice(
@@ -71,6 +71,7 @@ object MidiDevices : AnkoLogger {
 				override fun onDeviceRemoved(info: MidiDeviceInfo) {
 					context.toast("Disconnected from ${info.name}.")
 					devices.find { it.info == info }?.close()
+					devices.removeAll { it.info == info }
 				}
 
 				override fun onDeviceStatusChanged(status: MidiDeviceStatus) {}
