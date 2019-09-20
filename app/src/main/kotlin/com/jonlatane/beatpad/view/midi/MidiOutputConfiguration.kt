@@ -127,12 +127,12 @@ interface MidiOutputConfiguration: BaseConfiguration {
           playToSonivoxCheckbox {
             connect(
               TOP to BOTTOM of playToFluidsynthCheckbox margin dip(15),
+              TOP to BOTTOM of playToFluidsynthText margin dip(15),
               START to START of PARENT_ID margin dip(15)
             )
           }
           playToSonivoxText {
             connect(
-              TOP to BOTTOM of playToFluidsynthText margin dip(15),
               TOP to TOP of playToSonivoxCheckbox,
               START to END of playToSonivoxCheckbox margin dip(15),
               END to END of PARENT_ID margin dip(15),
@@ -142,17 +142,18 @@ interface MidiOutputConfiguration: BaseConfiguration {
           playToExternalSynthsCheckbox {
             connect(
               TOP to BOTTOM of playToSonivoxCheckbox margin dip(15),
+              TOP to BOTTOM of playToSonivoxText margin dip(15),
               START to START of PARENT_ID margin dip(15),
               BOTTOM to BOTTOM of PARENT_ID margin dip(15)
             )
           }
           playToExternalSynthsText {
             connect(
-              TOP to BOTTOM of playToSonivoxText margin dip(15),
               TOP to TOP of playToExternalSynthsCheckbox,
               START to END of playToExternalSynthsCheckbox margin dip(15),
               END to END of PARENT_ID margin dip(15),
-              BOTTOM to BOTTOM of playToExternalSynthsCheckbox
+              BOTTOM to BOTTOM of playToExternalSynthsCheckbox,
+              BOTTOM to BOTTOM of PARENT_ID margin dip(15)
             )
           }
         }

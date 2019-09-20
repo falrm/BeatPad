@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
     companion object {
 
-        private const val SF2_FILE_NAME = "PNS Drum Kit.SF2"
+        private const val SF2_FILE_NAME = "soundfont/FluidR3Mono_GM.sf3"
 
         private const val KEY = 60
         private const val VELOCITY = 127
@@ -51,11 +51,11 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     }
 
     private fun noteOn() {
-        nativeLibJNI.noteOn(KEY, VELOCITY)
+        nativeLibJNI.noteOn(0, KEY, VELOCITY)
     }
 
     private fun noteOff() {
-        nativeLibJNI.noteOff(KEY)
+        nativeLibJNI.noteOff(0, KEY)
     }
 
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {

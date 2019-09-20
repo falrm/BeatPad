@@ -3,10 +3,13 @@ package com.jonlatane.beatpad.midi
 import android.content.pm.PackageManager
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.util.booleanPref
+import opensles.android.fluidsynth.fluidsynth_android_opensles.FluidsynthMidiReceiver
 import org.billthefarmer.mididriver.MidiDriver
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import java.io.ByteArrayOutputStream
+import kotlin.properties.Delegates
+import kotlin.properties.Delegates.observable
 
 /**
  * Singleton interface to both the Sonivox synthesizer ([ONBOARD_DRIVER])
@@ -16,6 +19,15 @@ object AndroidMidi : AnkoLogger {
 	internal var isPlayingFromExternalDevice = false
 	internal var lastMidiSyncTime: Long? = null
 	val ONBOARD_DRIVER = MidiDriver()
+	init {
+		System.loadLibrary("fluidsynth")
+	}
+	private var FLUIDSYNTH by observable(FluidsynthMidiReceiver(MainApplication.instance)) { _, old, _ ->
+		old.nativeLibJNI.destroy()
+	}
+	fun resetFluidSynth() {
+		FLUIDSYNTH = FluidsynthMidiReceiver(MainApplication.instance)
+	}
 	private var sendToInternalSynthSetting by booleanPref("sendToInternalSynth", false)
 	private var sendToInternalFluidSynthSetting by booleanPref("sendToInternalFluidSynth", true)
 	private var sendToExternalSynthSetting by booleanPref("sendToExternalSynth", true)
@@ -54,7 +66,7 @@ object AndroidMidi : AnkoLogger {
 			ONBOARD_DRIVER.write(bytes)
 		}
 		if(sendToInternalFluidSynth) {
-			//FLUIDSYNTH.onSend(bytes, 0, bytes.size, System.currentTimeMillis())
+			FLUIDSYNTH.onSend(bytes, 0, bytes.size, System.currentTimeMillis())
 		}
 		if (
 			MainApplication.instance.packageManager.hasSystemFeature(PackageManager.FEATURE_MIDI)

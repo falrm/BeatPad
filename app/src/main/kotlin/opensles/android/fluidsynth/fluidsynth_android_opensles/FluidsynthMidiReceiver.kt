@@ -3,63 +3,87 @@ package opensles.android.fluidsynth.fluidsynth_android_opensles
 import android.content.Context
 import android.media.midi.MidiReceiver
 import android.util.Log
+import fluidsynth_android_opensles.MainActivity
+import okio.Okio
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
+import java.io.File
 
 
 class FluidsynthMidiReceiver(
-  val nativeLibJNI: NativeLibJNI
-) : MidiReceiver()
-{
-    companion object {
-        internal fun Byte.toUnsigned() = if (this < 0) 256 + this else this.toInt()
+  val context: Context
+) : MidiReceiver(), AnkoLogger {
+  val nativeLibJNI: NativeLibJNI = NativeLibJNI()
+  val sf2file = File(context.filesDir, SF2_FILE_NAME)
+
+  companion object {
+    const val SF2_FILE_NAME = "Airfont_340.sf2"
+    internal fun Byte.toUnsigned() = if (this < 0) 256 + this else this.toInt()
+  }
+
+  init {
+    copySF2IfNecessary()
+    info("Starting FluidSynth")
+    nativeLibJNI.init(sf2file.absolutePath)
+  }
+
+  private fun copySF2IfNecessary() {
+    if (sf2file.exists() && sf2file.length() > 0) return
+    Okio.source(context.assets.open("soundfont/$SF2_FILE_NAME")).use { a ->
+      Okio.buffer(Okio.sink(sf2file)).use { b ->
+        b.writeAll(a)
+      }
     }
-    override fun onSend(msg: ByteArray?, offset: Int, count: Int, timestamp: Long) {
-        // FIXME: consider timestamp
-        if (msg == null)
-            throw IllegalArgumentException ("null msg")
-        var off = offset
-        var c = count
-        var runningStatus = 0
-        while (c > 0) {
-            var stat = msg[off].toUnsigned()
-            if (stat < 0x80) {
-                stat = runningStatus
-            } else {
-                off++
-                c--
-            }
-            runningStatus = stat
-            val ch = stat and 0x0F
-            when (stat and 0xF0) {
-                0x80 -> nativeLibJNI.noteOff(ch, msg[off].toUnsigned())
-                0x90 -> {
-                    if (msg[off + 1].toInt() == 0)
-                        nativeLibJNI.noteOff(ch, msg[off].toUnsigned())
-                    else
-                        nativeLibJNI.noteOn(ch, msg[off].toUnsigned(), msg[off + 1].toUnsigned())
-                }
-                0xA0 -> {
-                    // No PAf in fluidsynth?
-                }
-//                0xB0 -> syn.cc(ch, msg[off].toUnsigned(), msg[off + 1].toUnsigned())
-                0xC0 -> nativeLibJNI.programChange(ch, msg[off].toUnsigned())
+  }
+
+  override fun onSend(msg: ByteArray?, offset: Int, count: Int, timestamp: Long) {
+    // FIXME: consider timestamp
+    if (msg == null)
+      throw IllegalArgumentException("null msg")
+    var off = offset
+    var c = count
+    var runningStatus = 0
+    while (c > 0) {
+      var stat = msg[off].toUnsigned()
+      if (stat < 0x80) {
+        stat = runningStatus
+      } else {
+        off++
+        c--
+      }
+      runningStatus = stat
+      val ch = stat and 0x0F
+      when (stat and 0xF0) {
+        0x80 -> nativeLibJNI.noteOff(ch, msg[off].toUnsigned())
+        0x90 -> {
+          if (msg[off + 1].toInt() == 0)
+            nativeLibJNI.noteOff(ch, msg[off].toUnsigned())
+          else
+            nativeLibJNI.noteOn(ch, msg[off].toUnsigned(), msg[off + 1].toUnsigned())
+        }
+        0xA0 -> {
+          // No PAf in fluidsynth?
+        }
+        0xB0 -> nativeLibJNI.controlChange(ch, msg[off].toUnsigned(), msg[off + 1].toUnsigned())
+        0xC0 -> nativeLibJNI.programChange(ch, msg[off].toUnsigned())
 //                0xD0 -> syn.channelPressure(ch, msg[off].toUnsigned())
 //                0xE0 -> syn.pitchBend(ch, msg[off].toUnsigned() + msg[off + 1].toUnsigned() * 0x80)
 //                0xF0 -> syn.sysex(msg.copyOfRange(off, off + c - 1), null)
-            }
-            when (stat and 0xF0) {
-                0xC0,0xD0 -> {
-                    off++
-                    c--
-                }
-                0xF0 -> {
-                    off += c - 1
-                    c = 0
-                }
-                else -> {
-                    off += 2
-                    c -= 2
-                }
-            }
+      }
+      when (stat and 0xF0) {
+        0xC0, 0xD0 -> {
+          off++
+          c--
         }
+        0xF0       -> {
+          off += c - 1
+          c = 0
+        }
+        else       -> {
+          off += 2
+          c -= 2
+        }
+      }
     }
+  }
 }
