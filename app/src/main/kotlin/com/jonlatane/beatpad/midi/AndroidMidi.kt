@@ -2,6 +2,7 @@ package com.jonlatane.beatpad.midi
 
 import android.content.pm.PackageManager
 import com.jonlatane.beatpad.MainApplication
+import com.jonlatane.beatpad.fluidsynth.FluidsynthMidiReceiver
 import com.jonlatane.beatpad.util.booleanPref
 import org.billthefarmer.mididriver.MidiDriver
 import org.jetbrains.anko.AnkoLogger
@@ -16,7 +17,11 @@ object AndroidMidi : AnkoLogger {
 	internal var isPlayingFromExternalDevice = false
 	internal var lastMidiSyncTime: Long? = null
 	val ONBOARD_DRIVER = MidiDriver()
-	private var sendToInternalSynthSetting by booleanPref("sendToInternalSynth", true)
+	val FLUIDSYNTH by lazy {
+		FluidsynthMidiReceiver(MainApplication.instance)
+	}
+	private var sendToInternalSynthSetting by booleanPref("sendToInternalSynth", false)
+	private var sendToInternalFluidSynthSetting by booleanPref("sendToInternalFluidSynth", true)
 	private var sendToExternalSynthSetting by booleanPref("sendToExternalSynth", true)
 
 	var sendToExternalSynth = sendToExternalSynthSetting
@@ -29,6 +34,12 @@ object AndroidMidi : AnkoLogger {
 		set(value) {
 			field = value
 			sendToInternalSynthSetting = value
+			if(!value) deactivateUnusedDevices()
+		}
+	var sendToInternalFluidSynth = sendToInternalFluidSynthSetting
+		set(value) {
+			field = value
+			sendToInternalFluidSynthSetting = value
 			if(!value) deactivateUnusedDevices()
 		}
 
@@ -45,6 +56,9 @@ object AndroidMidi : AnkoLogger {
 	fun send(bytes: ByteArray) {
 		if(sendToInternalSynth) {
 			ONBOARD_DRIVER.write(bytes)
+		}
+		if(sendToInternalFluidSynthSetting) {
+			FLUIDSYNTH.onSend(bytes, 0, bytes.size, System.currentTimeMillis())
 		}
 		if (
 			MainApplication.instance.packageManager.hasSystemFeature(PackageManager.FEATURE_MIDI)

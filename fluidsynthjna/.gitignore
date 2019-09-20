@@ -1,0 +1,7 @@
+/build
+libs/fluidsynth.jar
+libs/fluidsynth-assetloader.jar
+jnaerator.stamp
+fluid-soundfont_3.1.orig.tar.gz
+src/main/assets/FluidR3_GM.sf2
+
