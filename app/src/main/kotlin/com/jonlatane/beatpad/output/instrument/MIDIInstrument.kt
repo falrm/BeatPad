@@ -15,7 +15,8 @@ class MIDIInstrument constructor(
 	@Transient override var channel: Byte = 0,
 	override var instrument: Byte = 0,
 	override var drumTrack: Boolean = false,
-	override val gm2Configuration: GM2Configuration = GM2Configuration()
+	override val gm2Configuration: GM2Configuration = GM2Configuration(),
+	val deviceSoundFont: String? = null
 ) : Instrument.Midi, AnkoLogger {
 	override var volume: Float = 1f
 		set(value) {

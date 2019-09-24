@@ -3,6 +3,7 @@ package opensles.android.fluidsynth.fluidsynth_android_opensles
 import android.content.Context
 import android.media.midi.MidiReceiver
 import android.util.Log
+import com.jonlatane.beatpad.storage.Storage
 import fluidsynth_android_opensles.MainActivity
 import okio.Okio
 import org.jetbrains.anko.AnkoLogger
@@ -11,13 +12,16 @@ import java.io.File
 
 
 class FluidsynthMidiReceiver(
-  val context: Context
+  val context: Context,
+  val sf2FileName: String = defaultSf2FileName
 ) : MidiReceiver(), AnkoLogger {
   val nativeLibJNI: NativeLibJNI = NativeLibJNI()
-  val sf2file = File(context.filesDir, SF2_FILE_NAME)
+  val sf2file = File(context.soundfontDir, sf2FileName)
 
   companion object {
-    const val SF2_FILE_NAME = "Airfont_340.sf2"
+    val defaultSf2FileName = "AirFont 340 (included).sf2"
+    val baseSoundfontDir = "soundfonts"
+    val Context.soundfontDir: String get() = "$filesDir${File.separator}$baseSoundfontDir"
     internal fun Byte.toUnsigned() = if (this < 0) 256 + this else this.toInt()
   }
 
@@ -29,7 +33,8 @@ class FluidsynthMidiReceiver(
 
   private fun copySF2IfNecessary() {
     if (sf2file.exists() && sf2file.length() > 0) return
-    Okio.source(context.assets.open("soundfont/$SF2_FILE_NAME")).use { a ->
+    File(context.soundfontDir).mkdirs()
+    Okio.source(context.assets.open("soundfont/$sf2FileName")).use { a ->
       Okio.buffer(Okio.sink(sf2file)).use { b ->
         b.writeAll(a)
       }

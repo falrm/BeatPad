@@ -42,7 +42,6 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 				MelodyViewModel.LayoutType.LINEAR -> MelodyViewModel.LayoutType.GRID
 				else                              -> MelodyViewModel.LayoutType.LINEAR
 			}
-			melodyViewModel.restoreLayoutTypeDimensions()
 		}
 	}.squareButtonStyle()
 

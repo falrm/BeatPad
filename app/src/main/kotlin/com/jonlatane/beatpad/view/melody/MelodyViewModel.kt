@@ -128,9 +128,10 @@ class MelodyViewModel(
 					else -> R.drawable.line
 				}
 			}
+			restoreLayoutTypeDimensions()
 		}
 
-	fun restoreLayoutTypeDimensions() = with(beatAdapter) {
+	private fun restoreLayoutTypeDimensions() = with(beatAdapter) {
 		val layoutTypeDimensions = layoutTypeDimensions[layoutType] ?: elementWidth to elementHeight
 		layoutTypeDimensions.let { (width, height) ->
 			animateElementHeight(height)

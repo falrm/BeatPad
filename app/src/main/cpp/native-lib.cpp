@@ -23,6 +23,7 @@ JNIEXPORT void JNICALL Java_opensles_android_fluidsynth_fluidsynth_1android_1ope
     const char *nativeSf2Path = env->GetStringUTFChars(sf2path, NULL);
     fluid_synth_sfload(synth, nativeSf2Path, true);
     env->ReleaseStringUTFChars(sf2path, nativeSf2Path);
+    fluid_synth_set_gain(synth, 1);
 
     adriver = new_fluid_audio_driver(settings, synth);
 }
