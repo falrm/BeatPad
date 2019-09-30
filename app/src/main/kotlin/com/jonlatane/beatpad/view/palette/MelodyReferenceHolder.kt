@@ -5,7 +5,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.support.v7.widget.RecyclerView
 import android.widget.PopupMenu
 import com.jonlatane.beatpad.R
@@ -15,6 +14,7 @@ import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.applyTypeface
+import com.jonlatane.beatpad.util.thumbColorFilterColor
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onSeekBarChangeListener
@@ -148,13 +148,9 @@ class MelodyReferenceHolder(
         }
         progress = ((melodyReference?.volume ?: 0f) * 127).toInt()
         if(!isMelodyReferenceEnabled) {
-          arrayOf(progressDrawable, thumb).forEach {
-            it.colorFilter = null
-          }
+          thumbColorFilterColor = null
         } else {
-          arrayOf(progressDrawable, thumb).forEach {
-            it.setColorFilter( Color.WHITE, PorterDuff.Mode.SRC_IN)
-          }
+          thumbColorFilterColor = Color.WHITE
           onSeekBarChangeListener {
             onProgressChanged { _, progress, _ ->
               melodyReference?.volume = progress.toFloat() / 127f

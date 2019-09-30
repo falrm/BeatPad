@@ -3,12 +3,14 @@ package com.jonlatane.beatpad.view.melody.renderer
 import android.graphics.Canvas
 import android.graphics.Rect
 import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.ColorGuide
 import com.jonlatane.beatpad.view.melody.input.MelodyBeatEventHandlerBase
 import com.jonlatane.beatpad.view.melody.MelodyBeatView
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
+import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import org.jetbrains.anko.withAlpha
 
 /**
@@ -22,6 +24,7 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
   override var chord: Chord
   var isCurrentlyPlayingBeat: Boolean
   var isSelectedBeatInHarmony: Boolean
+  val section: Section
 
   /**
    * Returns the range of indexes for the melody in this beat. i.e., for [beatPosition] = 3

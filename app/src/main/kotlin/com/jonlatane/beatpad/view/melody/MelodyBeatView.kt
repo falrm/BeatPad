@@ -7,6 +7,7 @@ import android.util.SparseArray
 import android.view.MotionEvent
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.util.size
@@ -16,6 +17,7 @@ import com.jonlatane.beatpad.view.melody.input.MelodyBeatEventEditingHandler
 import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatNotationRenderer.DrawablePool
 import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatRenderer
 import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingModifiers
+import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import org.jetbrains.anko.*
 
 /**
@@ -27,9 +29,10 @@ class MelodyBeatView constructor(
   override val viewModel: MelodyViewModel
 ) : BaseColorboardView(context), MelodyBeatRenderer,
   MelodyBeatEventArticulationHandler, MelodyBeatEventEditingHandler, AnkoLogger {
+  override var section : Section = Section()
+    private set
   override var isCurrentlyPlayingBeat = false
   override var isSelectedBeatInHarmony = false
-
   override val displayType: MelodyViewModel.DisplayType get() = viewModel.displayType
   override val renderableToneBounds: Rect = Rect()
   override val colorblockAlpha: Float get() = viewModel.beatAdapter.colorblockAlpha
@@ -48,6 +51,30 @@ class MelodyBeatView constructor(
 
   override var sectionStartBeatPosition: Int = 0
   override var beatPosition = 0
+  set(value) {
+    val (beatPos, section) = when(viewModel.paletteViewModel.interactionMode) {
+      BeatScratchToolbar.InteractionMode.VIEW -> {
+        //TODO LAZY LAZY assuming 4/4 here
+        var sectionStartBeat = 0
+        var section = viewModel.paletteViewModel.palette.sections.first()
+        for(it in viewModel.paletteViewModel.palette.sections) {
+          val sectionLength = section.harmony.run { length / subdivisionsPerBeat}
+          if(sectionStartBeat + sectionLength <= value) {
+            sectionStartBeat += sectionLength
+          } else {
+            section = it
+            break
+          }
+        }
+        value - sectionStartBeat to section
+      }
+      else                                    -> {
+        value to BeatClockPaletteConsumer.section!!
+      }
+    }
+    field = beatPos
+    this.section = section
+  }
   override val palette get() = viewModel.paletteViewModel.palette
   override val melody: Melody<*>? get() = viewModel.openedMelody
 

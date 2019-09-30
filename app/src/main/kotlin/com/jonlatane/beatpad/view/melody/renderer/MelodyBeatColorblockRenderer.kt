@@ -38,21 +38,19 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
       )
     }
 
-    BeatClockPaletteConsumer.section?.let { section ->
-      section.melodies.filter { !it.isDisabled }.filter {
-        when(melody?.limitedToNotesInHarmony) {
-          null -> it.melody.limitedToNotesInHarmony
-          true -> it.melody.limitedToNotesInHarmony
-          false -> !it.melody.limitedToNotesInHarmony
-        }
-      }.map { it.melody }.forEach { otherMelody ->
-        canvas.drawColorblockMelody(
-          otherMelody,
-          stepNoteAlpha = if(melody == null) 255 else 66,
-          drawColorGuide = false,
-          alphaSource = colorblockAlpha
-        )
+    section.melodies.filter { !it.isDisabled }.filter {
+      when (melody?.limitedToNotesInHarmony) {
+        null  -> it.melody.limitedToNotesInHarmony
+        true  -> it.melody.limitedToNotesInHarmony
+        false -> !it.melody.limitedToNotesInHarmony
       }
+    }.map { it.melody }.forEach { otherMelody ->
+      canvas.drawColorblockMelody(
+        otherMelody,
+        stepNoteAlpha = if (melody == null) 255 else 66,
+        drawColorGuide = false,
+        alphaSource = colorblockAlpha
+      )
     }
   }
 

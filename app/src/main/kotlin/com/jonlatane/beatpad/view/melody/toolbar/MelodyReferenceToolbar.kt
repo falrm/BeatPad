@@ -142,18 +142,14 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 			isEnabled = melodyViewModel.isMelodyReferenceEnabled
 			progress = ((melodyReference?.volume ?: 0f) * 127).toInt()
 			if(melodyViewModel.isMelodyReferenceEnabled) {
-				arrayOf(progressDrawable, thumb).forEach {
-					it.setColorFilter(BeatClockPaletteConsumer.currentSectionColor, PorterDuff.Mode.SRC_IN)
-				}
+				thumbColorFilterColor = BeatClockPaletteConsumer.currentSectionColor
 				onSeekBarChangeListener {
 					onProgressChanged { _, progress, _ ->
 						melodyReference?.volume = progress.toFloat() / 127f
 					}
 				}
 			} else {
-				arrayOf(progressDrawable, thumb).forEach {
-					it.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN)
-				}
+				thumbColorFilterColor = Color.WHITE
 			}
 		}
 

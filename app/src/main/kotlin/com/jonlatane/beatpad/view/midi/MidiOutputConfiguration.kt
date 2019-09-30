@@ -10,9 +10,9 @@ import android.view.View
 import android.widget.CheckBox
 import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
-import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.midi.MidiDevices
+import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.BaseConfiguration
 import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
@@ -95,6 +95,7 @@ interface MidiOutputConfiguration: BaseConfiguration {
             typeface = MainApplication.chordTypefaceBold
             isClickable = true
             onClick {
+              context.toast("TODO")
               //playToSonivoxCheckbox.isChecked = !playToSonivoxCheckbox.isChecked
             }
           }.lparams(wrapContent, wrapContent)
@@ -106,7 +107,12 @@ interface MidiOutputConfiguration: BaseConfiguration {
             gravity = Gravity.START
             isClickable = true
             onClick {
-              //playToSonivoxCheckbox.isChecked = !playToSonivoxCheckbox.isChecked
+              vibrate(50)
+              context.startActivity(
+                Intent(Intent.ACTION_VIEW).also {
+                  it.data = Uri.parse("https://musical-artifacts.com/artifacts?formats=sf2")
+                }
+              )
             }
           }.lparams(0, wrapContent)
 
@@ -117,7 +123,12 @@ interface MidiOutputConfiguration: BaseConfiguration {
             gravity = Gravity.START
             isClickable = true
             onClick {
-              //playToSonivoxCheckbox.isChecked = !playToSonivoxCheckbox.isChecked
+              vibrate(50)
+              context.startActivity(
+                Intent(Intent.ACTION_VIEW).also {
+                  it.data = Uri.parse("https://github.com/falrm/fluidsynth-android-opensles")
+                }
+              )
             }
           }.lparams(0, wrapContent)
 

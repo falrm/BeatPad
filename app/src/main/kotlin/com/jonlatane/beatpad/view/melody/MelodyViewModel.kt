@@ -16,6 +16,7 @@ import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingModifiers
 import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingToolbar
 import com.jonlatane.beatpad.view.melody.toolbar.MelodyReferenceToolbar
 import com.jonlatane.beatpad.view.melody.toolbar.SectionToolbar
+import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -60,18 +61,25 @@ class MelodyViewModel(
 	lateinit var beatAdapter: MelodyBeatAdapter
 	fun updateToolbarsAndMelody() {
 		updateMelodyDisplay()
-		if(openedMelody != null) {
-
-			sectionToolbar.hide()
-			melodyReferenceToolbar.show()
-			melodyReferenceToolbar.updateButtonText()
-			melodyEditingToolbar.updateButtonText()
-		} else {
-			sectionToolbar.backgroundColor = BeatClockPaletteConsumer.currentSectionColor
-			sectionToolbar.show()
-			melodyReferenceToolbar.hide()
-			melodyEditingToolbar.hide()
-			melodyEditingModifiers.hide()
+		when {
+			openedMelody != null -> {
+				sectionToolbar.hide()
+				melodyReferenceToolbar.show()
+				melodyReferenceToolbar.updateButtonText()
+				melodyEditingToolbar.updateButtonText()
+			}
+			else                 -> {
+				sectionToolbar.backgroundColor = BeatClockPaletteConsumer.currentSectionColor
+				when(paletteViewModel.interactionMode) {
+					BeatScratchToolbar.InteractionMode.VIEW ->
+						sectionToolbar.hide()
+					else ->
+						sectionToolbar.show()
+				}
+				melodyReferenceToolbar.hide()
+				melodyEditingToolbar.hide()
+				melodyEditingModifiers.hide()
+			}
 		}
 	}
 

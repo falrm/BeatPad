@@ -29,7 +29,6 @@ class PartListAdapter(
 		viewModel.partListAdapters.add(this)
 	}
 
-
 	val itemTouchHelper = ItemTouchHelper(object: ItemTouchHelper.Callback() {
 		init {
 		}
@@ -75,21 +74,15 @@ class PartListAdapter(
 	}).also { it.attachToRecyclerView(recyclerView) }
 
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PartHolder {
-		return recyclerView.partHolder(viewModel, this)
-	}
-
-
-
-	fun _RecyclerView.partHolder(viewModel: PaletteViewModel, adapter: PartListAdapter): PartHolder {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PartHolder = with(recyclerView) {
 		val layout = PartHolderView(context).lparams {
-      width = dip(120)
-      height = matchParent
-    }
+			width = dip(120)
+			height = matchParent
+		}
 		return PartHolder(
 			viewModel,
 			layout,
-			adapter
+			this@PartListAdapter
 		)
 	}
 

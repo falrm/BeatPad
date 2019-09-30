@@ -6,7 +6,7 @@
 	<color name="colorPrimaryDark">#424242</color>
 	<color name="colorDisabledText">#424242</color>
 	<color name="colorPrimaryLight">#E0E0E0</color>
-	<color name="colorAccent">#F652F9</color>
+	<color name="colorAccent">@color/colorPrimary</color>
 
 	<!-- A Background color for the Orbifold view -->
 	<color name="brown">#8b6b61</color>

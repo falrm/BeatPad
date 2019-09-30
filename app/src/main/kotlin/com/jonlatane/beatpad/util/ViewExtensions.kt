@@ -14,15 +14,27 @@ import org.jetbrains.anko.singleLine
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.res.Configuration
+import android.graphics.PorterDuff
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import android.widget.SeekBar
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 
 
 val defaultDuration get() = 300L
 
+var SeekBar.thumbColorFilterColor: Int?
+  get() = null
+  set(value) {
+    arrayOf(progressDrawable, thumb).forEach { drawable ->
+      when(value) {
+        null -> drawable.colorFilter = null
+        else -> drawable.setColorFilter(value, PorterDuff.Mode.SRC_IN)
+      }
+    }
+  }
 interface HideableView {
 	var initialHeight: Int?
 	var initialWidth: Int?

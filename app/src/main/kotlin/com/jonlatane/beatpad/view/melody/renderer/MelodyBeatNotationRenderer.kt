@@ -92,8 +92,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
   val Melody<*>.averageTone
     get() = (this as? RationalMelody)?.changes?.values?.flatMap { it.tones }?.average()
 
-  override val harmony: Harmony get() = viewModel.harmony ?:
-    MelodyBeatAdapter.sectionAndStartBeat(palette, beatPosition).first!!.harmony
+  override val harmony: Harmony get() = section.harmony
   val meter: Harmony.Meter get() = harmony.meter
   val isFinalBeat: Boolean get() = (beatPosition + 1) % meter.defaultBeatsPerMeasure == 0
 
@@ -129,9 +128,9 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
   val clefs: List<Clef> get() = listOf(Clef.TREBLE, Clef.BASS)
 
   val sectionMelodies
-    get() = BeatClockPaletteConsumer.section?.let { section ->
-      section.melodies.filter { !it.isDisabled }
-    }?.map { it.melody } ?: emptyList()
+    get() = section.melodies
+      .filter { !it.isDisabled }
+      .map { it.melody }
 
   val sectionMelodiesOfPartType: List<Melody<*>>
     get() = arrayOf(melody).filterNotNull() +
