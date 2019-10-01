@@ -58,6 +58,7 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
         ?: viewModel.paletteViewModel.orbifold.chord
           ?: MelodyBeatView.DEFAULT_CHORD
       isCurrentlyPlayingBeat =
+        BeatClockPaletteConsumer.section == section &&
         viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
           fromSubdivisionsPerBeat = BeatClockPaletteConsumer.ticksPerBeat,
           toSubdivisionsPerBeat = melody.subdivisionsPerBeat

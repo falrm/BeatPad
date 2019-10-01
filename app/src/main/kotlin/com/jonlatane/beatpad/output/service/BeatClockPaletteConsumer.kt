@@ -9,6 +9,7 @@ import com.jonlatane.beatpad.model.dsl.Patterns
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.to127Int
+import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import com.jonlatane.beatpad.view.palette.SectionHolder
 import io.multifunctions.letCheckNull
@@ -128,6 +129,14 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
         activeAttacks += attack
       }
       if ((tickPosition + 1) / ticksPerBeat >= totalBeats) {
+        viewModel?.run {
+          if(interactionMode == BeatScratchToolbar.InteractionMode.VIEW){
+            val nextSection = palette.sections.getOrNull(
+              palette.sections.indexOf(BeatClockPaletteConsumer.section) + 1
+            )
+            BeatClockPaletteConsumer.section = nextSection
+          }
+        }
         tickPosition = 0
       } else {
         tickPosition += 1

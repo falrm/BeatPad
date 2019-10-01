@@ -100,21 +100,21 @@ interface MidiOutputConfiguration: BaseConfiguration {
             }
           }.lparams(wrapContent, wrapContent)
 
-          val fluidSynthMusicalArtifactsLink = textView {
-            id = View.generateViewId()
-            text = "Download *.sf2 SoundFonts from Musical-Artifacts 🌐"
-            typeface = MainApplication.chordTypeface
-            gravity = Gravity.START
-            isClickable = true
-            onClick {
-              vibrate(50)
-              context.startActivity(
-                Intent(Intent.ACTION_VIEW).also {
-                  it.data = Uri.parse("https://musical-artifacts.com/artifacts?formats=sf2")
-                }
-              )
-            }
-          }.lparams(0, wrapContent)
+//          val fluidSynthMusicalArtifactsLink = textView {
+//            id = View.generateViewId()
+//            text = "Download *.sf2 SoundFonts from Musical-Artifacts 🌐"
+//            typeface = MainApplication.chordTypeface
+//            gravity = Gravity.START
+//            isClickable = true
+//            onClick {
+//              vibrate(50)
+//              context.startActivity(
+//                Intent(Intent.ACTION_VIEW).also {
+//                  it.data = Uri.parse("https://musical-artifacts.com/artifacts?formats=sf2")
+//                }
+//              )
+//            }
+//          }.lparams(0, wrapContent)
 
           val fluidSynthLicenseText = textView {
             id = View.generateViewId()
@@ -217,17 +217,17 @@ interface MidiOutputConfiguration: BaseConfiguration {
                 END to START of fluidSynthChangeButton margin dip(15)
               )
             }
-            fluidSynthMusicalArtifactsLink {
-              connect(
-                TOP to BOTTOM of fluidSynthSoundFontText margin dip(15),
-                TOP to BOTTOM of fluidSynthChangeButton margin dip(15),
-                START to END of playToFluidsynthCheckbox margin dip(15),
-                END to END of PARENT_ID margin dip(15)
-              )
-            }
+//            fluidSynthMusicalArtifactsLink {
+//              connect(
+//                TOP to BOTTOM of fluidSynthSoundFontText margin dip(15),
+//                TOP to BOTTOM of fluidSynthChangeButton margin dip(15),
+//                START to END of playToFluidsynthCheckbox margin dip(15),
+//                END to END of PARENT_ID margin dip(15)
+//              )
+//            }
             fluidSynthLicenseText {
               connect(
-                TOP to BOTTOM of fluidSynthMusicalArtifactsLink margin dip(15),
+                TOP to BOTTOM of fluidSynthSoundFontText margin dip(15),
                 START to END of playToFluidsynthCheckbox margin dip(15),
                 END to END of PARENT_ID margin dip(15)
               )

@@ -84,6 +84,7 @@ class MelodyReferenceAdapter(
 			// Don't try to conform drum parts to harmony
 			if((part?.instrument as? MIDIInstrument)?.drumTrack == true) {
 				it.limitedToNotesInHarmony = false
+				it.drumPart = true
 			}
 		}
 	) {

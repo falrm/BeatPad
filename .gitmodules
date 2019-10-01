@@ -1,0 +1,3 @@
+[submodule "fluidsynth-android"]
+	path = fluidsynth-android
+	url = https://github.com/VolcanoMobile/fluidsynth-android.git

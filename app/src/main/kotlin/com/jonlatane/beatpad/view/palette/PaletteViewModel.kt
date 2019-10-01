@@ -46,6 +46,7 @@ class PaletteViewModel constructor(
   val interactionMode get() = beatScratchToolbar.interactionMode
   val isInEditMode get() = interactionMode == BeatScratchToolbar.InteractionMode.EDIT
   val isInViewMode get() = !isInEditMode
+  private var previouslyEditingSection: Section? = null
   fun notifyInteractionModeChanged() {
     when(interactionMode) {
       BeatScratchToolbar.InteractionMode.EDIT -> {
@@ -54,7 +55,9 @@ class PaletteViewModel constructor(
           paletteToolbar,
           sectionListRecyclerHorizontalRotator
         ).forEach { it.show() }
-        BeatClockPaletteConsumer.section = BeatClockPaletteConsumer.palette?.sections?.first()
+        BeatClockPaletteConsumer.section = previouslyEditingSection
+          ?: BeatClockPaletteConsumer.palette?.sections?.first()
+        sectionListAdapters.forEach { it.notifyDataSetChanged() }
       }
       BeatScratchToolbar.InteractionMode.VIEW -> {
         melodyViewVisible = true
@@ -64,7 +67,10 @@ class PaletteViewModel constructor(
         ).forEach { it.hide() }
         sectionListRecyclerVerticalRotator.hide(animation = HideAnimation.HORIZONTAL)
         editingMelody = null
-        BeatClockPaletteConsumer.section = null
+        BeatClockPaletteConsumer.section?.let {
+          previouslyEditingSection = it
+        }
+//        BeatClockPaletteConsumer.section = null
         melodyViewModel.layoutType = MelodyViewModel.LayoutType.GRID
       }
     }
@@ -225,20 +231,21 @@ class PaletteViewModel constructor(
   }
 
   fun notifySectionChange() {
-    harmonyViewModel.apply {
-      notifyHarmonyChanged()
-      isChoosingHarmonyChord = false
-      selectedHarmonyElements = null
-    }
     beatScratchToolbar.updateButtonColors()
-
-    melodyViewModel.updateToolbarsAndMelody()
+    if(interactionMode == BeatScratchToolbar.InteractionMode.EDIT) {
+      harmonyViewModel.apply {
+        notifyHarmonyChanged()
+        isChoosingHarmonyChord = false
+        selectedHarmonyElements = null
+      }
+      melodyViewModel.updateToolbarsAndMelody()
 //    melodyViewModel.beatAdapter.updateSmartHolders()
 //    melodyViewModel.melodyReferenceToolbar.updateButtonText()
-    if(editingMix) { // Trigger an update of the mix state.
-      editingMix = editingMix
+      if (editingMix) { // Trigger an update of the mix state.
+        editingMix = editingMix
+      }
+      updateMelodyReferences()
     }
-    updateMelodyReferences()
     PlaybackService.instance?.showNotification()
   }
 
