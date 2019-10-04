@@ -229,6 +229,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
       AuthUI.getInstance()
         .createSignInIntentBuilder()
         .setAvailableProviders(providers)
+        .setTheme(R.style.SignInTheme)
         .build(),
       RC_SIGN_IN)
   }

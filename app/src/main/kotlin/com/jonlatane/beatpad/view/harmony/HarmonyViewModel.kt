@@ -19,7 +19,7 @@ import java.net.URI
 open class HarmonyViewModel(
   override val storageContext: Context
 ): SelectedChordAnimation, Storage {
-  var paletteViewModel: PaletteViewModel? = null
+  lateinit var paletteViewModel: PaletteViewModel
   var harmonyView: HarmonyView? = null
   lateinit var beatAdapter: HarmonyBeatAdapter
   //var selectedChord: Chord? = null
@@ -29,7 +29,7 @@ open class HarmonyViewModel(
 //    notifyHarmonyChanged()
 //  }
   val section: Section? get() = BeatClockPaletteConsumer.section
-  val harmony: Harmony? get() = BeatClockPaletteConsumer.harmony
+  val harmony: Harmony? get() = section?.harmony
   override var isChoosingHarmonyChord: Boolean = false
   set(value) {
     field = value

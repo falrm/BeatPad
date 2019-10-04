@@ -14,6 +14,11 @@
         <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
 
+    <style name="SignInTheme" parent="FirebaseUI">
+        <item name="colorAccent">@color/major</item>
+        <item name="android:windowBackground">@drawable/splash_background</item>
+    </style>
+
     <!-- Material buttons -->
     <!--<style name="App.ThemeOverlay.MaterialComponents.Button.Custom"-->
            <!--parent="ThemeOverlay.MaterialComponents">-->

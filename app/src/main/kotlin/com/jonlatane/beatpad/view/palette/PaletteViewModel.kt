@@ -91,9 +91,29 @@ class PaletteViewModel constructor(
     }
   }
 
-  var playbackTick by observable<Int?>(null) { _, old, new ->
+  var playbackTick by observable<Int>(0) { _, old, new ->
     arrayOf(old, new).filterNotNull().map { tickPosition ->
-      (tickPosition.toDouble() / BeatClockPaletteConsumer.ticksPerBeat).toInt()
+      when(interactionMode) {
+        BeatScratchToolbar.InteractionMode.VIEW -> {
+          var totalBeats = 0
+          loop@ for(candidate in palette.sections) {
+            when (candidate) {
+              BeatClockPaletteConsumer.section -> break@loop
+              else -> totalBeats += candidate.harmony.run { length / subdivisionsPerBeat }
+            }
+          }
+//          val sectionIndex = palette.sections.indexOf(BeatClockPaletteConsumer.section)
+//          val sectionStartTick = sectionIndex.takeIf { it >= 0 }?.let {
+//            palette.sections.subList(
+//              0, palette.sections.indexOf(BeatClockPaletteConsumer.section)
+//            ).sumBy { it.harmony.run { length / subdivisionsPerBeat } } * BeatClockPaletteConsumer.ticksPerBeat
+//          } ?: 0
+
+          ((totalBeats * BeatClockPaletteConsumer.ticksPerBeat + tickPosition.toDouble())
+            / BeatClockPaletteConsumer.ticksPerBeat).toInt()
+        }
+        else -> (tickPosition.toDouble() / BeatClockPaletteConsumer.ticksPerBeat).toInt()
+      }
     }.toSet().forEach { melodyBeat ->
       melodyViewModel.beatAdapter.invalidate(melodyBeat)
       harmonyViewModel.beatAdapter.invalidate(melodyBeat)

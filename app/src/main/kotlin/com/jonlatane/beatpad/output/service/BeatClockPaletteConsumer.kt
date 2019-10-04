@@ -38,7 +38,9 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
   var section: Section? = null
   set(value) {
     field = value
-    viewModel?.notifySectionChange()
+    viewModel?.melodyView?.post {
+      viewModel?.notifySectionChange()
+    }
     //MidiDevices.refreshInstruments()
   }
   val currentSectionDrawable: Int get() = palette?.sections
@@ -130,11 +132,18 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
       }
       if ((tickPosition + 1) / ticksPerBeat >= totalBeats) {
         viewModel?.run {
-          if(interactionMode == BeatScratchToolbar.InteractionMode.VIEW){
-            val nextSection = palette.sections.getOrNull(
-              palette.sections.indexOf(BeatClockPaletteConsumer.section) + 1
-            )
-            BeatClockPaletteConsumer.section = nextSection
+          if(interactionMode == BeatScratchToolbar.InteractionMode.VIEW) {
+            var isNextSection = false
+            var nextSection: Section? = null
+            loop@ for(candidate in palette.sections) {
+              when {
+                candidate == section -> isNextSection = true
+                isNextSection        -> { nextSection = candidate; break@loop }
+              }
+            }
+            (nextSection ?: palette.sections.first()).let {
+              BeatClockPaletteConsumer.section = it
+            }
           }
         }
         tickPosition = 0

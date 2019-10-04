@@ -4,6 +4,7 @@ import BeatClockPaletteConsumer
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.graphics.PorterDuff
 import android.view.MenuItem
 import android.view.View
@@ -12,8 +13,10 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import com.google.firebase.auth.FirebaseAuth
 import com.jonlatane.beatpad.BuildConfig
+import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Palette
+import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.HideAnimation
@@ -105,50 +108,76 @@ class BeatScratchToolbar(
   }
 
 
-  val menuButton: ImageButton = imageButton {
+  val playPauseSectionDisplayButton: ImageButton = imageButton {
     imageResource = R.drawable.ic_menu_black_24dp
     backgroundResource = R.drawable.toolbar_button_beatscratch
     padding = dip(9)
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
-      val portrait = context.resources.configuration.portrait
-      val verticalSectionsVisible = !viewModel.sectionListRecyclerVerticalRotator.isHidden
-      val horizontalSectionsVisible = !viewModel.sectionListRecyclerHorizontalRotator.isHidden
-//      viewModel.sectionListRecyclerHorizontalRotator.hide(animation = HideAnimation.VERTICAL)
-      when {
-//        verticalSectionsVisible &&
-        !horizontalSectionsVisible -> {
-          viewModel.sectionListRecyclerHorizontal.adapter!!.notifyDataSetChanged()
-          viewModel.sectionListRecyclerHorizontalRotator.show(
-            animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
-          )
-          viewModel.sectionListRecyclerHorizontalSpacer?.show(
-            animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
-          )
-          viewModel.sectionListRecyclerVerticalRotator.hide(animation = HideAnimation.HORIZONTAL) {
-            post { viewModel.melodyViewModel.onZoomFinished() }
-          }
+      when(interactionMode) {
+        InteractionMode.EDIT -> {
+          swapSectionListDisplayModes()
         }
-        //horizontalSectionsVisible && !verticalSectionsVisible
-        else -> {
-          viewModel.sectionListRecyclerVertical.adapter!!.notifyDataSetChanged()
-          viewModel.sectionListRecyclerHorizontalRotator.hide(
-            animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
-          )
-          viewModel.sectionListRecyclerHorizontalSpacer?.hide(
-            animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
-          )
-          viewModel.sectionListRecyclerVerticalRotator.show(animation = HideAnimation.HORIZONTAL) {
-            post { viewModel.melodyViewModel.onZoomFinished() }
-          }
+        InteractionMode.VIEW -> {
+          togglePlayStop()
         }
       }
     }
   }.beatScratchToolbarStyle()
 
+  private val shouldPlay: Boolean get() = PlaybackService.instance?.isStopped != false
+
+  private fun togglePlayStop() {
+    playPauseSectionDisplayButton.imageResource = when(interactionMode) {
+      InteractionMode.EDIT -> R.drawable.ic_menu_black_24dp
+      InteractionMode.VIEW -> if(shouldPlay) R.drawable.icons8_stop_32
+      else R.drawable.icons8_play_32
+    }
+    updateButtonColors()
+    val startIntent = Intent(MainApplication.instance, PlaybackService::class.java)
+    startIntent.action = if(shouldPlay) PlaybackService.Companion.Action.PLAY_ACTION
+    else PlaybackService.Companion.Action.STOP_ACTION
+    MainApplication.instance.startService(startIntent)
+  }
+
+  private fun swapSectionListDisplayModes() {
+    val portrait = context.resources.configuration.portrait
+    val verticalSectionsVisible = !viewModel.sectionListRecyclerVerticalRotator.isHidden
+    val horizontalSectionsVisible = !viewModel.sectionListRecyclerHorizontalRotator.isHidden
+//      viewModel.sectionListRecyclerHorizontalRotator.hide(animation = HideAnimation.VERTICAL)
+    when {
+//        verticalSectionsVisible &&
+      !horizontalSectionsVisible -> {
+        viewModel.sectionListRecyclerHorizontal.adapter!!.notifyDataSetChanged()
+        viewModel.sectionListRecyclerHorizontalRotator.show(
+          animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
+        )
+        viewModel.sectionListRecyclerHorizontalSpacer?.show(
+          animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
+        )
+        viewModel.sectionListRecyclerVerticalRotator.hide(animation = HideAnimation.HORIZONTAL) {
+          post { viewModel.melodyViewModel.onZoomFinished() }
+        }
+      }
+      //horizontalSectionsVisible && !verticalSectionsVisible
+      else -> {
+        viewModel.sectionListRecyclerVertical.adapter!!.notifyDataSetChanged()
+        viewModel.sectionListRecyclerHorizontalRotator.hide(
+          animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
+        )
+        viewModel.sectionListRecyclerHorizontalSpacer?.hide(
+          animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
+        )
+        viewModel.sectionListRecyclerVerticalRotator.show(animation = HideAnimation.HORIZONTAL) {
+          post { viewModel.melodyViewModel.onZoomFinished() }
+        }
+      }
+    }
+  }
+
   fun updateButtonColors() {
     interactionMode = interactionMode
-    menuButton.image
+    playPauseSectionDisplayButton.image
       ?.setColorFilter(BeatClockPaletteConsumer.currentSectionColor, PorterDuff.Mode.SRC_IN)
   }
 
@@ -171,6 +200,12 @@ class BeatScratchToolbar(
     viewModeButton.padding = dip(9)
     editModeButton.padding = dip(9)
     if(changed) {
+      playPauseSectionDisplayButton.imageResource = when(value) {
+        InteractionMode.EDIT -> R.drawable.ic_menu_black_24dp
+        InteractionMode.VIEW -> if(shouldPlay) R.drawable.icons8_play_32
+        else R.drawable.icons8_stop_32
+      }
+      updateButtonColors()
       viewModel.notifyInteractionModeChanged()
     }
   }

@@ -17,6 +17,7 @@ import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.dsl.Patterns
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.*
+import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.withAlpha
 import kotlin.math.floor
@@ -28,10 +29,35 @@ class HarmonyBeatView constructor(
   var viewModel: HarmonyViewModel
 ): View(context), Storage, Patterns {
   override val storageContext: Context get() = context
-  val harmony: Harmony? get() = viewModel.harmony
-  val section: Section? get() = viewModel.section
+  var section: Section? = null
+    private set
+  val harmony: Harmony? get() = section?.harmony
 
   var beatPosition = 0
+    set(value) {
+      val (beatPos, section) = when(viewModel.paletteViewModel.interactionMode) {
+        BeatScratchToolbar.InteractionMode.VIEW -> {
+          //TODO LAZY LAZY assuming 4/4 here
+          var sectionStartBeat = 0
+          var section = viewModel.paletteViewModel.palette.sections.first()
+          for(it in viewModel.paletteViewModel.palette.sections) {
+            val sectionLength = section.harmony.run { length / subdivisionsPerBeat}
+            if(sectionStartBeat + sectionLength <= value) {
+              sectionStartBeat += sectionLength
+            } else {
+              section = it
+              break
+            }
+          }
+          value - sectionStartBeat to section
+        }
+        else                                    -> {
+          value to viewModel.section!!
+        }
+      }
+      field = beatPos
+      this.section = section
+    }
   internal var beatSelectionAnimationPosition: Int = 0
 
   inline val elementRange: IntRange? get() = harmony?.let { harmony ->
@@ -108,6 +134,12 @@ class HarmonyBeatView constructor(
             toLength = floor(harmony.length.toDouble() / harmony.subdivisionsPerBeat)
               .toInt() * 24
           )
+          if(
+            viewModel.paletteViewModel?.interactionMode == BeatScratchToolbar.InteractionMode.VIEW
+            && BeatClockPaletteConsumer.section != null
+          ) {
+
+          }
           BeatClockPaletteConsumer.tickPosition = newPlaybackTick
           viewModel.paletteViewModel?.playbackTick = newPlaybackTick
         }
@@ -126,16 +158,18 @@ class HarmonyBeatView constructor(
     }
 
     setOnLongClickListener {
-      vibrate(150)
-      harmony?.let { harmony ->
-        getPositionAndElement(lastTouchDownX)?.let { (position, _) ->
-          viewModel.selectedHarmonyElements = position..position
+      if (viewModel.paletteViewModel.interactionMode == BeatScratchToolbar.InteractionMode.EDIT) {
+        vibrate(150)
+        harmony?.let { harmony ->
+          getPositionAndElement(lastTouchDownX)?.let { (position, _) ->
+            viewModel.selectedHarmonyElements = position..position
+          }
+          removeChordMenuItem.isEnabled = harmony.changes.count() > 1
+          pasteHarmonyMenuItem.isEnabled = viewModel.getClipboardHarmony() != null
+          editChangeMenu.show()
         }
-        removeChordMenuItem.isEnabled = harmony.changes.count() > 1
-        pasteHarmonyMenuItem.isEnabled = viewModel.getClipboardHarmony() != null
-        editChangeMenu.show()
-      }
-      true
+        true
+      } else false
     }
   }
 
@@ -175,7 +209,8 @@ class HarmonyBeatView constructor(
           left = (overallWidth.toFloat() * elementIndex / elementCount).toInt()
           right = (overallWidth.toFloat() * (elementIndex+1) / elementCount).toInt()
         }
-        val isPlaying = viewModel?.paletteViewModel?.playbackTick?.convertPatternIndex(
+        val isPlaying = section == BeatClockPaletteConsumer.section &&
+          viewModel.paletteViewModel.playbackTick?.convertPatternIndex(
           from = BeatClockPaletteConsumer.ticksPerBeat,
           to = harmony
         ) == elementPosition
