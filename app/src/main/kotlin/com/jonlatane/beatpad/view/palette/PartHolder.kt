@@ -211,5 +211,7 @@ class PartHolder(
 	}
 
 
-	override fun updateSmartHolder() {}
+	override fun updateSmartHolder() {
+
+	}
 }

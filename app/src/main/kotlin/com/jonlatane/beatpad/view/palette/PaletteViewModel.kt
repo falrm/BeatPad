@@ -56,6 +56,8 @@ class PaletteViewModel constructor(
         showHorizontalSectionList {
           melodyViewModel.onZoomFinished()
         }
+        harmonyViewModel.notifyHarmonyChanged()
+        partListAdapters.forEach { it.notifyDataSetChanged() }
         sectionListAdapters.forEach { it.notifyDataSetChanged() }
       }
       BeatScratchToolbar.InteractionMode.VIEW -> {
