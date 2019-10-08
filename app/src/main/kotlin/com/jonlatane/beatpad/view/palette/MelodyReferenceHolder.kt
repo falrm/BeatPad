@@ -14,6 +14,7 @@ import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.applyTypeface
+import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import com.jonlatane.beatpad.util.thumbColorFilterColor
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -30,7 +31,9 @@ class MelodyReferenceHolder(
       height = wrapContent
 		}
 	}
-) : RecyclerView.ViewHolder(layout), AnkoLogger, Storage {
+) : RecyclerView.ViewHolder(layout), AnkoLogger, Storage, SmartAdapter.Holder {
+  override fun updateSmartHolder() {}
+
   override val storageContext: Context get() = context
   private val partPosition: Int get() = adapter.partPosition
 	val part: Part? get() = adapter.part

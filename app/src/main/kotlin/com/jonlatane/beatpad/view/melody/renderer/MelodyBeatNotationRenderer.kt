@@ -8,6 +8,7 @@ import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.view.melody.MelodyBeatAdapter
+import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha

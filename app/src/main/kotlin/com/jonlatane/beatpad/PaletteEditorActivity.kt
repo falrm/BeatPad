@@ -67,6 +67,12 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
       savedInstanceState
     }
 
+    viewModel.melodyView.post {
+      if (BeatClockPaletteConsumer.playbackMode == BeatClockPaletteConsumer.PlaybackMode.PALETTE) {
+        viewModel.beatScratchToolbar.interactionMode = BeatScratchToolbar.InteractionMode.VIEW
+      }
+    }
+
     if (bundle != null) {
       println("Got intent with extras: ${bundle.formatted()}")
       onRestoreInstanceState(bundle)

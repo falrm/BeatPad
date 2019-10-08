@@ -1,4 +1,4 @@
-//import com.jonlatane.beatpad.output.service.let
+import android.annotation.SuppressLint
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.midi.AndroidMidi
@@ -32,9 +32,10 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
     MidiDevices.refreshInstruments()
     tickPosition = 0
   }
-  var viewModel: PaletteViewModel? by observable(null) { _, _, _ ->
-
-  }
+  enum class PlaybackMode { SECTION, PALETTE }
+  var playbackMode = PlaybackMode.SECTION
+  @SuppressLint("StaticFieldLeak")
+  var viewModel: PaletteViewModel? = null
   var section: Section? = null
   set(value) {
     field = value
@@ -131,22 +132,20 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
         activeAttacks += attack
       }
       if ((tickPosition + 1) / ticksPerBeat >= totalBeats) {
-        viewModel?.run {
-          if(interactionMode == BeatScratchToolbar.InteractionMode.VIEW) {
-            var isNextSection = false
-            var nextSection: Section? = null
-            loop@ for(candidate in palette.sections) {
-              when {
-                candidate == section -> isNextSection = true
-                isNextSection        -> { nextSection = candidate; break@loop }
-              }
-            }
-            (nextSection ?: palette.sections.first()).let {
-              BeatClockPaletteConsumer.section = it
+        tickPosition = 0
+        if(playbackMode == PlaybackMode.PALETTE) {
+          var isNextSection = false
+          var nextSection: Section? = null
+          loop@ for(candidate in palette.sections) {
+            when {
+              candidate === section -> isNextSection = true
+              isNextSection        -> { nextSection = candidate; break@loop }
             }
           }
+          (nextSection ?: palette.sections.first()).let {
+            BeatClockPaletteConsumer.section = it
+          }
         }
-        tickPosition = 0
       } else {
         tickPosition += 1
       }

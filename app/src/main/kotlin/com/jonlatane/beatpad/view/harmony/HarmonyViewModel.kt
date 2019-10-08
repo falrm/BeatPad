@@ -12,13 +12,15 @@ import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.view.ZoomableRecyclerView
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
+import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.error
+import org.jetbrains.anko.info
 import org.jetbrains.anko.toast
 import java.net.URI
 
 open class HarmonyViewModel(
   override val storageContext: Context
-): SelectedChordAnimation, Storage {
+): SelectedChordAnimation, Storage, AnkoLogger {
   lateinit var paletteViewModel: PaletteViewModel
   var harmonyView: HarmonyView? = null
   lateinit var beatAdapter: HarmonyBeatAdapter
@@ -77,9 +79,9 @@ open class HarmonyViewModel(
   }
   fun notifyHarmonyChanged() {
     beatAdapter.updateSmartHolders()
-    paletteViewModel?.melodyViewModel?.beatAdapter?.updateSmartHolders()
     harmonyView?.syncScrollingChordText()
-    paletteViewModel?.melodyViewModel?.melodyView?.syncScrollingChordText()
+    paletteViewModel.melodyViewModel.beatAdapter.updateSmartHolders()
+    paletteViewModel.melodyViewModel.melodyView.syncScrollingChordText()
   }
   fun pasteHarmony(section: Section? = this@HarmonyViewModel.section) {
     getClipboardHarmony()?.let { newHarmony ->

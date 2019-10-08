@@ -37,7 +37,6 @@ class HarmonyBeatView constructor(
     set(value) {
       val (beatPos, section) = when(viewModel.paletteViewModel.interactionMode) {
         BeatScratchToolbar.InteractionMode.VIEW -> {
-          //TODO LAZY LAZY assuming 4/4 here
           var sectionStartBeat = 0
           var section = viewModel.paletteViewModel.palette.sections.first()
           for(it in viewModel.paletteViewModel.palette.sections) {
@@ -135,13 +134,13 @@ class HarmonyBeatView constructor(
               .toInt() * 24
           )
           if(
-            viewModel.paletteViewModel?.interactionMode == BeatScratchToolbar.InteractionMode.VIEW
-            && BeatClockPaletteConsumer.section != null
+            viewModel.paletteViewModel.interactionMode == BeatScratchToolbar.InteractionMode.VIEW
+            && BeatClockPaletteConsumer.section != section
           ) {
-
+            BeatClockPaletteConsumer.section = section
           }
           BeatClockPaletteConsumer.tickPosition = newPlaybackTick
-          viewModel.paletteViewModel?.playbackTick = newPlaybackTick
+          viewModel.paletteViewModel.playbackTick = newPlaybackTick
         }
       }
     }

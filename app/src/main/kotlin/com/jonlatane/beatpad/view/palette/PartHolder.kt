@@ -13,6 +13,7 @@ import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.showInstrumentPicker2
 import com.jonlatane.beatpad.util.applyTypeface
 import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import com.jonlatane.beatpad.util.vibrate
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onSeekBarChangeListener
@@ -22,7 +23,7 @@ class PartHolder(
 	val viewModel: PaletteViewModel,
 	val layout: PartHolderView,
 	private val adapter: PartListAdapter
-) : RecyclerView.ViewHolder(layout), PartHolderLayout, AnkoLogger {
+) : RecyclerView.ViewHolder(layout), PartHolderLayout, AnkoLogger, SmartAdapter.Holder {
 	val part: Part?  get() = viewModel.palette.parts.getOrNull(adapterPosition)
 	val context get() = layout.context
 	val melodyReferenceAdapter = MelodyReferenceAdapter(viewModel, layout.melodyReferenceRecycler, this)
@@ -208,4 +209,7 @@ class PartHolder(
 			onSeekBarChangeListener {}
 		}
 	}
+
+
+	override fun updateSmartHolder() {}
 }

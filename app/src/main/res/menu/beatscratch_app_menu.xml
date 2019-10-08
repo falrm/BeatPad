@@ -1,27 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="[palette name]"
-          android:id="@+id/paletteName"/>
-    <item android:title="New Palette..."
-          android:id="@+id/newPalette"/>
-    <item android:title="Open Palette..."
-          android:id="@+id/openPalette"/>
-    <item android:title="Duplicate Palette..."
-          android:id="@+id/duplicatePalette"/>
-    <item android:title="Save Palette"
-          android:id="@+id/savePalette"/>
-    <item android:title="Copy Palette"
-          android:id="@+id/copyPalette"/>
-    <item android:title="Export MIDI..."
-          android:id="@+id/exportMidi"/>
-    <item android:title="Export MusicXML..."
-          android:id="@+id/exportMusicXml"/>
-    <item android:title="MIDI Output Settings"
-          android:id="@+id/configureMidiSynthesizers"/>
-    <item android:title="Presets..."
-          android:id="@+id/openPreset"/>
-    <item android:title="Sign In..."
-          android:id="@+id/signIn"/>
-    <item android:title="About BeatScratch"
-          android:id="@+id/aboutBeatScratch"/>
+  <item
+    android:id="@+id/paletteName"
+    android:title="[palette name]" />
+  <item
+    android:id="@+id/newPalette"
+    android:title="New Palette..." />
+  <item
+    android:id="@+id/openPalette"
+    android:title="Open Palette..." />
+  <item
+    android:id="@+id/duplicatePalette"
+    android:title="Duplicate Palette..." />
+  <item
+    android:id="@+id/savePalette"
+    android:title="Save Palette" />
+  <item
+    android:id="@+id/copyPalette"
+    android:title="Copy Palette" />
+  <item
+    android:id="@+id/exportMidi"
+    android:title="Export MIDI..."
+    android:visible="false" />
+  <item
+    android:id="@+id/exportMusicXml"
+    android:title="Export MusicXML..."
+    android:visible="false" />
+  <item
+    android:id="@+id/configureMidiSynthesizers"
+    android:title="MIDI Output Settings" />
+  <item
+    android:id="@+id/openPreset"
+    android:title="Presets..."
+    android:visible="false" />
+  <item
+    android:id="@+id/signIn"
+    android:title="Sign In..."
+    android:visible="false" />
+  <item
+    android:id="@+id/aboutBeatScratch"
+    android:title="About BeatScratch"
+    android:visible="false" />
 </menu>

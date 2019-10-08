@@ -28,7 +28,9 @@ import com.jonlatane.beatpad.view.melody.MelodyViewModel
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import org.jetbrains.anko.*
+import java.lang.Thread.sleep
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.properties.Delegates.observable
 
 /**
@@ -46,34 +48,69 @@ class PaletteViewModel constructor(
   val interactionMode get() = beatScratchToolbar.interactionMode
   val isInEditMode get() = interactionMode == BeatScratchToolbar.InteractionMode.EDIT
   val isInViewMode get() = !isInEditMode
-  private var previouslyEditingSection: Section? = null
   fun notifyInteractionModeChanged() {
     when(interactionMode) {
       BeatScratchToolbar.InteractionMode.EDIT -> {
         melodyViewVisible = false
-        listOf<HideableView>(
-          paletteToolbar,
-          sectionListRecyclerHorizontalRotator
-        ).forEach { it.show() }
-        BeatClockPaletteConsumer.section = previouslyEditingSection
-          ?: BeatClockPaletteConsumer.palette?.sections?.first()
+        paletteToolbar.show()
+        showHorizontalSectionList {
+          melodyViewModel.onZoomFinished()
+        }
         sectionListAdapters.forEach { it.notifyDataSetChanged() }
       }
       BeatScratchToolbar.InteractionMode.VIEW -> {
-        melodyViewVisible = true
-        listOf<HideableView>(
-          paletteToolbar,
-          sectionListRecyclerHorizontalRotator
-        ).forEach { it.hide() }
-        sectionListRecyclerVerticalRotator.hide(animation = HideAnimation.HORIZONTAL)
-        editingMelody = null
-        BeatClockPaletteConsumer.section?.let {
-          previouslyEditingSection = it
-        }
-//        BeatClockPaletteConsumer.section = null
         melodyViewModel.layoutType = MelodyViewModel.LayoutType.GRID
+        editingMelody = null
+        melodyViewVisible = true
+        val sectionListsHidden = AtomicInteger(0)
+        fun showMelody() {
+          if(sectionListsHidden.incrementAndGet() == 3) {
+            melodyViewModel.onZoomFinished()
+            doAsync {
+              sleep(300)
+              uiThread {
+                melodyViewModel.onZoomFinished()
+              }
+            }
+          }
+        }
+        paletteToolbar.hide { showMelody() }
+        hideVerticalSectionList   { showMelody() }
+        hideHorizontalSectionList { showMelody() }
       }
     }
+  }
+  fun showVerticalSectionList(animated: Boolean = true, endAction: (() -> Unit)? = null) {
+    sectionListRecyclerVerticalRotator.show(animated = animated, animation = HideAnimation.HORIZONTAL)
+    endAction?.invoke()
+  }
+  fun hideVerticalSectionList(animated: Boolean = true, endAction: (() -> Unit)? = null) {
+    sectionListRecyclerVerticalRotator.hide(animated = animated, animation = HideAnimation.HORIZONTAL)
+    endAction?.invoke()
+  }
+  fun showHorizontalSectionList(animated: Boolean = true, endAction: (() -> Unit)? = null) {
+    val portrait = storageContext.resources.configuration.portrait
+    sectionListRecyclerHorizontalRotator.show(
+      animated = animated,
+      animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
+    )
+    sectionListRecyclerHorizontalSpacer?.show(
+      animated = animated,
+      animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
+    )
+    endAction?.invoke()
+  }
+  fun hideHorizontalSectionList(animated: Boolean = true, endAction: (() -> Unit)? = null) {
+    val portrait = storageContext.resources.configuration.portrait
+    sectionListRecyclerHorizontalRotator.hide(
+      animated = animated,
+      animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
+    )
+    sectionListRecyclerHorizontalSpacer?.hide(
+      animated = animated,
+      animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
+    )
+    endAction?.invoke()
   }
   fun save(showSuccessToast: Boolean = false) = storageContext.storePalette(palette, showSuccessToast = showSuccessToast)
   private var lastSaveTime = System.currentTimeMillis()
@@ -97,8 +134,8 @@ class PaletteViewModel constructor(
         BeatScratchToolbar.InteractionMode.VIEW -> {
           var totalBeats = 0
           loop@ for(candidate in palette.sections) {
-            when (candidate) {
-              BeatClockPaletteConsumer.section -> break@loop
+            when {
+              candidate === BeatClockPaletteConsumer.section -> break@loop
               else -> totalBeats += candidate.harmony.run { length / subdivisionsPerBeat }
             }
           }

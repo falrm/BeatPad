@@ -149,26 +149,16 @@ class BeatScratchToolbar(
 //        verticalSectionsVisible &&
       !horizontalSectionsVisible -> {
         viewModel.sectionListRecyclerHorizontal.adapter!!.notifyDataSetChanged()
-        viewModel.sectionListRecyclerHorizontalRotator.show(
-          animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
-        )
-        viewModel.sectionListRecyclerHorizontalSpacer?.show(
-          animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
-        )
-        viewModel.sectionListRecyclerVerticalRotator.hide(animation = HideAnimation.HORIZONTAL) {
+        viewModel.showHorizontalSectionList()
+        viewModel.hideVerticalSectionList {
           post { viewModel.melodyViewModel.onZoomFinished() }
         }
       }
       //horizontalSectionsVisible && !verticalSectionsVisible
       else -> {
         viewModel.sectionListRecyclerVertical.adapter!!.notifyDataSetChanged()
-        viewModel.sectionListRecyclerHorizontalRotator.hide(
-          animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
-        )
-        viewModel.sectionListRecyclerHorizontalSpacer?.hide(
-          animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
-        )
-        viewModel.sectionListRecyclerVerticalRotator.show(animation = HideAnimation.HORIZONTAL) {
+        viewModel.hideHorizontalSectionList()
+        viewModel.showVerticalSectionList {
           post { viewModel.melodyViewModel.onZoomFinished() }
         }
       }
@@ -176,17 +166,8 @@ class BeatScratchToolbar(
   }
 
   fun updateButtonColors() {
-    interactionMode = interactionMode
-    playPauseSectionDisplayButton.image
-      ?.setColorFilter(BeatClockPaletteConsumer.currentSectionColor, PorterDuff.Mode.SRC_IN)
-  }
-
-  enum class InteractionMode { VIEW, EDIT }
-  var interactionMode: InteractionMode = InteractionMode.EDIT
-  set(value) {
-    val changed = field != value
-    field = value
-    when(value) {
+//    interactionMode = interactionMode
+    when(interactionMode) {
       InteractionMode.VIEW -> viewModeButton to editModeButton
       InteractionMode.EDIT -> editModeButton to viewModeButton
     }.let {
@@ -199,6 +180,24 @@ class BeatScratchToolbar(
     }
     viewModeButton.padding = dip(9)
     editModeButton.padding = dip(9)
+    playPauseSectionDisplayButton.image
+      ?.setColorFilter(BeatClockPaletteConsumer.currentSectionColor, PorterDuff.Mode.SRC_IN)
+  }
+
+  enum class InteractionMode {
+    VIEW {
+      override val playbackMode = BeatClockPaletteConsumer.PlaybackMode.PALETTE
+    },
+    EDIT {
+      override var playbackMode = BeatClockPaletteConsumer.PlaybackMode.SECTION
+    };
+    abstract val playbackMode: BeatClockPaletteConsumer.PlaybackMode
+  }
+  var interactionMode: InteractionMode = InteractionMode.EDIT
+  set(value) {
+    val changed = field != value
+    field = value
+    BeatClockPaletteConsumer.playbackMode = value.playbackMode
     if(changed) {
       playPauseSectionDisplayButton.imageResource = when(value) {
         InteractionMode.EDIT -> R.drawable.ic_menu_black_24dp

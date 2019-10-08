@@ -156,7 +156,7 @@ var View.rightMargin get() = this.marginLayoutParams.rightMargin
   }
 
 fun View.animateWidth(width: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
-	val anim = ValueAnimator.ofInt(measuredWidth, width)
+	val anim = ValueAnimator.ofInt(this.width, width)
 	anim.addUpdateListener { valueAnimator ->
 		layoutWidth = valueAnimator.animatedValue as Int
 	}
@@ -169,7 +169,7 @@ fun View.animateWidth(width: Int, duration: Long = defaultDuration, endAction: (
 }
 
 fun View.animateHeight(height: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {
-	val anim = ValueAnimator.ofInt(this.measuredHeight, height)
+	val anim = ValueAnimator.ofInt(this.height, height)
   anim.interpolator = LinearInterpolator()
 	anim.addUpdateListener { valueAnimator ->
 		this.layoutHeight = valueAnimator.animatedValue as Int

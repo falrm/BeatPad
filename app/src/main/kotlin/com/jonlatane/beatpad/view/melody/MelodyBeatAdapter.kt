@@ -268,6 +268,7 @@ class MelodyBeatAdapter(
   }
 
   override fun onBindViewHolder(holder: MelodyBeatHolder, position: Int) = with(holder) {
+    super.onBindViewHolder(holder, position)
 //    element.layoutWidth = elementWidth
 //    element.layoutHeight = elementHeight + harmonyViewHeight
     melodyBeatView.sectionStartBeatPosition = when(viewModel.paletteViewModel.interactionMode) {

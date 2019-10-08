@@ -56,6 +56,7 @@ class HarmonyBeatAdapter(
 	}
 
 	override fun onBindViewHolder(holder: HarmonyBeatHolder, position: Int) {
+		super.onBindViewHolder(holder, position)
 		holder.element.beatPosition = position
     holder.element.layoutWidth = elementWidth
 		holder.element.invalidate()
