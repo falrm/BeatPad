@@ -17,6 +17,7 @@ import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import org.jetbrains.anko.verbose
+import org.jetbrains.anko.warn
 import java.util.*
 import kotlin.math.floor
 import kotlin.properties.Delegates.observable
@@ -79,6 +80,7 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
     override fun clearInstance(instance: Attack): Attack = instance.apply { chosenTones.clear() }
   }
   private val activeAttacks = Vector<Attack>(16)
+  private val outgoingAttacks = Vector<Attack>(16)
   private val upcomingAttacks = Vector<Attack>(16)
 
   private fun loadUpcomingAttacks(palette: Palette, section: Section) {
@@ -108,23 +110,59 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
     }
   }
 
+  private fun cleanUpExpiredAttacks() {
+    activeAttacks.forEach { attack ->
+      val attackCameFromRunningMelody = section?.melodies
+        ?.filter { !it.isDisabled }
+        ?.map { it.melody }
+        ?.contains(attack.melody) ?: false
+      if (!attackCameFromRunningMelody) {
+        //info("stopping active attack $attack")
+        outgoingAttacks.add(attack)
+      }
+    }
+    outgoingAttacks.forEach { attack ->
+      destroyAttack(attack)
+    }
+    outgoingAttacks.clear()
+  }
+
+  private fun RationalMelody.stopCurrentAttacks() {
+    for (activeAttack in activeAttacks) {
+      if (activeAttack.melody == this) {
+        //verbose { "Ending attack $activeAttack" }
+        destroyAttack(activeAttack)
+        break
+      }
+    }
+  }
+
+  private fun getNextSection(): Section {
+    var isNextSection = false
+    var nextSection: Section? = null
+    loop@ for(candidate in palette!!.sections) {
+      when {
+        candidate === section -> isNextSection = true
+        isNextSection        -> { nextSection = candidate; break@loop }
+      }
+    }
+    return (nextSection ?: palette!!.sections.first()).let {
+      it
+    }
+  }
+
   fun tick() {
     (palette to section).letCheckNull { palette: Palette, section: Section ->
       val totalBeats = harmony?.let { it.length.toFloat() / it.subdivisionsPerBeat } ?: 0f
       loadUpcomingAttacks(palette, section)
+      cleanUpExpiredAttacks()
       for (attack in upcomingAttacks) {
         val instrument = attack.instrument!!
-        // Stop current notes from this attack's melody
-        for (activeAttack in activeAttacks) {
-          if (activeAttack.melody == attack.melody) {
-            verbose { "Ending attack $activeAttack" }
-            destroyAttack(activeAttack)
-            break
-          }
-        }
+        (attack.melody as? RationalMelody)?.stopCurrentAttacks()
+
         // And play the new notes
 
-        verbose { "Executing attack $attack" }
+        //verbose { "Executing attack $attack" }
 
         attack.chosenTones.forEach { tone ->
           instrument.play(tone, attack.velocity.to127Int)
@@ -132,37 +170,19 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
         activeAttacks += attack
       }
       if ((tickPosition + 1) / ticksPerBeat >= totalBeats) {
-        tickPosition = 0
         if(playbackMode == PlaybackMode.PALETTE) {
-          var isNextSection = false
-          var nextSection: Section? = null
-          loop@ for(candidate in palette.sections) {
-            when {
-              candidate === section -> isNextSection = true
-              isNextSection        -> { nextSection = candidate; break@loop }
-            }
-          }
-          (nextSection ?: palette.sections.first()).let {
-            BeatClockPaletteConsumer.section = it
-          }
+          val nextSection = getNextSection()
+          tickPosition = 0
+          this.section = nextSection
+        } else {
+          tickPosition = 0
         }
       } else {
         tickPosition += 1
       }
-    } ?: info("Tick called with no Palette available")
+    } ?: warn("Tick called with no Palette available")
 
     upcomingAttacks.clear()
-    // Clean up expired attacks
-    activeAttacks.forEach { attack ->
-      val attackCameFromRunningMelody = section?.melodies
-        ?.filter { !it.isDisabled }
-        ?.map { it.melody }
-        ?.contains(attack.melody) ?: false
-      if (!attackCameFromRunningMelody) {
-        info("stopping active attack $attack")
-        destroyAttack(attack)
-      }
-    }
 
     AndroidMidi.flushSendStream()
     viewModel?.harmonyView?.post { viewModel?.playbackTick = tickPosition }

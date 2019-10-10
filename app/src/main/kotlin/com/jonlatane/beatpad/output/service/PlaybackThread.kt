@@ -20,7 +20,7 @@ internal class PlaybackThread : Thread(), AnkoLogger {
           val start = System.currentTimeMillis()
           val tickTime: Long = 60000L / (BeatClockPaletteConsumer.palette!!.bpm.toInt() * subdivisionsPerBeat)
           verbose { "Tick @${BeatClockPaletteConsumer.tickPosition} (T:${System.currentTimeMillis()}" }
-          tryWithRetries { BeatClockPaletteConsumer.tick() }
+          BeatClockPaletteConsumer.tick()
           while(System.currentTimeMillis() < start + tickTime) {
             sleep(1L)
           }
@@ -29,7 +29,7 @@ internal class PlaybackThread : Thread(), AnkoLogger {
           BeatClockPaletteConsumer.clearActiveAttacks()
           AndroidMidi.flushSendStream()
           synchronized(PlaybackThread) {
-            (PlaybackThread as java.lang.Object).wait()
+            (PlaybackThread as Object).wait()
           }
           //Thread.sleep(10)
         }
