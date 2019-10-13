@@ -4,6 +4,8 @@ import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.dsl.Patterns
 import java.util.*
 import kotlin.NoSuchElementException
+import kotlin.math.ceil
+import kotlin.math.floor
 
 /**
  * A [Pattern] can be thought of a sequence of changes, all at points in time expressible
@@ -19,6 +21,10 @@ interface Pattern<T : Transposable<T>> : Transposable<Pattern<T>>, Patterns {
   var subdivisionsPerBeat: Int
   var length: Int
   var tonic: Int
+  val lengthInBeats: Int get() = length / subdivisionsPerBeat
+  val exactLengthInBeats: Double get() = length.toDouble()/subdivisionsPerBeat
+  val upperLengthInBeats: Int get() = ceil(exactLengthInBeats).toInt()
+  val lowerLengthInBeats: Int get() = floor(exactLengthInBeats).toInt()
 
   fun beat(beatPosition: Int): NavigableMap<Int, T> = changes.subMap(
     beatPosition * subdivisionsPerBeat, true,
