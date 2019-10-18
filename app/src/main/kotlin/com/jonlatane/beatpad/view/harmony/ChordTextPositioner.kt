@@ -31,7 +31,7 @@ interface ChordTextPositioner: AnkoLogger {
   val chordChangeLabels: MutableMap<Int, TextView>
   val chordChangeLabelPool: DefaultPool<TextView>
   val recycler: RecyclerView
-  val supportGridLayout: Boolean get() = false
+  val supportGridLayout: Boolean
   val defaultChordChangeLabelPool get() = with(this as _RelativeLayout) {
     object : DefaultPool<TextView>(16) {
       override fun produceInstance() = textView {
@@ -125,7 +125,10 @@ interface ChordTextPositioner: AnkoLogger {
     val subdivisionsPerBeat = harmony.subdivisionsPerBeat
     val upperBound = (lastRenderedBeatPosition - firstHarmonyBeatPosition + 1) * subdivisionsPerBeat
     val strictLowerBound = subdivisionsPerBeat * (firstRenderedBeatPosition - firstHarmonyBeatPosition)
-    val lowerBound = min(strictLowerBound, harmony.lowerKey(strictLowerBound))
+    val lowerBound = when(recycler.layoutManager) {
+      is GridLayoutManager -> strictLowerBound
+      else ->  min(strictLowerBound, harmony.lowerKey(strictLowerBound))
+    }
 
     val visibleChanges: SortedMap<Int, Chord> = harmony.changes
       .headMap(upperBound, true)
@@ -194,9 +197,13 @@ interface ChordTextPositioner: AnkoLogger {
           }
       }
     }
+    fun Int.isOutOfViewBounds() = this !in
+      (firstRenderedBeatPosition * BeatClockPaletteConsumer.ticksPerBeat)..((lastRenderedBeatPosition + 1) * BeatClockPaletteConsumer.ticksPerBeat)
+    fun Int.isInHarmonyAndWasUnused() =
+      this in (firstHarmonyBeatPosition * BeatClockPaletteConsumer.ticksPerBeat) until ((lastHarmonyBeatPosition + 1) * BeatClockPaletteConsumer.ticksPerBeat)
+        && !visibleChanges.containsKey(this - firstHarmonyBeatPosition * BeatClockPaletteConsumer.ticksPerBeat)
     val entriesToRemove = chordChangeLabels.filterKeys {
-      it in (firstHarmonyBeatPosition * BeatClockPaletteConsumer.ticksPerBeat)..(lastHarmonyBeatPosition * BeatClockPaletteConsumer.ticksPerBeat)
-        && !visibleChanges.containsKey(it - firstHarmonyBeatPosition * BeatClockPaletteConsumer.ticksPerBeat)
+      it. isInHarmonyAndWasUnused()
     }
     entriesToRemove.forEach { (key, textView) ->
       chordChangeLabels.remove(key)

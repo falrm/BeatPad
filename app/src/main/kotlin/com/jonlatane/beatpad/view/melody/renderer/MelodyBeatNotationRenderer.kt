@@ -61,6 +61,10 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
         otherMelody.averageTone!!
       }
     }
+    val melodyToRenderSelectionAndPlaybackWith = when(melody) {
+      null -> melodiesToRender.maxBy { it.subdivisionsPerBeat }
+      else -> null
+    }
     // Render queue is accessed from two directions; in order from highest to lowest Melody
     val renderQueue = melodiesToRender.toMutableList()
     var index = 0
@@ -73,12 +77,13 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
         2    -> renderQueue.removeAt(renderQueue.size - 1) to true
         else -> renderQueue.removeAt(0) to false
       }
+      val drawSelectionAndPlayback = otherMelody == melodyToRenderSelectionAndPlaybackWith
       canvas.drawNotationMelody(
         otherMelody,
         drawAlpha = melody?.let { notationAlpha / 3f } ?: notationAlpha,
         drawColorGuide = false,
-        forceDrawColorGuideForCurrentBeat = melody == null,
-        forceDrawColorGuideForSelectedBeat = melody == null,
+        forceDrawColorGuideForCurrentBeat = drawSelectionAndPlayback,
+        forceDrawColorGuideForSelectedBeat = drawSelectionAndPlayback,
         stemsUp = if(melody == null) {
           if (melodiesToRender.size > 2 && renderQueue.isEmpty())
             otherMelody.averageTone!! < melodiesToRender.mapNotNull{ it.averageTone }.average()

@@ -25,6 +25,7 @@ class HarmonyView(
   override val chordChangeLabels: MutableMap<Int, TextView> = mutableMapOf()
   override val chordChangeLabelPool: DefaultPool<TextView> = defaultChordChangeLabelPool
   override val recycler: RecyclerView get() = viewModel.harmonyViewModel.harmonyElementRecycler!!
+  override val supportGridLayout = false
 
   init {
     viewModel.harmonyView = this

@@ -94,11 +94,16 @@ interface Storage : AnkoLogger {
         loadPalette(this, file.backup)
       } catch (t: Throwable) {
         if(startWithPresetPalette) {
+          PresetPalettes.values().forEach { preset ->
+            storePalette(preset.palette, "${preset.title}.json", false)
+          }
           val preset = PresetPalettes.values().random()
-          toast("Welcome! Starting you off with ${preset.title}.")
+          BeatClockPaletteConsumer.viewModel?.melodyView?.post {
+            toast("Welcome! Starting you off with ${preset.title}.")
+          }
           openPaletteFile = preset.title
           startWithPresetPalette = false
-          BeatClockPaletteConsumer.viewModel?.saveAfterDelay()
+//          BeatClockPaletteConsumer.viewModel?.saveAfterDelay()
           preset.palette
         } else {
           error("Failed to load any palette data, starting from scratch...", t)
