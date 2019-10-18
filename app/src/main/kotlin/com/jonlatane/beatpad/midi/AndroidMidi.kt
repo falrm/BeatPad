@@ -30,7 +30,7 @@ object AndroidMidi : AnkoLogger {
 	}
 	private var sendToInternalSynthSetting by booleanPref("sendToInternalSynth", false)
 	private var sendToInternalFluidSynthSetting by booleanPref("sendToInternalFluidSynth", true)
-	private var sendToExternalSynthSetting by booleanPref("sendToExternalSynth", true)
+	private var sendToExternalSynthSetting by booleanPref("sendToExternalSynth", false)
 
 	var sendToExternalSynth = sendToExternalSynthSetting
 		set(value) {

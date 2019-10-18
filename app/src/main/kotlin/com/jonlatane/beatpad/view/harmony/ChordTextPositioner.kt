@@ -138,11 +138,15 @@ interface ChordTextPositioner: AnkoLogger {
 
     val locationOnScreen = intArrayOf(-1, -1)
 
+    fun Int.positionToBeatHash() = (firstHarmonyBeatPosition) * BeatClockPaletteConsumer.ticksPerBeat +
+      (this / subdivisionsPerBeat) * BeatClockPaletteConsumer.ticksPerBeat +
+      (this % subdivisionsPerBeat)
+    fun Int.beatHashToPosition() = (this / BeatClockPaletteConsumer.ticksPerBeat - firstHarmonyBeatPosition) * subdivisionsPerBeat + this % BeatClockPaletteConsumer.ticksPerBeat
     var lastView: TextView? = null
     var lastTranslationX: Float? = null
     visibleChanges.forEach { (position, chord) ->
       val beatPosition: Float = firstHarmonyBeatPosition + (position.toFloat() / subdivisionsPerBeat)
-      val beatHash = firstHarmonyBeatPosition * BeatClockPaletteConsumer.ticksPerBeat + position
+      val beatHash = position.positionToBeatHash()
       val label = chordChangeLabels[beatHash]
         ?: chordChangeLabelPool.borrow().also { chordChangeLabels[beatHash] = it }
       label.apply textView@{
@@ -165,7 +169,6 @@ interface ChordTextPositioner: AnkoLogger {
             val recyclerViewX = locationOnScreen[0]
             val chordTranslationX = max(0f, chordPositionX - recyclerViewX)
 
-            verbose { "Location of view for $text @ (beat $beatPosition) is $chordTranslationX" }
             this@textView.translationX = chordTranslationX
             if(supportGridLayout) {
               val recyclerViewY = locationOnScreen[1]
@@ -176,6 +179,7 @@ interface ChordTextPositioner: AnkoLogger {
               this@textView.leftMargin = marginForKey + round(harmonyViewHeight * 0.2f).toInt()
             }
             this@textView.text = chord.name
+//            info("Location of view for $text @ (beat $beatPosition, hash $beatHash, position $position) is $chordTranslationX")
             this@textView.alpha = 1f
             this@textView.layoutParams = this@textView.layoutParams.apply {
               val length = (harmony.changes.higherKey(position) ?: harmony.length - 1) - position
@@ -197,13 +201,18 @@ interface ChordTextPositioner: AnkoLogger {
           }
       }
     }
+    val lowerBoundBeat = if(recycler.layoutManager is GridLayoutManager) firstRenderedBeatPosition else min(firstHarmonyBeatPosition, firstRenderedBeatPosition)
     fun Int.isOutOfViewBounds() = this !in
-      (firstRenderedBeatPosition * BeatClockPaletteConsumer.ticksPerBeat)..((lastRenderedBeatPosition + 1) * BeatClockPaletteConsumer.ticksPerBeat)
+      (lowerBoundBeat * BeatClockPaletteConsumer.ticksPerBeat) until ((lastRenderedBeatPosition + 1) * BeatClockPaletteConsumer.ticksPerBeat)
     fun Int.isInHarmonyAndWasUnused() =
       this in (firstHarmonyBeatPosition * BeatClockPaletteConsumer.ticksPerBeat) until ((lastHarmonyBeatPosition + 1) * BeatClockPaletteConsumer.ticksPerBeat)
-        && !visibleChanges.containsKey(this - firstHarmonyBeatPosition * BeatClockPaletteConsumer.ticksPerBeat)
-    val entriesToRemove = chordChangeLabels.filterKeys {
-      it. isInHarmonyAndWasUnused()
+        && !visibleChanges.containsKey(this.beatHashToPosition())
+    val entriesToRemove = chordChangeLabels.filterKeys { beatHash ->
+      beatHash.isInHarmonyAndWasUnused() || beatHash.isOutOfViewBounds()
+
+      /*.also { outOfBounds -> if(outOfBounds) info(
+        "Out of bounds chord text: $beatHash:${chordChangeLabels[beatHash]?.text}, $firstRenderedBeatPosition, $lastRenderedBeatPosition, ${((firstRenderedBeatPosition - 1) * BeatClockPaletteConsumer.ticksPerBeat)..((lastRenderedBeatPosition + 1) * BeatClockPaletteConsumer.ticksPerBeat)}, $firstHarmonyBeatPosition, $lastHarmonyBeatPosition")
+      }*/
     }
     entriesToRemove.forEach { (key, textView) ->
       chordChangeLabels.remove(key)
