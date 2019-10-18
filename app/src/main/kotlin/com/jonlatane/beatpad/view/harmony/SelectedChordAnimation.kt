@@ -47,7 +47,7 @@ interface SelectedChordAnimation: AnkoLogger {
         }
       })
       interpolator = LinearInterpolator()
-      duration = 4800L // 5fps (12 "frames") over 2400MS
+      duration = 9600L // 5fps (12 "frames") over 2400MS
     }.start()
   }
 

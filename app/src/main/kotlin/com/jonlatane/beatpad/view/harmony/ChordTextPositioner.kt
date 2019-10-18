@@ -16,6 +16,7 @@ import io.multifunctions.letCheckNull
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.*
 import java.util.*
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
@@ -26,6 +27,7 @@ interface ChordTextPositioner: AnkoLogger {
   }
   val viewModel: PaletteViewModel
   val marginForKey: Int
+  /** Vector of beat hashes (based on BCPC.ticksPerBeat as a max subdivisionPerBeat for chord change labels*/
   val chordChangeLabels: MutableMap<Int, TextView>
   val chordChangeLabelPool: DefaultPool<TextView>
   val recycler: RecyclerView
@@ -67,38 +69,45 @@ interface ChordTextPositioner: AnkoLogger {
     val (firstBeatPosition, lastBeatPosition) = (recycler.layoutManager as LinearLayoutManager).run {
       findFirstVisibleItemPosition() to findLastVisibleItemPosition()
     }
+    var renderedAHarmony = false
     // Render the harmony if there is one
-    val harmonies = when(viewModel.interactionMode) {
-      BeatScratchToolbar.InteractionMode.EDIT -> listOf(viewModel.harmonyViewModel.harmony)
+    when(viewModel.interactionMode) {
+      BeatScratchToolbar.InteractionMode.EDIT -> {
+        viewModel.harmonyViewModel.harmony?.let { harmony ->
+
+          //
+          renderedAHarmony = true
+          positionChordTextOntoView(harmony, 0, harmony.lengthInBeats - 1, firstBeatPosition, lastBeatPosition)
+        }
+      }
       BeatScratchToolbar.InteractionMode.VIEW -> {
         var sectionStartBeat = 0
         var sectionEndBeat = 0
         loop@ for(section in viewModel.palette.sections) {
-          sectionEndBeat = sectionStartBeat + section.harmony.lengthInBeats
+          val harmony = section.harmony
+          sectionEndBeat = sectionStartBeat + harmony.lengthInBeats
           if(sectionStartBeat <= lastBeatPosition || sectionEndBeat >= firstBeatPosition) {
-            harmonyFindingVector.add(section.harmony)
+            renderedAHarmony = true
+            positionChordTextOntoView(harmony, sectionStartBeat, sectionEndBeat, firstBeatPosition, lastBeatPosition)
           }
-        }
-        harmonyFindingVector
-      }
-    }.filterNotNull()
-    harmonies.forEach { harmony ->
-      positionChordTextOntoView(harmony, 0, harmony.lengthInBeats - 1, firstBeatPosition, lastBeatPosition)
-    }
-    if(harmonies.isEmpty()) {
-      //No harmony, render some placeholder stuff
-      chordChangeLabels.toMap().forEach { (key, textView) ->
-        chordChangeLabels.remove(key)
-        chordChangeLabelPool.recycle(textView)
-      }
-      chordChangeLabels[-1] = chordChangeLabelPool.borrow().apply {
-        text = "No harmony"
-        alpha = 1f
-        layoutParams = this.layoutParams.apply {
-          maxWidth = Int.MAX_VALUE
+          sectionStartBeat = sectionEndBeat
         }
       }
     }
+//    if(!renderedAHarmony) {
+//      //No harmony, render some placeholder stuff
+//      chordChangeLabels.toMap().forEach { (key, textView) ->
+//        chordChangeLabels.remove(key)
+//        chordChangeLabelPool.recycle(textView)
+//      }
+//      chordChangeLabels[-1] = chordChangeLabelPool.borrow().apply {
+//        text = "No harmony"
+//        alpha = 1f
+//        layoutParams = this.layoutParams.apply {
+//          maxWidth = Int.MAX_VALUE
+//        }
+//      }
+//    }
     harmonyFindingVector.clear()
     if(postAgainAfter) {
       recycler.post { syncScrollingChordText(postAgainAfter = false) }
@@ -112,9 +121,10 @@ interface ChordTextPositioner: AnkoLogger {
     firstRenderedBeatPosition: Int,
     lastRenderedBeatPosition: Int
   ) {
+    // Derive a submap of harmony.changes that contains visible changes
     val subdivisionsPerBeat = harmony.subdivisionsPerBeat
-    val upperBound = (lastRenderedBeatPosition + 1) * subdivisionsPerBeat
-    val strictLowerBound = subdivisionsPerBeat * firstRenderedBeatPosition
+    val upperBound = (lastRenderedBeatPosition - firstHarmonyBeatPosition + 1) * subdivisionsPerBeat
+    val strictLowerBound = subdivisionsPerBeat * (firstRenderedBeatPosition - firstHarmonyBeatPosition)
     val lowerBound = min(strictLowerBound, harmony.lowerKey(strictLowerBound))
 
     val visibleChanges: SortedMap<Int, Chord> = harmony.changes
@@ -128,13 +138,14 @@ interface ChordTextPositioner: AnkoLogger {
     var lastView: TextView? = null
     var lastTranslationX: Float? = null
     visibleChanges.forEach { (position, chord) ->
-      val label = chordChangeLabels[position]
-        ?: chordChangeLabelPool.borrow().also { chordChangeLabels[position] = it }
+      val beatPosition: Float = firstHarmonyBeatPosition + (position.toFloat() / subdivisionsPerBeat)
+      val beatHash = firstHarmonyBeatPosition * BeatClockPaletteConsumer.ticksPerBeat + position
+      val label = chordChangeLabels[beatHash]
+        ?: chordChangeLabelPool.borrow().also { chordChangeLabels[beatHash] = it }
       label.apply textView@{
-        val beatPosition = (position.toFloat() / subdivisionsPerBeat).toInt()
         (recycler.layoutManager as LinearLayoutManager)
           .run {
-            findViewByPosition(beatPosition)?.let { it to false } ?:
+            findViewByPosition(floor(beatPosition).toInt())?.let { it to false } ?:
             if(beatPosition < firstRenderedBeatPosition)findViewByPosition(firstRenderedBeatPosition)!! to true
             else null
           }?.let { (beatView: View, isFakeFirstBeat) ->
@@ -183,7 +194,10 @@ interface ChordTextPositioner: AnkoLogger {
           }
       }
     }
-    val entriesToRemove = chordChangeLabels.filterKeys { !visibleChanges.containsKey(it) }
+    val entriesToRemove = chordChangeLabels.filterKeys {
+      it in (firstHarmonyBeatPosition * BeatClockPaletteConsumer.ticksPerBeat)..(lastHarmonyBeatPosition * BeatClockPaletteConsumer.ticksPerBeat)
+        && !visibleChanges.containsKey(it - firstHarmonyBeatPosition * BeatClockPaletteConsumer.ticksPerBeat)
+    }
     entriesToRemove.forEach { (key, textView) ->
       chordChangeLabels.remove(key)
       chordChangeLabelPool.recycle(textView)

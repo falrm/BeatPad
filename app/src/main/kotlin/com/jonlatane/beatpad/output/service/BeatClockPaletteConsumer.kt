@@ -34,7 +34,7 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
     tickPosition = 0
   }
   enum class PlaybackMode { SECTION, PALETTE }
-  var playbackMode = PlaybackMode.SECTION
+  var playbackMode = PlaybackMode.PALETTE
   @SuppressLint("StaticFieldLeak")
   var viewModel: PaletteViewModel? = null
   var section: Section? = null
