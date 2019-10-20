@@ -20,7 +20,7 @@ object AndroidMidi : AnkoLogger {
 	internal var lastMidiSyncTime: Long? = null
 	val ONBOARD_DRIVER = MidiDriver()
 	init {
-		System.loadLibrary("fluidsynth")
+		System.loadLibrary("fluidsynthjni")
 	}
 	private var FLUIDSYNTH by observable(FluidsynthMidiReceiver(MainApplication.instance)) { _, old, _ ->
 		old.nativeLibJNI.destroy()

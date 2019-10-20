@@ -2,9 +2,6 @@ package opensles.android.fluidsynth.fluidsynth_android_opensles
 
 import android.content.Context
 import android.media.midi.MidiReceiver
-import android.util.Log
-import com.jonlatane.beatpad.storage.Storage
-import fluidsynth_android_opensles.MainActivity
 import okio.Okio
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
