@@ -51,11 +51,12 @@ class PaletteViewModel constructor(
   fun notifyInteractionModeChanged() {
     when(interactionMode) {
       BeatScratchToolbar.InteractionMode.EDIT -> {
-        melodyViewVisible = false
-        paletteToolbar.show()
         showHorizontalSectionList {
-          melodyViewModel.onZoomFinished()
+          paletteToolbar.show {
+            melodyViewVisible = false
+          }
         }
+
         harmonyViewModel.notifyHarmonyChanged()
         partListAdapters.forEach { it.notifyDataSetChanged() }
         sectionListAdapters.forEach { it.notifyDataSetChanged() }
@@ -63,11 +64,11 @@ class PaletteViewModel constructor(
       BeatScratchToolbar.InteractionMode.VIEW -> {
         melodyViewModel.layoutType = MelodyViewModel.LayoutType.GRID
         editingMelody = null
-        melodyViewVisible = true
         val sectionListsHidden = AtomicInteger(0)
         fun showMelody() {
           if(sectionListsHidden.incrementAndGet() == 3) {
-            melodyViewModel.onZoomFinished()
+//            melodyViewModel.onZoomFinished()
+            melodyViewVisible = true
             doAsync {
               sleep(300)
               uiThread {

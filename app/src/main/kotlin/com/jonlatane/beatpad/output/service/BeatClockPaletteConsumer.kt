@@ -7,6 +7,7 @@ import com.jonlatane.beatpad.model.*
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.dsl.Patterns
 import com.jonlatane.beatpad.model.melody.RationalMelody
+import com.jonlatane.beatpad.output.service.Base24ConversionMap
 import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.to127Int
 import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
@@ -19,6 +20,7 @@ import org.jetbrains.anko.info
 import org.jetbrains.anko.verbose
 import org.jetbrains.anko.warn
 import java.util.*
+import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.properties.Delegates.observable
 
@@ -103,9 +105,10 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
           && part.melodies.contains(it.melody)
       }.forEach { melodyReference ->
         val melody = melodyReference.melody
-        upcomingAttacks += (melody as? RationalMelody)
-          ?.attacksForCurrentTickPosition(part, chord, melodyReference.volume)
-          ?: emptyList()
+        (melody as? RationalMelody)
+          ?.attackForCurrentTickPosition(part, chord, melodyReference.volume)?.let {
+            upcomingAttacks += it
+          }
       }
     }
   }
@@ -162,7 +165,7 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
 
         // And play the new notes
 
-        //verbose { "Executing attack $attack" }
+//        info("Executing attack $attack")
 
         attack.chosenTones.forEach { tone ->
           instrument.play(tone, attack.velocity.to127Int)
@@ -209,51 +212,31 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
    * Based on the current [tickPosition], populates the passed [Attack] object.
    * Returns true if the attack should be played.
    */
-  private fun RationalMelody.attacksForCurrentTickPosition(
+  private fun RationalMelody.attackForCurrentTickPosition(
     part: Part,
     chord: Chord?,
     volume: Float
-  ): List<Attack> {
-    val currentBeat: Double = tickPosition.toDouble() / ticksPerBeat
-    val melodyLength: Double = length.toDouble() / subdivisionsPerBeat
-    val positionInMelody: Double = currentBeat % melodyLength
-
-    // This candidate for attack is the closest element index to the current tick
-    val indexCandidates = floor(positionInMelody * subdivisionsPerBeat).toInt().let {
-      listOf(it, it + 1)
-    }
-    val indexHits = indexCandidates.filter { indexCandidate ->
-
-      val realIndexPosition = indexCandidate.toDouble() / subdivisionsPerBeat
-
-      // Now, is the previous or next tick closer to this element index's real value?
-      fun distance(tickOffset: Double): Double = Math.abs(
-        positionInMelody + (tickOffset / ticksPerBeat) - realIndexPosition
-      )
-
-      val thisTickDistance = distance(0.0)
-      val nextTickDistance = distance(1.0)
-      val previousTickDistance = distance(-1.0)
-      thisTickDistance <= nextTickDistance && thisTickDistance < previousTickDistance
-    }
-
-    return indexHits.mapNotNull {
+  ): Attack? {
+    return Base24ConversionMap[subdivisionsPerBeat]?.indexOf(tickPosition % ticksPerBeat)?.takeIf { it >=0 }?.let { correspondingPosition ->
+      val currentBeat = tickPosition / ticksPerBeat
+      val melodyPosition = currentBeat * subdivisionsPerBeat + correspondingPosition
       val attack = attackPool.borrow()
       when {
-        isChangeAt(it % length) -> {
-          val change = changeBefore(it % length)
+        isChangeAt(melodyPosition % length) -> {
+          val change = changeBefore(melodyPosition % length)
           attack.part = part
           attack.instrument = part.instrument
           attack.melody = this
           attack.velocity = change.velocity * volume
 
           change.tones.forEach { tone ->
-            val playbackTone =  chord?.let { chord -> playbackToneUnder(tone, chord) } ?: tone
+            val playbackTone = chord?.let { chord -> playbackToneUnder(tone, chord) } ?: tone
             attack.chosenTones.add(playbackTone)
           }
+          info("creating attack for melody=${this.hashCode()} tick=$tickPosition correspondingPosition=$correspondingPosition subdivision=$melodyPosition/$subdivisionsPerBeat beat=$currentBeat with tones ${attack.chosenTones}")
           attack
         }
-        else -> null
+        else                                       -> null
       }
     }
   }

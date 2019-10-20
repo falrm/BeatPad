@@ -149,9 +149,6 @@ class MelodyViewModel(
 		}
 	}
 
-	/**
-	 * Exposed for access by [HarmonyView]
-	 */
 	fun onZoomFinished(animated: Boolean = true) = with(beatAdapter) {
 		val targetWidth = if(layoutType == LayoutType.GRID) {
 			ceil(melodyVerticalScrollView.width.toFloat() / recommendedSpanCount).toInt()

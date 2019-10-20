@@ -28,7 +28,9 @@ import com.jonlatane.beatpad.view.palette.filemanagement.PaletteManagementDialog
 import io.multifunctions.let
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import java.lang.Thread.sleep
 import java.net.URI
+import java.util.concurrent.atomic.AtomicInteger
 
 
 class BeatScratchToolbar(
@@ -145,22 +147,29 @@ class BeatScratchToolbar(
     val verticalSectionsVisible = !viewModel.sectionListRecyclerVerticalRotator.isHidden
     val horizontalSectionsVisible = !viewModel.sectionListRecyclerHorizontalRotator.isHidden
 //      viewModel.sectionListRecyclerHorizontalRotator.hide(animation = HideAnimation.VERTICAL)
+    val actionsDone = AtomicInteger(0)
+    fun zoomThing() {
+      if(actionsDone.incrementAndGet() == 2) {
+        doAsync {
+          sleep(300L)
+          uiThread {
+            viewModel.melodyViewModel.onZoomFinished()
+          }
+        }
+      }
+    }
     when {
 //        verticalSectionsVisible &&
       !horizontalSectionsVisible -> {
         viewModel.sectionListRecyclerHorizontal.adapter!!.notifyDataSetChanged()
-        viewModel.showHorizontalSectionList()
-        viewModel.hideVerticalSectionList {
-          post { viewModel.melodyViewModel.onZoomFinished() }
-        }
+        viewModel.showHorizontalSectionList { zoomThing() }
+        viewModel.hideVerticalSectionList { zoomThing() }
       }
       //horizontalSectionsVisible && !verticalSectionsVisible
       else -> {
         viewModel.sectionListRecyclerVertical.adapter!!.notifyDataSetChanged()
-        viewModel.hideHorizontalSectionList()
-        viewModel.showVerticalSectionList {
-          post { viewModel.melodyViewModel.onZoomFinished() }
-        }
+        viewModel.hideHorizontalSectionList{ zoomThing() }
+        viewModel.showVerticalSectionList { zoomThing() }
       }
     }
   }

@@ -125,6 +125,9 @@ class MelodyBeatAdapter(
             it.element.forceLayout() //TODO: This helps
           }
           recyclerView.requestLayout() //TODO: This helps
+          if(viewModel.layoutType === MelodyViewModel.LayoutType.LINEAR) {
+            viewModel.melodyVerticalScrollView.requestLayout()
+          }
         }
         recyclerView.applyToHolders<MelodyBeatHolder> {
           it.harmonyBeatView.layoutHeight = recyclerView.harmonyViewHeight
