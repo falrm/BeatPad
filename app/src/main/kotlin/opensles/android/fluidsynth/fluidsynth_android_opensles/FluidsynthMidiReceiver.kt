@@ -16,7 +16,7 @@ class FluidsynthMidiReceiver(
   val sf2file = File(context.soundfontDir, sf2FileName)
 
   companion object {
-    val defaultSf2FileName = "AirFont 340 (included).sf2"
+    val defaultSf2FileName = "FluidR3Mono_GM (included).sf3"
     val baseSoundfontDir = "soundfonts"
     val Context.soundfontDir: String get() = "$filesDir${File.separator}$baseSoundfontDir"
     internal fun Byte.toUnsigned() = if (this < 0) 256 + this else this.toInt()
@@ -40,6 +40,7 @@ class FluidsynthMidiReceiver(
 
   override fun onSend(msg: ByteArray?, offset: Int, count: Int, timestamp: Long) {
     // FIXME: consider timestamp
+    val startTime = System.nanoTime()
     if (msg == null)
       throw IllegalArgumentException("null msg")
     var off = offset
@@ -72,6 +73,7 @@ class FluidsynthMidiReceiver(
 //                0xE0 -> syn.pitchBend(ch, msg[off].toUnsigned() + msg[off + 1].toUnsigned() * 0x80)
 //                0xF0 -> syn.sysex(msg.copyOfRange(off, off + c - 1), null)
       }
+      info("Time to process: ${System.nanoTime() - startTime}ns")
       when (stat and 0xF0) {
         0xC0, 0xD0 -> {
           off++

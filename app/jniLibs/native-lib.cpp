@@ -14,9 +14,10 @@ JNIEXPORT void JNICALL Java_opensles_android_fluidsynth_fluidsynth_1android_1ope
     settings = new_fluid_settings();
     fluid_settings_setstr(settings, "audio.driver", "oboe");
     fluid_settings_setstr(settings, "audio.oboe.performance-mode", "LowLatency");
+//    fluid_settings_setstr(settings, "audio.oboe.sharing-mode", "Exclusive");
 //    fluid_settings_setint(settings, "audio.opensles.use-callback-mode", 1);
-    fluid_settings_setint(settings, "audio.period-size", 512);
-    fluid_settings_setint(settings, "audio.realtime-prio", 99);
+//    fluid_settings_setint(settings, "audio.period-size", 1024);
+//    fluid_settings_setint(settings, "audio.realtime-prio", 99);
 
     synth = new_fluid_synth(settings);
 //
@@ -65,15 +66,6 @@ JNIEXPORT jboolean JNICALL Java_opensles_android_fluidsynth_fluidsynth_1android_
         jint control,
         jint value) {
     return (jboolean) (FLUID_OK == fluid_synth_cc(synth, (int) channel, (int) control, (int) value));
-}
-extern "C"
-JNIEXPORT jboolean JNICALL Java_opensles_android_fluidsynth_fluidsynth_1android_1opensles_NativeLibJNI_send(
-        JNIEnv *env,
-        jobject /* this */,
-        jbyteArray array) {
-    jbyte* bufferPtr = (*env)->GetByteArrayElements(env, array, NULL);
-
-    return (jboolean) (FLUID_OK == fluid_synth_handle_midi_event(synth, (int) channel, (int) control, (int) value));
 }
 
 extern "C"
