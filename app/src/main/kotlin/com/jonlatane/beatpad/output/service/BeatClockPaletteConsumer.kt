@@ -233,7 +233,7 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
             val playbackTone = chord?.let { chord -> playbackToneUnder(tone, chord) } ?: tone
             attack.chosenTones.add(playbackTone)
           }
-          info("creating attack for melody=${this.hashCode()} tick=$tickPosition correspondingPosition=$correspondingPosition subdivision=$melodyPosition/$subdivisionsPerBeat beat=$currentBeat with tones ${attack.chosenTones}")
+//          info("creating attack for melody=${this.hashCode()} tick=$tickPosition correspondingPosition=$correspondingPosition subdivision=$melodyPosition/$subdivisionsPerBeat beat=$currentBeat with tones ${attack.chosenTones}")
           attack
         }
         else                                       -> null

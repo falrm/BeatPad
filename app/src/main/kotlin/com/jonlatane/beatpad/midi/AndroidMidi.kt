@@ -3,13 +3,10 @@ package com.jonlatane.beatpad.midi
 import android.content.pm.PackageManager
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.util.booleanPref
-import opensles.android.fluidsynth.fluidsynth_android_opensles.FluidsynthMidiReceiver
+import fluidsynth.FluidSynthMidiReceiver
 import org.billthefarmer.mididriver.MidiDriver
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.info
 import java.io.ByteArrayOutputStream
-import kotlin.properties.Delegates
-import kotlin.properties.Delegates.observable
 
 /**
  * Singleton interface to both the Sonivox synthesizer ([ONBOARD_DRIVER])
@@ -22,11 +19,11 @@ object AndroidMidi : AnkoLogger {
 	init {
 		System.loadLibrary("fluidsynthjni")
 	}
-	private var FLUIDSYNTH by observable(FluidsynthMidiReceiver(MainApplication.instance)) { _, old, _ ->
-		old.nativeLibJNI.destroy()
-	}
+	private var FLUIDSYNTH = FluidSynthMidiReceiver(MainApplication.instance)
 	fun resetFluidSynth() {
-		FLUIDSYNTH = FluidsynthMidiReceiver(MainApplication.instance)
+		FLUIDSYNTH.nativeLibJNI.destroy()
+		FLUIDSYNTH = FluidSynthMidiReceiver(MainApplication.instance)
+		MidiDevices.refreshInstruments()
 	}
 	private var sendToInternalSynthSetting by booleanPref("sendToInternalSynth", false)
 	private var sendToInternalFluidSynthSetting by booleanPref("sendToInternalFluidSynth", true)

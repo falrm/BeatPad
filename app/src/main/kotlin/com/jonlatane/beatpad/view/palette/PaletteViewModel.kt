@@ -192,13 +192,13 @@ class PaletteViewModel constructor(
     colorboardPart = new.colorboardPart ?: new.parts[0]
     splatPart = new.splatPart ?: new.parts[0]
     orbifold.orbifold = new.orbifold
-    orbifold.chord = new.chord
     paletteToolbar.updateTempoDisplay()
     partListAdapters.forEach { it.notifyDataSetChanged() }
     sectionListAdapters.forEach { it.notifyDataSetChanged() }
     if(!new.sections.contains(BeatClockPaletteConsumer.section)) {
       BeatClockPaletteConsumer.section = new.sections.first()
     }
+    orbifold.chord = new.sections.first().harmony.changeBefore(0)
   }
 
   var editingMix: Boolean by observable(false) { _, _, editingVolume ->

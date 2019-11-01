@@ -1,8 +1,6 @@
 package com.jonlatane.beatpad.view.midi
 
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.support.constraint.ConstraintSet.PARENT_ID
 import android.text.TextUtils
 import android.view.Gravity
@@ -12,8 +10,8 @@ import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.midi.AndroidMidi
 import com.jonlatane.beatpad.midi.MidiDevices
-import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.BaseConfiguration
+import fluidsynth.FluidSynthMidiReceiver
 import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
 import org.jetbrains.anko.constraint.layout.applyConstraintSet
@@ -76,7 +74,7 @@ interface MidiOutputConfiguration: BaseConfiguration {
 
           val fluidSynthSoundFontText = textView {
             id = View.generateViewId()
-            text = "AirFont 340 (included).sf2"
+            text = FluidSynthMidiReceiver.defaultSf2FileName
             typeface = MainApplication.chordTypeface
             gravity = Gravity.START or Gravity.CENTER_VERTICAL
             singleLine = true
@@ -100,6 +98,24 @@ interface MidiOutputConfiguration: BaseConfiguration {
             }
           }.lparams(wrapContent, wrapContent)
 
+          val resetFluidSynth = button {
+            id = View.generateViewId()
+            text = "Reset FluidSynth"
+            typeface = MainApplication.chordTypefaceBold
+            isClickable = true
+            onClick {
+              context.toast("Resetting FluidSynth...")
+              doAsync {
+                AndroidMidi.resetFluidSynth()
+                uiThread {
+                  context.toast("Reset complete.")
+                }
+              }
+              //playToSonivoxCheckbox.isChecked = !playToSonivoxCheckbox.isChecked
+            }
+          }.lparams(wrapContent, wrapContent)
+
+
 //          val fluidSynthMusicalArtifactsLink = textView {
 //            id = View.generateViewId()
 //            text = "Download *.sf2 SoundFonts from Musical-Artifacts 🌐"
@@ -116,21 +132,21 @@ interface MidiOutputConfiguration: BaseConfiguration {
 //            }
 //          }.lparams(0, wrapContent)
 
-          val fluidSynthLicenseText = textView {
-            id = View.generateViewId()
-            text = "Source on GitHub 💗"
-            typeface = MainApplication.chordTypeface
-            gravity = Gravity.START
-            isClickable = true
-            onClick {
-              vibrate(50)
-              context.startActivity(
-                Intent(Intent.ACTION_VIEW).also {
-                  it.data = Uri.parse("https://github.com/falrm/fluidsynth-android-opensles")
-                }
-              )
-            }
-          }.lparams(0, wrapContent)
+//          val fluidSynthLicenseText = textView {
+//            id = View.generateViewId()
+//            text = "Source on GitHub 💗"
+//            typeface = MainApplication.chordTypeface
+//            gravity = Gravity.START
+//            isClickable = true
+//            onClick {
+//              vibrate(50)
+//              context.startActivity(
+//                Intent(Intent.ACTION_VIEW).also {
+//                  it.data = Uri.parse("https://github.com/FluidSynth/fluidsynth")
+//                }
+//              )
+//            }
+//          }.lparams(0, wrapContent)
 
           playToSonivoxCheckbox = checkBox {
             id = View.generateViewId()
@@ -225,16 +241,23 @@ interface MidiOutputConfiguration: BaseConfiguration {
 //                END to END of PARENT_ID margin dip(15)
 //              )
 //            }
-            fluidSynthLicenseText {
+            resetFluidSynth {
               connect(
                 TOP to BOTTOM of fluidSynthSoundFontText margin dip(15),
                 START to END of playToFluidsynthCheckbox margin dip(15),
                 END to END of PARENT_ID margin dip(15)
               )
             }
+//            fluidSynthLicenseText {
+//              connect(
+//                TOP to BOTTOM of resetFluidSynth margin dip(15),
+//                START to END of playToFluidsynthCheckbox margin dip(15),
+//                END to END of PARENT_ID margin dip(15)
+//              )
+//            }
             playToSonivoxCheckbox {
               connect(
-                TOP to BOTTOM of fluidSynthLicenseText margin dip(15),
+                TOP to BOTTOM of resetFluidSynth margin dip(15),
                 START to START of PARENT_ID margin dip(15)
               )
             }

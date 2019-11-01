@@ -45,8 +45,8 @@ android {
 		applicationId "com.jonlatane.beatpad"
 		minSdkVersion 23
 		targetSdkVersion 29
-		versionCode 106
-		versionName "0.70.2"
+		versionCode 108
+		versionName "0.72.0"
 		multiDexEnabled false
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 		externalNativeBuild {
@@ -68,8 +68,7 @@ android {
 	}
 	externalNativeBuild {
 		cmake {
-			path "jniLibs/CMakeLists.txt"
-//			path "src/main/cpp/fluidsynth/android/CMakeLists.txt"
+      path "src/main/cpp/CMakeLists.txt"
 		}
 	}
 	flavorDimensions "version"
