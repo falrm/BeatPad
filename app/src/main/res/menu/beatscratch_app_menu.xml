@@ -41,4 +41,7 @@
     android:id="@+id/aboutBeatScratch"
     android:title="About BeatScratch"
     android:visible="false" />
+  <item
+    android:id="@+id/quitApplication"
+    android:title="Quit BeatScratch" />
 </menu>

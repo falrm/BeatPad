@@ -6,13 +6,21 @@ import android.view.MotionEvent
 import android.view.ViewManager
 import android.widget.HorizontalScrollView
 import android.widget.ScrollView
+import com.jonlatane.beatpad.util.HideableView
 import org.jetbrains.anko._ScrollView
 import org.jetbrains.anko.custom.ankoView
 
 open class NonDelayedScrollView @JvmOverloads constructor(
 	context: Context,
 	var scrollingEnabled: Boolean = true
-) : _ScrollView(context) {
+) : _ScrollView(context), HideableView {
+	override var initialHeight: Int? = null
+	override var initialWidth: Int? = null
+	override var initialTopMargin: Int? = null
+	override var initialBottomMargin: Int? = null
+	override var initialLeftMargin: Int? = null
+	override var initialRightMargin: Int? = null
+
 	override fun shouldDelayChildPressedState() = false
 	override fun onTouchEvent(ev: MotionEvent): Boolean {
 		when (ev.action) {

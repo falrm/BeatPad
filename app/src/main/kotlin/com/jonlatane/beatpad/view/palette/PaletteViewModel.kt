@@ -64,16 +64,12 @@ class PaletteViewModel constructor(
       BeatScratchToolbar.InteractionMode.VIEW -> {
         melodyViewModel.layoutType = MelodyViewModel.LayoutType.GRID
         editingMelody = null
-        val sectionListsHidden = AtomicInteger(0)
-        fun showMelody() {
-          if(sectionListsHidden.incrementAndGet() == 3) {
-//            melodyViewModel.onZoomFinished()
-            melodyViewVisible = true
-            doAsync {
-              sleep(300)
-              uiThread {
-                melodyViewModel.onZoomFinished()
-              }
+        val showMelody = incrementUntil(3) {
+          melodyViewVisible = true
+          doAsync {
+            sleep(300)
+            uiThread {
+              melodyViewModel.onZoomFinished()
             }
           }
         }
@@ -351,6 +347,7 @@ class PaletteViewModel constructor(
                   melodyView.translationX = 0f
                   melodyView.animate().alpha(1f).withEndAction {
                     partListTransitionView.alpha = 0f
+                    melodyViewModel.onZoomFinished()
                   }.start()
                 }
               }.start()

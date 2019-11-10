@@ -3,8 +3,6 @@ package com.jonlatane.beatpad.view.melody
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
-import android.os.Bundle
-import android.os.Parcelable
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -22,6 +20,7 @@ import com.jonlatane.beatpad.view.harmony.HarmonyBeatView
 import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
@@ -171,7 +170,9 @@ class MelodyBeatAdapter(
     recyclerView.layoutManager = linearLayoutManager
     (recyclerView.layoutManager as LinearLayoutManager).onRestoreInstanceState(state)
     melodyVerticalScrollView.scrollingEnabled = true
+    melodyLeftScroller.show(animation = HideAnimation.HORIZONTAL)
     melodyView.rightSpacer.animateWidth(0)
+    melodyView.leftSpacer.animateWidth(0)
   }
 
   fun gridLayout() = with(viewModel) {
@@ -188,9 +189,12 @@ class MelodyBeatAdapter(
     (recyclerView.layoutManager as LinearLayoutManager).onRestoreInstanceState(state)
     melodyVerticalScrollView.scrollingEnabled = false
     melodyVerticalScrollView.verticalScrollbarPosition = 0
-    melodyView.rightSpacer.animateWidth(viewModel.melodyView.dip(5)) {
+    val doZoomFinished = incrementUntil(2) {
       onZoomFinished()
     }
+    melodyLeftScroller.hide(animation = HideAnimation.HORIZONTAL)
+    melodyView.leftSpacer.animateWidth(viewModel.melodyView.dip(5)) { doZoomFinished() }
+    melodyView.rightSpacer.animateWidth(viewModel.melodyView.dip(5)) { doZoomFinished() }
   }
 
   fun animateElementHeight(height: Int, duration: Long = defaultDuration, endAction: (() -> Unit)? = null) {

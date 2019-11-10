@@ -19,9 +19,9 @@ import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.storage.Storage
-import com.jonlatane.beatpad.util.HideAnimation
 import com.jonlatane.beatpad.util.applyTypeface
 import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.util.incrementUntil
 import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.view.midi.MidiOutputConfiguration
 import com.jonlatane.beatpad.view.palette.filemanagement.PaletteManagementDialog
@@ -30,7 +30,7 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.lang.Thread.sleep
 import java.net.URI
-import java.util.concurrent.atomic.AtomicInteger
+import kotlin.system.exitProcess
 
 
 class BeatScratchToolbar(
@@ -95,6 +95,22 @@ class BeatScratchToolbar(
         R.id.signIn -> FirebaseAuth.getInstance().currentUser?.let {
           showConfirmDialog(context, "Really sign out?") { viewModel.activity.signOut() }
         } ?: viewModel.activity.signIn()
+        R.id.quitApplication -> showConfirmDialog(
+          context,
+          "Really quit BeatScratch?",
+          yesText = "Quit"
+        ) {
+          val intent = Intent(context, PlaybackService::class.java)
+          intent.action = PlaybackService.Companion.Action.STOPFOREGROUND_ACTION
+          context.startService(intent)
+          viewModel.activity.finish()
+          doAsync {
+            sleep(1000L)
+            val pid = android.os.Process.myPid()
+            android.os.Process.killProcess(pid)
+            exitProcess(0)
+          }
+        }
         else             -> context.toast("TODO!")
       }
       true
@@ -147,14 +163,11 @@ class BeatScratchToolbar(
     val verticalSectionsVisible = !viewModel.sectionListRecyclerVerticalRotator.isHidden
     val horizontalSectionsVisible = !viewModel.sectionListRecyclerHorizontalRotator.isHidden
 //      viewModel.sectionListRecyclerHorizontalRotator.hide(animation = HideAnimation.VERTICAL)
-    val actionsDone = AtomicInteger(0)
-    fun zoomThing() {
-      if(actionsDone.incrementAndGet() == 2) {
-        doAsync {
-          sleep(300L)
-          uiThread {
-            viewModel.melodyViewModel.onZoomFinished()
-          }
+    val doZoomFinished = incrementUntil(2) {
+      doAsync {
+        sleep(300L)
+        uiThread {
+          viewModel.melodyViewModel.onZoomFinished()
         }
       }
     }
@@ -162,14 +175,14 @@ class BeatScratchToolbar(
 //        verticalSectionsVisible &&
       !horizontalSectionsVisible -> {
         viewModel.sectionListRecyclerHorizontal.adapter!!.notifyDataSetChanged()
-        viewModel.showHorizontalSectionList { zoomThing() }
-        viewModel.hideVerticalSectionList { zoomThing() }
+        viewModel.showHorizontalSectionList { doZoomFinished() }
+        viewModel.hideVerticalSectionList { doZoomFinished() }
       }
       //horizontalSectionsVisible && !verticalSectionsVisible
       else -> {
         viewModel.sectionListRecyclerVertical.adapter!!.notifyDataSetChanged()
-        viewModel.hideHorizontalSectionList{ zoomThing() }
-        viewModel.showVerticalSectionList { zoomThing() }
+        viewModel.hideHorizontalSectionList{ doZoomFinished() }
+        viewModel.showVerticalSectionList { doZoomFinished() }
       }
     }
   }

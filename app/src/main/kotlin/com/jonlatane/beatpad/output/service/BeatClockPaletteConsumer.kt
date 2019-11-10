@@ -130,8 +130,11 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
     outgoingAttacks.clear()
   }
 
+  private val _activeAttacksCopy = Vector<Attack>()
   private fun RationalMelody.stopCurrentAttacks() {
-    for (activeAttack in activeAttacks) {
+    _activeAttacksCopy.clear()
+    _activeAttacksCopy.addAll(activeAttacks)
+    for (activeAttack in _activeAttacksCopy) {
       if (activeAttack.melody == this) {
         //verbose { "Ending attack $activeAttack" }
         destroyAttack(activeAttack)

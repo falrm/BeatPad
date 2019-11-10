@@ -40,6 +40,10 @@ interface Storage : AnkoLogger {
       return (File(context.paletteDir).listFiles() ?: emptyArray())
         .toList()
         .filter { it.name.endsWith(".json") }
+        .sortedByDescending {
+          if(it.name == openPaletteFileName) Long.MAX_VALUE
+          else it.lastModified()
+        }
       //.map { it.name }
     }
 

@@ -32,6 +32,7 @@ import org.jetbrains.anko.constraint.layout.applyConstraintSet
 import org.jetbrains.anko.sdk25.coroutines.onCheckedChange
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.io.File
+import java.lang.Thread.sleep
 import java.net.URI
 
 class PaletteManagementDialog(
@@ -300,15 +301,32 @@ class PaletteManagementDialog(
               padding = dip(16)
               typeface = MainApplication.chordTypefaceRegular
               isClickable = true
-              onClick {
+
+              var clickCount = 0
+              fun singleClick() {
                 vibrate(10)
                 editPaletteName.text.apply {
                   clear()
-//                  val fillStuff = if(mode == Mode.OPEN) name else Section.generateDuplicateName(
-//                    Storage.getPalettes(context).map { it.nameWithoutExtension },
-//                    name
-//                  )
                   append(name)
+                }
+              }
+              onClick {
+                when(mode) {
+                  Mode.OPEN -> when(++clickCount) {
+                      1 -> {
+                        singleClick()
+                        doAsync {
+                          sleep(250)
+                          clickCount = 0
+                        }
+                      }
+                      2 -> {
+                        vibrate(10)
+                        saveButton.callOnClick()
+                        clickCount = 0
+                      }
+                    }
+                  else -> singleClick()
                 }
               }
             }

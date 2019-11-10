@@ -5,31 +5,31 @@ import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.view.ViewGroup
-import android.view.ViewManager
-import android.widget.RelativeLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.color
-import com.jonlatane.beatpad.view.*
+import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.harmony.ChordTextPositioner
+import com.jonlatane.beatpad.view.nonDelayedScrollView
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
+import com.jonlatane.beatpad.view.zoomableRecyclerView
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.*
-import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.sdk25.coroutines.onScrollChange
 import org.jetbrains.anko.sdk25.coroutines.onTouch
+import kotlin.math.max
 
 
 class MelodyView(
 	context: Context,
 	override val viewModel: PaletteViewModel
 ): HideableRelativeLayout(context), ChordTextPositioner {
-	override val marginForKey = dip(30)
+	override val marginForKey get() = max(dip(5),viewModel.melodyViewModel.melodyLeftScroller.width)
 	override val chordChangeLabels: MutableMap<Int, TextView> = mutableMapOf()
 	override val chordChangeLabelPool: DefaultPool<TextView> = defaultChordChangeLabelPool
 	override val recycler: RecyclerView get() = viewModel.melodyViewModel.melodyRecyclerView
 	val rightSpacer: View
+	val leftSpacer: View
 	override val supportGridLayout = true
 	fun LayoutParams.melodyPosition() = with(viewModel.melodyViewModel){
 		leftOf(rightSpacer)
@@ -88,6 +88,13 @@ class MelodyView(
 				alignParentRight()
 				alignParentLeft()
 			}
+			leftSpacer = view {
+				id = View.generateViewId()
+			}.lparams(0, matchParent) {
+				below(melodyEditingToolbar)
+				above(melodyEditingModifiers)
+				alignParentLeft()
+			}
 			melodyLeftScroller = nonDelayedScrollView {
 				id = R.id.left_scroller
 				linearLayout {
@@ -101,7 +108,7 @@ class MelodyView(
 			}.lparams(dip(30), matchParent) {
 				below(melodyEditingToolbar)
 				above(melodyEditingModifiers)
-				alignParentLeft()
+				rightOf(leftSpacer)
 			}
 			rightSpacer = view {
 				id = View.generateViewId()
