@@ -19,7 +19,7 @@ class HarmonyBeatAdapter(
 	val viewModel: PaletteViewModel,
 	override val recyclerView: _RecyclerView
 ) : SmartAdapter<HarmonyBeatHolder>(), AnkoLogger, BeatAdapter {
-  private val minimumElementWidth: Int get() = recyclerView.run {
+	val minimumElementWidth: Int get() = recyclerView.run {
     (recyclerView.width.toFloat() / itemCount).toInt()
   }
 

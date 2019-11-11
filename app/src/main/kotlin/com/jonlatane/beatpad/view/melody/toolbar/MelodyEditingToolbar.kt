@@ -25,7 +25,7 @@ import org.jetbrains.anko.sdk25.coroutines.onLongClick
 class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 	: Toolbar(context, viewModel), AnkoLogger
 {
-	private val lengthDialog = LengthDialog(context, melodyViewModel)
+	val lengthDialog = LengthDialog(context, melodyViewModel)
 
 	private val lengthButton: Button = button {
 		text = "0/0\n0 beats"

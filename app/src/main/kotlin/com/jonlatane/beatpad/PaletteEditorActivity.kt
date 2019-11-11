@@ -68,6 +68,9 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
     }
 
     viewModel.melodyView.post {
+      viewModel.harmonyViewModel.beatAdapter.apply {
+        elementWidth = minimumElementWidth
+      }
       if (BeatClockPaletteConsumer.playbackMode == BeatClockPaletteConsumer.PlaybackMode.PALETTE) {
         viewModel.beatScratchToolbar.interactionMode = BeatScratchToolbar.InteractionMode.VIEW
       }
@@ -206,6 +209,9 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
         elementWidth = savedInstanceState.getInt("beatWidth", elementWidth)
         elementHeight = savedInstanceState.getInt("beatHeight", elementHeight)
       }
+      viewModel.harmonyViewModel.beatAdapter.apply {
+        elementWidth = savedInstanceState.getInt("harmonyBeatWidth", elementWidth)
+      }
     }
   }
 
@@ -221,6 +227,7 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
     outState.putString("editingMelodyId", viewModel.editingMelody?.id.toString())
     outState.putInt("beatWidth", viewModel.melodyBeatAdapter.elementWidth)
     outState.putInt("beatHeight", viewModel.melodyBeatAdapter.elementHeight)
+    outState.putInt("harmonyBeatWidth", viewModel.harmonyViewModel.beatAdapter.elementWidth)
   }
 
   fun signIn() {

@@ -103,6 +103,13 @@ class MelodyReferenceAdapter(
 			Thread.sleep(300L)
 			uiThread {
 				viewModel.editingMelody = newMelody
+				doAsync {
+					Thread.sleep(500L)
+					uiThread {
+						viewModel.melodyViewModel.melodyReferenceToolbar.editModeActive = true
+						viewModel.melodyViewModel.melodyEditingToolbar.lengthDialog.show()
+					}
+				}
 			}
 		}
 	}
