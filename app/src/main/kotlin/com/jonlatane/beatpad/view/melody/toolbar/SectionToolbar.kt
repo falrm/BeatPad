@@ -86,8 +86,9 @@ class SectionToolbar(context: Context, viewModel: PaletteViewModel)
 				padding = dip(0)
 				typeface = MainApplication.chordTypefaceBold
 				onClick {
-					viewModel.melodyViewModel.lengthToolbar.show()
-					this@hideableFrame.hide(animation = HideAnimation.HORIZONTAL_ALPHA)
+					context.toast("Section/Harmony Length: TODO! For now, settle for 4 bars in 16th notes.")
+//					viewModel.melodyViewModel.lengthToolbar.show()
+//					this@hideableFrame.hide(animation = HideAnimation.HORIZONTAL_ALPHA)
 				}
 			}
 		}.longSquareButtonStyle().lparams { height = matchParent }

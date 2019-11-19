@@ -235,6 +235,8 @@ class PaletteViewModel constructor(
           true
         } else false
       }
+
+      melodyViewModel.lengthToolbar.update()
       melodyViewModel.melodyReferenceToolbar.apply { editModeActive = editModeActive }
       melodyViewVisible = true
     } else {

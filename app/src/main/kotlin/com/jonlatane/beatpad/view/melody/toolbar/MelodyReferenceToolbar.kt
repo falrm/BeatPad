@@ -77,7 +77,7 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 		}
 		if (value) {
 			melodyViewModel.melodyEditingToolbar.show()
-			melodyViewModel.melodyEditingToolbar.lengthButtonFrame.show(animation = HideAnimation.HORIZONTAL_ALPHA)
+			melodyViewModel.melodyEditingToolbar.lengthButtonFrame.show(animation = HideAnimation.HORIZONTAL_THEN_VERTICAL)
 			melodyViewModel.melodyEditingModifiers.show()
 			melodyViewModel.layoutType = MelodyViewModel.LayoutType.LINEAR
 //				viewModel.backStack.push {

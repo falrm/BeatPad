@@ -24,28 +24,71 @@ import kotlin.math.round
 @SuppressLint("ViewConstructor")
 class LengthToolbar(context: Context, viewModel: PaletteViewModel)
   : Toolbar(context, viewModel), AnkoLogger {
-  private val subdivisionsEditTextEditText: EditText
+  companion object {
+    fun formatBeatCount(subdivisionsPerBeat: Int, length: Int): String =
+      "%.3f"
+        .format(length.toFloat() / subdivisionsPerBeat)
+        .trim('0')
+        .trimEnd('.')
+  }
+  private val subdivisionsEditText: EditText
   private val perBeatEditText: EditText
   private val totalEditText: EditText
   private val subdivisionsText: TextView
   private val perBeatText: TextView
   private val totalBeatsOrBarsText: TextView
 
-  private fun EditText.makeDraggableNumber(minValue: Int, maxValue: Int) {
+  fun update() {
+    updateSubdivisions()
+    updatePerBeat()
+  }
+
+  private fun updateSubdivisions() {
+    subdivisionsEditText.text.run {
+      clear()
+      viewModel.editingMelody?.let { melody ->
+        append(melody.length.toString())
+      }
+    }
+    updateBeats()
+  }
+
+  private fun updatePerBeat() {
+    perBeatEditText.text.run {
+      clear()
+      viewModel.editingMelody?.let { melody ->
+        append(melody.subdivisionsPerBeat.toString())
+      }
+    }
+    updateBeats()
+  }
+
+  private fun updateBeats() {
+    totalEditText.text.run {
+      clear()
+      viewModel.editingMelody?.let { melody ->
+        val beatCount = formatBeatCount(melody.subdivisionsPerBeat, melody.length)
+        append(beatCount)
+        totalBeatsOrBarsText.text = if(beatCount == "1") "beat" else "beats"
+      }
+    }
+  }
+
+  private fun EditText.makeDraggableNumber(minValue: Int, maxValue: Int, updateValue: (Int) -> Unit) {
     val startPoint = PointF()
     var startValue = 0
-    onTouch { v, event ->
+    onTouch { _, event ->
       if (event.action == MotionEvent.ACTION_DOWN) {
         startPoint.x = event.x
         startPoint.y = event.y
-        startValue = text.toString().toInt()
+        startValue = text.toString().toIntOrNull() ?: -1
         info("Set start value to $startValue for (${startPoint.x},${startPoint.y}")
       }
       val xIncrement = 30
       val yIncrement = 30
       if (event.action == MotionEvent.ACTION_MOVE || event.action == MotionEvent.ACTION_OUTSIDE) {
         if(abs(event.x - startPoint.x) > xIncrement || abs(event.y - startPoint.y) > yIncrement) {
-          val currentValue = text.toString().toInt()
+          val currentValue = text.toString().toIntOrNull() ?: -1
           var updatedValue = round(
             startValue + (event.x - startPoint.x) / xIncrement - round((event.y - startPoint.y) / yIncrement)
           ).toInt()
@@ -53,8 +96,7 @@ class LengthToolbar(context: Context, viewModel: PaletteViewModel)
           updatedValue = max(updatedValue, minValue)
           info("Updated value is $updatedValue for (${event.x},${event.y})")
           if(currentValue != updatedValue) {
-            text.clear()
-            text.append(updatedValue.toString())
+            updateValue(updatedValue)
             vibrate(10)
           }
         }
@@ -62,19 +104,26 @@ class LengthToolbar(context: Context, viewModel: PaletteViewModel)
     }
   }
   init {
-    subdivisionsEditTextEditText = editText {
+    val closeButton = imageButton {
+      imageResource = R.drawable.check_mark
+      onClick {
+        this@LengthToolbar.hide()
+        viewModel.melodyViewModel.melodyEditingToolbar.lengthButtonFrame.show(animation = HideAnimation.HORIZONTAL_THEN_VERTICAL)
+        viewModel.melodyViewModel.sectionToolbar.lengthButtonFrame.show(animation = HideAnimation.HORIZONTAL_ALPHA)
+      }
+    }.squareButtonStyle()
+
+    subdivisionsEditText = editText {
       inputType = InputType.TYPE_CLASS_NUMBER
       gravity = Gravity.CENTER
       typeface = MainApplication.chordTypefaceBold
-//        toolbarButtonEditTextStyle()
-      text.append("64")
+      toolbarButtonEditTextStyle()
+      text.append("-1")
       backgroundResource = R.drawable.toolbar_melody_button
-      makeDraggableNumber(1, 9999)
-//      onFocusChange { v, hasFocus ->
-//        if(!hasFocus) {
-//
-//        }
-//      }
+      makeDraggableNumber(1, 9999) {
+        viewModel.editingMelody?.length = it
+        updateSubdivisions()
+      }
     }.mediumSquareButtonStyle()
     subdivisionsText = textView("subdivisions") {
       toolbarTextStyle()
@@ -86,9 +135,12 @@ class LengthToolbar(context: Context, viewModel: PaletteViewModel)
       gravity = Gravity.CENTER
       typeface = MainApplication.chordTypefaceBold
 //        toolbarButtonEditTextStyle()
-      text.append("4")
+      text.append("-1")
       backgroundResource = R.drawable.toolbar_melody_button
-      makeDraggableNumber(1, 24)
+      makeDraggableNumber(1, 24) {
+        viewModel.editingMelody?.subdivisionsPerBeat = it
+        updatePerBeat()
+      }
     }.squareButtonStyle()
     perBeatText = textView("per beat") {
       toolbarTextStyle()
@@ -102,24 +154,11 @@ class LengthToolbar(context: Context, viewModel: PaletteViewModel)
 //        toolbarButtonEditTextStyle()
       text.append("16")
       backgroundResource = R.drawable.toolbar_melody_button
-
-      onFocusChange { v, hasFocus ->
-        if(!hasFocus) {
-
-        }
-      }
+      isEnabled = false
     }.longSquareButtonStyle()
     totalBeatsOrBarsText = textView("beats") {
       toolbarTextStyle()
       gravity = Gravity.CENTER
     }.flexStyle()
-    val closeButton = imageButton {
-      imageResource = R.drawable.notehead_x
-      onClick {
-        this@LengthToolbar.hide()
-        viewModel.melodyViewModel.melodyEditingToolbar.lengthButtonFrame.show(animation = HideAnimation.HORIZONTAL_ALPHA)
-        viewModel.melodyViewModel.sectionToolbar.lengthButtonFrame.show(animation = HideAnimation.HORIZONTAL_ALPHA)
-      }
-    }.squareButtonStyle()
   }
 }

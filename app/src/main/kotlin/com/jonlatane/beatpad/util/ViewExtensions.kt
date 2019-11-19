@@ -313,6 +313,52 @@ enum class HideAnimation: AnkoLogger {
         endAction()
       }
     }
+  },
+  VERTICAL_THEN_HORIZONTAL {
+    override fun View.show(animated: Boolean, endAction: () -> Unit) {
+      with(VERTICAL) {
+        show(animated) {
+          animate().alpha(1f)
+          with(HORIZONTAL) {
+            show(animated, endAction)
+          }
+        }
+      }
+    }
+
+    override fun View.hide(animated: Boolean, endAction: () -> Unit) {
+      animate().alpha(0f)
+      with(VERTICAL) {
+        hide(animated) {
+          with(HORIZONTAL) {
+            hide(animated, endAction)
+          }
+        }
+      }
+    }
+  },
+  HORIZONTAL_THEN_VERTICAL {
+    override fun View.show(animated: Boolean, endAction: () -> Unit) {
+      with(HORIZONTAL) {
+        show(animated) {
+          animate().alpha(1f)
+          with(VERTICAL) {
+            show(animated, endAction)
+          }
+        }
+      }
+    }
+
+    override fun View.hide(animated: Boolean, endAction: () -> Unit) {
+      animate().alpha(0f)
+      with(HORIZONTAL) {
+        hide(animated) {
+          with(VERTICAL) {
+            hide(animated, endAction)
+          }
+        }
+      }
+    }
   };
 
   abstract fun View.show(animated: Boolean = true, endAction: () -> Unit = {})

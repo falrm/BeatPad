@@ -15,9 +15,7 @@ import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.*
-import com.jonlatane.beatpad.view.HideableFrame
-import com.jonlatane.beatpad.view.hideableButton
-import com.jonlatane.beatpad.view.hideableFrame
+import com.jonlatane.beatpad.view.*
 import com.jonlatane.beatpad.view.melody.lengthToolbar
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
@@ -27,6 +25,9 @@ import org.jetbrains.anko.sdk25.coroutines.onLongClick
 class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 	: Toolbar(context, viewModel), AnkoLogger
 {
+	init {
+		gravity = Gravity.BOTTOM
+	}
 	val lengthDialog = LengthDialog(context, melodyViewModel)
 
 	val lengthButtonFrame: HideableFrame
@@ -34,30 +35,22 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 	init {
 		lengthButtonFrame = hideableFrame {
 			lengthButton = button {
-				text = "0/0\n0 beats"
+				text = "-/-\n- beats"
 				setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12f)
 				backgroundResource = R.drawable.toolbar_melody_button
 				padding = dip(0)
 				typeface = MainApplication.chordTypefaceBold
-	//		singleLine = true
-	//		ellipsize = TextUtils.TruncateAt.MARQUEE
-	//		marqueeRepeatLimit = -1
-	//		isSelected = true
-				isLongClickable = true
+				translationY = dip(-1).toFloat()
 				onClick {
 					viewModel.melodyViewModel.lengthToolbar.show()
-					this@hideableFrame.hide(animation = HideAnimation.HORIZONTAL_ALPHA)
-				}
-				onLongClick {
-					vibrate(10)
-					lengthDialog.show()
+					this@hideableFrame.hide(animation = HideAnimation.VERTICAL_THEN_HORIZONTAL)
 				}
 			}
-		}.longSquareButtonStyle().lparams { height = matchParent }
+		}.longSquareButtonStyle()
 	}
 
 	private val relativeToButton: Button = button {
-		text = ""
+		text = "Relative to -"
 		backgroundResource = R.drawable.toolbar_melody_button
 		setPadding(dip(15), dip(10), dip(10), dip(10))
 		gravity = Gravity.LEFT or Gravity.CENTER_VERTICAL
@@ -66,6 +59,39 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 		}
 		toolbarButtonTextStyle()
 	}.flexStyle()
+
+	private val upButton = imageButton {
+		imageResource = R.drawable.icons8_sort_up_100
+		backgroundResource = R.drawable.toolbar_melody_button
+		padding = dip(10)
+		scaleType = ImageView.ScaleType.FIT_CENTER
+		onClick {
+			melodyViewModel.openedMelody?.transposeInPlace(1)
+			updateMelody()
+		}
+		onLongClick(returnValue = true) {
+			melodyViewModel.openedMelody?.transposeInPlace(12)
+			context.toast("Octave Up")
+			updateMelody()
+		}
+	}.squareButtonStyle()
+
+	private val downButton = imageButton {
+		imageResource = R.drawable.icons8_sort_down_100
+		backgroundResource = R.drawable.toolbar_melody_button
+		padding = dip(10)
+		scaleType = ImageView.ScaleType.FIT_CENTER
+		onClick {
+			melodyViewModel.openedMelody?.transposeInPlace(-1)
+			updateMelody()
+		}
+		onLongClick(returnValue = true) {
+			melodyViewModel.openedMelody?.transposeInPlace(-12)
+			context.toast("Octave Down")
+			updateMelody()
+		}
+	}.squareButtonStyle()
+
 	private val relativeToMenu = PopupMenu(context, relativeToButton).also {
 		it.inflate(R.menu.melody_relative_menu)
 		it.setOnMenuItemClickListener { item ->
@@ -179,6 +205,8 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 	}
 	private fun updateMelody() = viewModel.melodyBeatAdapter.notifyDataSetChanged()
 
+
+	//TODO All this should be in a model somewhere else, really
   private fun Melody<*>.transposeInPlace(interval: Int) {
     when(this) {
       is RationalMelody -> {
@@ -220,36 +248,4 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
       else -> TODO("Melody type cannot be transposed!")
     }
   }
-
-	private val upButton = imageButton {
-		imageResource = R.drawable.icons8_sort_up_100
-		backgroundResource = R.drawable.toolbar_melody_button
-		padding = dip(10)
-		scaleType = ImageView.ScaleType.FIT_CENTER
-		onClick {
-      melodyViewModel.openedMelody?.transposeInPlace(1)
-			updateMelody()
-		}
-		onLongClick(returnValue = true) {
-      melodyViewModel.openedMelody?.transposeInPlace(12)
-			context.toast("Octave Up")
-			updateMelody()
-		}
-	}.squareButtonStyle()
-
-	private val downButton = imageButton {
-		imageResource = R.drawable.icons8_sort_down_100
-		backgroundResource = R.drawable.toolbar_melody_button
-		padding = dip(10)
-		scaleType = ImageView.ScaleType.FIT_CENTER
-		onClick {
-      melodyViewModel.openedMelody?.transposeInPlace(-1)
-			updateMelody()
-		}
-		onLongClick(returnValue = true) {
-      melodyViewModel.openedMelody?.transposeInPlace(-12)
-			context.toast("Octave Down")
-			updateMelody()
-		}
-	}.squareButtonStyle()
 }
