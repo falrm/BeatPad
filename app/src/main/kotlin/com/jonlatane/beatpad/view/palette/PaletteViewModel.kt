@@ -30,7 +30,6 @@ import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import org.jetbrains.anko.*
 import java.lang.Thread.sleep
 import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.max
 import kotlin.properties.Delegates.observable
 
@@ -236,7 +235,7 @@ class PaletteViewModel constructor(
         } else false
       }
 
-      melodyViewModel.lengthToolbar.update()
+      melodyViewModel.melodyLengthToolbar.update()
       melodyViewModel.melodyReferenceToolbar.apply { editModeActive = editModeActive }
       melodyViewVisible = true
     } else {

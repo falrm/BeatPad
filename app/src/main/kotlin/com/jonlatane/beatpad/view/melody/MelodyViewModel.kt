@@ -7,9 +7,7 @@ import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
-import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.util.smartrecycler.applyToHolders
-import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.NonDelayedRecyclerView
 import com.jonlatane.beatpad.view.NonDelayedScrollView
 import com.jonlatane.beatpad.view.melody.toolbar.*
@@ -18,7 +16,6 @@ import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.ceil
-import kotlin.math.round
 import kotlin.properties.Delegates.observable
 
 class MelodyViewModel(
@@ -50,7 +47,7 @@ class MelodyViewModel(
 	lateinit var sectionToolbar: SectionToolbar
 	lateinit var melodyReferenceToolbar: MelodyReferenceToolbar
 	lateinit var melodyEditingToolbar: MelodyEditingToolbar
-	lateinit var lengthToolbar: LengthToolbar
+	lateinit var melodyLengthToolbar: MelodyLengthToolbar
 	lateinit var melodyView: MelodyView
 	lateinit var melodyLeftScroller: NonDelayedScrollView
 	lateinit var melodyEditingModifiers: MelodyEditingModifiers
@@ -76,7 +73,7 @@ class MelodyViewModel(
 				}
 				melodyReferenceToolbar.hide()
 				melodyEditingToolbar.hide()
-				lengthToolbar.hide()
+				melodyLengthToolbar.hide()
 				melodyEditingModifiers.hide()
 			}
 		}

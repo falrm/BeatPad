@@ -14,7 +14,6 @@ import com.jonlatane.beatpad.util.vibrate
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.sdk25.coroutines.onFocusChange
 import org.jetbrains.anko.sdk25.coroutines.onTouch
 import kotlin.math.abs
 import kotlin.math.max
@@ -22,7 +21,7 @@ import kotlin.math.min
 import kotlin.math.round
 
 @SuppressLint("ViewConstructor")
-class LengthToolbar(context: Context, viewModel: PaletteViewModel)
+class MelodyLengthToolbar(context: Context, viewModel: PaletteViewModel)
   : Toolbar(context, viewModel), AnkoLogger {
   companion object {
     fun formatBeatCount(subdivisionsPerBeat: Int, length: Int): String =
@@ -107,7 +106,7 @@ class LengthToolbar(context: Context, viewModel: PaletteViewModel)
     val closeButton = imageButton {
       imageResource = R.drawable.check_mark
       onClick {
-        this@LengthToolbar.hide()
+        this@MelodyLengthToolbar.hide()
         viewModel.melodyViewModel.melodyEditingToolbar.lengthButtonFrame.show(animation = HideAnimation.HORIZONTAL_THEN_VERTICAL)
         viewModel.melodyViewModel.sectionToolbar.lengthButtonFrame.show(animation = HideAnimation.HORIZONTAL_ALPHA)
       }

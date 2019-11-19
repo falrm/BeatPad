@@ -46,7 +46,7 @@ interface ChordTextPositioner: AnkoLogger {
       }.lparams(width = wrapContent, height = wrapContent) {
         alignParentLeft()
         if(supportGridLayout) {
-          below(viewModel.melodyViewModel.lengthToolbar)
+          below(viewModel.melodyViewModel.melodyLengthToolbar)
         } else {
           centerVertically()
         }

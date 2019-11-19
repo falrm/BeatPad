@@ -35,7 +35,7 @@ class MelodyView(
 		leftOf(rightSpacer)
 		above(melodyEditingModifiers)
 		rightOf(melodyLeftScroller)
-		below(lengthToolbar)
+		below(melodyLengthToolbar)
 	}
 	init {
 		with(viewModel.melodyViewModel) {
@@ -57,7 +57,7 @@ class MelodyView(
 				alignParentRight()
 				alignParentLeft()
 			}
-			lengthToolbar = lengthToolbar(viewModel) {
+			melodyLengthToolbar = lengthToolbar(viewModel) {
 				id = R.id.length_toolbar
 				elevation = 6f
 			}.lparams(matchParent, wrapContent) {
@@ -99,7 +99,7 @@ class MelodyView(
 			leftSpacer = view {
 				id = View.generateViewId()
 			}.lparams(0, matchParent) {
-				below(lengthToolbar)
+				below(melodyLengthToolbar)
 				above(melodyEditingModifiers)
 				alignParentLeft()
 			}
@@ -114,7 +114,7 @@ class MelodyView(
 				scrollingEnabled = false
 				isVerticalScrollBarEnabled = false
 			}.lparams(dip(30), matchParent) {
-				below(lengthToolbar)
+				below(melodyLengthToolbar)
 				above(melodyEditingModifiers)
 				rightOf(leftSpacer)
 			}
@@ -123,7 +123,7 @@ class MelodyView(
 			}.lparams(0, matchParent) {
 				alignParentRight()
 				above(melodyEditingModifiers)
-				below(lengthToolbar)
+				below(melodyLengthToolbar)
 			}
 			melodyVerticalScrollView = nonDelayedScrollView {
 				id = R.id.center_v_scroller
@@ -181,7 +181,7 @@ class MelodyView(
 				melodyRecyclerView.minimumHeight = melodyVerticalScrollView.height
 				melodyEditingToolbar.hide(false)
 				melodyEditingModifiers.hide(false)
-				lengthToolbar.hide(false)
+				melodyLengthToolbar.hide(false)
 				syncScrollingChordText()
 			}
 		}

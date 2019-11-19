@@ -8,6 +8,7 @@ import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.storage.PaletteStorage
+import com.jonlatane.beatpad.util.HideAnimation
 import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
@@ -107,8 +108,9 @@ class MelodyReferenceAdapter(
 					Thread.sleep(500L)
 					uiThread {
 						viewModel.melodyViewModel.melodyReferenceToolbar.editModeActive = true
-            viewModel.melodyViewModel.melodyEditingToolbar.lengthDialog.show()
-            viewModel.melodyViewModel.lengthToolbar.show()
+//            viewModel.melodyViewModel.melodyEditingToolbar.lengthDialog.show()
+						viewModel.melodyViewModel.melodyEditingToolbar.lengthButtonFrame.hide(animation = HideAnimation.VERTICAL_THEN_HORIZONTAL)
+            viewModel.melodyViewModel.melodyLengthToolbar.show()
 					}
 				}
 			}

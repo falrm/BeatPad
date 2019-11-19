@@ -87,7 +87,7 @@ class SectionToolbar(context: Context, viewModel: PaletteViewModel)
 				typeface = MainApplication.chordTypefaceBold
 				onClick {
 					context.toast("Section/Harmony Length: TODO! For now, settle for 4 bars in 16th notes.")
-//					viewModel.melodyViewModel.lengthToolbar.show()
+//					viewModel.melodyViewModel.melodyLengthToolbar.show()
 //					this@hideableFrame.hide(animation = HideAnimation.HORIZONTAL_ALPHA)
 				}
 			}

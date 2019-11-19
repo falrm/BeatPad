@@ -16,7 +16,6 @@ import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.*
 import com.jonlatane.beatpad.view.*
-import com.jonlatane.beatpad.view.melody.lengthToolbar
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -42,7 +41,7 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 				typeface = MainApplication.chordTypefaceBold
 				translationY = dip(-1).toFloat()
 				onClick {
-					viewModel.melodyViewModel.lengthToolbar.show()
+					viewModel.melodyViewModel.melodyLengthToolbar.show()
 					this@hideableFrame.hide(animation = HideAnimation.VERTICAL_THEN_HORIZONTAL)
 				}
 			}

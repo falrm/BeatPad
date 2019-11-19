@@ -14,8 +14,8 @@ inline fun ViewManager.melodyEditingModifiers(theme: Int = 0, init: MelodyEditin
 
 inline fun ViewManager.melodyEditingToolbar(viewModel: PaletteViewModel, theme: Int = 0, init: MelodyEditingToolbar.() -> Unit = {})
 	= ankoView({ MelodyEditingToolbar(it, viewModel) }, theme, init)
-inline fun ViewManager.lengthToolbar(viewModel: PaletteViewModel, theme: Int = 0, init: LengthToolbar.() -> Unit = {})
-	= ankoView({ LengthToolbar(it, viewModel) }, theme, init)
+inline fun ViewManager.lengthToolbar(viewModel: PaletteViewModel, theme: Int = 0, init: MelodyLengthToolbar.() -> Unit = {})
+	= ankoView({ MelodyLengthToolbar(it, viewModel) }, theme, init)
 inline fun ViewManager.melodyReferenceToolbar(viewModel: PaletteViewModel, theme: Int = 0, init: MelodyReferenceToolbar.() -> Unit = {})
 	= ankoView({ MelodyReferenceToolbar(it, viewModel) }, theme, init)
 inline fun ViewManager.sectionToolbar(viewModel: PaletteViewModel, theme: Int = 0, init: SectionToolbar.() -> Unit = {})

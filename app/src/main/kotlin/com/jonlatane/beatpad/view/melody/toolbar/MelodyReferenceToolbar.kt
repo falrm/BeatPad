@@ -89,7 +89,7 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 //				}
 		} else {
 			melodyViewModel.melodyEditingToolbar.hide()
-			melodyViewModel.lengthToolbar.hide()
+			melodyViewModel.melodyLengthToolbar.hide()
 			melodyViewModel.melodyEditingModifiers.hide()
 			melodyViewModel.layoutType = MelodyViewModel.LayoutType.GRID
 		}
