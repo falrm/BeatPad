@@ -31,6 +31,7 @@ import org.jetbrains.anko.*
 import java.lang.Thread.sleep
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.max
 import kotlin.properties.Delegates.observable
 
 /**
@@ -80,8 +81,12 @@ class PaletteViewModel constructor(
     }
   }
   fun showVerticalSectionList(animated: Boolean = true, endAction: (() -> Unit)? = null) {
-    sectionListRecyclerVerticalRotator.show(animated = animated, animation = HideAnimation.HORIZONTAL)
-    endAction?.invoke()
+    sectionListRecyclerVerticalRotator.show(animated = animated, animation = HideAnimation.HORIZONTAL) {
+      sectionListRecyclerVertical.smoothScrollToPosition(
+        max(0, palette.sections.indexOf(BeatClockPaletteConsumer.section))
+      )
+      endAction?.invoke()
+    }
   }
   fun hideVerticalSectionList(animated: Boolean = true, endAction: (() -> Unit)? = null) {
     sectionListRecyclerVerticalRotator.hide(animated = animated, animation = HideAnimation.HORIZONTAL)
@@ -89,15 +94,21 @@ class PaletteViewModel constructor(
   }
   fun showHorizontalSectionList(animated: Boolean = true, endAction: (() -> Unit)? = null) {
     val portrait = storageContext.resources.configuration.portrait
+
+    val done = incrementUntil(if(sectionListRecyclerHorizontalSpacer != null) 2 else 1) {
+      sectionListRecyclerHorizontal.smoothScrollToPosition(
+        max(0, palette.sections.indexOf(BeatClockPaletteConsumer.section))
+      )
+      endAction?.invoke()
+    }
     sectionListRecyclerHorizontalRotator.show(
       animated = animated,
       animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
-    )
+    ) { done() }
     sectionListRecyclerHorizontalSpacer?.show(
       animated = animated,
       animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
-    )
-    endAction?.invoke()
+    ) { done() }
   }
   fun hideHorizontalSectionList(animated: Boolean = true, endAction: (() -> Unit)? = null) {
     val portrait = storageContext.resources.configuration.portrait
@@ -214,8 +225,6 @@ class PaletteViewModel constructor(
   var editingMelody: Melody<*>? by observable<Melody<*>?>(null) { _, old, new ->
     melodyViewModel.updateToolbarsAndMelody()
     if (new != null && !melodyViewVisible) {
-      colorboardView.hide()
-      keyboardView.hide()
       harmonyViewModel.beatAdapter
         .syncPositionTo(melodyViewModel.melodyRecyclerView)
 
@@ -310,6 +319,10 @@ class PaletteViewModel constructor(
       if(field != visible) {
         field = visible
         if(visible) {
+          hideColorboard()
+          hideOrbifold()
+          hideKeyboard()
+          //TODO Hide Orbifold + Keyboard IF not editing chord, otherwise scroll to the chord being edited.
           showMelodyView()
         } else {
           hideMelodyView()

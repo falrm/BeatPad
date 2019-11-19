@@ -76,6 +76,7 @@ class MelodyViewModel(
 				}
 				melodyReferenceToolbar.hide()
 				melodyEditingToolbar.hide()
+				lengthToolbar.hide()
 				melodyEditingModifiers.hide()
 			}
 		}
