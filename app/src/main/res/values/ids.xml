@@ -16,6 +16,7 @@
 -->
 <resources>
 	<item name="bottom_scroller" type="id"/>
+	<item name="length_toolbar" type="id"/>
 	<item name="melody_editing_toolbar" type="id"/>
 	<item name="melody_reference_toolbar" type="id"/>
 	<item name="left_scroller" type="id"/>

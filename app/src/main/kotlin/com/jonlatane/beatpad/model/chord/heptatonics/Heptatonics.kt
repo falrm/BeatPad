@@ -88,8 +88,17 @@ data class Heptatonics(
 		colors.contains(8) && fifth != AUGMENTED -> MINOR
 		else -> NONEXISTENT
 	}
-
+  fun booleansToInt(vararg arr: Boolean): Int {
+    var n = 0
+    for (b in arr)
+      n = n shl 1 or if (b) 1 else 0
+    return n
+  }
 	val colorString: String by lazy {
+    val bitRepresentation = booleansToInt(*(1..11).map{colors.contains(it)}.toBooleanArray())
+    ChordExtensionNames[bitRepresentation].firstOrNull()?.let {
+      return@lazy it
+    }
     when {
       colors.size == 12 -> " Chrom."
       colors.size >= 10 -> " Chrom. (no ${(0..11).filter { !colors.contains(it) }

@@ -447,7 +447,7 @@ class PaletteViewModel constructor(
     orbifold.show(
       animation = if (orbifold.context.configuration.portrait) {
         HideAnimation.VERTICAL
-      } else HideAnimation.HORIZONTAL,
+      } else HideAnimation.HORIZONTAL_ALPHA,
       animated = animated,
       endAction = {
         orbifold.conditionallyAnimateToSelectionState()
@@ -463,7 +463,7 @@ class PaletteViewModel constructor(
     orbifold.hide(
       animation = if (orbifold.context.configuration.portrait) {
         HideAnimation.VERTICAL
-      } else HideAnimation.HORIZONTAL,
+      } else HideAnimation.HORIZONTAL_ALPHA,
       animated = animated
     )
   }

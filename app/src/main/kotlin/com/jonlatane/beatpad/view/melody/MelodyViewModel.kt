@@ -12,10 +12,7 @@ import com.jonlatane.beatpad.util.smartrecycler.applyToHolders
 import com.jonlatane.beatpad.view.HideableRelativeLayout
 import com.jonlatane.beatpad.view.NonDelayedRecyclerView
 import com.jonlatane.beatpad.view.NonDelayedScrollView
-import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingModifiers
-import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingToolbar
-import com.jonlatane.beatpad.view.melody.toolbar.MelodyReferenceToolbar
-import com.jonlatane.beatpad.view.melody.toolbar.SectionToolbar
+import com.jonlatane.beatpad.view.melody.toolbar.*
 import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
@@ -53,6 +50,7 @@ class MelodyViewModel(
 	lateinit var sectionToolbar: SectionToolbar
 	lateinit var melodyReferenceToolbar: MelodyReferenceToolbar
 	lateinit var melodyEditingToolbar: MelodyEditingToolbar
+	lateinit var lengthToolbar: LengthToolbar
 	lateinit var melodyView: MelodyView
 	lateinit var melodyLeftScroller: NonDelayedScrollView
 	lateinit var melodyEditingModifiers: MelodyEditingModifiers

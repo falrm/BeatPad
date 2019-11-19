@@ -270,6 +270,7 @@ class SectionHolder constructor(
     }
     itemView.apply {
       setOnClickListener {
+        vibrate(10)
         adapter.addSection()
       }
       setOnLongClickListener { false }

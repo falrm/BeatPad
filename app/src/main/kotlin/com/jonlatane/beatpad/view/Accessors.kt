@@ -1,8 +1,7 @@
 package com.jonlatane.beatpad.view
 
-import android.graphics.Typeface
 import android.view.ViewManager
-import com.jonlatane.beatpad.MainApplication
+import org.jetbrains.anko.AnkoViewDslMarker
 import org.jetbrains.anko.custom.ankoView
 
 
@@ -11,9 +10,12 @@ import org.jetbrains.anko.custom.ankoView
 //inline fun ViewManager.numberPickerWithTypeface(theme: Int = 0, init: NumberPickerWithTypeface.() -> Unit)
 //	= ankoView({ NumberPickerWithTypeface(it) }, theme, init)
 
-
+inline fun ViewManager.hideableButton(init: (@AnkoViewDslMarker HideableButton).() -> Unit)
+	= ankoView({ HideableButton(it) }, theme = 0) { init() }
 inline fun ViewManager.hideableLinearLayout(theme: Int = 0, init: HideableLinearLayout.() -> Unit = {})
 	= ankoView({ HideableLinearLayout(it) }, theme, init)
+inline fun ViewManager.hideableFrame(theme: Int = 0, init: HideableFrame.() -> Unit = {})
+	= ankoView({ HideableFrame(it) }, theme, init)
 
 fun ViewManager.nonDelayedHorizontalScrollView(theme: Int = 0)
 	= nonDelayedHorizontalScrollView(theme) {}

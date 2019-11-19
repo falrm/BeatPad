@@ -3,7 +3,6 @@ package com.jonlatane.beatpad.view.melody.toolbar
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.view.View
 import android.widget.ImageView
 import com.jonlatane.beatpad.R
@@ -78,6 +77,7 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 		}
 		if (value) {
 			melodyViewModel.melodyEditingToolbar.show()
+			melodyViewModel.melodyEditingToolbar.lengthButtonFrame.show(animation = HideAnimation.HORIZONTAL_ALPHA)
 			melodyViewModel.melodyEditingModifiers.show()
 			melodyViewModel.layoutType = MelodyViewModel.LayoutType.LINEAR
 //				viewModel.backStack.push {
@@ -89,7 +89,9 @@ class MelodyReferenceToolbar(context: Context, viewModel: PaletteViewModel)
 //				}
 		} else {
 			melodyViewModel.melodyEditingToolbar.hide()
+			melodyViewModel.lengthToolbar.hide()
 			melodyViewModel.melodyEditingModifiers.hide()
+			melodyViewModel.layoutType = MelodyViewModel.LayoutType.GRID
 		}
 	}
 	private val editButton = imageButton {

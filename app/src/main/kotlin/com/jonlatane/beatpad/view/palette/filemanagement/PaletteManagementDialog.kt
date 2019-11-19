@@ -65,24 +65,27 @@ class PaletteManagementDialog(
         )
       },
       onSubmit = { name ->
-        val doCreate: () -> Unit = { with(Storage) {
-          val palette = when {
-            createFromIntentCheckbox.isChecked -> MainApplication.intentPalette ?: null.also {
-              storageContext.toast("Palette no longer accessible in intents.")
+        val doCreate: () -> Unit = {
+          with(Storage) {
+            val palette = when {
+              createFromIntentCheckbox.isChecked    -> MainApplication.intentPalette ?: null.also {
+                storageContext.toast("Palette no longer accessible in intents.")
+              }
+              createFromClipboardCheckbox.isChecked -> getClipboardPalette() ?: null.also {
+                storageContext.toast("Palette no longer accessible from clipboard.")
+              }
+              else                                  -> PaletteStorage.basePalette
             }
-            createFromClipboardCheckbox.isChecked -> getClipboardPalette() ?: null.also {
-              storageContext.toast("Palette no longer accessible from clipboard.")
+            if (palette != null) {
+              openPaletteFile = name
+              BeatClockPaletteConsumer.palette = palette
+              BeatClockPaletteConsumer.viewModel?.palette = BeatClockPaletteConsumer.palette!!
+              storageContext.storePalette(showSuccessToast = true)
             }
-            else -> PaletteStorage.basePalette
           }
-          if(palette != null) {
-            openPaletteFile = name
-            BeatClockPaletteConsumer.palette = palette
-            BeatClockPaletteConsumer.viewModel?.palette = BeatClockPaletteConsumer.palette!!
-            storageContext.storePalette(showSuccessToast = true)
-          }
-        } }
-        if(Storage.getPalettes(storageContext).map { it.nameWithoutExtension }.contains(name)) {
+          displayedAlert?.dismiss()
+        }
+        if (Storage.getPalettes(storageContext).map { it.nameWithoutExtension }.contains(name)) {
           showConfirmDialog(
             storageContext,
             promptText = "Palette \"$name\" already exists. Overwrite it?",
@@ -100,10 +103,13 @@ class PaletteManagementDialog(
         )
       },
       onSubmit = { name ->
-        val doSave: () -> Unit = { with(Storage) {
-          openPaletteFile = name
-          storageContext.storePalette(showSuccessToast = true)
-        } }
+        val doSave: () -> Unit = {
+          with(Storage) {
+            openPaletteFile = name
+            storageContext.storePalette(showSuccessToast = true)
+          }
+          displayedAlert?.dismiss()
+        }
         if(Storage.getPalettes(storageContext).map { it.nameWithoutExtension }.contains(name)) {
           showConfirmDialog(
             storageContext,
@@ -164,12 +170,14 @@ class PaletteManagementDialog(
     editPaletteName.text.clear()
     editPaletteName.text.append(mode.defaultText(storageContext))
     paletteRecycler.adapter!!.notifyDataSetChanged()
-    (alert.show() as AlertDialog).apply {
+    displayedAlert = alert.show() as AlertDialog
+    displayedAlert?.apply {
       setOnCancelListener { MainApplication.intentPalette = null }
       setOnDismissListener { MainApplication.intentPalette = null }
     }
   }
   private lateinit var lengthLayout: RelativeLayout
+  private var displayedAlert: AlertDialog? = null
   private val alert = storageContext.alert {
     customView {
       lengthLayout = relativeLayout {

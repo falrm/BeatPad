@@ -5,10 +5,14 @@ import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import android.support.constraint.ConstraintSet
+import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
@@ -273,6 +277,23 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
         // ...
       }
     }
+  }
+
+  override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+    if (event.action == MotionEvent.ACTION_DOWN) {
+      val v = currentFocus
+      if (v is EditText) {
+        val outRect = Rect()
+        v.getGlobalVisibleRect(outRect)
+        if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
+          info("focus touchevent")
+          v.clearFocus();
+          val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+          imm.hideSoftInputFromWindow(v.getWindowToken(), 0)
+        }
+      }
+    }
+    return super.dispatchTouchEvent(event)
   }
 
 

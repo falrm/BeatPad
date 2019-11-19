@@ -46,7 +46,7 @@ interface HideableView {
   fun show(
     animated: Boolean = true,
     animation: HideAnimation = HideAnimation.VERTICAL,
-    endAction: (() -> Unit)? = null
+    endAction: () -> Unit = {}
   ) {
     animation.apply {
       (this@HideableView as View).show(animated, endAction)
@@ -56,21 +56,12 @@ interface HideableView {
   fun hide(
     animated: Boolean = true,
     animation: HideAnimation = HideAnimation.VERTICAL,
-    endAction: (() -> Unit)? = null
+    endAction: () -> Unit = {}
   ) {
     animation.apply {
       (this@HideableView as View).hide(animated, endAction)
     }
   }
-}
-
-fun TextView.toolbarTextStyle() {
-	singleLine = true
-	ellipsize = TextUtils.TruncateAt.MARQUEE
-	marqueeRepeatLimit = -1
-	isSelected = true
-	allCaps = true
-  typeface = MainApplication.chordTypefaceBold
 }
 
 var nextViewId: Int = 10001
@@ -243,7 +234,7 @@ inline val Configuration.tablet: Boolean
 
 enum class HideAnimation: AnkoLogger {
   VERTICAL {
-    override fun View.show(animated: Boolean, endAction: (() -> Unit)?) {
+    override fun View.show(animated: Boolean, endAction: () -> Unit) {
       setupHiding()
       if (animated) {
         animateHeight((this as HideableView).initialHeight!!, endAction = endAction)
@@ -253,11 +244,11 @@ enum class HideAnimation: AnkoLogger {
         layoutHeight = (this as HideableView).initialHeight!!
         topMargin = (this as HideableView).initialTopMargin!!
         bottomMargin = (this as HideableView).initialBottomMargin!!
-        endAction?.invoke()
+        endAction()
       }
     }
 
-    override fun View.hide(animated: Boolean, endAction: (() -> Unit)?) {
+    override fun View.hide(animated: Boolean, endAction: () -> Unit) {
       setupHiding()
       if (animated) {
         animateHeight(0, endAction = endAction)
@@ -267,35 +258,65 @@ enum class HideAnimation: AnkoLogger {
         layoutHeight = 0
         topMargin = 0
         bottomMargin = 0
-        endAction?.invoke()
+        endAction()
       }
     }
   },
   HORIZONTAL {
-    override fun View.show(animated: Boolean, endAction: (() -> Unit)?) {
+    override fun View.show(animated: Boolean, endAction: () -> Unit) {
       setupHiding()
       if (animated) {
         animateWidth((this as HideableView).initialWidth!!, endAction = endAction)
       } else {
         layoutWidth = (this as HideableView).initialWidth!!
-        endAction?.invoke()
+        endAction()
       }
     }
 
-    override fun View.hide(animated: Boolean, endAction: (() -> Unit)?) {
+    override fun View.hide(animated: Boolean, endAction: () -> Unit) {
       setupHiding()
       if (animated) {
         animateWidth(0, endAction = endAction)
       } else {
         layoutWidth = 0
-        endAction?.invoke()
+        endAction()
+      }
+    }
+  },
+  HORIZONTAL_ALPHA {
+    override fun View.show(animated: Boolean, endAction: () -> Unit) {
+      setupHiding()
+      if (animated) {
+        animateWidth((this as HideableView).initialWidth!!, duration = defaultDuration/2) {
+          animate().alpha(1f).setDuration(defaultDuration/2).withEndAction {
+            endAction()
+          }.start()
+        }
+      } else {
+        layoutWidth = (this as HideableView).initialWidth!!
+        alpha = 1f
+        endAction()
+      }
+    }
+
+    override fun View.hide(animated: Boolean, endAction: () -> Unit) {
+      setupHiding()
+      if (animated) {
+        animate().alpha(0f).setDuration(defaultDuration/2).withEndAction {
+          animateWidth(0, duration = defaultDuration/2) {
+            endAction()
+          }
+        }.start()
+      } else {
+        layoutWidth = 0
+        alpha = 0f
+        endAction()
       }
     }
   };
 
-  abstract fun View.show(animated: Boolean = true, endAction: (() -> Unit)? = null)
-
-  abstract fun View.hide(animated: Boolean = true, endAction: (() -> Unit)? = null)
+  abstract fun View.show(animated: Boolean = true, endAction: () -> Unit = {})
+  abstract fun View.hide(animated: Boolean = true, endAction: () -> Unit = {})
 
   fun View.setupHiding() {
     if ((this as HideableView).initialWidth == null || (this as HideableView).initialHeight == null) {

@@ -107,7 +107,8 @@ class MelodyReferenceAdapter(
 					Thread.sleep(500L)
 					uiThread {
 						viewModel.melodyViewModel.melodyReferenceToolbar.editModeActive = true
-						viewModel.melodyViewModel.melodyEditingToolbar.lengthDialog.show()
+            viewModel.melodyViewModel.melodyEditingToolbar.lengthDialog.show()
+            viewModel.melodyViewModel.lengthToolbar.show()
 					}
 				}
 			}

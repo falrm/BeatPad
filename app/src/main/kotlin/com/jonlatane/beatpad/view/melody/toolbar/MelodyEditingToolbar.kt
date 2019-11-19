@@ -14,9 +14,11 @@ import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import com.jonlatane.beatpad.util.mod12
-import com.jonlatane.beatpad.util.mod12Nearest
-import com.jonlatane.beatpad.util.toolbarTextStyle
+import com.jonlatane.beatpad.util.*
+import com.jonlatane.beatpad.view.HideableFrame
+import com.jonlatane.beatpad.view.hideableButton
+import com.jonlatane.beatpad.view.hideableFrame
+import com.jonlatane.beatpad.view.melody.lengthToolbar
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -27,25 +29,32 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 {
 	val lengthDialog = LengthDialog(context, melodyViewModel)
 
-	private val lengthButton: Button = button {
-		text = "0/0\n0 beats"
-		setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12f)
-		backgroundResource = R.drawable.toolbar_melody_button
-		padding = dip(0)
-		typeface = MainApplication.chordTypefaceBold
-//		singleLine = true
-//		ellipsize = TextUtils.TruncateAt.MARQUEE
-//		marqueeRepeatLimit = -1
-//		isSelected = true
-		onClick {
-			//storageContext.toast("TODO")
-      try {
-        lengthDialog.show()
-      } catch(t: Throwable) {
-        error("Error showing length dialog", t)
-      }
-		}
-	}.longSquareButtonStyle().lparams { height = matchParent }
+	val lengthButtonFrame: HideableFrame
+	lateinit var lengthButton: Button
+	init {
+		lengthButtonFrame = hideableFrame {
+			lengthButton = button {
+				text = "0/0\n0 beats"
+				setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12f)
+				backgroundResource = R.drawable.toolbar_melody_button
+				padding = dip(0)
+				typeface = MainApplication.chordTypefaceBold
+	//		singleLine = true
+	//		ellipsize = TextUtils.TruncateAt.MARQUEE
+	//		marqueeRepeatLimit = -1
+	//		isSelected = true
+				isLongClickable = true
+				onClick {
+					viewModel.melodyViewModel.lengthToolbar.show()
+					this@hideableFrame.hide(animation = HideAnimation.HORIZONTAL_ALPHA)
+				}
+				onLongClick {
+					vibrate(10)
+					lengthDialog.show()
+				}
+			}
+		}.longSquareButtonStyle().lparams { height = matchParent }
+	}
 
 	private val relativeToButton: Button = button {
 		text = ""
@@ -55,7 +64,7 @@ class MelodyEditingToolbar(context: Context, viewModel: PaletteViewModel)
 		onClick {
 			relativeToMenu.show()
 		}
-		toolbarTextStyle()
+		toolbarButtonTextStyle()
 	}.flexStyle()
 	private val relativeToMenu = PopupMenu(context, relativeToButton).also {
 		it.inflate(R.menu.melody_relative_menu)
