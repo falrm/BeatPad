@@ -1,10 +1,9 @@
 package com.jonlatane.beatpad.view.palette.filemanagement
 
+import BeatClockPaletteConsumer
 import android.app.AlertDialog
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.DialogInterface
-import android.support.constraint.ConstraintLayout
 import android.support.constraint.ConstraintSet
 import android.support.v7.widget.RecyclerView
 import android.view.Gravity
@@ -13,12 +12,11 @@ import android.view.ViewGroup
 import android.widget.*
 import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
-import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Section
+import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.storage.PaletteStorage
-import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.InstaRecycler
 import com.jonlatane.beatpad.util.vibrate
@@ -28,6 +26,7 @@ import com.jonlatane.beatpad.view.hideableRelativeLayout
 import com.jonlatane.beatpad.view.nonDelayedRecyclerView
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
+import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
 import org.jetbrains.anko.constraint.layout.applyConstraintSet
 import org.jetbrains.anko.sdk25.coroutines.onCheckedChange
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -127,6 +126,9 @@ class PaletteManagementDialog(
           openPaletteFile = name
           BeatClockPaletteConsumer.palette = storageContext.loadPalette()
           BeatClockPaletteConsumer.viewModel?.palette = BeatClockPaletteConsumer.palette!!
+        }
+        if(PlaybackService.instance?.isStopped != false) {
+          displayedAlert?.dismiss()
         }
       })
   }

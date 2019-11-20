@@ -3,7 +3,9 @@ package com.jonlatane.beatpad.view.melody.toolbar
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PointF
+import android.text.Editable
 import android.text.InputType
+import android.text.TextWatcher
 import android.view.Gravity
 import android.view.MotionEvent
 import android.widget.*
@@ -50,6 +52,7 @@ class MelodyLengthToolbar(context: Context, viewModel: PaletteViewModel)
       }
     }
     updateBeats()
+    viewModel.melodyViewModel.updateToolbarsAndMelody()
   }
 
   private fun updatePerBeat() {
@@ -60,6 +63,7 @@ class MelodyLengthToolbar(context: Context, viewModel: PaletteViewModel)
       }
     }
     updateBeats()
+    viewModel.melodyViewModel.updateToolbarsAndMelody()
   }
 
   private fun updateBeats() {
@@ -123,6 +127,19 @@ class MelodyLengthToolbar(context: Context, viewModel: PaletteViewModel)
         viewModel.editingMelody?.length = it
         updateSubdivisions()
       }
+      addTextChangedListener(object : TextWatcher {
+        override fun afterTextChanged(s: Editable) {}
+        override fun beforeTextChanged(s: CharSequence, start: Int,
+                                       count: Int, after: Int) {}
+
+        override fun onTextChanged(s: CharSequence, start: Int,
+                                   before: Int, count: Int) {
+          s.toString().toIntOrNull()?.let {
+            viewModel.editingMelody?.length = it
+            viewModel.melodyViewModel.updateToolbarsAndMelody()
+          }
+        }
+      })
     }.mediumSquareButtonStyle()
     subdivisionsText = textView("subdivisions") {
       toolbarTextStyle()
@@ -140,6 +157,19 @@ class MelodyLengthToolbar(context: Context, viewModel: PaletteViewModel)
         viewModel.editingMelody?.subdivisionsPerBeat = it
         updatePerBeat()
       }
+      addTextChangedListener(object : TextWatcher {
+        override fun afterTextChanged(s: Editable) {}
+        override fun beforeTextChanged(s: CharSequence, start: Int,
+                                       count: Int, after: Int) {}
+
+        override fun onTextChanged(s: CharSequence, start: Int,
+                                   before: Int, count: Int) {
+          s.toString().toIntOrNull()?.let {
+            viewModel.editingMelody?.subdivisionsPerBeat = it
+            viewModel.melodyViewModel.updateToolbarsAndMelody()
+          }
+        }
+      })
     }.squareButtonStyle()
     perBeatText = textView("per beat") {
       toolbarTextStyle()

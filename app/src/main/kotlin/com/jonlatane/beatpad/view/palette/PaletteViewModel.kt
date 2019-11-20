@@ -31,6 +31,7 @@ import org.jetbrains.anko.*
 import java.lang.Thread.sleep
 import java.util.*
 import kotlin.math.max
+import kotlin.math.round
 import kotlin.properties.Delegates.observable
 
 /**
@@ -70,11 +71,21 @@ class PaletteViewModel constructor(
             sleep(300)
             uiThread {
               melodyViewModel.onZoomFinished()
+              doAsync {
+                sleep(300)
+                uiThread {
+                  val currentBeat = tickPositionToBeatPosition(playbackTick)
+                  val scrollToBeat = if(PlaybackService.instance?.isStopped != true) {
+                    round(currentBeat + palette.bpm / 16.66667f).toInt()
+                  } else currentBeat
+                  melodyViewModel.melodyRecyclerView.smoothScrollToPosition(scrollToBeat)
+                }
+              }
             }
           }
         }
         paletteToolbar.hide { showMelody() }
-        hideVerticalSectionList   { showMelody() }
+        hideVerticalSectionList { showMelody() }
         hideHorizontalSectionList { showMelody() }
       }
     }
@@ -137,29 +148,24 @@ class PaletteViewModel constructor(
     }
   }
 
+  fun tickPositionToBeatPosition(tickPosition: Int) = when(interactionMode) {
+    BeatScratchToolbar.InteractionMode.VIEW -> {
+      var totalBeats = 0
+      loop@ for(candidate in palette.sections) {
+        when {
+          candidate === BeatClockPaletteConsumer.section -> break@loop
+          else -> totalBeats += candidate.harmony.run { length / subdivisionsPerBeat }
+        }
+      }
+      ((totalBeats * BeatClockPaletteConsumer.ticksPerBeat + tickPosition.toDouble())
+        / BeatClockPaletteConsumer.ticksPerBeat).toInt()
+    }
+    else -> (tickPosition.toDouble() / BeatClockPaletteConsumer.ticksPerBeat).toInt()
+  }
+
   var playbackTick by observable<Int>(0) { _, old, new ->
     arrayOf(old, new).filterNotNull().map { tickPosition ->
-      when(interactionMode) {
-        BeatScratchToolbar.InteractionMode.VIEW -> {
-          var totalBeats = 0
-          loop@ for(candidate in palette.sections) {
-            when {
-              candidate === BeatClockPaletteConsumer.section -> break@loop
-              else -> totalBeats += candidate.harmony.run { length / subdivisionsPerBeat }
-            }
-          }
-//          val sectionIndex = palette.sections.indexOf(BeatClockPaletteConsumer.section)
-//          val sectionStartTick = sectionIndex.takeIf { it >= 0 }?.let {
-//            palette.sections.subList(
-//              0, palette.sections.indexOf(BeatClockPaletteConsumer.section)
-//            ).sumBy { it.harmony.run { length / subdivisionsPerBeat } } * BeatClockPaletteConsumer.ticksPerBeat
-//          } ?: 0
-
-          ((totalBeats * BeatClockPaletteConsumer.ticksPerBeat + tickPosition.toDouble())
-            / BeatClockPaletteConsumer.ticksPerBeat).toInt()
-        }
-        else -> (tickPosition.toDouble() / BeatClockPaletteConsumer.ticksPerBeat).toInt()
-      }
+      tickPositionToBeatPosition(tickPosition)
     }.toSet().forEach { melodyBeat ->
       melodyViewModel.beatAdapter.invalidate(melodyBeat)
       harmonyViewModel.beatAdapter.invalidate(melodyBeat)
