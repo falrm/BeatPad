@@ -16,7 +16,9 @@ import com.jonlatane.beatpad.midi.MidiDevices
 import com.jonlatane.beatpad.output.instrument.audiotrack.AudioTrackCache
 import com.jonlatane.beatpad.storage.Storage
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.info
+import kotlin.system.exitProcess
 
 
 class PlaybackService : Service(), AnkoLogger {
@@ -88,6 +90,13 @@ class PlaybackService : Service(), AnkoLogger {
         info("Received Stop Foreground Intent")
         stopForeground(true)
         stopSelf()
+        BeatClockPaletteConsumer.viewModel?.activity?.finish()
+        doAsync {
+          Thread.sleep(1000L)
+          val pid = android.os.Process.myPid()
+          android.os.Process.killProcess(pid)
+          exitProcess(0)
+        }
       }
     }
     return START_STICKY

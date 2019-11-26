@@ -1,10 +1,14 @@
 package com.jonlatane.beatpad.view.melody
 
+import BeatClockPaletteConsumer
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.PointF
+import android.graphics.Rect
 import android.util.SparseArray
 import android.view.MotionEvent
+import com.github.yamamotoj.cachedproperty.CachedProperty
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Section
@@ -16,9 +20,12 @@ import com.jonlatane.beatpad.view.melody.input.MelodyBeatEventArticulationHandle
 import com.jonlatane.beatpad.view.melody.input.MelodyBeatEventEditingHandler
 import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatNotationRenderer.DrawablePool
 import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatRenderer
+import com.jonlatane.beatpad.view.melody.renderer.BaseMelodyBeatRenderer.ViewType
 import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingModifiers
 import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
-import org.jetbrains.anko.*
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.error
+import org.jetbrains.anko.info
 
 /**
  * BeatViews
@@ -29,8 +36,17 @@ class MelodyBeatView constructor(
   override val viewModel: MelodyViewModel
 ) : BaseColorboardView(context), MelodyBeatRenderer,
   MelodyBeatEventArticulationHandler, MelodyBeatEventEditingHandler, AnkoLogger {
+  override var viewType: ViewType = ViewType.OtherNonDrumParts
+  override val palette get() = viewModel.paletteViewModel.palette
   override var section : Section = Section()
     private set
+  override val melody: Melody<*>? get() = viewModel.openedMelody?.let {
+    when {
+      viewType == ViewType.DrumPart && it.drumPart -> it
+      viewType != ViewType.DrumPart && !it.drumPart -> it
+      else -> null
+    }
+  }
   override var isCurrentlyPlayingBeat = false
   override var isSelectedBeatInHarmony = false
   override val displayType: MelodyViewModel.DisplayType get() = viewModel.displayType
@@ -44,6 +60,8 @@ class MelodyBeatView constructor(
   override val doubleFlatPool = DrawablePool(R.drawable.doubleflat, context)
   override val naturalPool = DrawablePool(R.drawable.natural_sign, context)
   override val xNoteheadPool: DrawablePool = DrawablePool(R.drawable.notehead_x, context)
+  override val renderedMelodiesCache = CachedProperty { super.renderedMelodies }
+  override val renderedMelodies: List<Melody<*>> by renderedMelodiesCache
 
   init {
     showSteps = true
@@ -75,8 +93,6 @@ class MelodyBeatView constructor(
     field = beatPos
     this.section = section
   }
-  override val palette get() = viewModel.paletteViewModel.palette
-  override val melody: Melody<*>? get() = viewModel.openedMelody
 
   override val downPointers = SparseArray<PointF>()
   //override var initialHeight: Int? = null
@@ -133,7 +149,11 @@ class MelodyBeatView constructor(
 
   override fun updateMelodyDisplay() = viewModel.updateMelodyDisplay()
 
-  override fun invalidateDrawingLayer() = invalidate()
+  override fun invalidateDrawingLayer() {
+    if(viewType != ViewType.Unused) {
+      invalidate()
+    }
+  }
 
   companion object {
     val DEFAULT_CHORD = Chord(0, intArrayOf(0,1,2,3,4,5,6,7,8,9,10,11))

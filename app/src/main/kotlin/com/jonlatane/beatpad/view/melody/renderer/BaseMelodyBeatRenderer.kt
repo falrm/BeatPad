@@ -1,8 +1,10 @@
 package com.jonlatane.beatpad.view.melody.renderer
 
+import BeatClockPaletteConsumer.viewModel
 import android.graphics.Canvas
 import android.graphics.Rect
 import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.util.size
@@ -10,7 +12,6 @@ import com.jonlatane.beatpad.view.colorboard.ColorGuide
 import com.jonlatane.beatpad.view.melody.input.MelodyBeatEventHandlerBase
 import com.jonlatane.beatpad.view.melody.MelodyBeatView
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
-import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import org.jetbrains.anko.withAlpha
 
 /**
@@ -18,6 +19,20 @@ import org.jetbrains.anko.withAlpha
  */
 interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
   val viewModel: MelodyViewModel
+  sealed class ViewType {
+    data class PartView(var part: Part): ViewType()
+    object OtherNonDrumParts: ViewType()
+    object DrumPart: ViewType()
+    object Unused: ViewType()
+
+    val isUsed get() = when(this) {
+      is PartView       -> false
+      OtherNonDrumParts -> viewModel?.palette?.parts?.any { !it.drumTrack } ?: false
+      DrumPart          -> viewModel?.palette?.parts?.any { it.drumTrack } ?: false
+      Unused            -> false
+    }
+  }
+  var viewType: ViewType
   val overallBounds: Rect
   override val bounds: Rect
   val renderableToneBounds: Rect

@@ -53,8 +53,15 @@ class PaletteViewModel constructor(
     when(interactionMode) {
       BeatScratchToolbar.InteractionMode.EDIT -> {
         showHorizontalSectionList {
+          backStack.push {
+            if (melodyViewVisible && isInEditMode) {
+              melodyViewVisible = false
+              true
+            } else false
+          }
           paletteToolbar.show {
-            melodyViewVisible = false
+            melodyViewModel.sectionToolbar.show()
+            //melodyViewVisible = false
           }
         }
 
@@ -207,6 +214,7 @@ class PaletteViewModel constructor(
     paletteToolbar.updateTempoDisplay()
     partListAdapters.forEach { it.notifyDataSetChanged() }
     sectionListAdapters.forEach { it.notifyDataSetChanged() }
+    listOf(sectionListRecyclerVertical, sectionListRecyclerHorizontal).forEach { it.smoothScrollToPosition(0) }
     if(!new.sections.contains(BeatClockPaletteConsumer.section)) {
       BeatClockPaletteConsumer.section = new.sections.first()
     }

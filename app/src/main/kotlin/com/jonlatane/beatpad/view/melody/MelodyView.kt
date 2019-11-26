@@ -5,6 +5,7 @@ import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.util.color
@@ -106,10 +107,24 @@ class MelodyView(
 			melodyLeftScroller = nonDelayedScrollView {
 				id = R.id.left_scroller
 				linearLayout {
+					orientation = LinearLayout.VERTICAL
 					verticalAxis = melodyToneAxis().lparams {
 						width = dip(30)
 						height = dip(MelodyBeatAdapter.initialBeatHeightDp)
 					}
+					verticalAxes.add(verticalAxis!!)
+					verticalAxes.add(
+						melodyToneAxis().lparams {
+							width = dip(30)
+							height = dip(MelodyBeatAdapter.initialBeatHeightDp)
+						}
+					)
+					verticalAxes.add(
+						melodyToneAxis().lparams {
+							width = dip(30)
+							height = dip(MelodyBeatAdapter.initialBeatHeightDp)
+						}
+					)
 				}
 				scrollingEnabled = false
 				isVerticalScrollBarEnabled = false

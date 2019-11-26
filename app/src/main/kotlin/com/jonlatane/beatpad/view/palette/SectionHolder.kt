@@ -239,28 +239,31 @@ class SectionHolder constructor(
   }
 
   private fun openSectionInMelodyView() {
-    // Check if section is already opened
-    if(viewModel.editingMelody == null && viewModel.melodyViewVisible)
-      return
-    val previouslyEditingMelody = viewModel.editingMelody
-    viewModel.backStack.push {
-      when {
-        previouslyEditingMelody != null -> {
-          viewModel.editingMelody = previouslyEditingMelody
-          true
-        }
-        viewModel.isInEditMode          -> {
-          viewModel.melodyViewVisible = false
-          true
-        }
-        else                            -> {
-          false
+    // Check if section is already opened; if so, close it
+    if(viewModel.editingMelody == null && viewModel.melodyViewVisible) {
+      viewModel.melodyViewVisible = false
+      vibrate(10, 100)
+    } else {
+      val previouslyEditingMelody = viewModel.editingMelody
+      viewModel.backStack.push {
+        when {
+          previouslyEditingMelody != null -> {
+            viewModel.editingMelody = previouslyEditingMelody
+            true
+          }
+          viewModel.isInEditMode          -> {
+            viewModel.melodyViewVisible = false
+            true
+          }
+          else                            -> {
+            false
+          }
         }
       }
+      viewModel.editingMelody = null
+      viewModel.melodyViewVisible = true
+      vibrate(10, 100)
     }
-    viewModel.editingMelody = null
-    viewModel.melodyViewVisible = true
-    vibrate(10, 100)
   }
 
   private fun makeAddButton() {

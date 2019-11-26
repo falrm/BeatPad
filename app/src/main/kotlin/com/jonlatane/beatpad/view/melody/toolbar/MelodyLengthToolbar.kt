@@ -137,6 +137,7 @@ class MelodyLengthToolbar(context: Context, viewModel: PaletteViewModel)
           s.toString().toIntOrNull()?.let {
             viewModel.editingMelody?.length = it
             viewModel.melodyViewModel.updateToolbarsAndMelody()
+            updateBeats()
           }
         }
       })
@@ -167,6 +168,7 @@ class MelodyLengthToolbar(context: Context, viewModel: PaletteViewModel)
           s.toString().toIntOrNull()?.let {
             viewModel.editingMelody?.subdivisionsPerBeat = it
             viewModel.melodyViewModel.updateToolbarsAndMelody()
+            updateBeats()
           }
         }
       })

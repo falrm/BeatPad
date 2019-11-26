@@ -45,8 +45,8 @@ android {
 		applicationId "com.jonlatane.beatpad"
 		minSdkVersion 23
 		targetSdkVersion 29
-		versionCode 111
-		versionName "0.76.0"
+		versionCode 112
+		versionName "0.76.1"
 		multiDexEnabled false
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 		externalNativeBuild {
@@ -127,6 +127,8 @@ dependencies {
 	implementation 'com.github.stupacki:MultiFunctions:1.2.1'
 	//implementation 'org.nield:kotlin-statistics:1.2.1'
 	implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
+	implementation 'com.github.yamamotoj:cached-property-kotlin:0.1.0'
+
 
 	implementation("org.jetbrains.kotlinx:kotlinx-io-jvm:$kotlinx_io_version") {
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-common'

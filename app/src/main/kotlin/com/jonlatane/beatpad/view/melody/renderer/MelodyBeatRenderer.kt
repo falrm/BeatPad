@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.melody.renderer
 
 import android.graphics.Canvas
+import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.view.melody.MelodyBeatView
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
@@ -8,6 +9,7 @@ import org.jetbrains.anko.info
 interface MelodyBeatRenderer: MelodyBeatColorblockRenderer, MelodyBeatNotationRenderer, AnkoLogger {
   fun MelodyBeatView.renderMelodyBeat(canvas: Canvas) {
     canvas.getClipBounds(overallBounds)
+    renderedMelodiesCache.invalidate()
     if(colorblockAlpha > 0f) {
       setupBaseBounds()
       renderColorblockMelodyBeat(canvas)

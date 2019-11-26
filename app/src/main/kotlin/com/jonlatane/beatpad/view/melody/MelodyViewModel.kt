@@ -44,6 +44,7 @@ class MelodyViewModel(
 
 	val playing = AtomicBoolean(false)
 	var verticalAxis: MelodyToneAxis? = null
+	val verticalAxes: MutableList<MelodyToneAxis> = mutableListOf()
 	lateinit var sectionToolbar: SectionToolbar
 	lateinit var melodyReferenceToolbar: MelodyReferenceToolbar
 	lateinit var melodyEditingToolbar: MelodyEditingToolbar

@@ -30,7 +30,6 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.lang.Thread.sleep
 import java.net.URI
-import kotlin.math.max
 import kotlin.system.exitProcess
 
 
@@ -104,13 +103,6 @@ class BeatScratchToolbar(
           val intent = Intent(context, PlaybackService::class.java)
           intent.action = PlaybackService.Companion.Action.STOPFOREGROUND_ACTION
           context.startService(intent)
-          viewModel.activity.finish()
-          doAsync {
-            sleep(1000L)
-            val pid = android.os.Process.myPid()
-            android.os.Process.killProcess(pid)
-            exitProcess(0)
-          }
         }
         else             -> context.toast("TODO!")
       }

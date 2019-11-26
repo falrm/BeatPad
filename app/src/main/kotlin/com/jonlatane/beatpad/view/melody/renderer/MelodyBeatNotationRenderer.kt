@@ -4,11 +4,10 @@ import BeatClockPaletteConsumer
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
+import com.github.yamamotoj.cachedproperty.CachedProperty
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.melody.RationalMelody
-import com.jonlatane.beatpad.view.melody.MelodyBeatAdapter
-import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
@@ -138,15 +137,25 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
       .filter { !it.isDisabled }
       .map { it.melody }
 
+  val renderedMelodiesCache: CachedProperty<List<Melody<*>>>
+  val renderedMelodies: List<Melody<*>>
+  get() = when(BeatClockPaletteConsumer.playbackMode) {
+    BeatClockPaletteConsumer.PlaybackMode.SECTION -> sectionMelodies
+    BeatClockPaletteConsumer.PlaybackMode.PALETTE -> palette.sections.flatMap {
+      it.melodies.filter { !it.isDisabled }
+    }.map { it.melody }
+  }
+
   val sectionMelodiesOfPartType: List<Melody<*>>
-    get() = arrayOf(melody).filterNotNull() +
-      sectionMelodies.filter {
-        when (melody?.drumPart) {
-          null  -> !it.drumPart //Section mode, just show harmonic stuff
-          true  -> it.drumPart
-          false -> !it.drumPart
-        }
+    get() = when(viewType) {
+      BaseMelodyBeatRenderer.ViewType.DrumPart -> {
+        sectionMelodies.filter { it.drumPart }
       }
+      BaseMelodyBeatRenderer.ViewType.OtherNonDrumParts ->
+        arrayOf(melody).filterNotNull() +
+        sectionMelodies.filter { !it.drumPart }
+      else -> emptyList()
+    }
 
   fun Canvas.drawNotationMelody(
     melody: Melody<*>,
@@ -157,13 +166,13 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     forceDrawColorGuideForSelectedBeat: Boolean = false,
     stemsUp: Boolean = true
   ) {
-    val maxSubdivisonsPerBeatUnder7 = (sectionMelodiesOfPartType + melody)
+    val maxSubdivisonsPerBeatUnder7 = (renderedMelodies + melody)
       .filter { it.subdivisionsPerBeat <= 7 }
       .map { it.subdivisionsPerBeat }.max() ?: 7
-    val maxSubdivisonsPerBeatUnder13 = (sectionMelodiesOfPartType + melody)
+    val maxSubdivisonsPerBeatUnder13 = (renderedMelodies + melody)
       .filter { it.subdivisionsPerBeat <= 13 }
       .map { it.subdivisionsPerBeat }.max() ?: 13
-    val maxSubdivisonsPerBeat = (sectionMelodiesOfPartType + melody)
+    val maxSubdivisonsPerBeat = (renderedMelodies + melody)
       .map { it.subdivisionsPerBeat }.max() ?: 24
     val maxBoundsWidthUnder7 = min(
       (overallBounds.right - overallBounds.left) / maxSubdivisonsPerBeatUnder7,
