@@ -2,6 +2,7 @@ package com.jonlatane.beatpad.view.harmony
 
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import com.jonlatane.beatpad.util.applyToEach
 import com.jonlatane.beatpad.util.smartrecycler.applyToHolders
 import com.jonlatane.beatpad.util.layoutWidth
 import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
@@ -69,4 +70,21 @@ class HarmonyBeatAdapter(
 	override fun invalidate(beatPosition: Int) {
 		recyclerView.layoutManager!!.findViewByPosition(beatPosition)?.invalidate()
 	}
+
+  fun notifyTickPositionChanged(
+    oldTick: Int,
+    newTick: Int,
+    oldBeat: Int,
+    newBeat: Int
+  ) {
+    if(oldBeat == newBeat) {
+      arrayOf(newBeat)
+    } else {
+      arrayOf(oldBeat, newBeat)
+    }.forEach { beatPosition ->
+      boundViewHolders.find { it.adapterPosition == beatPosition }?.apply {
+        element.invalidateDrawingLayerIfPositionChanged(oldTick, newTick)
+      }
+    }
+  }
 }

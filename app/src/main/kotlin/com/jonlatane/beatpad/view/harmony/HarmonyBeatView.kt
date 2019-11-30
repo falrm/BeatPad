@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.harmony
 
 import BeatClockPaletteConsumer
+import BeatClockPaletteConsumer.ticksPerBeat
 import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -17,6 +18,7 @@ import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.dsl.Patterns
 import com.jonlatane.beatpad.storage.Storage
 import com.jonlatane.beatpad.util.*
+import com.jonlatane.beatpad.view.melody.renderer.BaseMelodyBeatRenderer
 import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.withAlpha
@@ -287,6 +289,20 @@ class HarmonyBeatView constructor(
       val elementPosition = Math.min(beatPosition * harmony.subdivisionsPerBeat + elementIndex, harmony.length - 1)
       return elementPosition to harmony.changeBefore(elementPosition)
     }
+  }
+
+  fun invalidateDrawingLayerIfPositionChanged(
+    oldTick: Int,
+    newTick: Int
+  ) {
+    val positionsPerBeat = harmony?.subdivisionsPerBeat ?: 1
+    val (oldPosition, newPosition) = arrayOf(oldTick, newTick).map {
+      it.convertPatternIndex(
+        fromSubdivisionsPerBeat = ticksPerBeat,
+        toSubdivisionsPerBeat = positionsPerBeat
+      )
+    }
+    if(oldPosition != newPosition) { invalidate() }
   }
 
   private fun Canvas.drawRhythm(harmony: Harmony?, elementIndex: Int) {

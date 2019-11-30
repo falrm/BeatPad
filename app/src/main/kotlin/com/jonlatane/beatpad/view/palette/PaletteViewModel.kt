@@ -171,12 +171,26 @@ class PaletteViewModel constructor(
   }
 
   var playbackTick by observable<Int>(0) { _, old, new ->
-    arrayOf(old, new).filterNotNull().map { tickPosition ->
+    val oldAndNewBeats = if (old == new) {
+      arrayOf(new)
+    } else {
+      arrayOf(old, new)
+    }.map { tickPosition ->
       tickPositionToBeatPosition(tickPosition)
-    }.toSet().forEach { melodyBeat ->
-      melodyViewModel.beatAdapter.invalidate(melodyBeat)
-      harmonyViewModel.beatAdapter.invalidate(melodyBeat)
     }
+    if(!harmonyView.isHidden) {
+      oldAndNewBeats.forEach { beat ->
+        //      melodyViewModel.beatAdapter.invalidate(beat)
+        harmonyViewModel.beatAdapter.notifyTickPositionChanged(
+          oldTick = old, newTick = new,
+          oldBeat = oldAndNewBeats.first(), newBeat = oldAndNewBeats.last()
+        )
+      }
+    }
+    melodyViewModel.beatAdapter.notifyTickPositionChanged(
+      oldTick = old, newTick = new,
+      oldBeat = oldAndNewBeats.first(), newBeat = oldAndNewBeats.last()
+    )
   }
 
   val melodyViewModel = MelodyViewModel(this)

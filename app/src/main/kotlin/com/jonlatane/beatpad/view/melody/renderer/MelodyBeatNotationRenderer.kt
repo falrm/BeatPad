@@ -146,6 +146,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     }.map { it.melody }
   }
 
+  val sectionMelodiesOfPartTypeCache: CachedProperty<List<Melody<*>>>
   val sectionMelodiesOfPartType: List<Melody<*>>
     get() = when(viewType) {
       BaseMelodyBeatRenderer.ViewType.DrumPart -> {

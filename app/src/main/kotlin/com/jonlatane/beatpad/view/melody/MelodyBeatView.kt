@@ -1,6 +1,7 @@
 package com.jonlatane.beatpad.view.melody
 
 import BeatClockPaletteConsumer
+import BeatClockPaletteConsumer.ticksPerBeat
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
@@ -60,6 +61,8 @@ class MelodyBeatView constructor(
   override val doubleFlatPool = DrawablePool(R.drawable.doubleflat, context)
   override val naturalPool = DrawablePool(R.drawable.natural_sign, context)
   override val xNoteheadPool: DrawablePool = DrawablePool(R.drawable.notehead_x, context)
+  override val sectionMelodiesOfPartTypeCache = CachedProperty { super.sectionMelodiesOfPartType }
+  override val sectionMelodiesOfPartType: List<Melody<*>> by sectionMelodiesOfPartTypeCache
   override val renderedMelodiesCache = CachedProperty { super.renderedMelodies }
   override val renderedMelodies: List<Melody<*>> by renderedMelodiesCache
 
@@ -152,6 +155,24 @@ class MelodyBeatView constructor(
   override fun invalidateDrawingLayer() {
     if(viewType != ViewType.Unused) {
       invalidate()
+    }
+  }
+
+  fun invalidateDrawingLayerIfPositionChanged(
+    oldTick: Int,
+    newTick: Int
+  ) {
+    val positionsPerBeat = sectionMelodiesOfPartType
+      .maxBy { it.subdivisionsPerBeat }?.subdivisionsPerBeat ?: 1
+    val (oldPosition, newPosition) = arrayOf(oldTick, newTick).map {
+      it.convertPatternIndex(
+        fromSubdivisionsPerBeat = ticksPerBeat,
+        toSubdivisionsPerBeat = positionsPerBeat
+      )
+    }
+    when {
+      viewType == ViewType.Unused -> {}
+      oldPosition != newPosition -> invalidate()
     }
   }
 

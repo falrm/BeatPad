@@ -11,6 +11,7 @@ import android.view.animation.LinearInterpolator
 import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Pattern
 import com.jonlatane.beatpad.model.Section
+import com.jonlatane.beatpad.model.dsl.Patterns
 import com.jonlatane.beatpad.util.*
 import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import com.jonlatane.beatpad.util.smartrecycler.applyToHolders
@@ -29,7 +30,7 @@ import kotlin.math.round
 class MelodyBeatAdapter(
   val viewModel: MelodyViewModel,
   override val recyclerView: _RecyclerView
-) : SmartAdapter<MelodyBeatHolder>(), AnkoLogger, BeatAdapter {
+) : SmartAdapter<MelodyBeatHolder>(), AnkoLogger, BeatAdapter, Patterns {
   companion object {
     const val initialBeatWidthDp: Float = 125f
     const val initialBeatHeightDp: Float = 400f
@@ -311,8 +312,28 @@ class MelodyBeatAdapter(
       harmonyBeatView.invalidate()
       melodyBeatViews.applyToEach { invalidateDrawingLayer() }
     }
-    (recyclerView.layoutManager!!.findViewByPosition(beatPosition) as? ViewGroup)?.apply {
-      (0 until childCount).map { getChildAt(it) }.forEach { it.invalidate() }
+//    (recyclerView.layoutManager!!.findViewByPosition(beatPosition) as? ViewGroup)?.apply {
+//      (0 until childCount).map { getChildAt(it) }.forEach { it.invalidate() }
+//    }
+  }
+
+  fun notifyTickPositionChanged(
+    oldTick: Int,
+    newTick: Int,
+    oldBeat: Int,
+    newBeat: Int
+  ) {
+    if(oldBeat == newBeat) {
+      arrayOf(newBeat)
+    } else {
+      arrayOf(oldBeat, newBeat)
+    }.forEach { beatPosition ->
+      boundViewHolders.find { it.adapterPosition == beatPosition }?.apply {
+        harmonyBeatView.invalidateDrawingLayerIfPositionChanged(oldTick, newTick)
+        melodyBeatViews.applyToEach {
+          invalidateDrawingLayerIfPositionChanged(oldTick, newTick)
+        }
+      }
     }
   }
 }

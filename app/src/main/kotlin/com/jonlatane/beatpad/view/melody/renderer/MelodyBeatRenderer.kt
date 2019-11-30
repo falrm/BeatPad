@@ -9,6 +9,7 @@ import org.jetbrains.anko.info
 interface MelodyBeatRenderer: MelodyBeatColorblockRenderer, MelodyBeatNotationRenderer, AnkoLogger {
   fun MelodyBeatView.renderMelodyBeat(canvas: Canvas) {
     canvas.getClipBounds(overallBounds)
+    sectionMelodiesOfPartTypeCache.invalidate()
     renderedMelodiesCache.invalidate()
     if(colorblockAlpha > 0f) {
       setupBaseBounds()
