@@ -46,7 +46,9 @@ class PaletteViewModel constructor(
     //BeatClockPaletteConsumer.viewModel = this
   }
 
-  val interactionMode get() = beatScratchToolbar.interactionMode
+  var interactionMode
+    get() = beatScratchToolbar.interactionMode
+    set(value) { beatScratchToolbar.interactionMode = value }
   val isInEditMode get() = interactionMode == BeatScratchToolbar.InteractionMode.EDIT
   val isInViewMode get() = !isInEditMode
   fun notifyInteractionModeChanged() {

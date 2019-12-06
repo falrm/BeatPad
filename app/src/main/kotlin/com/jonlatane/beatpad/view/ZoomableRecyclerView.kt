@@ -35,7 +35,7 @@ class ZoomableRecyclerView @JvmOverloads constructor(
 			}
 		}
 	).apply {
-
+		isQuickScaleEnabled = false
 	}
 
 	override fun dispatchTouchEvent(event: MotionEvent): Boolean {

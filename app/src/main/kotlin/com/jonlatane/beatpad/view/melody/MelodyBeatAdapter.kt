@@ -162,12 +162,14 @@ class MelodyBeatAdapter(
     isItemPrefetchEnabled = false
   }
 
-  private fun recommendedGridLayoutManager() = GridLayoutManager(
+  private fun recommendedGridLayoutManager() = object: GridLayoutManager(
     recyclerView.context,
     recommendedSpanCount,
     RecyclerView.VERTICAL,
     false
-  ).apply {
+  ) {
+    override fun supportsPredictiveItemAnimations(): Boolean = false
+  }.apply {
     //isItemPrefetchEnabled = false
   }
 

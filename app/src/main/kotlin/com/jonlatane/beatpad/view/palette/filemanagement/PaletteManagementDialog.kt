@@ -24,6 +24,7 @@ import com.jonlatane.beatpad.view.HideableConstraintLayout
 import com.jonlatane.beatpad.view.hideableConstraintLayout
 import com.jonlatane.beatpad.view.hideableRelativeLayout
 import com.jonlatane.beatpad.view.nonDelayedRecyclerView
+import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
@@ -83,6 +84,20 @@ class PaletteManagementDialog(
             }
           }
           displayedAlert?.dismiss()
+          val originalInteractionMode = paletteViewModel.interactionMode
+          if(originalInteractionMode != com.jonlatane.beatpad.view.palette.BeatScratchToolbar.InteractionMode.EDIT) {
+            paletteViewModel.interactionMode = com.jonlatane.beatpad.view.palette.BeatScratchToolbar.InteractionMode.EDIT
+          }
+          if(paletteViewModel.melodyViewVisible) {
+            doAsync {
+              if(originalInteractionMode != com.jonlatane.beatpad.view.palette.BeatScratchToolbar.InteractionMode.EDIT) {
+                java.lang.Thread.sleep(300L)
+              }
+              uiThread {
+                paletteViewModel.melodyViewVisible = false
+              }
+            }
+          }
         }
         if (Storage.getPalettes(storageContext).map { it.nameWithoutExtension }.contains(name)) {
           showConfirmDialog(

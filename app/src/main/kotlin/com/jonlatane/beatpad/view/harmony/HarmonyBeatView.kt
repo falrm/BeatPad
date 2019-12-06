@@ -275,11 +275,11 @@ class HarmonyBeatView constructor(
     if(harmony == null) {
       canvas.drawRhythm(null, 0)
     }
-    bounds.apply {
-      left = overallBounds.right
-      right = overallBounds.right
-    }
-    canvas.drawRhythm(harmony, harmony?.subdivisionsPerBeat ?: 1)
+//    bounds.apply {
+//      left = overallBounds.right
+//      right = overallBounds.right
+//    }
+//    canvas.drawRhythm(harmony, harmony?.subdivisionsPerBeat ?: 1)
   }
 
   fun getPositionAndElement(x: Float): Pair<Int, Chord?>? {
@@ -306,12 +306,36 @@ class HarmonyBeatView constructor(
   }
 
   private fun Canvas.drawRhythm(harmony: Harmony?, elementIndex: Int) {
-    paint.color = 0xAA212121.toInt()
-    val halfWidth = if (elementIndex % (harmony?.subdivisionsPerBeat ?: 1) == 0) 5f else 1f
+    paint.color = 0xFF424242.toInt()
+    val leftOffset = harmony?.run {
+      when {
+        elementIndex % subdivisionsPerBeat == 0 -> when {
+          (beatPosition) % meter.defaultBeatsPerMeasure == 0 -> 6f
+          else                                                   -> 3f
+        }
+        else                                    -> null
+      }
+    } ?: 1f
+    val rightOffset = harmony?.run {
+      when {
+        (elementIndex) % subdivisionsPerBeat == subdivisionsPerBeat - 1 -> when {
+          (beatPosition) % meter.defaultBeatsPerMeasure == meter.defaultBeatsPerMeasure - 1 -> 6f
+          else                                                   -> 3f
+        }
+        else                                    -> null
+      }
+    } ?: 1f
     drawRect(
-      bounds.left.toFloat() - halfWidth,
+      bounds.left.toFloat(),
       bounds.top.toFloat(),
-      bounds.left.toFloat() + halfWidth,
+      bounds.left.toFloat() + leftOffset,
+      bounds.bottom.toFloat(),
+      paint
+    )
+    drawRect(
+      bounds.right.toFloat() - rightOffset,
+      bounds.top.toFloat(),
+      bounds.right.toFloat(),
       bounds.bottom.toFloat(),
       paint
     )

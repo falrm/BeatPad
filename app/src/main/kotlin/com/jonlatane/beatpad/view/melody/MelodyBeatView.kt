@@ -113,6 +113,7 @@ class MelodyBeatView constructor(
   override fun onDraw(canvas: Canvas) {
     super.onDraw(canvas)
     try {
+      canvas.getClipBounds(overallBounds)
       renderMelodyBeat(canvas)
     } catch(t: Throwable) {
       error("Failed to render MelodyBeatView", t)
