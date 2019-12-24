@@ -29,7 +29,9 @@ object MidiControllers: AnkoLogger {
 			it.type == MidiDeviceInfo.PortInfo.TYPE_OUTPUT
 		}!!.portNumber
 		device.openOutputPort(portNumber)?.let { outputPort ->
-			MainApplication.instance.toast("Controller ${info.name} connected!")
+			try {
+//				MainApplication.instance.toast("Controller ${info.name} connected!")
+			} catch(t: Throwable) {}
 			outputPort.connect(Receiver())
 			outputPort
 		}

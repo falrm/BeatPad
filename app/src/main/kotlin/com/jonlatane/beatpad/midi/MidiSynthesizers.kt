@@ -24,7 +24,9 @@ object MidiSynthesizers: AnkoLogger {
 			}!!.portNumber
 			device.openInputPort(portNumber)?.let { inputPort ->
 				inputPort.send(byteArrayOf(123.toByte()), 0, 1) //All notes off
-				MainApplication.instance.toast("Synthesizer ${info.name} connected!")
+				try {
+//					MainApplication.instance.toast("Synthesizer ${info.name} connected!")
+				} catch(t: Throwable) {}
 				inputPort
 			}
 		} else null

@@ -16,6 +16,8 @@ import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import org.jetbrains.anko.*
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.round
 import kotlin.properties.Delegates.observable
 
 class MelodyViewModel(
@@ -148,8 +150,15 @@ class MelodyViewModel(
 
 	fun onZoomFinished(animated: Boolean = true) = with(beatAdapter) {
 		val targetWidth = if(layoutType == LayoutType.GRID) {
-			ceil(melodyVerticalScrollView.width.toFloat() / recommendedSpanCount).toInt()
+			val remainder = melodyVerticalScrollView.width % recommendedSpanCount
+			(melodyVerticalScrollView.width / recommendedSpanCount)
 				.also {
+					melodyRecyclerView.setPadding(
+							floor(remainder.toFloat() / 2).toInt(),
+							0,
+							ceil(remainder.toFloat() / 2).toInt(),
+							0
+					)
 					if(animated) animateElementWidth(it)
 					else elementWidth =  it
 				}

@@ -104,7 +104,7 @@ class MelodyBeatAdapter(
       //viewModel.paletteViewModel.harmonyViewModel.beatAdapter.elementWidth = field
     }
 
-  var elementHeight = recyclerView.run { dip(initialBeatHeightDp) }
+  var elementHeight: Int = recyclerView.run { dip(initialBeatHeightDp) }
     set(value) {
       if (field != value) {
         field = when {
@@ -187,6 +187,7 @@ class MelodyBeatAdapter(
     melodyLeftScroller.show(animation = HideAnimation.HORIZONTAL)
     melodyView.rightSpacer.animateWidth(0)
     melodyView.leftSpacer.animateWidth(0)
+    melodyRecyclerView.setPadding(0, 0, 0, 0)
   }
 
   fun gridLayout() = with(viewModel) {

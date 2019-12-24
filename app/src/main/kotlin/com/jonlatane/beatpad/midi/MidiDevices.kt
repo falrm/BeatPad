@@ -61,15 +61,15 @@ object MidiDevices : AnkoLogger {
 			manager.registerDeviceCallback(object : MidiManager.DeviceCallback() {
 				@RequiresApi(Build.VERSION_CODES.M)
 				override fun onDeviceAdded(info: MidiDeviceInfo) {
-					context.toast(
-						"Connecting to ${info.properties[MidiDeviceInfo.PROPERTY_NAME]}..."
-					)
+					try {
+//						context.toast("Connecting to ${info.properties[MidiDeviceInfo.PROPERTY_NAME]}...")
+					} catch(t: Throwable) {}
 					setupDevice(info)
 				}
 
 				@RequiresApi(Build.VERSION_CODES.M)
 				override fun onDeviceRemoved(info: MidiDeviceInfo) {
-					context.toast("Disconnected from ${info.name}.")
+//					context.toast("Disconnected from ${info.name}.")
 					devices.find { it.info == info }?.close()
 					devices.removeAll { it.info == info }
 				}
