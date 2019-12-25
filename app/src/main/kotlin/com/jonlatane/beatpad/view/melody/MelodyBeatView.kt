@@ -7,6 +7,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.PointF
 import android.graphics.Rect
+import android.util.LruCache
 import android.util.SparseArray
 import android.view.MotionEvent
 import com.github.yamamotoj.cachedproperty.CachedProperty
@@ -19,9 +20,11 @@ import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
 import com.jonlatane.beatpad.view.melody.input.MelodyBeatEventArticulationHandler
 import com.jonlatane.beatpad.view.melody.input.MelodyBeatEventEditingHandler
-import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatNotationRenderer.DrawablePool
 import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatRenderer
 import com.jonlatane.beatpad.view.melody.renderer.BaseMelodyBeatRenderer.ViewType
+import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatNotationRenderer
+import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatNotationRenderer.*
+import com.jonlatane.beatpad.view.melody.renderer.Note
 import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingModifiers
 import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import org.jetbrains.anko.AnkoLogger
@@ -65,6 +68,8 @@ class MelodyBeatView constructor(
   override val sectionMelodiesOfPartType: List<Melody<*>> by sectionMelodiesOfPartTypeCache
   override val renderedMelodiesCache = CachedProperty { super.renderedMelodies }
   override val renderedMelodies: List<Melody<*>> by renderedMelodiesCache
+  override val previousSignCache: LruCache<PreviousSignRequest, Note.Sign> = PREVIOUS_SIGN_CACHE
+  override val playbackNoteCache: LruCache<PlaybackNoteRequest, List<Note>> = PLAYBACK_NOTE_CACHE
 
   init {
     showSteps = true
@@ -179,5 +184,7 @@ class MelodyBeatView constructor(
 
   companion object {
     val DEFAULT_CHORD = Chord(0, intArrayOf(0,1,2,3,4,5,6,7,8,9,10,11))
+    val PREVIOUS_SIGN_CACHE: LruCache<PreviousSignRequest, Note.Sign> = LruCache(10240)
+    val PLAYBACK_NOTE_CACHE: LruCache<PlaybackNoteRequest, List<Note>> = LruCache(10240)
   }
 }

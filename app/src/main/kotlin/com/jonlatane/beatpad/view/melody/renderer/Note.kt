@@ -36,6 +36,7 @@ data class Note private constructor(
     val stringValue: String,
     val modifier: Int
   ) {
+    None("", 0),
     Natural("", 0),
     Sharp("#", 1),
     DoubleSharp("##", 2),

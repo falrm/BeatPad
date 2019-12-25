@@ -4,7 +4,7 @@ import com.jonlatane.beatpad.model.chord.Chord
 import java.util.*
 
 data class Harmony(
-  // TODO: Is having [tonic] in a Pattern always good?
+  var id: UUID = UUID.randomUUID(),
   override var tonic: Int = 0,
   override val changes: NavigableMap<Int, Chord> = TreeMap(),
   override var length: Int = 1,
@@ -23,6 +23,7 @@ data class Harmony(
   }
 
   override fun transpose(interval: Int) = Harmony(
+    id,
     tonic,
     TreeMap(changes.mapValues { it.value.transpose(interval) }),
     subdivisionsPerBeat

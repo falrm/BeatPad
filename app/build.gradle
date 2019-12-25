@@ -1,10 +1,10 @@
 buildscript {
-	ext.kotlin_version = '1.3.41'
+	ext.kotlin_version = '1.3.61'
 	ext.anko_version = '0.10.8'
 	ext.kotlinx_io_version = '0.1.0-alpha-17-rc13'
   ext.support_version = '28.0.0'
   ext.constraint_layout_version = '1.1.3'
-	ext.jackson_version = '2.9.3'
+	ext.jackson_version = '2.10.1'
 	repositories {
 		jcenter()
 		google()
@@ -54,6 +54,10 @@ android {
 				cppFlags ""
 			}
 		}
+	}
+	compileOptions {
+		sourceCompatibility 1.8
+		targetCompatibility 1.8
 	}
 	buildTypes {
 		debug {
@@ -107,7 +111,7 @@ dependencies {
 //	implementation "com.android.support:recyclerview-v7:$support_version"
 	implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"
 
-	implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 	implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
 //	implementation "org.jetbrains.anko:anko:$anko_version"
@@ -124,7 +128,7 @@ dependencies {
 	implementation "org.jetbrains.anko:anko-design:$anko_version"
 	//implementation 'commons-codec:commons-codec:1.12'
 	implementation 'net.iharder:base64:2.3.9'
-	implementation 'com.github.stupacki:MultiFunctions:1.2.1'
+    implementation 'com.github.stupacki:MultiFunctions:1.2.1'
 	//implementation 'org.nield:kotlin-statistics:1.2.1'
 	implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
 	implementation 'com.github.yamamotoj:cached-property-kotlin:0.1.0'
@@ -134,19 +138,19 @@ dependencies {
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-common'
   }
 
-	androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.2', {
 		exclude group: 'com.android.support', module: 'support-annotations'
 	})
-	implementation "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
-	implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4.1"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.10.1'
 
 
 	implementation 'com.github.billthefarmer:mididriver:v1.17'
-	implementation 'org.apache.commons:commons-lang3:3.5'
-	implementation 'com.squareup.okio:okio:1.14.0'
+    implementation 'org.apache.commons:commons-lang3:3.9'
+    implementation 'com.squareup.okio:okio:1.14.0'
 
 	testImplementation("io.damo.aspen:aspen:2.0.0") {
 		exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
 	}
-	testImplementation 'org.assertj:assertj-core:2.8.0'
+	testImplementation 'org.assertj:assertj-core:3.14.0'
 }

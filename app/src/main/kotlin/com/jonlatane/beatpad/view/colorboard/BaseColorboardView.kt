@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Paint
 import android.graphics.Rect
 import android.util.AttributeSet
+import android.util.LruCache
 import android.view.View
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.chord.Maj7
@@ -26,7 +27,18 @@ abstract class BaseColorboardView @JvmOverloads constructor(
 	override var paint = Paint()
 	override var bounds = Rect()
 	override val drawingContext: Context get() = context
-	override fun color(resourceId: Int) = context.color(resourceId)
+	override fun color(resourceId: Int): Int {
+		return when(val result = colorCache.get(resourceId)) {
+			null -> context.color(resourceId).also {
+				colorCache.put(resourceId, it)
+			}
+			else -> result
+		}
+	}
 	override fun dip(value: Float): Int = context.dip(value)
 	override fun dip(value: Int): Int = context.dip(value)
+
+	companion object {
+		private val colorCache = LruCache<Int, Int>(128)
+	}
 }

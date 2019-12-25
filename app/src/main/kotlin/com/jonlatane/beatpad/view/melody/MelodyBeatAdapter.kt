@@ -34,7 +34,7 @@ class MelodyBeatAdapter(
   companion object {
     const val initialBeatWidthDp: Float = 125f
     const val initialBeatHeightDp: Float = 400f
-    const val minimumBeatWidthDp: Float = 30f
+    const val minimumBeatWidthDp: Float = 50f
     const val maximumBeatHeightDp: Float = 10000f
     fun sectionAndStartBeat(palette: Palette, beatPosition: Int) = palette.sections.fold<Section, Pair<Section?, Int>>(null to 0) { (sectionAtPosition: Section?, sum), section ->
       val sectionBeatLength = section.harmony.run { length / subdivisionsPerBeat }
@@ -170,7 +170,7 @@ class MelodyBeatAdapter(
   ) {
     override fun supportsPredictiveItemAnimations(): Boolean = false
   }.apply {
-    //isItemPrefetchEnabled = false
+    isItemPrefetchEnabled = false
   }
 
   fun linearLayout() = with(viewModel) {

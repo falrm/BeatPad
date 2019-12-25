@@ -54,7 +54,10 @@ class PaletteViewModel constructor(
   fun notifyInteractionModeChanged() {
     when(interactionMode) {
       BeatScratchToolbar.InteractionMode.EDIT -> {
-        showHorizontalSectionList {
+        fun showSectionList(block: () -> Unit) = if(activity.resources.configuration.portrait)
+          showHorizontalSectionList(true, block)
+        else showVerticalSectionList(true, block)
+        showSectionList {
           backStack.push {
             if (melodyViewVisible && isInEditMode) {
               melodyViewVisible = false

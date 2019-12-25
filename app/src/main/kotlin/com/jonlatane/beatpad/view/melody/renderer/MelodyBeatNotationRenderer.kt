@@ -4,9 +4,11 @@ import BeatClockPaletteConsumer
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
+import android.util.LruCache
 import com.github.yamamotoj.cachedproperty.CachedProperty
 import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
+import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import kotlinx.io.pool.DefaultPool
 import org.jetbrains.anko.warn
@@ -114,7 +116,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
   val filledNoteheadPool: DrawablePool
   val xNoteheadPool: DrawablePool
 
-  class DrawablePool(val drawableResource: Int, val context: Context) : DefaultPool<Drawable>(15) {
+  class DrawablePool(val drawableResource: Int, val context: Context) : DefaultPool<Drawable>(256) {
     val notationDrawableCache = Collections.synchronizedList(mutableListOf<Drawable>())
     override fun produceInstance(): Drawable {
       val result = context.resources.getDrawable(drawableResource, null)
@@ -221,18 +223,72 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     if (drawRhythm) drawRhythm(melody, melody.subdivisionsPerBeat, drawAlpha)
   }
 
+  data class PlaybackNoteRequest(
+    val tones: Set<Int>,
+    val melody: UUID,
+    val chord: Chord
+  )
+  val playbackNoteCache: LruCache<PlaybackNoteRequest, List<Note>>
+  fun getPlaybackNotes(
+    tones: Set<Int>,
+    melody: Melody<*>,
+    chord: Chord
+  ): List<Note> {
+    val request = PlaybackNoteRequest(tones, melody.id, chord)
+    return when(val cacheResult = playbackNoteCache.get(request)) {
+      null -> {
+        computePlaybackNotes(tones, melody, chord).also {
+          playbackNoteCache.put(request, it)
+        }
+      }
+      else -> cacheResult
+    }
+  }
+
+  fun computePlaybackNotes(
+    tones: Set<Int>,
+    melody: Melody<*>,
+    chord: Chord
+  ): List<Note> = tones.map {
+    val playbackTone = melody.playbackToneUnder(it, chord)
+    Note.nameNoteUnderChord(playbackTone, chord)
+  }
+
+  data class PreviousSignRequest(
+    val melody: UUID,
+    val harmony: UUID,
+    val note: Note,
+    val melodyPosition: Int
+  )
+  val previousSignCache: LruCache<PreviousSignRequest, Note.Sign>
   fun previousSignOf(
     melody: Melody<*>,
     harmony: Harmony,
     note: Note,
     melodyPosition: Int
-  ): Note.Sign? {
+  ): Note.Sign {
+    val request = PreviousSignRequest(melody.id, harmony.id, note, melodyPosition)
+    return when(val cacheResult = previousSignCache.get(request)) {
+      null -> {
+        calculatePreviousSignOf(melody, harmony, note, melodyPosition).also {
+          previousSignCache.put(request, it)
+        }
+      }
+      else -> cacheResult
+    }
+  }
+  fun calculatePreviousSignOf(
+    melody: Melody<*>,
+    harmony: Harmony,
+    note: Note,
+    melodyPosition: Int
+  ): Note.Sign {
     val currentBeatPosition = melodyPosition.toFloat() / melody.subdivisionsPerBeat
     val lastDownbeat = (0..Int.MAX_VALUE).first {
       it % harmony.meter.defaultBeatsPerMeasure == 0 &&
       it <= currentBeatPosition && it + harmony.meter.defaultBeatsPerMeasure > currentBeatPosition
     }
-    var result: Note.Sign? = null
+    var result: Note.Sign = Note.Sign.None
     melody.changes.navigableKeySet()
       .subSet(lastDownbeat * melody.subdivisionsPerBeat, true, melodyPosition, true)
       .reversed()
@@ -262,7 +318,6 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
   }
 
 
-
   fun Canvas.drawNoteheadsLedgersAndStems(
     melody: Melody<*>,
     harmony: Harmony,
@@ -283,10 +338,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
         val noteheadWidth = min((letterStepSize * 2).toInt(), maxFittableNoteheadWidth)
         val noteheadHeight = noteheadWidth//(bounds.right - bounds.left)
 
-        val playbackNotes = tones.map {
-          val playbackTone = melody.playbackToneUnder(it, chord)
-          Note.nameNoteUnderChord(playbackTone, chord)
-        }
+        val playbackNotes = getPlaybackNotes(tones, melody, chord)
         var maxCenter = Float.MIN_VALUE
         var minCenter = Float.MAX_VALUE
         var hadStaggeredNotes = false
@@ -346,9 +398,8 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
               Note.Sign.DoubleFlat -> null
               else -> doubleFlatPool
             }
-            Note.Sign.Natural -> when(previousSign) {
-              Note.Sign.Natural -> null
-              null -> null
+            Note.Sign.Natural, Note.Sign.None -> when(previousSign) {
+              Note.Sign.Natural, Note.Sign.None -> null
               else -> naturalPool
             }
           }?.borrow()
@@ -364,7 +415,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
                   top - 2 * noteheadHeight / 3 to bottom
                 Note.Sign.DoubleSharp ->
                   top + noteheadHeight / 4 to bottom - noteheadHeight / 4
-                Note.Sign.Sharp, Note.Sign.Natural ->
+                Note.Sign.Sharp, Note.Sign.Natural, Note.Sign.None ->
                   top - noteheadHeight / 3 to bottom + noteheadHeight / 3
               }
               drawable.setBounds(signLeft, signTop, signRight, signBottom)
