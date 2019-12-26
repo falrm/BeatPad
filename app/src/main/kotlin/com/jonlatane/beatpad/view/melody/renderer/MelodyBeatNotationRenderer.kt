@@ -11,6 +11,7 @@ import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import kotlinx.io.pool.DefaultPool
+import kotlinx.io.pool.ObjectPool
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
 import java.util.*
@@ -21,6 +22,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
   val notationAlpha: Float
 
   fun renderNotationMelodyBeat(canvas: Canvas) {
+    flushNotationDrawableCache()
     paint.color = color(android.R.color.black).withAlpha((255 * notationAlpha).toInt())
     paint.strokeWidth = (bounds.width() * 0.008f).let {
       val minValue = 1f
@@ -93,42 +95,73 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
       )
       index++
     }
-    flushNotationDrawableCache()
   }
 
-  val Melody<*>.averageTone
-    get() = (this as? RationalMelody)?.changes?.values?.flatMap { it.tones }?.average()
+  val Melody<*>.averageTone: Float?
+    get() = (this as? RationalMelody)?.changes?.values?.let { changes ->
+      when(val totalTones = changes.sumBy { it.tones.size }) {
+        0 -> Float.NaN
+        else -> changes.sumBy {
+          if(it.tones.isEmpty()) 0 else it.tones.sum()
+        }.toFloat() / totalTones
+      }
+    }
+//  val Melody<*>.averageTone
+//    get() = (this as? RationalMelody)?.changes?.values?.map { it.tones }?.let { listOfToneLists ->
+//      listOfToneLists.sumBy { it.sum() }.toFloat() / listOfToneLists.sumBy { it.size }
+//    }
+
+//  val Melody<*>.averageTone
+//    get() = (this as? RationalMelody)?.changes?.values?.flatMap { it.tones }?.average()
 
   override val harmony: Harmony get() = section.harmony
   val meter: Harmony.Meter get() = harmony.meter
   val isFinalBeat: Boolean get() = (beatPosition + 1) % meter.defaultBeatsPerMeasure == 0
 
   fun flushNotationDrawableCache() {
-    listOf(filledNoteheadPool, sharpPool, xNoteheadPool)
+    listOf(filledNoteheadPool, xNoteheadPool, sharpPool, flatPool, doubleSharpPool, doubleFlatPool, naturalPool)
       .forEach { it.flushNotationDrawableCache() }
   }
 
-  val sharpPool: DrawablePool
-  val flatPool: DrawablePool
-  val doubleSharpPool: DrawablePool
-  val doubleFlatPool: DrawablePool
-  val naturalPool: DrawablePool
-  val filledNoteheadPool: DrawablePool
-  val xNoteheadPool: DrawablePool
+  val sharpPool: LocalizedDrawablePool
+  val flatPool: LocalizedDrawablePool
+  val doubleSharpPool: LocalizedDrawablePool
+  val doubleFlatPool: LocalizedDrawablePool
+  val naturalPool: LocalizedDrawablePool
+  val filledNoteheadPool: LocalizedDrawablePool
+  val xNoteheadPool: LocalizedDrawablePool
 
-  class DrawablePool(val drawableResource: Int, val context: Context) : DefaultPool<Drawable>(256) {
-    val notationDrawableCache = Collections.synchronizedList(mutableListOf<Drawable>())
+  class LocalizedDrawablePool(
+    val drawablePool: DrawablePool
+  ): ObjectPool<Drawable> {
+    val localCache = Collections.synchronizedList(mutableListOf<Drawable>())
+    override val capacity: Int get() = drawablePool.capacity
+
+    override fun borrow(): Drawable {
+      val result = drawablePool.borrow()
+      localCache.add(result)
+      return result
+    }
+
+    override fun dispose() = drawablePool.dispose()
+
+    override fun recycle(instance: Drawable) = drawablePool.recycle(instance)
+
+    fun flushNotationDrawableCache() {
+      localCache.removeAll {
+        recycle(it); true
+      }
+    }
+  }
+
+  class DrawablePool(val drawableResource: Int, val context: Context) : DefaultPool<Drawable>(10000) {
     override fun produceInstance(): Drawable {
       val result = context.resources.getDrawable(drawableResource, null)
         ?.constantState?.newDrawable()?.mutate()
-      notationDrawableCache.add(result)
       return result!!
     }
-
-    fun flushNotationDrawableCache() {
-      notationDrawableCache.removeAll {
-        recycle(it); true
-      }
+    init {
+      (1..10000).map { borrow() }.forEach { recycle(it) }
     }
   }
 
@@ -224,13 +257,13 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
   }
 
   data class PlaybackNoteRequest(
-    val tones: Set<Int>,
+    val tones: List<Int>,
     val melody: UUID,
     val chord: Chord
   )
   val playbackNoteCache: LruCache<PlaybackNoteRequest, List<Note>>
   fun getPlaybackNotes(
-    tones: Set<Int>,
+    tones: List<Int>,
     melody: Melody<*>,
     chord: Chord
   ): List<Note> {
@@ -246,7 +279,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
   }
 
   fun computePlaybackNotes(
-    tones: Set<Int>,
+    tones: List<Int>,
     melody: Melody<*>,
     chord: Chord
   ): List<Note> = tones.map {
@@ -328,9 +361,9 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
   ) {
     try {
       val change = melody.changeBefore(elementPosition % melody.length)
-      val tones: Set<Int> = change.let {
+      val tones: List<Int> = change.let {
         (it as? RationalMelody.Element)?.tones
-      } ?: emptySet()
+      } ?: emptyList()
 
       if (tones.isNotEmpty()) {
         val boundsWidth = bounds.width()

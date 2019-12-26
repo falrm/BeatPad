@@ -107,9 +107,9 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
     paint.color = (if (isChange) 0xAA212121.toInt() else 0xAA424242.toInt()).withAlpha((alphaSource * drawAlpha).toInt())
 
     try {
-      val tones: Set<Int> = element?.let {
+      val tones: List<Int> = element?.let {
         (it as? RationalMelody.Element)?.tones
-      } ?: emptySet()
+      } ?: emptyList()
 
       if (tones.isNotEmpty()) {
         val leftMargin = if (isChange) drawPadding else 0

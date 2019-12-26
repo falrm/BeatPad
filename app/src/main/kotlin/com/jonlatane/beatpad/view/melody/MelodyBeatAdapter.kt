@@ -47,7 +47,7 @@ class MelodyBeatAdapter(
 
   private val axis get() = viewModel.verticalAxis!!
   private val axes: List<MelodyToneAxis> get() = viewModel.verticalAxes
-  val minimumElementWidth get() = recyclerView.run { dip(minimumBeatWidthDp) }
+  val minimumElementWidth get() = viewModel.melodyVerticalScrollView.width / 24
   val maximumElementWidth
     get() = when (viewModel.layoutType) {
       MelodyViewModel.LayoutType.GRID   -> viewModel.melodyVerticalScrollView.width / 2

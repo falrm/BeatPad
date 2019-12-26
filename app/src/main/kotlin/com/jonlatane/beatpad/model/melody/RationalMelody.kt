@@ -19,12 +19,12 @@ data class RationalMelody(
   override var relatedMelodies: MutableSet<UUID> = mutableSetOf()
 ) : Melody<RationalMelody.Element> {
   data class Element(
-    var tones: MutableSet<Int> = mutableSetOf(),
+    var tones: MutableList<Int> = mutableListOf(),
     var velocity: Float = 1f
   ) : Melody.Element<RationalMelody, RationalMelody.Element> {
     override fun transpose(interval: Int): RationalMelody.Element {
       return RationalMelody.Element(
-        tones = tones.map { it + interval }.toMutableSet(),
+        tones = tones.map { it + interval }.toMutableList(),
         velocity = velocity
       )
     }

@@ -11,6 +11,7 @@ import android.util.LruCache
 import android.util.SparseArray
 import android.view.MotionEvent
 import com.github.yamamotoj.cachedproperty.CachedProperty
+import com.jonlatane.beatpad.MainApplication
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Section
@@ -57,13 +58,13 @@ class MelodyBeatView constructor(
   override val renderableToneBounds: Rect = Rect()
   override val colorblockAlpha: Float get() = viewModel.beatAdapter.colorblockAlpha
   override val notationAlpha: Float get() = viewModel.beatAdapter.notationAlpha
-  override val filledNoteheadPool = DrawablePool(R.drawable.notehead_filled, context)
-  override val sharpPool = DrawablePool(R.drawable.sharp, context)
-  override val flatPool = DrawablePool(R.drawable.flat, context)
-  override val doubleSharpPool = DrawablePool(R.drawable.doublesharp, context)
-  override val doubleFlatPool = DrawablePool(R.drawable.doubleflat, context)
-  override val naturalPool = DrawablePool(R.drawable.natural_sign, context)
-  override val xNoteheadPool: DrawablePool = DrawablePool(R.drawable.notehead_x, context)
+  override val filledNoteheadPool = LocalizedDrawablePool(FILLED_NOTEHEAD_POOL)
+  override val sharpPool = LocalizedDrawablePool(SHARP_POOL)
+  override val flatPool = LocalizedDrawablePool(FLAT_POOL)
+  override val doubleSharpPool = LocalizedDrawablePool(DOUBLE_SHARP_POOL)
+  override val doubleFlatPool = LocalizedDrawablePool(DOUBLE_FLAT_POOL)
+  override val naturalPool = LocalizedDrawablePool(NATURAL_POOL)
+  override val xNoteheadPool = LocalizedDrawablePool(X_NOTEHEAD_POOL)
   override val sectionMelodiesOfPartTypeCache = CachedProperty { super.sectionMelodiesOfPartType }
   override val sectionMelodiesOfPartType: List<Melody<*>> by sectionMelodiesOfPartTypeCache
   override val renderedMelodiesCache = CachedProperty { super.renderedMelodies }
@@ -186,5 +187,12 @@ class MelodyBeatView constructor(
     val DEFAULT_CHORD = Chord(0, intArrayOf(0,1,2,3,4,5,6,7,8,9,10,11))
     val PREVIOUS_SIGN_CACHE: LruCache<PreviousSignRequest, Note.Sign> = LruCache(10240)
     val PLAYBACK_NOTE_CACHE: LruCache<PlaybackNoteRequest, List<Note>> = LruCache(10240)
+    val FILLED_NOTEHEAD_POOL = DrawablePool(R.drawable.notehead_filled, MainApplication.instance)
+    val SHARP_POOL = DrawablePool(R.drawable.sharp, MainApplication.instance)
+    val FLAT_POOL = DrawablePool(R.drawable.flat, MainApplication.instance)
+    val DOUBLE_SHARP_POOL = DrawablePool(R.drawable.doublesharp, MainApplication.instance)
+    val DOUBLE_FLAT_POOL = DrawablePool(R.drawable.doubleflat, MainApplication.instance)
+    val NATURAL_POOL = DrawablePool(R.drawable.natural_sign, MainApplication.instance)
+    val X_NOTEHEAD_POOL: DrawablePool = DrawablePool(R.drawable.notehead_x, MainApplication.instance)
   }
 }
