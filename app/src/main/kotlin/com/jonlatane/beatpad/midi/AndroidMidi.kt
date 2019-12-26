@@ -63,7 +63,7 @@ object AndroidMidi : AnkoLogger {
 			ONBOARD_DRIVER.write(bytes)
 		}
 		if(sendToInternalFluidSynth) {
-			FLUIDSYNTH.onSend(bytes, 0, bytes.size, System.currentTimeMillis())
+			FLUIDSYNTH.send(bytes, 0, bytes.size, System.currentTimeMillis())
 		}
 		if (
 			MainApplication.instance.packageManager.hasSystemFeature(PackageManager.FEATURE_MIDI)
@@ -74,16 +74,25 @@ object AndroidMidi : AnkoLogger {
 	}
 
 	private fun deactivateUnusedDevices() {
+		if(!sendToInternalFluidSynth) {
+			stopMidiReceiver { FLUIDSYNTH.send(it, 0, it.size) }
+
+		}
 		if(!sendToInternalSynth) {
-			ONBOARD_DRIVER.write(byteArrayOf(123.toByte())) // All notes off
-			ONBOARD_DRIVER.write(byteArrayOf(0xFF.toByte())) // Midi reset
+			stopMidiReceiver { ONBOARD_DRIVER.write(it) }
 		}
 		if (
 			MainApplication.instance.packageManager.hasSystemFeature(PackageManager.FEATURE_MIDI)
 			&& !sendToExternalSynth
 		) {
-			MidiSynthesizers.send(byteArrayOf(123.toByte())) // All notes off
-			MidiSynthesizers.send(byteArrayOf(0xFF.toByte())) // Midi reset
+			stopMidiReceiver { MidiSynthesizers.send(it) }
+		}
+	}
+
+	fun stopMidiReceiver(send: (ByteArray) -> Unit) {
+		(0 until 16).forEach {  channel ->
+			send(byteArrayOf(((0b1011 shl 4) + channel).toByte(), 123, 0)) // All notes off
+			send(byteArrayOf(((0b1011 shl 4) + channel).toByte(), 120, 0)) // All sound off
 		}
 	}
 }

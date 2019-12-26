@@ -1,14 +1,12 @@
 package fluidsynth
 
 import android.content.Context
+import android.media.AudioManager
 import android.media.midi.MidiReceiver
 import okio.Okio
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import java.io.File
-import android.media.AudioManager
-
-
 
 
 class FluidSynthMidiReceiver(
