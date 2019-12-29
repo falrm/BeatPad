@@ -289,6 +289,7 @@ class PaletteViewModel constructor(
   lateinit var partListTransitionView: TextView
   lateinit var beatScratchToolbar: BeatScratchToolbar
   lateinit var paletteToolbar: PaletteToolbar
+  lateinit var staffConfigurationToolbar: StaffConfigurationToolbar
   lateinit var keyboardView: KeyboardView
   lateinit var colorboardView: ColorboardInputView
   var keyboardPart by observable<Part?>(null) { _, _, new ->

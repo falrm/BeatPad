@@ -16,6 +16,12 @@ inline fun ViewManager.paletteToolbar(
 	init: PaletteToolbar.() -> Unit
 ) = ankoView({ PaletteToolbar(it, viewModel) }, theme, init)
 
+inline fun ViewManager.staffConfigurationToolbar(
+	theme: Int = 0,
+	viewModel: PaletteViewModel,
+	init: StaffConfigurationToolbar.() -> Unit
+) = ankoView({ StaffConfigurationToolbar(it, viewModel) }, theme, init)
+
 inline fun ViewManager.partListView(
 	theme: Int = 0,
 	viewModel: PaletteViewModel,

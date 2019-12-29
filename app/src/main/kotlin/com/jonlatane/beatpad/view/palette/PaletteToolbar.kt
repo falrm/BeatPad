@@ -37,9 +37,6 @@ class PaletteToolbar(
   override var initialLeftMargin: Int? = null
   override var initialRightMargin: Int? = null
   override val storageContext: Context get() = configurationContext
-  private val metronomeImage = context.resources.getDrawable(R.drawable.noun_metronome_415494_000000, null).apply {
-    setBounds(0, 0, 60, 60)
-  }
 
   init {
     orientation = LinearLayout.HORIZONTAL

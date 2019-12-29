@@ -165,6 +165,12 @@ class PaletteUI constructor(
       below(viewModel.beatScratchToolbar)
     }
 
+    viewModel.staffConfigurationToolbar = staffConfigurationToolbar(viewModel = viewModel) {
+      id = View.generateViewId()
+    }.lparams(matchParent, dip(48)) {
+      below(viewModel.paletteToolbar)
+    }
+
     viewModel.sectionListRecyclerVerticalRotator = rotateLayout {
       id = View.generateViewId()
       angle = 0
@@ -172,7 +178,7 @@ class PaletteUI constructor(
         id = View.generateViewId()
       }.lparams(dip(200), matchParent)
     }.lparams(dip(200), matchParent) {
-      below(viewModel.paletteToolbar)
+      below(viewModel.staffConfigurationToolbar)
       alignParentLeft()
       alignParentBottom()
     }
@@ -184,7 +190,7 @@ class PaletteUI constructor(
         id = View.generateViewId()
       }.lparams(matchParent, dip(40))
     }.lparams(matchParent, dip(40)) {
-      below(viewModel.paletteToolbar)
+      below(viewModel.staffConfigurationToolbar)
       alignParentLeft()
       alignParentRight()
     }

@@ -104,6 +104,7 @@ class PartListAdapter(
 		)
 	)) {
 		viewModel.palette.parts.add(part)
+		viewModel.staffConfigurationToolbar.notifyPartsChanged()
 		if (canAddParts()) {
 			notifyItemInserted(viewModel.palette.parts.size - 1)
 			notifyItemChanged(viewModel.palette.parts.size)
@@ -112,5 +113,5 @@ class PartListAdapter(
 		}
 	}
 
-	fun canAddParts() = viewModel.palette.parts.size < PartListAdapter.MAX_PARTS
+	fun canAddParts() = viewModel.palette.parts.size < MAX_PARTS
 }
