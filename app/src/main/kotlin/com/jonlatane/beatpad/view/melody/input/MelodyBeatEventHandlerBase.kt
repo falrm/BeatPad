@@ -27,9 +27,8 @@ interface MelodyBeatEventHandlerBase: Patterns, AnkoLogger {
   val beatPosition: Int
   val palette: Palette
   val downPointers: SparseArray<PointF>
-	val melody: Melody<*>?
+	val focusedMelody: Melody<*>?
   val harmony: Harmony
-  val changes: NavigableMap<Int, out Transposable<*>>? get() = melody?.changes
   fun chordAt(elementPosition: Int, melody: Melody<*>) =
     harmony.let { harmony ->
       val harmonyPosition = elementPosition.convertPatternIndex(melody, harmony)

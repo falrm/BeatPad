@@ -23,7 +23,6 @@ import com.jonlatane.beatpad.view.melody.input.MelodyBeatEventArticulationHandle
 import com.jonlatane.beatpad.view.melody.input.MelodyBeatEventEditingHandler
 import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatRenderer
 import com.jonlatane.beatpad.view.melody.renderer.BaseMelodyBeatRenderer.ViewType
-import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatNotationRenderer
 import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatNotationRenderer.*
 import com.jonlatane.beatpad.view.melody.renderer.Note
 import com.jonlatane.beatpad.view.melody.toolbar.MelodyEditingModifiers
@@ -45,7 +44,7 @@ class MelodyBeatView constructor(
   override val palette get() = viewModel.paletteViewModel.palette
   override var section : Section = Section()
     private set
-  override val melody: Melody<*>? get() = viewModel.openedMelody?.let {
+  override val focusedMelody: Melody<*>? get() = viewModel.openedMelody?.let {
     when {
       viewType == ViewType.DrumPart && it.drumPart -> it
       viewType != ViewType.DrumPart && !it.drumPart -> it
@@ -56,7 +55,10 @@ class MelodyBeatView constructor(
   override var isSelectedBeatInHarmony = false
   override val displayType: MelodyViewModel.DisplayType get() = viewModel.displayType
   override val renderableToneBounds: Rect = Rect()
-  override val colorblockAlpha: Float get() = viewModel.beatAdapter.colorblockAlpha
+  override val colorblockAlpha: Float get() = when {
+    focusedMelody != null -> viewModel.beatAdapter.editingMelodyColorblockAlpha
+    else                  -> viewModel.beatAdapter.colorblockAlpha
+  }
   override val notationAlpha: Float get() = viewModel.beatAdapter.notationAlpha
   override val filledNoteheadPool = LocalizedDrawablePool(FILLED_NOTEHEAD_POOL)
   override val sharpPool = LocalizedDrawablePool(SHARP_POOL)
@@ -108,7 +110,7 @@ class MelodyBeatView constructor(
   override val renderVertically = true
   override val halfStepsOnScreen = 88f
 
-  inline val elementRange: IntRange? get() = melody?.let { elementRangeFor(it) }
+  inline val elementRange: IntRange? get() = focusedMelody?.let { elementRangeFor(it) }
   val drawWidth get() = elementRange?.let { (width.toFloat() / it.size).toInt() } ?: 0
   override val drawPadding: Int
     get() = if (drawWidth > dip(27f)) dip(5)
@@ -144,7 +146,7 @@ class MelodyBeatView constructor(
   }
 
   override fun getPositionAndElement(x: Float): Pair<Int, Transposable<*>?>? {
-    return melody?.let { melody ->
+    return focusedMelody?.let { melody ->
       val elementRange: IntRange = elementRange!!
       val elementIndex: Int = (elementRange.size * x / width).toInt()
       val elementPosition = beatPosition * melody.subdivisionsPerBeat + elementIndex

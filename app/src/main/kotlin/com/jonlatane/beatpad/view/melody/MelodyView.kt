@@ -81,11 +81,11 @@ class MelodyView(
 				onHeldDownChanged = { heldDown ->
 					if (displayType == MelodyViewModel.DisplayType.NOTATION) {
 						val anim = ValueAnimator.ofFloat(
-							beatAdapter.colorblockAlpha,
+							beatAdapter.editingMelodyColorblockAlpha,
 							if (heldDown) 0.43f else 0f
 						)
 						anim.addUpdateListener { valueAnimator ->
-							beatAdapter.colorblockAlpha = valueAnimator.animatedValue as Float
+							beatAdapter.editingMelodyColorblockAlpha = valueAnimator.animatedValue as Float
 						}
 						anim.start()
 					}

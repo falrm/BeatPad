@@ -33,7 +33,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     }
     canvas.renderStaffLines()
 
-    melody?.let { melody ->
+    focusedMelody?.let { melody ->
       val alphaMultiplier = if (viewModel.isMelodyReferenceEnabled) 1f else 2f / 3
       canvas.drawNotationMelody(
         melody,
@@ -55,16 +55,16 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     }
 
     paint.color = color(android.R.color.black).withAlpha(
-      if (melody != null) (255 * notationAlpha / 3f).toInt()
+      if (focusedMelody != null) (255 * notationAlpha / 3f).toInt()
       else (255 * notationAlpha).toInt()
     )
-    var melodiesToRender = sectionMelodiesOfPartType.filter { it != melody }
-    if(melody == null) {
+    var melodiesToRender = sectionMelodiesOfPartType.filter { it != focusedMelody }
+    if(focusedMelody == null) {
       melodiesToRender = melodiesToRender.sortedByDescending { otherMelody ->
         otherMelody.averageTone!!
       }
     }
-    val melodyToRenderSelectionAndPlaybackWith = when(melody) {
+    val melodyToRenderSelectionAndPlaybackWith = when(focusedMelody) {
       null -> melodiesToRender.maxBy { it.subdivisionsPerBeat }
       else -> null
     }
@@ -83,11 +83,11 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
       val drawSelectionAndPlayback = otherMelody == melodyToRenderSelectionAndPlaybackWith
       canvas.drawNotationMelody(
         otherMelody,
-        drawAlpha = melody?.let { notationAlpha / 3f } ?: notationAlpha,
+        drawAlpha = focusedMelody?.let { notationAlpha / 3f } ?: notationAlpha,
         drawColorGuide = false,
         forceDrawColorGuideForCurrentBeat = drawSelectionAndPlayback,
         forceDrawColorGuideForSelectedBeat = drawSelectionAndPlayback,
-        stemsUp = if(melody == null) {
+        stemsUp = if(focusedMelody == null) {
           if (melodiesToRender.size > 2 && renderQueue.isEmpty())
             otherMelody.averageTone!! < melodiesToRender.mapNotNull{ it.averageTone }.average()
           else stemsUp
@@ -188,7 +188,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
         sectionMelodies.filter { it.drumPart }
       }
       BaseMelodyBeatRenderer.ViewType.OtherNonDrumParts ->
-        arrayOf(melody).filterNotNull() +
+        arrayOf(focusedMelody).filterNotNull() +
         sectionMelodies.filter { !it.drumPart }
       else -> emptyList()
     }
@@ -204,12 +204,12 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
   ) {
     val maxSubdivisonsPerBeatUnder7 = (renderedMelodies + melody)
       .filter { it.subdivisionsPerBeat <= 7 }
-      .map { it.subdivisionsPerBeat }.max() ?: 7
+      .maxBy { it.subdivisionsPerBeat }?.subdivisionsPerBeat ?: 7
     val maxSubdivisonsPerBeatUnder13 = (renderedMelodies + melody)
       .filter { it.subdivisionsPerBeat <= 13 }
-      .map { it.subdivisionsPerBeat }.max() ?: 13
+      .maxBy { it.subdivisionsPerBeat }?.subdivisionsPerBeat ?: 13
     val maxSubdivisonsPerBeat = (renderedMelodies + melody)
-      .map { it.subdivisionsPerBeat }.max() ?: 24
+      .maxBy { it.subdivisionsPerBeat }?.subdivisionsPerBeat ?: 24
     val maxBoundsWidthUnder7 = min(
       (overallBounds.right - overallBounds.left) / maxSubdivisonsPerBeatUnder7,
       round(letterStepSize * 10).toInt()

@@ -1,6 +1,5 @@
 package com.jonlatane.beatpad.view.melody.renderer
 
-import BeatClockPaletteConsumer
 import android.graphics.Canvas
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Transposable
@@ -8,7 +7,6 @@ import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
-import com.jonlatane.beatpad.view.melody.MelodyBeatView
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
 
@@ -19,7 +17,7 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
   fun renderColorblockMelodyBeat(canvas: Canvas) {
     paint.strokeWidth = 0f
     canvas.renderSteps()
-    melody?.let { melody ->
+    focusedMelody?.let { melody ->
       val alphaMultiplier = if(viewModel.isMelodyReferenceEnabled) 1f else 2f/3
       canvas.drawColorblockMelody(
         melody,
@@ -29,7 +27,7 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
       )
     }
 
-    if(melody == null) {
+    if(focusedMelody == null) {
       canvas.drawColorblockMelody(
         oneBeatMelody.apply { subdivisionsPerBeat = harmony.subdivisionsPerBeat},
         stepNoteAlpha = 0,
@@ -39,7 +37,7 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
     }
 
     section.melodies.filter { !it.isDisabled }.filter {
-      when (melody?.limitedToNotesInHarmony) {
+      when (focusedMelody?.limitedToNotesInHarmony) {
         null  -> it.melody.limitedToNotesInHarmony
         true  -> it.melody.limitedToNotesInHarmony
         false -> !it.melody.limitedToNotesInHarmony
@@ -47,7 +45,7 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
     }.map { it.melody }.forEach { otherMelody ->
       canvas.drawColorblockMelody(
         otherMelody,
-        stepNoteAlpha = if (melody == null) 255 else 66,
+        stepNoteAlpha = if (focusedMelody == null) 255 else 66,
         drawColorGuide = false,
         alphaSource = colorblockAlpha
       )

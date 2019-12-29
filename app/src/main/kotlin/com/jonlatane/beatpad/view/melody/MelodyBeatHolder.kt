@@ -17,6 +17,9 @@ class MelodyBeatHolder private constructor(
 	val element: View, //base view
 	private val adapter: MelodyBeatAdapter
 ) : RecyclerView.ViewHolder(element), SmartAdapter.Holder {
+	val melodyBeatView0 get() = melodyBeatViews[0]
+	val melodyBeatView1 get() = melodyBeatViews[1]
+	val melodyBeatView2 get() = melodyBeatViews[2]
 	companion object {
 		fun create(
 			recyclerView: _RecyclerView,
@@ -25,6 +28,9 @@ class MelodyBeatHolder private constructor(
 			with(recyclerView) {
 				val melodyBeatViews = listOf(
 					MelodyBeatView(context, viewModel = viewModel)
+						.apply { viewType = ViewType.Unused }
+						.lparams(elementWidth, 0),
+					MelodyBeatView(context, viewModel = viewModel)
 						.apply { viewType = ViewType.OtherNonDrumParts }
 						.lparams(elementWidth, elementHeight),
 					MelodyBeatView(context, viewModel = viewModel)
@@ -32,26 +38,7 @@ class MelodyBeatHolder private constructor(
 							viewType =
 								//palette.parts.find { it.drumTrack }?.let { MelodyBeatRenderer.ViewType.PartView(it) } ?:
 									ViewType.DrumPart
-						}.lparams(elementWidth, elementHeight),
-					MelodyBeatView(context, viewModel = viewModel)
-						.apply { viewType = ViewType.Unused }
-						.lparams(elementWidth, 0)
-//					,
-//					MelodyBeatView(context, viewModel = viewModel)
-//						.apply { viewType = MelodyBeatRenderer.ViewType.Unused }
-//						.lparams(elementWidth, 0),
-//					MelodyBeatView(context, viewModel = viewModel)
-//						.apply { viewType = MelodyBeatRenderer.ViewType.Unused }
-//						.lparams(elementWidth, 0),
-//					MelodyBeatView(context, viewModel = viewModel)
-//						.apply { viewType = MelodyBeatRenderer.ViewType.Unused }
-//						.lparams(elementWidth, 0),
-//					MelodyBeatView(context, viewModel = viewModel)
-//						.apply { viewType = MelodyBeatRenderer.ViewType.Unused }
-//						.lparams(elementWidth, 0),
-//					MelodyBeatView(context, viewModel = viewModel)
-//						.apply { viewType = MelodyBeatRenderer.ViewType.Unused }
-//						.lparams(elementWidth, 0)
+						}.lparams(elementWidth, elementHeight)
 					)
 				val harmonyBeatView = HarmonyBeatView(
 					context,

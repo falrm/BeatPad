@@ -33,11 +33,11 @@ interface MelodyBeatEventEditingHandler : MelodyBeatEventHandlerBase, AlphaDrawe
 							}
 							MelodyViewModel.DisplayType.NOTATION   -> {
                 val playbackToneMap: Map<Int, List<Int>> = element.tones.groupBy {
-									melody!!.let { melody ->
+									focusedMelody!!.let { melody ->
 										melody.playbackToneUnder(it, chordAt(position, melody))
 									}
                 }
-                val targetPlaybackTone = melody!!.let { melody ->
+                val targetPlaybackTone = focusedMelody!!.let { melody ->
 									melody.playbackToneUnder(targetTone, chordAt(position, melody))
 								}
                 if(playbackToneMap.containsKey(targetPlaybackTone)) {

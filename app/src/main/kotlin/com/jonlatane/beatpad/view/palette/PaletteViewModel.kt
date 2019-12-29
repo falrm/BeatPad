@@ -68,6 +68,7 @@ class PaletteViewModel constructor(
             melodyViewModel.sectionToolbar.show()
             //melodyViewVisible = false
           }
+          staffConfigurationToolbar.hide()
         }
 
         harmonyViewModel.notifyHarmonyChanged()
@@ -96,6 +97,7 @@ class PaletteViewModel constructor(
             }
           }
         }
+        staffConfigurationToolbar.show()
         paletteToolbar.hide { showMelody() }
         hideVerticalSectionList { showMelody() }
         hideHorizontalSectionList { showMelody() }

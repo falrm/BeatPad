@@ -252,6 +252,16 @@ class MelodyBeatAdapter(
       }
     }
 
+  var editingMelodyColorblockAlpha: Float = 0f
+    set(value) {
+      field = value
+      recyclerView.applyToHolders<MelodyBeatHolder> {
+        it.melodyBeatViews.applyToEach {
+          invalidateDrawingLayer()
+        }
+      }
+    }
+
   var notationAlpha: Float = 1f
     set(value) {
       field = value
