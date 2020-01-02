@@ -97,11 +97,44 @@ class PaletteViewModel constructor(
             }
           }
         }
-        staffConfigurationToolbar.show()
         paletteToolbar.hide { showMelody() }
         hideVerticalSectionList { showMelody() }
         hideHorizontalSectionList { showMelody() }
       }
+    }
+  }
+  fun toggleStaffConfigurationToolbarVisible() {
+    if(staffConfigurationToolbar.isHidden) {
+      staffConfigurationToolbar.show()
+    } else {
+      staffConfigurationToolbar.hide()
+    }
+  }
+  fun toggleSectionOpenInMelodyView() {
+    // Check if section is already opened; if so, close it
+    if(editingMelody == null && melodyViewVisible) {
+      melodyViewVisible = false
+      vibrate(10, 100)
+    } else {
+      val previouslyEditingMelody = editingMelody
+      backStack.push {
+        when {
+          previouslyEditingMelody != null -> {
+            editingMelody = previouslyEditingMelody
+            true
+          }
+          isInEditMode          -> {
+            melodyViewVisible = false
+            true
+          }
+          else                            -> {
+            false
+          }
+        }
+      }
+      editingMelody = null
+      melodyViewVisible = true
+      vibrate(10, 100)
     }
   }
   fun showVerticalSectionList(animated: Boolean = true, endAction: (() -> Unit)? = null) {

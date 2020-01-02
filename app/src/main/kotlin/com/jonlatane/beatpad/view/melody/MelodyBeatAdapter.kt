@@ -45,6 +45,57 @@ class MelodyBeatAdapter(
     }
   }
 
+  var viewType0: ViewType = ViewType.Unused
+  set(value) {
+    field = value
+    propagateViewTypeChanges(value) { melodyBeatView0 }
+  }
+  var viewType1: ViewType = ViewType.OtherNonDrumParts
+    set(value) {
+      field = value
+      propagateViewTypeChanges(value) { melodyBeatView1 }
+    }
+  var viewType2: ViewType = ViewType.DrumPart
+    set(value) {
+      field = value
+      propagateViewTypeChanges(value) { melodyBeatView2 }
+    }
+
+  fun propagateViewTypeChanges(
+    viewType: ViewType,
+    viewResolver: MelodyBeatHolder.() -> MelodyBeatView
+  ) {
+    applyToHolders {
+      val view = it.viewResolver()
+      val oldHeight = if (view.viewType.isUsed) elementHeight else 0
+      val newHeight = if (viewType.isUsed) elementHeight else 0
+      fun syncChordsWithAnimation() {
+        val anim = ValueAnimator.ofFloat(0f, 100f)
+        anim.interpolator = LinearInterpolator()
+        anim.addUpdateListener { valueAnimator ->
+          viewModel.melodyView.syncScrollingChordText(false)
+        }
+        anim.setDuration(400L).start()
+      }
+      when {
+        newHeight > oldHeight -> {
+          view.viewType = viewType
+          syncChordsWithAnimation()
+          view.animateHeight(newHeight)
+        }
+        oldHeight > newHeight -> {
+          syncChordsWithAnimation()
+          view.animateHeight(newHeight) {
+            view.viewType = viewType
+          }
+        }
+        else -> {
+          view.viewType = viewType
+        }
+      }
+    }
+  }
+
   private val axis get() = viewModel.verticalAxis!!
   private val axes: List<MelodyToneAxis> get() = viewModel.verticalAxes
   val minimumElementWidth get() = viewModel.melodyVerticalScrollView.width / 24
@@ -274,7 +325,8 @@ class MelodyBeatAdapter(
 
   val RecyclerView.harmonyViewHeight get() = min(dip(45), elementHeight / 10)
   val MelodyBeatHolder.harmonyViewHeight get() = min(harmonyBeatView.dip(45), elementHeight / 10)
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyBeatHolder = MelodyBeatHolder.create(recyclerView, this)
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MelodyBeatHolder =
+    MelodyBeatHolder.create(recyclerView, this)
 
   override fun onBindViewHolder(holder: MelodyBeatHolder, position: Int): Unit = with(holder) {
     super.onBindViewHolder(holder, position)
@@ -287,6 +339,9 @@ class MelodyBeatAdapter(
         position
       ).second
     }
+    melodyBeatView0.viewType = viewType0
+    melodyBeatView1.viewType = viewType1
+    melodyBeatView2.viewType = viewType2
     melodyBeatViews.applyToEach {
       beatPosition = position
       layoutWidth = elementWidth

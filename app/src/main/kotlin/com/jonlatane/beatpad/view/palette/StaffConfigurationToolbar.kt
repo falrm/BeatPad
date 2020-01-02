@@ -17,11 +17,11 @@ import com.jonlatane.beatpad.util.color
 import com.jonlatane.beatpad.util.smartrecycler.updateSmartHolders
 import com.jonlatane.beatpad.view.colorboard.ColorboardConfiguration
 import com.jonlatane.beatpad.view.keyboard.KeyboardConfiguration
+import com.jonlatane.beatpad.view.melody.renderer.BaseMelodyBeatRenderer.ViewType
 import com.jonlatane.beatpad.view.melody.toolbar.Toolbar
 import com.jonlatane.beatpad.view.nonDelayedRecyclerView
 import com.jonlatane.beatpad.view.orbifold.OrbifoldConfiguration
 import org.jetbrains.anko.*
-import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 
@@ -112,6 +112,7 @@ class StaffConfigurationToolbar(
     onClick {
       showAccompaniment = !showAccompaniment
       alpha = if(showAccompaniment) 1f else 0.5f
+      viewModel.melodyBeatAdapter.viewType1 = if(showAccompaniment) ViewType.OtherNonDrumParts else ViewType.Unused
     }
   }.lparams(wrapContent, matchParent)
 
@@ -134,6 +135,7 @@ class StaffConfigurationToolbar(
     onClick {
       showDrums = !showDrums
       alpha = if(showDrums) 1f else 0.5f
+      viewModel.melodyBeatAdapter.viewType2 = if(showDrums) ViewType.DrumPart else ViewType.Unused
     }
   }.lparams(wrapContent, matchParent)
 

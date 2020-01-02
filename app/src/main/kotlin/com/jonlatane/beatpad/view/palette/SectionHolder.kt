@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.MenuItem
-import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.TextView
 import com.jonlatane.beatpad.MainApplication
@@ -221,7 +220,7 @@ class SectionHolder constructor(
     itemView.apply {
       setOnClickListener {
         if(BeatClockPaletteConsumer.section == section) {
-          openSectionInMelodyView()
+          viewModel.toggleSectionOpenInMelodyView()
         } else {
           BeatClockPaletteConsumer.section = section
           viewModel.sectionListAdapters.forEach { it.recyclerView.updateSmartHolders() }
@@ -235,34 +234,6 @@ class SectionHolder constructor(
         menu.show()
         true
       }
-    }
-  }
-
-  private fun openSectionInMelodyView() {
-    // Check if section is already opened; if so, close it
-    if(viewModel.editingMelody == null && viewModel.melodyViewVisible) {
-      viewModel.melodyViewVisible = false
-      vibrate(10, 100)
-    } else {
-      val previouslyEditingMelody = viewModel.editingMelody
-      viewModel.backStack.push {
-        when {
-          previouslyEditingMelody != null -> {
-            viewModel.editingMelody = previouslyEditingMelody
-            true
-          }
-          viewModel.isInEditMode          -> {
-            viewModel.melodyViewVisible = false
-            true
-          }
-          else                            -> {
-            false
-          }
-        }
-      }
-      viewModel.editingMelody = null
-      viewModel.melodyViewVisible = true
-      vibrate(10, 100)
     }
   }
 

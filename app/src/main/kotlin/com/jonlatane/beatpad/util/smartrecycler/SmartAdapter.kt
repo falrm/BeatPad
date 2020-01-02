@@ -19,6 +19,12 @@ abstract class SmartAdapter<HolderType: RecyclerView.ViewHolder>: RecyclerView.A
     boundViewHolders.mapNotNull { it as? Holder }.forEach { it.updateSmartHolder() }
   }
 
+  fun applyToHolders(
+    mutation: (HolderType) -> Unit
+  ) {
+    boundViewHolders.forEach { mutation(it) }
+  }
+
   interface Holder {
     fun updateSmartHolder()
   }

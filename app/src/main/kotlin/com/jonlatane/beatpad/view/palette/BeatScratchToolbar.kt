@@ -30,7 +30,6 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.lang.Thread.sleep
 import java.net.URI
-import kotlin.system.exitProcess
 
 
 class BeatScratchToolbar(
@@ -221,6 +220,12 @@ class BeatScratchToolbar(
       }
       updateButtonColors()
       viewModel.notifyInteractionModeChanged()
+    } else {
+      if(value == InteractionMode.VIEW) {
+        viewModel.toggleStaffConfigurationToolbarVisible()
+      } else {
+        viewModel.toggleSectionOpenInMelodyView()
+      }
     }
   }
   val viewModeButton: ImageButton = imageButton {
