@@ -77,6 +77,8 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
       }
       if (BeatClockPaletteConsumer.playbackMode == BeatClockPaletteConsumer.PlaybackMode.PALETTE) {
         viewModel.beatScratchToolbar.interactionMode = BeatScratchToolbar.InteractionMode.VIEW
+      } else {
+        viewModel.staffConfigurationToolbar.hide(false)
       }
     }
 
