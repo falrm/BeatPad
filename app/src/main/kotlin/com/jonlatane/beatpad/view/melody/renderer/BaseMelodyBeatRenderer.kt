@@ -120,7 +120,10 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
       }
       ViewType.OtherNonDrumParts -> sectionMelodies.filter {  melody ->
         !melody.drumPart &&
-          viewModel.paletteViewModel.staffConfigurationToolbar.soloPart?.melodies?.none { it == melody } ?: true
+          when(val soloPart = viewModel.paletteViewModel.staffConfigurationToolbar.soloPart) {
+            null -> true
+            else -> !soloPart.melodies.contains(melody)
+          }
       }
       ViewType.DrumPart          -> sectionMelodies.filter { it.drumPart }
       ViewType.Unused            -> emptyList()

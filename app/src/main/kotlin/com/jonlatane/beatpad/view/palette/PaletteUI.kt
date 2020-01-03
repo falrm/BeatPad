@@ -47,8 +47,10 @@ class PaletteUI constructor(
 
       viewModel.apply {
         orbifold.onChordChangedListener = { chord ->
-          paletteToolbar.orbifoldText.text = chord.name
-          paletteToolbar.orbifoldText.textColor = context.color(OrbifoldView.colorResourceFor(chord))
+          viewModeToolbar.orbifoldText.text = chord.name
+          viewModeToolbar.orbifoldText.textColor = context.color(OrbifoldView.colorResourceFor(chord))
+          editModeToolbar.orbifoldText.text = chord.name
+          editModeToolbar.orbifoldText.textColor = context.color(OrbifoldView.colorResourceFor(chord))
           val keyboardDrumTrack = (keyboardPart?.instrument as? MIDIInstrument)?.drumTrack == true
           if(!harmonyViewModel.isChoosingHarmonyChord) {
             colorboardView.chord = chord
@@ -159,16 +161,22 @@ class PaletteUI constructor(
       alignParentTop()
     }
 
-    viewModel.paletteToolbar = paletteToolbar(viewModel = viewModel) {
+    viewModel.editModeToolbar = editModeToolbar(viewModel = viewModel) {
       id = R.id.toolbar
     }.lparams(matchParent, dip(48)) {
       below(viewModel.beatScratchToolbar)
     }
 
+    viewModel.viewModeToolbar = viewModeToolbar(viewModel = viewModel) {
+      id = View.generateViewId()
+    }.lparams(matchParent, dip(48)) {
+      below(viewModel.editModeToolbar)
+    }
+
     viewModel.staffConfigurationToolbar = staffConfigurationToolbar(viewModel = viewModel) {
       id = View.generateViewId()
     }.lparams(matchParent, dip(48)) {
-      below(viewModel.paletteToolbar)
+      below(viewModel.viewModeToolbar)
     }
 
     viewModel.sectionListRecyclerVerticalRotator = rotateLayout {
@@ -291,7 +299,7 @@ class PaletteUI constructor(
       alignParentTop()
     }
 
-    viewModel.paletteToolbar = paletteToolbar(viewModel = viewModel) {
+    viewModel.editModeToolbar = editModeToolbar(viewModel = viewModel) {
       id = R.id.toolbar
       orientation = LinearLayout.HORIZONTAL
     }.lparams(matchParent, if(context.configuration.tablet) dip(48) else dip(36)) {
@@ -300,11 +308,19 @@ class PaletteUI constructor(
       alignParentRight()
     }
 
+    viewModel.viewModeToolbar = viewModeToolbar(viewModel = viewModel) {
+      id = View.generateViewId()
+    }.lparams(matchParent, dip(48)) {
+      rightOf(viewModel.beatScratchToolbar)
+      below(viewModel.editModeToolbar)
+      alignParentRight()
+    }
+
     viewModel.staffConfigurationToolbar = staffConfigurationToolbar(viewModel = viewModel) {
       id = View.generateViewId()
     }.lparams(matchParent, dip(48)) {
       rightOf(viewModel.beatScratchToolbar)
-      below(viewModel.paletteToolbar)
+      below(viewModel.viewModeToolbar)
       alignParentRight()
     }
 

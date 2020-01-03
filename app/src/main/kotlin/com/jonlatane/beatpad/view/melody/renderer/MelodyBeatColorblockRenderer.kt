@@ -7,6 +7,7 @@ import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
 import com.jonlatane.beatpad.storage.PaletteStorage
 import com.jonlatane.beatpad.view.colorboard.AlphaDrawer
+import com.jonlatane.beatpad.view.melody.renderer.BaseMelodyBeatRenderer.ViewType
 import org.jetbrains.anko.warn
 import org.jetbrains.anko.withAlpha
 
@@ -27,11 +28,16 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
       )
     }
 
+    // Draw a background if no melody is focused
     if(focusedMelody == null) {
       canvas.drawColorblockMelody(
         oneBeatMelody.apply { subdivisionsPerBeat = harmony.subdivisionsPerBeat},
         stepNoteAlpha = 0,
-        drawColorGuide = true,
+        drawColorGuide = when(val viewType = viewType) {
+          is ViewType.PartView -> !viewType.part.drumTrack
+          is ViewType.DrumPart -> false
+          else                                        -> true
+        },
         alphaSource = colorblockAlpha
       )
     }

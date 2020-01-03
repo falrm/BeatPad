@@ -26,7 +26,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLongClick
 
 
-class PaletteToolbar(
+class EditModeToolbar(
   override val configurationContext: Context,
   override val viewModel: PaletteViewModel
 ) : _LinearLayout(configurationContext), AnkoLogger, TempoConfiguration, OrbifoldConfiguration, ColorboardConfiguration, KeyboardConfiguration, Storage, HideableView {

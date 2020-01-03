@@ -4,17 +4,23 @@ import android.view.ViewManager
 import com.jonlatane.beatpad.view.HideableRecyclerView
 import org.jetbrains.anko.custom.ankoView
 
-fun ViewManager.paletteToolbar(
+fun ViewManager.editModeToolbar(
 	theme: Int = 0,
 	viewModel: PaletteViewModel
-) = paletteToolbar(theme, viewModel, {})
+) = editModeToolbar(theme, viewModel, {})
 
 
-inline fun ViewManager.paletteToolbar(
+inline fun ViewManager.editModeToolbar(
 	theme: Int = 0,
 	viewModel: PaletteViewModel,
-	init: PaletteToolbar.() -> Unit
-) = ankoView({ PaletteToolbar(it, viewModel) }, theme, init)
+	init: EditModeToolbar.() -> Unit
+) = ankoView({ EditModeToolbar(it, viewModel) }, theme, init)
+
+inline fun ViewManager.viewModeToolbar(
+	theme: Int = 0,
+	viewModel: PaletteViewModel,
+	init: ViewModeToolbar.() -> Unit
+) = ankoView({ ViewModeToolbar(it, viewModel) }, theme, init)
 
 inline fun ViewManager.staffConfigurationToolbar(
 	theme: Int = 0,

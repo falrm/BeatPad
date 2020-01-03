@@ -111,9 +111,13 @@ class MelodyViewModel(
 		}
 		fadeInAnim.setDuration(500).start()
 		fadeOutAnim.setDuration(500).start()
-		melodyReferenceToolbar.displayTypeButton.imageResource = when(value) {
-			DisplayType.COLORBLOCK -> R.drawable.colorboard_icon_vertical
-			else -> R.drawable.notehead_filled
+		listOf(
+			melodyReferenceToolbar.displayTypeButton, paletteViewModel.viewModeToolbar.displayTypeButton
+		).forEach {
+			it.imageResource = when(value) {
+				DisplayType.COLORBLOCK -> R.drawable.colorboard_icon_vertical
+				else -> R.drawable.notehead_filled
+			}
 		}
 	}
 
@@ -129,7 +133,11 @@ class MelodyViewModel(
 			} else {
 				linearLayout()
 			}
-			listOf(melodyReferenceToolbar.layoutTypeButton, sectionToolbar.layoutTypeButton).forEach {
+			listOf(
+				melodyReferenceToolbar.layoutTypeButton,
+				sectionToolbar.layoutTypeButton,
+				paletteViewModel.viewModeToolbar.layoutTypeButton
+			).forEach {
 				it.imageResource = when(value) {
 					LayoutType.GRID -> R.drawable.grid
 					else -> R.drawable.line

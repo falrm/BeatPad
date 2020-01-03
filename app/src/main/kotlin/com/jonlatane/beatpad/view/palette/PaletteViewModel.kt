@@ -25,6 +25,8 @@ import com.jonlatane.beatpad.view.harmony.HarmonyView
 import com.jonlatane.beatpad.view.harmony.HarmonyViewModel
 import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
+import com.jonlatane.beatpad.view.melody.renderer.BaseMelodyBeatRenderer
+import com.jonlatane.beatpad.view.melody.renderer.BaseMelodyBeatRenderer.ViewType
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import org.jetbrains.anko.*
@@ -64,11 +66,12 @@ class PaletteViewModel constructor(
               true
             } else false
           }
-          paletteToolbar.show {
+          editModeToolbar.show {
             melodyViewModel.sectionToolbar.show()
             //melodyViewVisible = false
           }
           staffConfigurationToolbar.hide()
+          viewModeToolbar.hide()
         }
 
         harmonyViewModel.notifyHarmonyChanged()
@@ -97,7 +100,10 @@ class PaletteViewModel constructor(
             }
           }
         }
-        paletteToolbar.hide { showMelody() }
+        staffConfigurationToolbar.soloPart = null
+        staffConfigurationToolbar.showAccompaniment = true
+        staffConfigurationToolbar.showDrums = true
+        editModeToolbar.hide { showMelody() }
         hideVerticalSectionList { showMelody() }
         hideHorizontalSectionList { showMelody() }
       }
@@ -106,8 +112,10 @@ class PaletteViewModel constructor(
   fun toggleStaffConfigurationToolbarVisible() {
     if(staffConfigurationToolbar.isHidden) {
       staffConfigurationToolbar.show()
+      viewModeToolbar.show()
     } else {
       staffConfigurationToolbar.hide()
+      viewModeToolbar.hide()
     }
   }
   fun toggleSectionOpenInMelodyView() {
@@ -132,6 +140,10 @@ class PaletteViewModel constructor(
           }
         }
       }
+      staffConfigurationToolbar.soloPart = null
+      staffConfigurationToolbar.showAccompaniment = true
+      staffConfigurationToolbar.showDrums = true
+
       editingMelody = null
       melodyViewVisible = true
     }
@@ -264,7 +276,7 @@ class PaletteViewModel constructor(
     colorboardPart = new.colorboardPart ?: new.parts[0]
     splatPart = new.splatPart ?: new.parts[0]
     orbifold.orbifold = new.orbifold
-    paletteToolbar.updateTempoDisplay()
+    editModeToolbar.updateTempoDisplay()
     partListAdapters.forEach { it.notifyDataSetChanged() }
     sectionListAdapters.forEach { it.notifyDataSetChanged() }
     listOf(sectionListRecyclerVertical, sectionListRecyclerHorizontal).forEach { it.smoothScrollToPosition(0) }
@@ -310,6 +322,21 @@ class PaletteViewModel constructor(
         saveAfterDelay()
       }
     }
+
+    when {
+      new == null -> {
+        staffConfigurationToolbar.soloPart = null
+        staffConfigurationToolbar.showAccompaniment = true
+        staffConfigurationToolbar.showDrums = true
+      }
+      else -> {
+        palette.parts.firstOrNull { it.melodies.contains(new) }?.let {
+          staffConfigurationToolbar.soloPart = it
+          staffConfigurationToolbar.showAccompaniment = true
+          staffConfigurationToolbar.showDrums = !it.drumTrack
+        }
+      }
+    }
   }
 
   lateinit var sectionListRecyclerHorizontalRotator: RotateLayout
@@ -322,7 +349,8 @@ class PaletteViewModel constructor(
   lateinit var partListView: PartListView
   lateinit var partListTransitionView: TextView
   lateinit var beatScratchToolbar: BeatScratchToolbar
-  lateinit var paletteToolbar: PaletteToolbar
+  lateinit var editModeToolbar: EditModeToolbar
+  lateinit var viewModeToolbar: ViewModeToolbar
   lateinit var staffConfigurationToolbar: StaffConfigurationToolbar
   lateinit var keyboardView: KeyboardView
   lateinit var colorboardView: ColorboardInputView
@@ -523,8 +551,11 @@ class PaletteViewModel constructor(
         } else false
       }
     }
-    paletteToolbar.orbifoldButton.backgroundResource = R.drawable.toolbar_button_active
-    paletteToolbar.updateInstrumentButtonPaddings()
+    listOf(editModeToolbar.orbifoldButton, viewModeToolbar.orbifoldButton).forEach {
+      it.backgroundResource = R.drawable.toolbar_button_active
+    }
+    editModeToolbar.updateInstrumentButtonPaddings()
+    viewModeToolbar.updateInstrumentButtonPaddings()
     orbifold.conditionallyAnimateToSelectionState()
     orbifold.show(
       animation = if (orbifold.context.configuration.portrait) {
@@ -538,8 +569,10 @@ class PaletteViewModel constructor(
   }
 
   fun hideOrbifold(animated: Boolean = true) {
-    paletteToolbar.orbifoldButton.backgroundResource = R.drawable.toolbar_button
-    paletteToolbar.updateInstrumentButtonPaddings()
+    listOf(editModeToolbar.orbifoldButton, viewModeToolbar.orbifoldButton).forEach {
+      it.backgroundResource = R.drawable.toolbar_button
+    }
+    editModeToolbar.updateInstrumentButtonPaddings()
     harmonyViewModel.isChoosingHarmonyChord = false
     harmonyViewModel.selectedHarmonyElements = null
     orbifold.hide(
@@ -558,14 +591,19 @@ class PaletteViewModel constructor(
       } else false
     }
     keyboardView.show(animated)
-    paletteToolbar.keysButton.backgroundResource = R.drawable.toolbar_button_active
-    paletteToolbar.updateInstrumentButtonPaddings()
-
+    listOf(editModeToolbar.keysButton, viewModeToolbar.keysButton).forEach {
+      it.backgroundResource = R.drawable.toolbar_button_active
+    }
+    editModeToolbar.updateInstrumentButtonPaddings()
+    viewModeToolbar.updateInstrumentButtonPaddings()
   }
 
   fun hideKeyboard(animated: Boolean = true) {
-    paletteToolbar.keysButton.backgroundResource = R.drawable.toolbar_button
-    paletteToolbar.updateInstrumentButtonPaddings()
+    listOf(editModeToolbar.keysButton, viewModeToolbar.keysButton).forEach {
+      it.backgroundResource = R.drawable.toolbar_button
+    }
+    editModeToolbar.updateInstrumentButtonPaddings()
+    viewModeToolbar.updateInstrumentButtonPaddings()
     orbifold.customChordMode = false
     keyboardView.hide(animated)
   }
@@ -578,13 +616,19 @@ class PaletteViewModel constructor(
       } else false
     }
     colorboardView.show(animated)
-    paletteToolbar.colorsButton.backgroundResource = R.drawable.toolbar_button_active
-    paletteToolbar.updateInstrumentButtonPaddings()
+    listOf(editModeToolbar.colorsButton, viewModeToolbar.colorsButton).forEach {
+      it.backgroundResource = R.drawable.toolbar_button_active
+    }
+    editModeToolbar.updateInstrumentButtonPaddings()
+    viewModeToolbar.updateInstrumentButtonPaddings()
   }
 
   fun hideColorboard(animated: Boolean = true) {
-    paletteToolbar.colorsButton.backgroundResource = R.drawable.toolbar_button
-    paletteToolbar.updateInstrumentButtonPaddings()
+    listOf(editModeToolbar.colorsButton, viewModeToolbar.colorsButton).forEach {
+      it.backgroundResource = R.drawable.toolbar_button
+    }
+    editModeToolbar.updateInstrumentButtonPaddings()
+    viewModeToolbar.updateInstrumentButtonPaddings()
     colorboardView.hide(animated)
   }
 
