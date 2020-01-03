@@ -10,9 +10,7 @@ import com.jonlatane.beatpad.model.Instrument
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
 import com.jonlatane.beatpad.util.mod12
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.backgroundResource
-import org.jetbrains.anko.verbose
+import org.jetbrains.anko.*
 import java.util.*
 import kotlin.properties.Delegates.observable
 

@@ -26,9 +26,7 @@ abstract class Toolbar(context: Context, val viewModel: PaletteViewModel)
   val melodyViewModel get() = viewModel.melodyViewModel
   val melody get() = melodyViewModel.openedMelody
   val melodyReference get() = melodyViewModel.melodyReference
-  fun <T: View> T.flexStyle(extensions: LayoutParams.() -> Unit = {}) = this.lparams {
-    width = matchParent
-    height = squareSize
+  fun <T: View> T.flexStyle(extensions: LayoutParams.() -> Unit = {}) = this.lparams(matchParent, squareSize) {
     weight = 1f
     extensions()
   }

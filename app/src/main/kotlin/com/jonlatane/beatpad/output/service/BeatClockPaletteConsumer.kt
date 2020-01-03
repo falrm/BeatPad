@@ -15,10 +15,7 @@ import com.jonlatane.beatpad.view.palette.PaletteViewModel
 import com.jonlatane.beatpad.view.palette.SectionHolder
 import io.multifunctions.letCheckNull
 import kotlinx.io.pool.DefaultPool
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.info
-import org.jetbrains.anko.verbose
-import org.jetbrains.anko.warn
+import org.jetbrains.anko.*
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.floor
@@ -33,6 +30,7 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
   set(value) {
     field = value
     MidiDevices.refreshInstruments()
+    viewModel?.staffConfiguration?.soloPart = null
     tickPosition = 0
   }
   enum class PlaybackMode { SECTION, PALETTE }
@@ -87,14 +85,17 @@ object BeatClockPaletteConsumer : Patterns, AnkoLogger {
 
   private fun loadUpcomingAttacks(palette: Palette, section: Section) {
     chord = (harmonyChord ?: chord)?.also { chord ->
-      viewModel?.orbifold?.post {
-        if (
-          viewModel?.harmonyViewModel?.isChoosingHarmonyChord != true
-          && chord != viewModel?.orbifold?.chord
-        ) {
-          viewModel?.orbifold?.disableNextTransitionAnimation()
-          //viewModel?.orbifold?.prepareAnimationTo(chord)
-          viewModel?.orbifold?.chord = chord
+      doAsync {
+        viewModel?.apply {
+          if (
+            !harmonyViewModel.isChoosingHarmonyChord && chord != orbifold.chord
+          ) {
+            orbifold.disableNextTransitionAnimation()
+            //viewModel?.orbifold?.prepareAnimationTo(chord)
+            uiThread {
+              orbifold.chord = chord
+            }
+          }
         }
       }
     }
