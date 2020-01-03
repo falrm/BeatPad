@@ -1,6 +1,5 @@
 package com.jonlatane.beatpad.view.melody.renderer
 
-import BeatClockPaletteConsumer.viewModel
 import android.graphics.Canvas
 import android.graphics.Rect
 import com.github.yamamotoj.cachedproperty.CachedProperty
@@ -111,7 +110,7 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
       }
       ViewType.OtherNonDrumParts -> sectionMelodies.filter {  melody ->
         !melody.drumPart &&
-          when(val soloPart = viewModel.paletteViewModel.staffConfigurationToolbar.soloPart) {
+          when(val soloPart = viewModel.paletteViewModel.staffConfiguration.soloPart) {
             null -> true
             else -> !soloPart.melodies.contains(melody)
           }

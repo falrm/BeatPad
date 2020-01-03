@@ -25,8 +25,6 @@ import com.jonlatane.beatpad.view.harmony.HarmonyView
 import com.jonlatane.beatpad.view.harmony.HarmonyViewModel
 import com.jonlatane.beatpad.view.keyboard.KeyboardView
 import com.jonlatane.beatpad.view.melody.MelodyViewModel
-import com.jonlatane.beatpad.view.melody.renderer.BaseMelodyBeatRenderer
-import com.jonlatane.beatpad.view.melody.renderer.BaseMelodyBeatRenderer.ViewType
 import com.jonlatane.beatpad.view.orbifold.OrbifoldView
 import com.jonlatane.beatpad.view.orbifold.RhythmAnimations
 import org.jetbrains.anko.*
@@ -54,6 +52,9 @@ class PaletteViewModel constructor(
   val isInEditMode get() = interactionMode == BeatScratchToolbar.InteractionMode.EDIT
   val isInViewMode get() = !isInEditMode
   fun notifyInteractionModeChanged() {
+    staffConfiguration.soloPart = null
+    staffConfiguration.showAccompaniment = true
+    staffConfiguration.showDrums = true
     when(interactionMode) {
       BeatScratchToolbar.InteractionMode.EDIT -> {
         fun showSectionList(block: () -> Unit) = if(activity.resources.configuration.portrait)
@@ -70,7 +71,7 @@ class PaletteViewModel constructor(
             melodyViewModel.sectionToolbar.show()
             //melodyViewVisible = false
           }
-          staffConfigurationToolbar.hide()
+          staffConfiguration.hide()
           viewModeToolbar.hide()
         }
 
@@ -100,9 +101,6 @@ class PaletteViewModel constructor(
             }
           }
         }
-        staffConfigurationToolbar.soloPart = null
-        staffConfigurationToolbar.showAccompaniment = true
-        staffConfigurationToolbar.showDrums = true
         editModeToolbar.hide { showMelody() }
         hideVerticalSectionList { showMelody() }
         hideHorizontalSectionList { showMelody() }
@@ -110,11 +108,11 @@ class PaletteViewModel constructor(
     }
   }
   fun toggleStaffConfigurationToolbarVisible() {
-    if(staffConfigurationToolbar.isHidden) {
-      staffConfigurationToolbar.show()
+    if(staffConfiguration.isHidden) {
+      staffConfiguration.show()
       viewModeToolbar.show()
     } else {
-      staffConfigurationToolbar.hide()
+      staffConfiguration.hide()
       viewModeToolbar.hide()
     }
   }
@@ -140,9 +138,9 @@ class PaletteViewModel constructor(
           }
         }
       }
-      staffConfigurationToolbar.soloPart = null
-      staffConfigurationToolbar.showAccompaniment = true
-      staffConfigurationToolbar.showDrums = true
+      staffConfiguration.soloPart = null
+      staffConfiguration.showAccompaniment = true
+      staffConfiguration.showDrums = true
 
       editingMelody = null
       melodyViewVisible = true
@@ -325,15 +323,15 @@ class PaletteViewModel constructor(
 
     when {
       new == null -> {
-        staffConfigurationToolbar.soloPart = null
-        staffConfigurationToolbar.showAccompaniment = true
-        staffConfigurationToolbar.showDrums = true
+        staffConfiguration.soloPart = null
+        staffConfiguration.showAccompaniment = true
+        staffConfiguration.showDrums = true
       }
       else -> {
         palette.parts.firstOrNull { it.melodies.contains(new) }?.let {
-          staffConfigurationToolbar.soloPart = it
-          staffConfigurationToolbar.showAccompaniment = true
-          staffConfigurationToolbar.showDrums = !it.drumTrack
+          staffConfiguration.soloPart = it
+          staffConfiguration.showAccompaniment = true
+          staffConfiguration.showDrums = !it.drumTrack
         }
       }
     }
@@ -351,7 +349,7 @@ class PaletteViewModel constructor(
   lateinit var beatScratchToolbar: BeatScratchToolbar
   lateinit var editModeToolbar: EditModeToolbar
   lateinit var viewModeToolbar: ViewModeToolbar
-  lateinit var staffConfigurationToolbar: StaffConfigurationToolbar
+  lateinit var staffConfiguration: StaffConfigurationToolbar
   lateinit var keyboardView: KeyboardView
   lateinit var colorboardView: ColorboardInputView
   var keyboardPart by observable<Part?>(null) { _, _, new ->

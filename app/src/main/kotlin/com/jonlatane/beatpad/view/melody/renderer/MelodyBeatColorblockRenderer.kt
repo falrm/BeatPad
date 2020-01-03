@@ -45,7 +45,7 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
     sectionMelodiesOfPartType.forEach { otherMelody ->
       canvas.drawColorblockMelody(
         otherMelody,
-        stepNoteAlpha = if (focusedMelody == null) 255 else 66,
+        stepNoteAlpha = if (viewModel.openedMelody == null) 255 else 66,
         drawColorGuide = false,
         drawRhythm = false,
         alphaSource = colorblockAlpha

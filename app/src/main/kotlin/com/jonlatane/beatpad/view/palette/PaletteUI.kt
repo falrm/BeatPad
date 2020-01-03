@@ -173,7 +173,7 @@ class PaletteUI constructor(
       below(viewModel.editModeToolbar)
     }
 
-    viewModel.staffConfigurationToolbar = staffConfigurationToolbar(viewModel = viewModel) {
+    viewModel.staffConfiguration = staffConfigurationToolbar(viewModel = viewModel) {
       id = View.generateViewId()
     }.lparams(matchParent, dip(48)) {
       below(viewModel.viewModeToolbar)
@@ -186,7 +186,7 @@ class PaletteUI constructor(
         id = View.generateViewId()
       }.lparams(dip(200), matchParent)
     }.lparams(dip(200), matchParent) {
-      below(viewModel.staffConfigurationToolbar)
+      below(viewModel.staffConfiguration)
       alignParentLeft()
       alignParentBottom()
     }
@@ -198,7 +198,7 @@ class PaletteUI constructor(
         id = View.generateViewId()
       }.lparams(matchParent, dip(40))
     }.lparams(matchParent, dip(40)) {
-      below(viewModel.staffConfigurationToolbar)
+      below(viewModel.staffConfiguration)
       alignParentLeft()
       alignParentRight()
     }
@@ -316,7 +316,7 @@ class PaletteUI constructor(
       alignParentRight()
     }
 
-    viewModel.staffConfigurationToolbar = staffConfigurationToolbar(viewModel = viewModel) {
+    viewModel.staffConfiguration = staffConfigurationToolbar(viewModel = viewModel) {
       id = View.generateViewId()
     }.lparams(matchParent, dip(48)) {
       rightOf(viewModel.beatScratchToolbar)
@@ -330,7 +330,7 @@ class PaletteUI constructor(
       id = R.id.harmony
     }.lparams(matchParent, dip(36)) {
       rightOf(viewModel.beatScratchToolbar)
-      below(viewModel.staffConfigurationToolbar)
+      below(viewModel.staffConfiguration)
       alignParentRight()
       bottomMargin = dip(4)
     }

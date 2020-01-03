@@ -95,6 +95,10 @@ class StaffConfigurationToolbar(
   }
 
   var showAccompaniment = true
+  set(value) {
+    field = value
+    viewModel.melodyBeatAdapter.viewType1 = if(value) ViewType.OtherNonDrumParts else ViewType.Unused
+  }
   val accompanimentButton = textView {
     backgroundResource = R.drawable.part_background
     text = "Accomp."
@@ -113,11 +117,14 @@ class StaffConfigurationToolbar(
     onClick {
       showAccompaniment = !showAccompaniment
       alpha = if(showAccompaniment) 1f else 0.5f
-      viewModel.melodyBeatAdapter.viewType1 = if(showAccompaniment) ViewType.OtherNonDrumParts else ViewType.Unused
     }
   }.lparams(wrapContent, matchParent)
 
   var showDrums = true
+  set(value) {
+    field = value
+    viewModel.melodyBeatAdapter.viewType2 = if(value) ViewType.DrumPart else ViewType.Unused
+  }
   val drumsButton = textView {
     text = "Drums"
     padding = dip(10f)
@@ -136,7 +143,6 @@ class StaffConfigurationToolbar(
     onClick {
       showDrums = !showDrums
       alpha = if(showDrums) 1f else 0.5f
-      viewModel.melodyBeatAdapter.viewType2 = if(showDrums) ViewType.DrumPart else ViewType.Unused
     }
   }.lparams(wrapContent, matchParent)
 

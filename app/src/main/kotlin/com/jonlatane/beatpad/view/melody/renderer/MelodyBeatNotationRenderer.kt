@@ -84,7 +84,7 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
       val drawSelectionAndPlayback = otherMelody == melodyToRenderSelectionAndPlaybackWith
       canvas.drawNotationMelody(
         otherMelody,
-        drawAlpha = focusedMelody?.let { notationAlpha / 3f } ?: notationAlpha,
+        drawAlpha = viewModel.openedMelody?.let { notationAlpha / 3f } ?: notationAlpha,
         drawColorGuide = false,
         forceDrawColorGuideForCurrentBeat = drawSelectionAndPlayback,
         forceDrawColorGuideForSelectedBeat = drawSelectionAndPlayback,
