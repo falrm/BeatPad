@@ -49,6 +49,7 @@ class MelodyBeatView constructor(
   override val focusedMelody: Melody<*>? get() = viewModel.openedMelody?.let {
     when {
       (viewType as? ViewType.PartView)?.part?.melodies?.contains(it) == true -> it
+      viewType == ViewType.OtherNonDrumParts -> null
       viewType == ViewType.DrumPart && it.drumPart -> it
       viewType != ViewType.DrumPart && !it.drumPart -> it
       else -> null

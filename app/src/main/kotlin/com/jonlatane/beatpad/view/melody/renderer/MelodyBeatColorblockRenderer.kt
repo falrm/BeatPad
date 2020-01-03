@@ -47,7 +47,7 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
         otherMelody,
         stepNoteAlpha = if (focusedMelody == null) 255 else 66,
         drawColorGuide = false,
-        drawRhythm = true,
+        drawRhythm = false,
         alphaSource = colorblockAlpha
       )
     }
