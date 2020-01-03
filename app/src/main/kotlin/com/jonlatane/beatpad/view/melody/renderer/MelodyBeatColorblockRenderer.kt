@@ -36,13 +36,7 @@ interface MelodyBeatColorblockRenderer: BaseMelodyBeatRenderer, MelodyBeatRhythm
       )
     }
 
-    section.melodies.filter { !it.isDisabled }.filter {
-      when (focusedMelody?.limitedToNotesInHarmony) {
-        null  -> it.melody.limitedToNotesInHarmony
-        true  -> it.melody.limitedToNotesInHarmony
-        false -> !it.melody.limitedToNotesInHarmony
-      }
-    }.map { it.melody }.forEach { otherMelody ->
+    sectionMelodiesOfPartType.forEach { otherMelody ->
       canvas.drawColorblockMelody(
         otherMelody,
         stepNoteAlpha = if (focusedMelody == null) 255 else 66,

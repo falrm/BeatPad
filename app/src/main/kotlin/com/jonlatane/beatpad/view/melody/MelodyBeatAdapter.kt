@@ -66,6 +66,7 @@ class MelodyBeatAdapter(
     viewResolver: MelodyBeatHolder.() -> MelodyBeatView
   ) {
     applyToHolders {
+      it.melodyBeatViews.forEach { element -> element.invalidateDrawingLayer() }
       val view = it.viewResolver()
       val oldHeight = if (view.viewType.isUsed) elementHeight else 0
       val newHeight = if (viewType.isUsed) elementHeight else 0
@@ -204,7 +205,16 @@ class MelodyBeatAdapter(
       }
     }
   val recommendedSpanCount: Int
-    get() = max(1, round(viewModel.melodyVerticalScrollView.width.toFloat() / elementWidth).toInt())
+    get() {
+      val basicRecommendation = round(viewModel.melodyVerticalScrollView.width.toFloat() / elementWidth).toInt()
+      val initialDefaultBeatsPerMeasure = viewModel.paletteViewModel.palette.sections.first().harmony.meter.defaultBeatsPerMeasure
+      val basicRecommendationMeasuresPerLine = basicRecommendation / initialDefaultBeatsPerMeasure
+      val actualRecommendation = when {
+        basicRecommendationMeasuresPerLine < 3 -> basicRecommendation
+        else -> basicRecommendationMeasuresPerLine * initialDefaultBeatsPerMeasure
+      }
+      return max(1, actualRecommendation)
+    }
   private val linearLayoutManager = LinearLayoutManager(
     recyclerView.context,
     RecyclerView.HORIZONTAL,
@@ -345,7 +355,7 @@ class MelodyBeatAdapter(
     melodyBeatViews.applyToEach {
       beatPosition = position
       layoutWidth = elementWidth
-      layoutHeight = if (viewType.isUsed == true) elementHeight else 0
+      layoutHeight = if (viewType.isUsed) elementHeight else 0
       this.sectionStartBeatPosition = sectionStartBeatPosition
       invalidateDrawingLayer()
     }

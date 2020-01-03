@@ -43,10 +43,11 @@ class StaffConfigurationToolbar(
     weight = 1f
   }
 
-  private var soloPart: Part? = null
+  var soloPart: Part? = null
   set(value) {
     field = value
     soloPartChooser.updateSmartHolders()
+    viewModel.melodyBeatAdapter.viewType0 = value?.let { ViewType.PartView(it) } ?: ViewType.Unused
   }
   private val soloParts get() = viewModel.palette.parts.filter { !it.drumTrack }
 

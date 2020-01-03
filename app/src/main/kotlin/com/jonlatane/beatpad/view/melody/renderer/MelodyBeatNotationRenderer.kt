@@ -10,6 +10,7 @@ import com.jonlatane.beatpad.model.Harmony
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.model.melody.RationalMelody
+import com.jonlatane.beatpad.view.melody.renderer.BaseMelodyBeatRenderer.ViewType
 import kotlinx.io.pool.DefaultPool
 import kotlinx.io.pool.ObjectPool
 import org.jetbrains.anko.warn
@@ -166,32 +167,6 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
   }
 
   val clefs: List<Clef> get() = listOf(Clef.TREBLE, Clef.BASS)
-
-  val sectionMelodies
-    get() = section.melodies
-      .filter { !it.isDisabled }
-      .map { it.melody }
-
-  val renderedMelodiesCache: CachedProperty<List<Melody<*>>>
-  val renderedMelodies: List<Melody<*>>
-  get() = when(BeatClockPaletteConsumer.playbackMode) {
-    BeatClockPaletteConsumer.PlaybackMode.SECTION -> sectionMelodies
-    BeatClockPaletteConsumer.PlaybackMode.PALETTE -> palette.sections.flatMap {
-      it.melodies.filter { !it.isDisabled }
-    }.map { it.melody }
-  }
-
-  val sectionMelodiesOfPartTypeCache: CachedProperty<List<Melody<*>>>
-  val sectionMelodiesOfPartType: List<Melody<*>>
-    get() = when(viewType) {
-      BaseMelodyBeatRenderer.ViewType.DrumPart -> {
-        sectionMelodies.filter { it.drumPart }
-      }
-      BaseMelodyBeatRenderer.ViewType.OtherNonDrumParts ->
-        arrayOf(focusedMelody).filterNotNull() +
-        sectionMelodies.filter { !it.drumPart }
-      else -> emptyList()
-    }
 
   fun Canvas.drawNotationMelody(
     melody: Melody<*>,

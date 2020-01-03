@@ -3,6 +3,7 @@ package com.jonlatane.beatpad.view.melody.renderer
 import BeatClockPaletteConsumer.viewModel
 import android.graphics.Canvas
 import android.graphics.Rect
+import com.github.yamamotoj.cachedproperty.CachedProperty
 import com.jonlatane.beatpad.model.Melody
 import com.jonlatane.beatpad.model.Part
 import com.jonlatane.beatpad.model.Section
@@ -26,8 +27,12 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
     object Unused: ViewType()
 
     val isUsed get() = when(this) {
-      is PartView       -> false
-      OtherNonDrumParts -> viewModel?.palette?.parts?.any { !it.drumTrack } ?: false
+      is PartView       -> true
+      OtherNonDrumParts -> viewModel?.let { viewModel ->
+        viewModel.palette.parts.any {
+          !it.drumTrack && it != viewModel.staffConfigurationToolbar.soloPart
+        }
+      } ?: false
       DrumPart          -> viewModel?.palette?.parts?.any { it.drumTrack } ?: false
       Unused            -> false
     }
@@ -103,4 +108,35 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
   }
 
   fun invalidateDrawingLayer(): Unit
+  val sectionMelodies
+    get() = section.melodies
+      .filter { !it.isDisabled }
+      .map { it.melody }
+
+  fun melodiesByViewType(viewType: ViewType): List<Melody<*>> =
+    when(viewType) {
+      is ViewType.PartView       -> sectionMelodies.filter {
+        melody -> viewType.part.melodies.any { it == melody }
+      }
+      ViewType.OtherNonDrumParts -> sectionMelodies.filter {  melody ->
+        !melody.drumPart &&
+          viewModel.paletteViewModel.staffConfigurationToolbar.soloPart?.melodies?.none { it == melody } ?: true
+      }
+      ViewType.DrumPart          -> sectionMelodies.filter { it.drumPart }
+      ViewType.Unused            -> emptyList()
+    }
+
+
+  val renderedMelodiesCache: CachedProperty<List<Melody<*>>>
+  val renderedMelodies: List<Melody<*>>
+    get() = when(BeatClockPaletteConsumer.playbackMode) {
+      BeatClockPaletteConsumer.PlaybackMode.SECTION -> sectionMelodies
+      BeatClockPaletteConsumer.PlaybackMode.PALETTE -> palette.sections.flatMap {
+        it.melodies.filter { !it.isDisabled }
+      }.map { it.melody }
+    }
+
+  val sectionMelodiesOfPartTypeCache: CachedProperty<List<Melody<*>>>
+  val sectionMelodiesOfPartType: List<Melody<*>>
+    get() = melodiesByViewType(viewType)
 }

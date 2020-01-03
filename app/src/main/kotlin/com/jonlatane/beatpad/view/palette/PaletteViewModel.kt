@@ -134,7 +134,6 @@ class PaletteViewModel constructor(
       }
       editingMelody = null
       melodyViewVisible = true
-      vibrate(10, 100)
     }
   }
   fun showVerticalSectionList(animated: Boolean = true, endAction: (() -> Unit)? = null) {

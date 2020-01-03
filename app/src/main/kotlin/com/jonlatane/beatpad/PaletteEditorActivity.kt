@@ -75,10 +75,9 @@ class PaletteEditorActivity : Activity(), Storage, AnkoLogger, InstrumentConfigu
       viewModel.harmonyViewModel.beatAdapter.apply {
         elementWidth = minimumElementWidth
       }
+      viewModel.staffConfigurationToolbar.hide(false)
       if (BeatClockPaletteConsumer.playbackMode == BeatClockPaletteConsumer.PlaybackMode.PALETTE) {
         viewModel.beatScratchToolbar.interactionMode = BeatScratchToolbar.InteractionMode.VIEW
-      } else {
-        viewModel.staffConfigurationToolbar.hide(false)
       }
     }
 

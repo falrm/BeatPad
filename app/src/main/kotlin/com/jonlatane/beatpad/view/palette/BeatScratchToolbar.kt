@@ -19,10 +19,7 @@ import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.output.service.PlaybackService
 import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.storage.Storage
-import com.jonlatane.beatpad.util.applyTypeface
-import com.jonlatane.beatpad.util.color
-import com.jonlatane.beatpad.util.incrementUntil
-import com.jonlatane.beatpad.util.isHidden
+import com.jonlatane.beatpad.util.*
 import com.jonlatane.beatpad.view.midi.MidiOutputConfiguration
 import com.jonlatane.beatpad.view.palette.filemanagement.PaletteManagementDialog
 import io.multifunctions.let
@@ -59,6 +56,7 @@ class BeatScratchToolbar(
     padding = dip(0)
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
+      vibrate(10, 100)
       updateAppMenu()
       appMenu.show()
     }
@@ -124,6 +122,7 @@ class BeatScratchToolbar(
     padding = dip(9)
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
+      vibrate(10, 100)
       when(interactionMode) {
         InteractionMode.EDIT -> {
           swapSectionListDisplayModes()
@@ -234,6 +233,7 @@ class BeatScratchToolbar(
     scaleType = ImageView.ScaleType.FIT_CENTER
     isClickable = true
     onClick {
+      vibrate(10, 100)
       interactionMode = InteractionMode.VIEW
     }
   }.beatScratchToolbarStyle()
@@ -242,6 +242,7 @@ class BeatScratchToolbar(
     padding = dip(10)
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
+      vibrate(10, 100)
       interactionMode = InteractionMode.EDIT
     }
   }.beatScratchToolbarStyle()

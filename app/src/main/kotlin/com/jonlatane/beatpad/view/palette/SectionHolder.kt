@@ -219,12 +219,12 @@ class SectionHolder constructor(
     }
     itemView.apply {
       setOnClickListener {
+        vibrate(10, 100)
         if(BeatClockPaletteConsumer.section == section) {
           viewModel.toggleSectionOpenInMelodyView()
         } else {
           BeatClockPaletteConsumer.section = section
           viewModel.sectionListAdapters.forEach { it.recyclerView.updateSmartHolders() }
-          vibrate(10, 100)
         }
       }
       setOnLongClickListener {
