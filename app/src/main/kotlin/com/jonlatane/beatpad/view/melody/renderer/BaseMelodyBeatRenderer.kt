@@ -26,16 +26,7 @@ interface BaseMelodyBeatRenderer: ColorGuide, MelodyBeatEventHandlerBase {
     object DrumPart: ViewType()
     object Unused: ViewType()
 
-    val isUsed get() = when(this) {
-      is PartView       -> true
-      OtherNonDrumParts -> viewModel?.let { viewModel ->
-        viewModel.palette.parts.any {
-          !it.drumTrack && it != viewModel.staffConfigurationToolbar.soloPart
-        }
-      } ?: false
-      DrumPart          -> viewModel?.palette?.parts?.any { it.drumTrack } ?: false
-      Unused            -> false
-    }
+    val isUsed get() = this != Unused
   }
   var viewType: ViewType
   val overallBounds: Rect

@@ -76,7 +76,7 @@ class MelodyBeatAdapter(
         anim.addUpdateListener { valueAnimator ->
           viewModel.melodyView.syncScrollingChordText(false)
         }
-        anim.setDuration(400L).start()
+        anim.setDuration(500L).start()
       }
       when {
         newHeight > oldHeight -> {

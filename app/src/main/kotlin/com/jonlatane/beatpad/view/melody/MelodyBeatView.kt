@@ -19,6 +19,7 @@ import com.jonlatane.beatpad.model.Transposable
 import com.jonlatane.beatpad.model.chord.Chord
 import com.jonlatane.beatpad.util.size
 import com.jonlatane.beatpad.view.colorboard.BaseColorboardView
+import com.jonlatane.beatpad.view.melody.MelodyViewModel.DisplayType
 import com.jonlatane.beatpad.view.melody.input.MelodyBeatEventArticulationHandler
 import com.jonlatane.beatpad.view.melody.input.MelodyBeatEventEditingHandler
 import com.jonlatane.beatpad.view.melody.renderer.MelodyBeatRenderer
@@ -30,6 +31,7 @@ import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.error
 import org.jetbrains.anko.info
+import kotlin.math.max
 
 /**
  * BeatViews
@@ -54,10 +56,13 @@ class MelodyBeatView constructor(
   }
   override var isCurrentlyPlayingBeat = false
   override var isSelectedBeatInHarmony = false
-  override val displayType: MelodyViewModel.DisplayType get() = viewModel.displayType
+  override val displayType: DisplayType get() = viewModel.displayType
   override val renderableToneBounds: Rect = Rect()
   override val colorblockAlpha: Float get() = when {
-    focusedMelody != null -> viewModel.beatAdapter.editingMelodyColorblockAlpha
+    focusedMelody != null -> when(viewModel.displayType) {
+      DisplayType.COLORBLOCK    -> viewModel.beatAdapter.colorblockAlpha
+      DisplayType.NOTATION -> max(viewModel.beatAdapter.colorblockAlpha, viewModel.beatAdapter.editingMelodyColorblockAlpha)
+    }
     else                  -> viewModel.beatAdapter.colorblockAlpha
   }
   override val notationAlpha: Float get() = viewModel.beatAdapter.notationAlpha
