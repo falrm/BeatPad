@@ -162,7 +162,7 @@ class SectionHolder constructor(
                 viewModel.palette.sections,
                 basis = section.name
               ),
-              harmony = section.harmony!!.copy(changes = TreeMap(section.harmony!!.changes)),
+              harmony = section.harmony.copy(id = UUID.randomUUID(), changes = TreeMap(section.harmony.changes)),
               relatedSections = (section.relatedSections + section.id).toMutableSet(),
               melodies = section.melodies.map {
                 it.copy(melody = it.melody)

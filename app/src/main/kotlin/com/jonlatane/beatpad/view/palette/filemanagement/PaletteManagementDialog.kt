@@ -144,6 +144,8 @@ class PaletteManagementDialog(
         }
         if(PlaybackService.instance?.isStopped != false) {
           displayedAlert?.dismiss()
+        } else {
+          paletteRecycler.smoothScrollToPosition(0)
         }
       })
   }

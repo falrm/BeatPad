@@ -220,8 +220,12 @@ class MelodyViewModel(
 	}
 
 	fun updateMelodyDisplay() {
-		MelodyBeatView.PREVIOUS_SIGN_CACHE.evictAll()
-		MelodyBeatView.PLAYBACK_NOTE_CACHE.evictAll()
+    try {
+      MelodyBeatView.PREVIOUS_SIGN_CACHE.evictAll()
+      MelodyBeatView.PLAYBACK_NOTE_CACHE.evictAll()
+    } catch(t: Throwable) {
+      warn("LruCache failed", t)
+    }
 		melodyRecyclerView.applyToHolders<RecyclerView.ViewHolder> {
 			it.itemView.childrenRecursiveSequence().forEach { it.invalidate() }
 		}

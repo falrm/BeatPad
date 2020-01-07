@@ -305,7 +305,7 @@ object ChordExtensionNames {
     0b00100100001 -> listOf()
     0b00100100010 -> listOf()
     0b00100100011 -> listOf()
-    0b00100100100 -> listOf()
+    0b00100100100 -> listOf("dim7")
     0b00100100101 -> listOf()
     0b00100100110 -> listOf()
     0b00100100111 -> listOf()
