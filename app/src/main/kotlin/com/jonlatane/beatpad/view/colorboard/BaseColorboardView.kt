@@ -16,7 +16,7 @@ abstract class BaseColorboardView @JvmOverloads constructor(
 	context: Context,
 	attrs: AttributeSet? = null,
 	defStyle: Int = 0
-) : View(context, attrs, defStyle), CanvasToneDrawer, ColorGuide, AnkoLogger {
+) : View(context, attrs, defStyle), ColorGuide, AnkoLogger {
 	override var chord = Chord(0, Maj7)
 	val drawnAlpha get() = (255 * alpha).toInt()
 	override var colorGuideAlpha = 255

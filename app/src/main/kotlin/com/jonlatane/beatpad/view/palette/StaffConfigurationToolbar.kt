@@ -43,11 +43,13 @@ class StaffConfigurationToolbar(
   var showAccompaniment = true
     set(value) {
       field = value
+      accompanimentButton.alpha = if (value) 1f else 0.5f
       viewModel.melodyBeatAdapter.viewType1 = if (value) ViewType.OtherNonDrumParts else ViewType.Unused
     }
   var showDrums = true
     set(value) {
       field = value
+      drumsButton.alpha = if (value) 1f else 0.5f
       viewModel.melodyBeatAdapter.viewType2 = if (value) ViewType.DrumPart else ViewType.Unused
     }
   private val soloPartChooser: NonDelayedRecyclerView

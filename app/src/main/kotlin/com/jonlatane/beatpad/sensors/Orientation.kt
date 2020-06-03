@@ -8,6 +8,8 @@ import android.hardware.SensorManager
 import com.jonlatane.beatpad.sensors.Orientation.pitch
 import com.jonlatane.beatpad.sensors.Orientation.roll
 import org.jetbrains.anko.AnkoLogger
+import kotlin.math.max
+import kotlin.math.min
 
 object Orientation: AnkoLogger {
     var azimuth = 0f
@@ -43,7 +45,7 @@ object Orientation: AnkoLogger {
      * @return
      */
     fun normalizedDevicePitch(): Float {
-        val normalizedPitch = Math.max(0f, Math.min(1f, (1.58f - pitch * 1.2f) / 3.14f))
+        val normalizedPitch = max(0f, min(1f, (1.58f - pitch * 1.2f) / 3.14f))
         return normalizedPitch
     }
 

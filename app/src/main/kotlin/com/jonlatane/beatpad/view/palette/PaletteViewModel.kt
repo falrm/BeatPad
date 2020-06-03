@@ -4,6 +4,7 @@ package com.jonlatane.beatpad.view.palette
 import BeatClockPaletteConsumer
 import android.content.Context
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import android.widget.TextView
 import com.jonlatane.beatpad.PaletteEditorActivity
 import com.jonlatane.beatpad.R
@@ -456,6 +457,7 @@ class PaletteViewModel constructor(
                   melodyView.animate().alpha(1f).withEndAction {
                     partListTransitionView.alpha = 0f
                     melodyViewModel.onZoomFinished()
+                    partListView.visibility = View.GONE
                   }.start()
                 }
               }.start()
@@ -488,6 +490,7 @@ class PaletteViewModel constructor(
   }
 
   private fun hideMelodyView(oldValue: Melody<*>? = editingMelody) {
+    partListView.visibility = View.VISIBLE
     harmonyView.show()
     partListView.viewHolders<PartHolder>().mapNotNull { partHolder ->
       partHolder.layout.melodyReferenceRecycler.viewHolders<MelodyReferenceHolder>()

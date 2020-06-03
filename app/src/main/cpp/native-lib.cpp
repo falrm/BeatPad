@@ -16,11 +16,12 @@ JNIEXPORT void JNICALL Java_fluidsynth_FluidSynthJNI_init(
     fluid_settings_setstr(settings, "audio.driver", "oboe");
     fluid_settings_setstr(settings, "audio.oboe.performance-mode", "LowLatency");
     fluid_settings_setstr(settings, "audio.sample-format", "16bits");
-//    fluid_settings_setstr(settings, "audio.oboe.sharing-mode", "Exclusive");
+    fluid_settings_setstr(settings, "audio.oboe.sharing-mode", "Exclusive");
 //    fluid_settings_setint(settings, "audio.opensles.use-callback-mode", 1);
+    fluid_settings_setint(settings, "audio.periods", 2);
     fluid_settings_setint(settings, "audio.period-size", periodSize);
     fluid_settings_setint(settings, "audio.sample-rate", sampleRate);
-    fluid_settings_setint(settings, "audio.realtime-prio", 99);
+//    fluid_settings_setint(settings, "audio.realtime-prio", 99);
 //    fluid_settings_setint(settings, "audio.periods", 64);
 
     synth = new_fluid_synth(settings);

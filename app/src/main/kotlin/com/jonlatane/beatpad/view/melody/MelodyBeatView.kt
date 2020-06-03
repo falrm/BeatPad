@@ -43,6 +43,10 @@ class MelodyBeatView constructor(
 ) : BaseColorboardView(context), MelodyBeatRenderer,
   MelodyBeatEventArticulationHandler, MelodyBeatEventEditingHandler, AnkoLogger {
   override var viewType: ViewType = ViewType.OtherNonDrumParts
+  set(value) {
+    field = value
+    visibility = if(value.isUsed) VISIBLE else GONE
+  }
   override val palette get() = viewModel.paletteViewModel.palette
   override var section : Section = Section()
     private set

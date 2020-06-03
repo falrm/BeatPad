@@ -89,7 +89,7 @@ data class Note private constructor(
           }
         }
         9 -> notesFor[tone]!!.first { // Name dim7 chords
-          if (chord.hasDiminished5 && !chord.hasMinor7 && !chord.hasMajor7) {
+          if (chord.hasDiminished5 && chord.hasMinor3 && !chord.hasMinor7 && !chord.hasMajor7) {
             it.letter == rootNote.letter + 6
           } else {
             it.letter == rootNote.letter + 5

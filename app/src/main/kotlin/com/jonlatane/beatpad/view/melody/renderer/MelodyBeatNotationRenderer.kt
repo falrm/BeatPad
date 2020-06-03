@@ -259,7 +259,11 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
     chord: Chord
   ): List<Note> = tones.map {
     val playbackTone = melody.playbackToneUnder(it, chord)
-    Note.nameNoteUnderChord(playbackTone, chord)
+    if(melody.drumPart) {
+      Note.naturalOrSharpNoteFor(playbackTone)
+    } else {
+      Note.nameNoteUnderChord(playbackTone, chord)
+    }
   }
 
   data class PreviousSignRequest(
@@ -311,7 +315,11 @@ interface MelodyBeatNotationRenderer : BaseMelodyBeatRenderer, MelodyBeatRhythmR
 
         val playbackNotes = tones.map {
           val playbackTone = melody.playbackToneUnder(it, chordAtTheTime)
-          Note.nameNoteUnderChord(playbackTone, chordAtTheTime)
+          if(melody.drumPart) {
+            Note.naturalOrSharpNoteFor(playbackTone)
+          } else {
+            Note.nameNoteUnderChord(playbackTone, chord)
+          }
         }
         val matchingNotes = playbackNotes.filter {
           it.heptatonicValue == note.heptatonicValue && it.octave == note.octave

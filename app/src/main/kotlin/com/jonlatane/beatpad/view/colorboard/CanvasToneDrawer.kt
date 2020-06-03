@@ -19,7 +19,6 @@ interface CanvasToneDrawer : AlphaDrawer {
   fun Canvas.renderSteps() {
     paint.color = color(R.color.colorPrimaryDark)
     if (showSteps) {
-      //val halfStepWidth: Float = axisLength / halfStepsOnScreen
       var linePosition = startPoint - 12 * halfStepWidth
       while (linePosition < axisLength) {
         if (renderVertically) {
