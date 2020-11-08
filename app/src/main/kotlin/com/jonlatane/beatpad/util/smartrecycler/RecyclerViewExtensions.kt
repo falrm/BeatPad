@@ -13,7 +13,7 @@ fun <HolderType>RecyclerView.applyToHolders(
 ) {
   viewHolders<HolderType>()
     .forEach { mutation(it) }
-  adapter.notifyDataSetChanged()
+  adapter!!.notifyDataSetChanged()
 }
 
 @Suppress("UNCHECKED_CAST")

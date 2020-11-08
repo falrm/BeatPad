@@ -245,10 +245,18 @@ class SectionHolder constructor(
     val previouslyEditingMelody = viewModel.editingMelody
     viewModel.backStack.push {
       when {
-        previouslyEditingMelody != null -> viewModel.editingMelody = previouslyEditingMelody
-        else                            -> viewModel.melodyViewVisible = false
+        previouslyEditingMelody != null -> {
+          viewModel.editingMelody = previouslyEditingMelody
+          true
+        }
+        viewModel.isInEditMode          -> {
+          viewModel.melodyViewVisible = false
+          true
+        }
+        else                            -> {
+          false
+        }
       }
-      true
     }
     viewModel.editingMelody = null
     viewModel.melodyViewVisible = true

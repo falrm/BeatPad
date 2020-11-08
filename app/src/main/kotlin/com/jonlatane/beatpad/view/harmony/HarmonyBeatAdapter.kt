@@ -55,8 +55,8 @@ class HarmonyBeatAdapter(
 		}
 	}
 
-	override fun onBindViewHolder(holder: HarmonyBeatHolder, beatPosition: Int) {
-		holder.element.beatPosition = beatPosition
+	override fun onBindViewHolder(holder: HarmonyBeatHolder, position: Int) {
+		holder.element.beatPosition = position
     holder.element.layoutWidth = elementWidth
 		holder.element.invalidate()
 	}
@@ -66,6 +66,6 @@ class HarmonyBeatAdapter(
 	}?: 16 // Always render at least one item, for layout sanity. 16 is kind of a hack though.
 
 	override fun invalidate(beatPosition: Int) {
-		recyclerView.layoutManager.findViewByPosition(beatPosition)?.invalidate()
+		recyclerView.layoutManager!!.findViewByPosition(beatPosition)?.invalidate()
 	}
 }

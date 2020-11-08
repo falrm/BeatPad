@@ -163,7 +163,7 @@ fun showInstrumentPicker2(
             }
           }
         ).lparams(matchParent, wrapContent)
-        adapter = recycler.adapter
+        adapter = recycler.adapter!!
       }
     }
   }.show()

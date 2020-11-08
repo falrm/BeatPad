@@ -10,12 +10,16 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.PopupMenu
+import com.google.firebase.auth.FirebaseAuth
 import com.jonlatane.beatpad.BuildConfig
 import com.jonlatane.beatpad.R
 import com.jonlatane.beatpad.model.Palette
+import com.jonlatane.beatpad.showConfirmDialog
 import com.jonlatane.beatpad.storage.Storage
-import com.jonlatane.beatpad.util.*
-import com.jonlatane.beatpad.util.smartrecycler.updateSmartHolders
+import com.jonlatane.beatpad.util.HideAnimation
+import com.jonlatane.beatpad.util.applyTypeface
+import com.jonlatane.beatpad.util.color
+import com.jonlatane.beatpad.util.isHidden
 import com.jonlatane.beatpad.view.midi.MidiOutputConfiguration
 import com.jonlatane.beatpad.view.palette.filemanagement.PaletteManagementDialog
 import io.multifunctions.let
@@ -51,11 +55,21 @@ class BeatScratchToolbar(
     padding = dip(0)
     scaleType = ImageView.ScaleType.FIT_CENTER
     onClick {
+      updateAppMenu()
       appMenu.show()
     }
   }.beatScratchToolbarStyle()
 
-  val paletteTitleMenuItem: MenuItem get() = appMenu.menu.findItem(R.id.paletteName)
+  fun updateAppMenu() {
+    paletteTitleMenuItem.title = Storage.openPaletteFile
+    signInMenuItem.title = FirebaseAuth.getInstance().currentUser?.let {
+      "Sign out ${it.displayName ?: "user"}..."
+    } ?: "Sign in..."
+    appMenu.applyTypeface()
+  }
+
+  private val paletteTitleMenuItem: MenuItem get() = appMenu.menu.findItem(R.id.paletteName)
+  private val signInMenuItem: MenuItem get() = appMenu.menu.findItem(R.id.signIn)
   private val appMenu = PopupMenu(context, appButton).apply {
     inflate(R.menu.beatscratch_app_menu)
 
@@ -73,6 +87,9 @@ class BeatScratchToolbar(
         R.id.copyPalette -> copyPalette()
         R.id.exportMusicXml, R.id.exportMidi -> context.toast("TODO for subscription 💸!")
         R.id.configureMidiSynthesizers -> midiOutputConfigurationAlert.show()
+        R.id.signIn -> FirebaseAuth.getInstance().currentUser?.let {
+          showConfirmDialog(context, "Really sign out?") { viewModel.activity.signOut() }
+        } ?: viewModel.activity.signIn()
         else             -> context.toast("TODO!")
       }
       true
@@ -101,7 +118,7 @@ class BeatScratchToolbar(
       when {
 //        verticalSectionsVisible &&
         !horizontalSectionsVisible -> {
-          viewModel.sectionListRecyclerHorizontal.adapter.notifyDataSetChanged()
+          viewModel.sectionListRecyclerHorizontal.adapter!!.notifyDataSetChanged()
           viewModel.sectionListRecyclerHorizontalRotator.show(
             animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
           )
@@ -114,7 +131,7 @@ class BeatScratchToolbar(
         }
         //horizontalSectionsVisible && !verticalSectionsVisible
         else -> {
-          viewModel.sectionListRecyclerVertical.adapter.notifyDataSetChanged()
+          viewModel.sectionListRecyclerVertical.adapter!!.notifyDataSetChanged()
           viewModel.sectionListRecyclerHorizontalRotator.hide(
             animation = if(portrait) HideAnimation.VERTICAL else HideAnimation.HORIZONTAL
           )
@@ -130,36 +147,49 @@ class BeatScratchToolbar(
   }.beatScratchToolbarStyle()
 
   fun updateButtonColors() {
-    viewMode = viewMode
+    interactionMode = interactionMode
     menuButton.image
       ?.setColorFilter(BeatClockPaletteConsumer.currentSectionColor, PorterDuff.Mode.SRC_IN)
   }
 
-  var viewMode = false
+  enum class InteractionMode { VIEW, EDIT }
+  var interactionMode: InteractionMode = InteractionMode.EDIT
   set(value) {
+    val changed = field != value
     field = value
-    if(value) { viewModeButton to editModeButton } else { editModeButton to viewModeButton }.let {
+    when(value) {
+      InteractionMode.VIEW -> viewModeButton to editModeButton
+      InteractionMode.EDIT -> editModeButton to viewModeButton
+    }.let {
       activeModeButton, inactiveModeButton ->
       inactiveModeButton?.backgroundResource = R.drawable.toolbar_button_beatscratch
       inactiveModeButton?.image
         ?.setColorFilter(BeatClockPaletteConsumer.currentSectionColor, PorterDuff.Mode.SRC_IN)
-      activeModeButton?.backgroundResource = R.drawable.toolbar_button_active_instrument
+      activeModeButton?.backgroundResource = R.drawable.toolbar_button_active
       activeModeButton?.image?.colorFilter = null
     }
     viewModeButton.padding = dip(9)
     editModeButton.padding = dip(9)
+    if(changed) {
+      viewModel.notifyInteractionModeChanged()
+    }
   }
   val viewModeButton: ImageButton = imageButton {
     imageResource = R.drawable.view_score
     padding = dip(7)
     scaleType = ImageView.ScaleType.FIT_CENTER
     isClickable = true
-    onClick { context.toast("TODO!") }
+    onClick {
+      interactionMode = InteractionMode.VIEW
+    }
   }.beatScratchToolbarStyle()
   val editModeButton: ImageButton = imageButton {
     imageResource = R.drawable.edit_black
     padding = dip(10)
     scaleType = ImageView.ScaleType.FIT_CENTER
+    onClick {
+      interactionMode = InteractionMode.EDIT
+    }
   }.beatScratchToolbarStyle()
 
   init { updateButtonColors() }

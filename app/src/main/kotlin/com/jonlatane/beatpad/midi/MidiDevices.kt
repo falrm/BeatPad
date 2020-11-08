@@ -1,17 +1,33 @@
 package com.jonlatane.beatpad.midi
 
+import BeatClockPaletteConsumer
 import android.content.Context
 import android.content.pm.PackageManager
 import android.media.midi.*
 import android.os.Build
 import android.os.Handler
+import android.os.HandlerThread
 import android.support.annotation.RequiresApi
 import com.jonlatane.beatpad.MainApplication
-import android.os.HandlerThread
 import com.jonlatane.beatpad.output.instrument.MIDIInstrument
-import org.jetbrains.anko.*
+import kotlinx.io.core.Closeable
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.toast
 
 object MidiDevices : AnkoLogger {
+	data class BSMidiDevice(
+		val info: MidiDeviceInfo,
+		val device: MidiDevice,
+		val inputPort: MidiInputPort?,
+		val outputPort: MidiOutputPort?
+	): Closeable {
+		override fun close() {
+			device.close()
+			inputPort?.close()
+			outputPort?.close()
+		}
+	}
+	val devices = mutableListOf<BSMidiDevice>()
 
 	@get:RequiresApi(Build.VERSION_CODES.M)
 	internal val manager: MidiManager by lazy {
@@ -54,8 +70,8 @@ object MidiDevices : AnkoLogger {
 				@RequiresApi(Build.VERSION_CODES.M)
 				override fun onDeviceRemoved(info: MidiDeviceInfo) {
 					context.toast("Disconnected from ${info.name}.")
-					MidiSynthesizers.destroySynthesizer(info)
-					MidiControllers.destroyController(info)
+					devices.find { it.info == info }?.close()
+					devices.removeAll { it.info == info }
 				}
 
 				override fun onDeviceStatusChanged(status: MidiDeviceStatus) {}
@@ -66,13 +82,17 @@ object MidiDevices : AnkoLogger {
 
 	@RequiresApi(Build.VERSION_CODES.M)
 	private fun setupDevice(info: MidiDeviceInfo) {
-		// Again, kinda weirdly, we'll be using input ports to set up output devices
-		if (info.inputPortCount > 0) {
-			MidiSynthesizers.setupSynthesizer(info)
-		}
-		if (info.outputPortCount > 0) {
-			MidiControllers.setupController(info)
-		}
+		manager.openDevice(info, { device ->
+			// Again, kinda weirdly, we'll be using input ports to set up output devices
+			val inputPort = if (info.inputPortCount > 0) {
+				MidiSynthesizers.setupSynthesizer(info, device)
+			} else null
+			val outputPort = if (info.outputPortCount > 0) {
+				MidiControllers.setupController(info, device)
+			} else null
+			devices += BSMidiDevice(info, device, inputPort, outputPort)
+			refreshInstruments()
+		}, handler)
 	}
 
 	@get:RequiresApi(Build.VERSION_CODES.M)

@@ -46,7 +46,9 @@ class MelodyBeatView constructor(
     showSteps = true
   }
 
+  override var sectionStartBeatPosition: Int = 0
   override var beatPosition = 0
+  override val palette get() = viewModel.paletteViewModel.palette
   override val melody: Melody<*>? get() = viewModel.openedMelody
 
   override val downPointers = SparseArray<PointF>()

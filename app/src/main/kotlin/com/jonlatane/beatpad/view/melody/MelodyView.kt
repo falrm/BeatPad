@@ -142,7 +142,7 @@ class MelodyView(
 					overScrollMode = View.OVER_SCROLL_NEVER
 					viewModel.melodyBeatAdapter = MelodyBeatAdapter(this@with, this)
 					adapter = viewModel.melodyBeatAdapter
-					adapter.registerAdapterDataObserver(
+					adapter!!.registerAdapterDataObserver(
 						object : RecyclerView.AdapterDataObserver() {
 							override fun onItemRangeInserted(start: Int, count: Int) {
 								//updateEmptyViewVisibility(this@recyclerView)

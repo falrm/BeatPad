@@ -132,8 +132,8 @@ class PaletteManagementDialog(
     saveButton.onClick {
       val name = editPaletteName.text.toString()
       mode.run { onSubmit(name) }
-      paletteRecycler.adapter.notifyDataSetChanged()
-      paletteViewModel.beatScratchToolbar.paletteTitleMenuItem.title = name
+      paletteRecycler.adapter!!.notifyDataSetChanged()
+      paletteViewModel.beatScratchToolbar.updateAppMenu()
       //(paletteRecycler.adapter as SmartAdapter).updateSmartHolders()
     }
 
@@ -162,7 +162,7 @@ class PaletteManagementDialog(
     editPaletteName.isEnabled = mode.textEditable
     editPaletteName.text.clear()
     editPaletteName.text.append(mode.defaultText(storageContext))
-    paletteRecycler.adapter.notifyDataSetChanged()
+    paletteRecycler.adapter!!.notifyDataSetChanged()
     (alert.show() as AlertDialog).apply {
       setOnCancelListener { MainApplication.intentPalette = null }
       setOnDismissListener { MainApplication.intentPalette = null }

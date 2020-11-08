@@ -98,6 +98,7 @@ interface Storage : AnkoLogger {
           toast("Welcome! Starting you off with ${preset.title}.")
           openPaletteFile = preset.title
           startWithPresetPalette = false
+          BeatClockPaletteConsumer.viewModel?.saveAfterDelay()
           preset.palette
         } else {
           error("Failed to load any palette data, starting from scratch...", t)

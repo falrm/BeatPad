@@ -32,7 +32,7 @@ inline fun ViewManager.sectionListView(
 			isItemPrefetchEnabled = false
 		}
 		overScrollMode = View.OVER_SCROLL_NEVER
-		adapter.registerAdapterDataObserver(
+		adapter!!.registerAdapterDataObserver(
 			object : RecyclerView.AdapterDataObserver() {
 				override fun onItemRangeInserted(start: Int, count: Int) {
 					//updateEmptyViewVisibility(this@recyclerView)

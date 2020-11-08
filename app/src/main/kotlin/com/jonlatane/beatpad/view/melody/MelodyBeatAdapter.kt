@@ -12,11 +12,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.LinearLayout
+import com.jonlatane.beatpad.model.Palette
 import com.jonlatane.beatpad.model.Pattern
+import com.jonlatane.beatpad.model.Section
 import com.jonlatane.beatpad.util.*
 import com.jonlatane.beatpad.util.smartrecycler.SmartAdapter
 import com.jonlatane.beatpad.util.smartrecycler.applyToHolders
 import com.jonlatane.beatpad.view.harmony.HarmonyBeatView
+import com.jonlatane.beatpad.view.palette.BeatScratchToolbar
 import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7._RecyclerView
 import kotlin.math.ceil
@@ -34,6 +37,14 @@ class MelodyBeatAdapter(
     const val initialBeatHeightDp: Float = 400f
     const val minimumBeatWidthDp: Float = 30f
     const val maximumBeatHeightDp: Float = 10000f
+    fun sectionAndStartBeat(palette: Palette, beatPosition: Int)
+      = palette.sections.fold<Section, Pair<Section?, Int>>(null to 0) { (sectionAtPosition: Section?, sum), section ->
+      val sectionBeatLength = section.harmony.run { length / subdivisionsPerBeat }
+      when {
+        sum + sectionBeatLength <= beatPosition -> section to sum + sectionBeatLength
+        else -> sectionAtPosition to sum
+      }
+    }
   }
 
   private val axis get() = viewModel.verticalAxis!!
@@ -259,6 +270,22 @@ class MelodyBeatAdapter(
   override fun onBindViewHolder(holder: MelodyBeatHolder, position: Int) = with(holder) {
 //    element.layoutWidth = elementWidth
 //    element.layoutHeight = elementHeight + harmonyViewHeight
+    melodyBeatView.sectionStartBeatPosition = when(viewModel.paletteViewModel.interactionMode) {
+      BeatScratchToolbar.InteractionMode.EDIT -> 0
+      BeatScratchToolbar.InteractionMode.VIEW -> sectionAndStartBeat(
+        viewModel.paletteViewModel.palette,
+        position
+      ).second
+      /*{
+        viewModel.paletteViewModel.palette.sections.fold(0) { sum, section ->
+          val sectionBeatLength = section.harmony.run { length / subdivisionsPerBeat }
+          when {
+            sum + sectionBeatLength <= position -> sum + sectionBeatLength
+            else -> sum
+          }
+        }
+      }*/
+    }
     melodyBeatView.beatPosition = position
     melodyBeatView.layoutWidth = elementWidth
     melodyBeatView.layoutHeight = elementHeight
@@ -272,17 +299,17 @@ class MelodyBeatAdapter(
 
   val Pattern<*>.itemCount get() = ceil(length.toDouble()/subdivisionsPerBeat).toInt()
 
-  override fun getItemCount(): Int = viewModel.run {
-    when(sectionLayoutType) {
-      MelodyViewModel.SectionLayoutType.SINGLE_SECTION ->
+  override fun getItemCount(): Int = with(viewModel) { with(viewModel.paletteViewModel) {
+    when(interactionMode) {
+      BeatScratchToolbar.InteractionMode.EDIT   ->
         harmony?.itemCount
           ?: openedMelody?.itemCount
           ?: 0
-      MelodyViewModel.SectionLayoutType.FULL_PALETTE ->
+      BeatScratchToolbar.InteractionMode.VIEW ->
         paletteViewModel.palette.sections.fold(0) { sum, section ->
           sum + section.harmony.itemCount
         }
-    }
+    } }
   }
 
   override fun invalidate(beatPosition: Int) {
@@ -290,9 +317,8 @@ class MelodyBeatAdapter(
       harmonyBeatView.invalidate()
       melodyBeatView.invalidate()
     }
-    (recyclerView.layoutManager.findViewByPosition(beatPosition) as? ViewGroup)?.apply {
+    (recyclerView.layoutManager!!.findViewByPosition(beatPosition) as? ViewGroup)?.apply {
       (0 until childCount).map { getChildAt(it) }.forEach { it.invalidate() }
     }
   }
-
 }
